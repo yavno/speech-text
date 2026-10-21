@@ -234,7 +234,10 @@ much, and stop competing for a runner with the tests.
 A hosted runner starts empty, so WhisperKit, FluidAudio and Sparkle would be
 cloned on every run. `-clonedSourcePackagesDirPath .swiftpm-cache` puts them
 somewhere `actions/cache` can keep, keyed on the hash of `Package.resolved` —
-which pins all three, so it is exactly the right key.
+which pins all three, so it is exactly the right key. The step runs on a hosted
+runner only: on the self-hosted Mac it downloaded the 614 MB archive on every run
+(6.5 of the Tests job's 9 minutes on 2026-10-21) into a folder checkout had just
+cleaned, while xcodebuild resolves from SwiftPM's own cache there in seconds.
 
 ### Compiler warnings
 

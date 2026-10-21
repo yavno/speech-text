@@ -72,9 +72,15 @@ jobs:
 
       # A hosted runner starts empty, so WhisperKit, FluidAudio and Sparkle are
       # cloned from scratch on every run unless they are kept. Package.resolved
-      # pins all three, so its hash is exactly the right key. It is a no-op on
-      # the self-hosted Mac, which has them already.
+      # pins all three, so its hash is exactly the right key.
+      #
+      # Hosted only. On the self-hosted Mac the restore was no no-op: it pulled the
+      # whole 614 MB archive from GitHub at about 1.6 MB/s, 6.5 of the job's 9
+      # minutes (2026-10-21), and checkout's clean had just deleted the folder it
+      # fills. Without it xcodebuild resolves from SwiftPM's own cache on that
+      # machine — the run with no archive yet resolved and tested in 54 s.
       - name: Cache the resolved packages
+        if: runner.environment == 'github-hosted'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .swiftpm-cache
