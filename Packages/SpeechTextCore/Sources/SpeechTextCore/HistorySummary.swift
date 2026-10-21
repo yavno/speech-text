@@ -596,7 +596,8 @@ public struct HistoryRowFits: Sendable {
 
 public enum HistoryFormat {
     /// Made once per format and calendar: a `DateFormatter` is costly to build, and every
-    /// History row asks for its clock each time it is drawn.
+    /// History row asks for its clock each time it is drawn. Under `formattersLock`, which
+    /// is what makes the unchecked access safe.
     nonisolated(unsafe) private static var formatters: [String: DateFormatter] = [:]
     private static let formattersLock = NSLock()
 

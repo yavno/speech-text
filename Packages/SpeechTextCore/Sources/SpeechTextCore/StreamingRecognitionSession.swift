@@ -464,17 +464,8 @@ public final class StreamingRecognitionSession: RecognitionSession {
     }
 }
 
-/// A weak reference to an object that is not `Sendable`, carried into a
-/// `MainActor.run` hop and read only there, on main, where every other use of the
-/// object happens too. Swift 6.2 can say this with `nonisolated(unsafe) weak let`;
-/// the project still builds with Swift 6.0 tools (Xcode 16), so it is a box.
-public final class MainActorWeakRef<Object: AnyObject>: @unchecked Sendable {
-    public weak var object: Object?
-    public init(_ object: Object?) { self.object = object }
-}
-
 /// The session's `OpenSegmentClock`: fed on the audio thread, told on main that the
-/// server closed a segment.
+/// server closed a segment. `@unchecked Sendable`: `value` is held under `lock`.
 private final class OpenSegmentBox: @unchecked Sendable {
     private let lock = NSLock()
     private var value: OpenSegmentClock

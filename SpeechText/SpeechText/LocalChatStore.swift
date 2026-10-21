@@ -155,6 +155,9 @@ func sha256Hex(of file: URL) throws -> String {
 /// location that is deleted when its delegate call returns, so it is moved into `staging`
 /// there; an interrupted download leaves its resume data in `staging/resume.data`, and
 /// beside it in `resume.bytes` how much of the file that partial download holds.
+/// `@unchecked Sendable`: URLSession calls it on its own queue, and what that shares with
+/// `run` and `cancel` — the continuation, the task, `onDisk` — is held under `lock`;
+/// `session` is set once, before the task starts.
 final class GGUFDownload: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     private let staging: URL
     private let expectedBytes: Int64

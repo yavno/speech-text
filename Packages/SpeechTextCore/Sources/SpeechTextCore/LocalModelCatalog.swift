@@ -438,6 +438,9 @@ public final class DownloadProgressThrottle: @unchecked Sendable {
 /// on the catalogue entry's `LocalSTTEngine`) and everything else talks to this box.
 /// Unregistered — which is exactly the test target's state — the tier reports itself
 /// unavailable instead of crashing.
+///
+/// Each box is written once, on main, at launch, before anything reads it: that is what
+/// makes the unchecked access safe.
 public enum LocalSTT {
     /// Builds a batch provider for an installed model ID. Replaced at launch.
     public nonisolated(unsafe) static var transcriberFactory: (String) -> BatchTranscriber = {

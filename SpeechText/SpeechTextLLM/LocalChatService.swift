@@ -11,6 +11,8 @@ import ChatTemplates
 /// Idle, the service exits: the weights are mapped from disk and the KV cache is
 /// gigabytes, which a menu bar app has no business holding between dictations. launchd
 /// starts it again on the next message, and the next rewrite pays the load.
+/// `@unchecked Sendable`: XPC calls it on any thread; `activity` and `idleTimer` are held
+/// under `lock`, and the runtime serialises its own jobs.
 final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sendable {
     static let shared = LocalChatService()
 

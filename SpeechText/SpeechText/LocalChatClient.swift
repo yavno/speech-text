@@ -70,7 +70,8 @@ enum LocalChatError: LocalizedError {
 
 /// The one connection to the service. launchd starts the service on the first message
 /// and again after it exits (idle, or a crash): an interrupted connection stays usable, so
-/// only an invalidated one is replaced.
+/// only an invalidated one is replaced. `@unchecked Sendable`: `connection` and
+/// `serviceMayBeRunning` are held under `lock`.
 final class LocalChatConnection: @unchecked Sendable {
     static let shared = LocalChatConnection()
 
