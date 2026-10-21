@@ -37,7 +37,9 @@ enum RecordingPhase: Equatable {
     var isStartingEngine: Bool { self == .starting }
 }
 
-@Observable
+/// Main-actor state. The audio thread reaches only the writer and the session's `feed`,
+/// and `engineQueue` only the capture it is handed.
+@MainActor @Observable
 final class SpeechEngine {
     private(set) var phase: RecordingPhase = .idle {
         didSet {
@@ -93,8 +95,8 @@ final class SpeechEngine {
     var barLevels: [CGFloat] = Array(repeating: 0, count: 12)
     /// The latest per-segment levels from the audio thread, and whether a main-queue hop
     /// to fold them into `barLevels` is already scheduled — see `installAudioTap`.
-    private let levelBox = LevelBox()
-    private let levelHopPending = AtomicFlag()
+    private nonisolated let levelBox = LevelBox()
+    private nonisolated let levelHopPending = AtomicFlag()
 
     /// Kept alive between sessions so the speech model stays loaded (~300-500ms to
     /// create); rebuilt only when the locale changes.
@@ -142,8 +144,9 @@ final class SpeechEngine {
     /// nothing there means "just polish", and the edit writes its own record.
     var recordsEmptyOutcomes = true
 
-    func requestMicrophoneAccess(completion: @escaping (Bool) -> Void) {
-        AVCaptureDevice.requestAccess(for: .audio) { granted in
+    func requestMicrophoneAccess(completion: @escaping @MainActor @Sendable (Bool) -> Void) {
+        // `@Sendable`: the answer comes on a queue of AVFoundation's.
+        AVCaptureDevice.requestAccess(for: .audio) { @Sendable granted in
             DispatchQueue.main.async {
                 completion(granted)
             }
@@ -274,49 +277,45 @@ final class SpeechEngine {
         // send it a second time — that produced duplicate requests (and duplicate
         // history entries, and duplicate billing) for one recording.
         segmentFinishStarted = true
-        // Unchecked for the reason given in the task below, which hands it to main.
-        nonisolated(unsafe) let writer = audioBufferWriter
+        let writer = audioBufferWriter
         let locale = configuration.historyLocale
         dlog("Engine", "pauseRecording(\(configuration.streams ? "stream" : "batch")): starting transcription task")
 
         transcriptionTask?.cancel()
         transcriptionTask = Task { [weak self] in
             guard let self else { return }
-            // Handed to the main actor unchecked: the engine is not `Sendable`, but this
-            // task touches it only inside `MainActor.run`, on main, where the rest of its
-            // state is read and written too. The same for `writer`: the session's own use
-            // of it off main (the tap appends, `finish()` encodes and uploads) is over by
-            // the time `MainActor.run` runs, after `finish()` has returned, and
-            // `recordOutcome` uses it on main as it always did. Nothing is shared that was
-            // not shared this way before; the checker is only told so.
-            nonisolated(unsafe) let engine = self
-            var finished = await session.finish()
-            finished.text = configuration.finished(finished.text)
-            let outcome = finished
+            let outcome = await Self.finishSegment(session, configuration: configuration)
             // A cancel can land while the upload is still in flight. If the reply came
             // back first, the segment was still transcribed, so it is still written to
             // History — but nothing that belongs to the engine's state now is touched.
             // A resume no longer cancels this task: it waits for the segment to land.
             let superseded = Task.isCancelled
-            await MainActor.run {
-                engine.recordOutcome(outcome, writer: writer, locale: locale,
-                                     superseded: superseded)
-                guard !superseded else { return }
-                if outcome.error == nil {
-                    engine.spanLayer.commitSegment(outcome.text)
-                    engine.spanLayer.settleSegment()
-                    if !outcome.text.isEmpty {
-                        engine.setPendingInsertion(outcome.text)
-                    }
-                }
-                // Still paused (a stop in the meantime moved on to .finishing and its
-                // waiter owns the transition): the segment has landed.
-                if case .paused(segmentInFlight: true) = engine.phase {
-                    engine.phase = .paused(segmentInFlight: false)
-                    if let resumeLocale { engine.resumeRecording(locale: resumeLocale) }
+            self.recordOutcome(outcome, writer: writer, locale: locale, superseded: superseded)
+            guard !superseded else { return }
+            if outcome.error == nil {
+                self.spanLayer.commitSegment(outcome.text)
+                self.spanLayer.settleSegment()
+                if !outcome.text.isEmpty {
+                    self.setPendingInsertion(outcome.text)
                 }
             }
+            // Still paused (a stop in the meantime moved on to .finishing and its
+            // waiter owns the transition): the segment has landed.
+            if case .paused(segmentInFlight: true) = self.phase {
+                self.phase = .paused(segmentInFlight: false)
+                if let resumeLocale { self.resumeRecording(locale: resumeLocale) }
+            }
         }
+    }
+
+    /// The session's answer with the finished text, worked out off main: `finish()` is
+    /// nonisolated, and the text pass after it ran off main before the engine was a
+    /// main-actor type, as it still does. The task that awaits this is the engine's, on main.
+    private nonisolated static func finishSegment(_ session: RecognitionSession,
+                                                  configuration: RecordingConfiguration) async -> RecognitionOutcome {
+        var finished = await session.finish()
+        finished.text = configuration.finished(finished.text)
+        return finished
     }
 
     func resumeRecording(locale: String = "en-US") {
@@ -544,7 +543,7 @@ final class SpeechEngine {
                 try engine.start()
             } catch {
                 let desc = error.localizedDescription
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
                     guard let self, self.engineStartToken == token else { return }
                     seLog.error("startAudioEngine: audio engine failed to start: \(desc, privacy: .public)")
                     let message = "Audio engine failed to start: \(desc)"
@@ -745,48 +744,36 @@ final class SpeechEngine {
         _ = session.pause()
 
         phase = .finishing
-        // Unchecked for the reason given in the task below, which hands it to main.
-        nonisolated(unsafe) let writer = audioBufferWriter
+        let writer = audioBufferWriter
         let locale = configuration.historyLocale
         let tier = configuration.provider == .apple ? "apple" : (configuration.streams ? "stream" : "batch")
         dlog("Engine", "stopRecording(\(tier)): liveText=\(liveText.count) chars, starting transcription task")
 
         transcriptionTask = Task { [weak self] in
             guard let self else { return }
-            // Handed to the main actor unchecked: the engine is not `Sendable`, but this
-            // task touches it only inside `MainActor.run`, on main, where the rest of its
-            // state is read and written too. The same for `writer`: the session's own use
-            // of it off main (the tap appends, `finish()` encodes and uploads) is over by
-            // the time `MainActor.run` runs, after `finish()` has returned, and
-            // `recordOutcome` uses it on main as it always did. Nothing is shared that was
-            // not shared this way before; the checker is only told so.
-            nonisolated(unsafe) let engine = self
-            var finished = await session.finish()
-            finished.text = configuration.finished(finished.text)
+            var finished = await Self.finishSegment(session, configuration: configuration)
             if let reason, !finished.cancelled, finished.text.isEmpty, finished.error == nil {
                 finished.error = reason
             }
             let outcome = finished
-            await MainActor.run {
-                // A stale task must never touch a newer session's state — but the
-                // outcome may still own a segment file (the upload finished before the
-                // cancel landed), and `recordOutcome` will never run to release it.
-                guard !Task.isCancelled else {
-                    if let url = outcome.audioFileURL { AudioBufferWriter.cleanup(fileURL: url) }
-                    return
-                }
-                engine.recordOutcome(outcome, writer: writer, locale: locale)
-                engine.finalText = outcome.text
-                engine.spanLayer.commitSegment(outcome.text)
-                engine.spanLayer.settleSegment()
-                // A stop nobody asked for: the Record Window takes a pause's segments only,
-                // and would otherwise never show these words.
-                if reason != nil, !outcome.text.isEmpty {
-                    engine.setPendingInsertion(outcome.text)
-                }
-                engine.phase = .idle
-                engine.cleanup()
+            // A stale task must never touch a newer session's state — but the
+            // outcome may still own a segment file (the upload finished before the
+            // cancel landed), and `recordOutcome` will never run to release it.
+            guard !Task.isCancelled else {
+                if let url = outcome.audioFileURL { AudioBufferWriter.cleanup(fileURL: url) }
+                return
             }
+            self.recordOutcome(outcome, writer: writer, locale: locale)
+            self.finalText = outcome.text
+            self.spanLayer.commitSegment(outcome.text)
+            self.spanLayer.settleSegment()
+            // A stop nobody asked for: the Record Window takes a pause's segments only,
+            // and would otherwise never show these words.
+            if reason != nil, !outcome.text.isEmpty {
+                self.setPendingInsertion(outcome.text)
+            }
+            self.phase = .idle
+            self.cleanup()
         }
     }
 
@@ -805,21 +792,14 @@ final class SpeechEngine {
                 // `pending` is no longer reachable from `transcriptionTask`, and left
                 // alive its completion would run against whatever newer session the
                 // engine holds by then (and the abandoned upload would still be billed).
-                //
-                // The engine goes to the main actor unchecked and still weak: it is not
-                // `Sendable`, but it is read only inside `MainActor.run`, on main, where
-                // every other use of it happens too.
-                let weakEngine = MainActorWeakRef(self)
                 await withTaskCancellationHandler {
                     await pending.value
-                    await MainActor.run {
-                        guard let engine = weakEngine.object, !Task.isCancelled else { return }
-                        if engine.finalText.isEmpty {
-                            engine.finalText = engine.liveText
-                        }
-                        engine.phase = .idle
-                        engine.cleanup()
+                    guard let self, !Task.isCancelled else { return }
+                    if self.finalText.isEmpty {
+                        self.finalText = self.liveText
                     }
+                    self.phase = .idle
+                    self.cleanup()
                 } onCancel: {
                     pending.cancel()
                 }
@@ -957,15 +937,12 @@ final class SpeechEngine {
         writer.prepare(sourceFormat: hwFormat)
         dlog("Engine", "input format: \(Int(hwFormat.sampleRate)) Hz, \(hwFormat.channelCount) ch")
 
-        // A selected microphone whose format the node had not caught up with would be
-        // converted at the wrong rate — the upload sped up or slowed down. Said once.
-        var reportedFormatMismatch = false
         // Fresh for every tap, so a new device is scaled from the defaults rather than
         // from the loudness of the one before it.
-        var normalizer = LevelNormalizer()
+        let scratch = TapScratch()
         audioEngine.installTap { [weak self] buffer in
-            if !reportedFormatMismatch, buffer.format.sampleRate != hwFormat.sampleRate {
-                reportedFormatMismatch = true
+            if !scratch.reportedFormatMismatch, buffer.format.sampleRate != hwFormat.sampleRate {
+                scratch.reportedFormatMismatch = true
                 dlog("Engine", "⚠ tap delivers \(Int(buffer.format.sampleRate)) Hz, prepared for \(Int(hwFormat.sampleRate)) Hz", level: .notice)
             }
             let pcm = writer.append(buffer)
@@ -976,8 +953,8 @@ final class SpeechEngine {
             // avoidable: the levels go into a box the display reads on its own clock,
             // and the hop is taken only when none is already pending.
             let seconds = Double(buffer.frameLength) / max(buffer.format.sampleRate, 1)
-            self.levelBox.store(normalizer.levels(rms: Self.perSegmentRMS(buffer: buffer, count: 12),
-                                                  seconds: seconds))
+            self.levelBox.store(scratch.normalizer.levels(rms: Self.perSegmentRMS(buffer: buffer, count: 12),
+                                                          seconds: seconds))
             if !self.levelHopPending.swap(true) {
                 DispatchQueue.main.async {
                     self.levelHopPending.swap(false)
@@ -1095,7 +1072,7 @@ final class SpeechEngine {
     /// that re-prepares the writer next and must know no callback is inside `append`.
     private func stopAudioEngine(_ engine: AudioCapture, waiting: Bool = false) {
         engineStartToken += 1
-        let stop = {
+        let stop: @Sendable () -> Void = {
             engine.stop()
             engine.removeTap()
         }
@@ -1134,7 +1111,7 @@ final class SpeechEngine {
     /// Split the audio buffer into N segments and compute RMS for each, raw — the
     /// display's scale is `LevelNormalizer`'s.
     /// Each bar gets a different time-slice of the actual audio → natural asymmetry.
-    private static func perSegmentRMS(buffer: AVAudioPCMBuffer, count: Int) -> [Float] {
+    private nonisolated static func perSegmentRMS(buffer: AVAudioPCMBuffer, count: Int) -> [Float] {
         guard let data = buffer.floatChannelData else {
             return Array(repeating: 0, count: count)
         }
@@ -1163,9 +1140,19 @@ final class SpeechEngine {
 
 // MARK: - Audio-thread hand-off
 
+/// What one tap keeps between its buffers. `@unchecked Sendable`: only that tap's
+/// callbacks touch it, and they run one after another.
+private final class TapScratch: @unchecked Sendable {
+    /// A selected microphone whose format the node had not caught up with would be
+    /// converted at the wrong rate — the upload sped up or slowed down. Said once.
+    var reportedFormatMismatch = false
+    var normalizer = LevelNormalizer()
+}
+
 /// The most recent levels the tap computed. Written on the audio thread, read on main;
 /// a lock around twelve values is cheaper than a block allocation per buffer.
-private final class LevelBox {
+/// `@unchecked Sendable`: `levels` is held under `lock`.
+private final class LevelBox: @unchecked Sendable {
     private var levels: [CGFloat] = []
     private let lock = NSLock()
 
@@ -1179,8 +1166,9 @@ private final class LevelBox {
     }
 }
 
-/// A boolean that can be set-and-read atomically from two threads.
-private final class AtomicFlag {
+/// A boolean that can be set-and-read atomically from two threads. `@unchecked Sendable`:
+/// `value` is held under `lock`.
+private final class AtomicFlag: @unchecked Sendable {
     private var value = false
     private let lock = NSLock()
 

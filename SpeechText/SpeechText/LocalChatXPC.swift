@@ -14,19 +14,21 @@ import ChatTemplates
 /// classes and both sides decode the same `Codable` types.
 let localChatServiceName = "app.speech-text.SpeechText.LLM"
 
-@objc protocol LocalChatServiceProtocol {
+/// `Sendable`, and every reply block with it: an XPC proxy and the replies it hands the
+/// service may be called from any thread, once.
+@objc protocol LocalChatServiceProtocol: Sendable {
     /// Loads the model if it is not already the one in memory, then answers. `reply` gets
     /// a JSON `LocalChatResponse`, or nil and the error's message.
-    func complete(_ request: Data, reply: @escaping (Data?, String?) -> Void)
+    func complete(_ request: Data, reply: @escaping @Sendable (Data?, String?) -> Void)
     /// Loads the model ahead of the first request — a cold load takes seconds — and reads
     /// the request's `prefixes`, the system prompts, which take seconds more.
-    func prewarm(_ request: Data, reply: @escaping (String?) -> Void)
+    func prewarm(_ request: Data, reply: @escaping @Sendable (String?) -> Void)
     /// Stops the completion with this `LocalChatRequest.id`: before its model loads, before
     /// it reads its prompt, or at its next token — and no other.
     func cancel(_ requestID: String)
     /// Drops the model at `modelPath` from memory if it is the one loaded — a removed
     /// download. Any other model stays: it may be the one in use.
-    func unload(_ modelPath: String, reply: @escaping () -> Void)
+    func unload(_ modelPath: String, reply: @escaping @Sendable () -> Void)
 }
 
 struct LocalChatRequest: Codable, Equatable {

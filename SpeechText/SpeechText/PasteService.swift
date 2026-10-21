@@ -6,6 +6,7 @@ import ApplicationServices
 import Carbon.HIToolbox
 import SpeechTextCore
 
+@MainActor
 struct PasteService {
     /// Pastes text at the current cursor position, preserving the user's clipboard.
     /// Saves clipboard contents, pastes via ⌘V, then restores the original clipboard.
@@ -644,9 +645,13 @@ struct PasteService {
         AXIsProcessTrusted()
     }
 
+    /// `kAXTrustedCheckOptionPrompt`'s value. The constant is a C global `var`, which Swift 6
+    /// will not read from a nonisolated context; its value is this string, and fixed.
+    static let trustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt"
+
     /// Prompt the user to grant accessibility permission
     static func promptAccessibility() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+        let options = [trustedCheckOptionPrompt: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
     }
 

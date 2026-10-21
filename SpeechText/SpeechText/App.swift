@@ -70,6 +70,7 @@ enum AppVersion {
 
 /// The About panel's credits: the update status, then the links. Centred, small, in
 /// the label colours so Dark Mode reads.
+@MainActor
 enum AboutCredits {
     static func make() -> NSAttributedString {
         let paragraph = NSMutableParagraphStyle()
@@ -121,16 +122,20 @@ enum AboutCredits {
 /// History is written on the main thread; read from anywhere else it gives nothing, the
 /// kept counts are left alone, and the terms keep their date order.
 func registerVocabularyHistory() {
-    let counts = HistoryTermCounts()
+    // Touched only on main, behind the guard below, which is what makes the unchecked
+    // capture safe.
+    nonisolated(unsafe) let counts = HistoryTermCounts()
     CustomVocabulary.historyUses = { needles in
         guard Thread.isMainThread else { return [:] }
-        return counts.uses(of: needles,
-                           in: TranscriptionHistory.shared.records.lazy.map { (id: $0.id, text: $0.text) })
+        return MainActor.assumeIsolated {
+            counts.uses(of: needles, in: TranscriptionHistory.shared.records.lazy.map { (id: $0.id, text: $0.text) })
+        }
     }
 }
 
 // MARK: - AppDelegate with NSStatusItem
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private let appState = AppState()
@@ -253,26 +258,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationCenter.default.addObserver(
             forName: .hotkeyDidChange, object: nil, queue: .main
         ) { [weak self] _ in
-            self?.rebuildMenu()
+            MainActor.assumeIsolated { self?.rebuildMenu() }
         }
 
         // The status overlay asks for History via notification (AppState doesn't own windows)
         NotificationCenter.default.addObserver(
             forName: .openHistoryWindow, object: nil, queue: .main
         ) { [weak self] _ in
-            self?.openHistory()
+            MainActor.assumeIsolated { self?.openHistory() }
         }
         // Settings' Edit Prompts… asks for the main window's Prompts page the same way.
         NotificationCenter.default.addObserver(
             forName: .openMainWindowPage, object: nil, queue: .main
         ) { [weak self] note in
-            self?.showMainWindow(on: (note.object as? String).flatMap(MainPage.init(rawValue:)))
+            let page = (note.object as? String).flatMap(MainPage.init(rawValue:))
+            MainActor.assumeIsolated { self?.showMainWindow(on: page) }
         }
         // A notice's way to a Settings page — the microphone notice's Change.
         NotificationCenter.default.addObserver(
             forName: .openSettingsPage, object: nil, queue: .main
         ) { [weak self] note in
-            self?.showSettings(category: note.object as? SettingsCategory)
+            let category = note.object as? SettingsCategory
+            MainActor.assumeIsolated { self?.showSettings(category: category) }
         }
 
         // Auto-register as login item on first launch (default: ON) — unless setup is
@@ -698,7 +705,7 @@ extension Notification.Name {
 
 // MARK: - AppState
 
-@Observable
+@MainActor @Observable
 final class AppState {
     let speechEngine = SpeechEngine()
     let hotkeyManager = HotkeyManager()
@@ -2140,12 +2147,15 @@ final class AppState {
         // Setup's Try it teaches the same thing on its own screen.
         holdTipStage = dictationTest.isActive ? .none : HoldTip.stage(count: count, canSwitch: canSwitch)
         let keys = shortcutKeys(shortcutText(for: action))
+        // Scheduled on the main run loop, so it fires on main.
         holdTipTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            guard let self, let action = self.holdTipAction, !self.holdTipFollowed else { return }
-            if modifiersOfHeldShortcutLetGo(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action)) {
-                self.holdTipFollowed = true
-                dlog("Hotkey", "hold: modifiers let go, \(action.title) still held")
-                self.refreshHoldTipPanel()
+            MainActor.assumeIsolated {
+                guard let self, let action = self.holdTipAction, !self.holdTipFollowed else { return }
+                if modifiersOfHeldShortcutLetGo(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action)) {
+                    self.holdTipFollowed = true
+                    dlog("Hotkey", "hold: modifiers let go, \(action.title) still held")
+                    self.refreshHoldTipPanel()
+                }
             }
         }
         guard holdTipStage != .none else { return }
@@ -2167,8 +2177,10 @@ final class AppState {
         let center = NotificationCenter.default
         for name in [NSWindow.didResizeNotification, NSWindow.didMoveNotification] {
             holdTipObservers.append(center.addObserver(forName: name, object: overlay, queue: .main) { [weak self, weak overlay] _ in
-                guard let overlay else { return }
-                self?.holdTipPanel?.place(beside: overlay.frame)
+                MainActor.assumeIsolated {
+                    guard let overlay else { return }
+                    self?.holdTipPanel?.place(beside: overlay.frame)
+                }
             })
         }
     }
@@ -2473,11 +2485,13 @@ final class AppState {
         directRecordingCloseObserver = NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification, object: panel, queue: .main
         ) { [weak self, weak panel] _ in
-            guard let self, self.directRecordingPanel === panel else { return }
-            self.releaseDirectRecordingEngine()
-            self.removeDirectRecordingCloseObserver()
-            self.directRecordingPanel = nil
-            self.directRecordingInsertion = nil
+            MainActor.assumeIsolated {
+                guard let self, self.directRecordingPanel === panel else { return }
+                self.releaseDirectRecordingEngine()
+                self.removeDirectRecordingCloseObserver()
+                self.directRecordingPanel = nil
+                self.directRecordingInsertion = nil
+            }
         }
     }
 
@@ -2527,7 +2541,7 @@ final class AppState {
 }
 
 /// Where an ended dictation's text went, once the paste says — nil while it is on its way.
-@Observable
+@MainActor @Observable
 final class OverlayConfirmation {
     var text: String?
 }

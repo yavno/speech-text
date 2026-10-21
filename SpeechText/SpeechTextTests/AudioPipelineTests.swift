@@ -1169,7 +1169,9 @@ final class AudioBufferWriterStopTests: XCTestCase {
     func testATapBufferDuringTheStopsFlushNeverReachesTheConverter() throws {
         let writer = AudioBufferWriter()
         writer.prepare(sourceFormat: mono48k())
-        let buffer = makeSineBuffer(format: mono48k(), frames: 4_800)
+        // Read, never written, by the thread below, which is what makes the unchecked
+        // hand-off safe.
+        nonisolated(unsafe) let buffer = makeSineBuffer(format: mono48k(), frames: 4_800)
         let appends = LateAppends()
         let running = DispatchSemaphore(value: 0)
         let done = DispatchSemaphore(value: 0)

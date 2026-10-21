@@ -41,6 +41,7 @@ extension Notification.Name {
 ///
 /// It watches every window rather than being told by each `open…` function, so a
 /// window added later cannot forget to report itself.
+@MainActor
 final class DockIconController {
     private var observers: [NSObjectProtocol] = []
 
@@ -51,22 +52,23 @@ final class DockIconController {
         for name in [NSWindow.didBecomeKeyNotification, NSWindow.didBecomeMainNotification,
                      NSWindow.didMiniaturizeNotification, NSWindow.didResignKeyNotification] {
             observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                self?.update()
+                MainActor.assumeIsolated { self?.update() }
             })
         }
         // At `willClose` the window still reports itself visible, so decide once it is gone.
         observers.append(center.addObserver(forName: NSWindow.willCloseNotification, object: nil, queue: .main) { [weak self] note in
             let closing = note.object as? NSWindow
-            DispatchQueue.main.async { self?.update(excluding: closing) }
+            DispatchQueue.main.async { [weak self] in self?.update(excluding: closing) }
         })
         observers.append(center.addObserver(forName: .dockIconModeDidChange, object: nil, queue: .main) { [weak self] _ in
-            self?.update()
+            MainActor.assumeIsolated { self?.update() }
         })
         update()
     }
 
     deinit {
-        observers.forEach(NotificationCenter.default.removeObserver)
+        // Let go with the app delegate, on main.
+        MainActor.assumeIsolated { observers.forEach(NotificationCenter.default.removeObserver) }
     }
 
     /// The main window, Settings and the other titled windows — not the recording overlay, the

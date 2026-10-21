@@ -159,24 +159,25 @@ actor ParakeetPipelineCache {
     private var manager: AsrManager?
     private var tail: Task<Void, Never>?
 
-    /// Runs `job` after every job queued before it, success or failure.
-    private func serialized<T: Sendable>(_ job: @escaping () async throws -> T) async throws -> T {
+    /// Runs `job` after every job queued before it, success or failure. The job is handed
+    /// the cache isolated, so it runs on the actor as the task that calls it does.
+    private func serialized<T: Sendable>(_ job: @escaping @Sendable (isolated ParakeetPipelineCache) async throws -> T) async throws -> T {
         let previous = tail
         let task = Task<T, Error> {
             await previous?.value
-            return try await job()
+            return try await job(self)
         }
         tail = Task { _ = try? await task.value }
         return try await task.value
     }
 
     func load(_ modelFolder: URL) async throws {
-        _ = try await serialized { try await self.ensureLoaded(modelFolder) }
+        _ = try await serialized { cache in try await cache.ensureLoaded(modelFolder) }
     }
 
     func transcribe(audioFileURL: URL, modelFolder: URL, language: Language?) async throws -> String {
-        try await serialized {
-            let manager = try await self.ensureLoaded(modelFolder)
+        try await serialized { cache in
+            let manager = try await cache.ensureLoaded(modelFolder)
             // A fresh decoder state per segment. The TDT decoder carries its prediction
             // network's state forward, which is what a *continuing* stream wants; a
             // segment here is a finished recording, and seeding it with the tail of the
@@ -216,11 +217,11 @@ actor ParakeetPipelineCache {
     /// not cost this one a reload. With no folder, whatever is loaded: `LocalSTT.prewarm`
     /// of the other engine, so only one local model is ever resident.
     func unload(ifLoaded modelFolder: URL? = nil) async {
-        _ = try? await serialized {
-            guard modelFolder == nil || self.folder == modelFolder else { return }
-            if let manager = self.manager { await manager.cleanup() }
-            self.manager = nil
-            self.folder = nil
+        _ = try? await serialized { cache in
+            guard modelFolder == nil || cache.folder == modelFolder else { return }
+            if let manager = cache.manager { await manager.cleanup() }
+            cache.manager = nil
+            cache.folder = nil
         }
     }
 }

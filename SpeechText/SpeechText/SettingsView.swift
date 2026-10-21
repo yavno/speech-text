@@ -597,7 +597,7 @@ struct SettingsView: View {
             active.count > 1 ? "One key, used for both." : nil
         }
 
-        func field(inUse: Bool) -> SettingsKeyField {
+        @MainActor func field(inUse: Bool) -> SettingsKeyField {
             SettingsKeyField(service: service, value: value, roles: roles, activeRoles: active,
                              uses: uses, inUse: inUse)
         }

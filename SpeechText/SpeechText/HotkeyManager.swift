@@ -7,7 +7,7 @@ import SpeechTextCore
 
 /// Which of the app's shortcuts macOS refused to register, and why. Settings reads it to
 /// say so under the shortcut, since a refused shortcut otherwise just never fires.
-@Observable
+@MainActor @Observable
 final class HotkeyRegistrationStatus {
     static let shared = HotkeyRegistrationStatus()
     var failures: [ShortcutAction: OSStatus] = [:]
@@ -18,7 +18,7 @@ final class HotkeyRegistrationStatus {
 /// hold recording goes on with ⌃⇧ let go and Q still down. The keycaps in
 /// Settings and setup and the hold tip read it; the modifiers they read off
 /// `NSEvent.modifierFlags`.
-@Observable
+@MainActor @Observable
 final class HeldShortcuts {
     static let shared = HeldShortcuts()
     private(set) var down: Set<ShortcutAction> = []
@@ -33,7 +33,8 @@ final class HeldShortcuts {
     }
 }
 
-@Observable
+/// Main-actor: Carbon delivers the application target's hotkey events on the main thread.
+@MainActor @Observable
 final class HotkeyManager {
     private var hotKeyRefs: [ShortcutAction: EventHotKeyRef] = [:]
     private var eventHandlerRef: EventHandlerRef?
@@ -57,13 +58,13 @@ final class HotkeyManager {
     var onEscape: (() -> Void)?
     private var escapeRef: EventHotKeyRef?
     private var escapeWanted = false
-    private static let escapeHotKeyID: UInt32 = 5
+    private nonisolated static let escapeHotKeyID: UInt32 = 5
 
     private var shortcuts: [ShortcutAction: KeyShortcut] = [:]
 
     private static let signature: OSType = 0x56504852
 
-    private static func hotKeyID(_ action: ShortcutAction) -> UInt32 {
+    private nonisolated static func hotKeyID(_ action: ShortcutAction) -> UInt32 {
         switch action {
         case .inline: return 1
         case .recordWindow: return 2
@@ -79,13 +80,13 @@ final class HotkeyManager {
         let center = NotificationCenter.default
         observers = [
             center.addObserver(forName: .hotkeyDidChange, object: nil, queue: .main) { [weak self] _ in
-                self?.reloadHotkeys()
+                MainActor.assumeIsolated { self?.reloadHotkeys() }
             },
             center.addObserver(forName: .hotkeyRecorderDidStart, object: nil, queue: .main) { [weak self] _ in
-                self?.pause()
+                MainActor.assumeIsolated { self?.pause() }
             },
             center.addObserver(forName: .hotkeyRecorderDidStop, object: nil, queue: .main) { [weak self] _ in
-                self?.resume()
+                MainActor.assumeIsolated { self?.resume() }
             },
         ]
     }
@@ -149,6 +150,7 @@ final class HotkeyManager {
                     &hotKeyID
                 )
                 guard status == noErr else { return OSStatus(eventNotHandledErr) }
+                let id = hotKeyID.id
                 let isDown = GetEventKind(event) == UInt32(kEventHotKeyPressed)
                 let pressedAt = GetEventTime(event)
 
@@ -157,12 +159,12 @@ final class HotkeyManager {
                     // pressed while a start held the thread lands after the fact.
                     let waited = GetCurrentEventTime() - pressedAt
                     if waited > 0.2 {
-                        dlog("Hotkey", "⚠ shortcut \(hotKeyID.id) \(isDown ? "press" : "release") reached the app \(Int(waited * 1000)) ms late — the main thread was busy", level: .notice)
+                        dlog("Hotkey", "⚠ shortcut \(id) \(isDown ? "press" : "release") reached the app \(Int(waited * 1000)) ms late — the main thread was busy", level: .notice)
                     }
-                    if let action = ShortcutAction.allCases.first(where: { HotkeyManager.hotKeyID($0) == hotKeyID.id }) {
+                    if let action = ShortcutAction.allCases.first(where: { HotkeyManager.hotKeyID($0) == id }) {
                         HeldShortcuts.shared.set(action, isDown: isDown)
                     }
-                    switch hotKeyID.id {
+                    switch id {
                     case 1: mgr.onDictationKey?(.inline, isDown)
                     case 2: if isDown { mgr.onRecordWindowToggle?() }
                     case 3: mgr.onDictationKey?(.ai, isDown)
@@ -259,9 +261,12 @@ final class HotkeyManager {
     }
 
     deinit {
-        stop()
-        for observer in observers {
-            NotificationCenter.default.removeObserver(observer)
+        // Let go with `AppState`, on main.
+        MainActor.assumeIsolated {
+            stop()
+            for observer in observers {
+                NotificationCenter.default.removeObserver(observer)
+            }
         }
     }
 }

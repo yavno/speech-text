@@ -81,7 +81,9 @@ final class InlineDictationFlow {
 /// A clip as the tap hands it over: Float32 mono at 48 kHz in ~20 ms buffers (the tap's
 /// ~50 a second), so the writer converts 48 → 16 kHz and OpenAI's socket 48 → 24 kHz, as
 /// they do in the app — not the 16 kHz the file happens to be stored at.
-struct TapAudio {
+/// `@unchecked Sendable`: the buffers are filled once, when the clip is read, and only
+/// read after that.
+struct TapAudio: @unchecked Sendable {
     static let sampleRate: Double = 48_000
     static let framesPerBuffer: AVAudioFrameCount = 960
 

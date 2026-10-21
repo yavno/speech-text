@@ -28,7 +28,11 @@ import SpeechTextCore
 /// It is also the standard user driver's delegate, for one hook: see
 /// `standardUserDriverWillShowModalAlert`. Sparkle holds that delegate weakly; `shared`
 /// is what keeps it alive.
-final class UpdateChecker: NSObject, SPUStandardUserDriverDelegate {
+///
+/// Main-actor, as Sparkle requires; its delegate methods are called on main, which the
+/// `@preconcurrency` conformance checks as they come in.
+@MainActor
+final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelegate {
     static let shared = UpdateChecker()
 
     /// Assigned after `super.init()`, because the controller is handed `self` as its
@@ -122,10 +126,12 @@ final class UpdateChecker: NSObject, SPUStandardUserDriverDelegate {
     func standardUserDriverWillShowModalAlert() {
         Self.activateApp()
         RunLoop.main.perform(inModes: [.modalPanel, .default]) {
-            let alert = NSApp.modalWindow
-            alert?.orderFrontRegardless()
-            dlog("Update", "modal alert \(alert == nil ? "not found" : "ordered front"), "
-                 + "app \(NSApp.isActive ? "active" : "not active")")
+            MainActor.assumeIsolated {
+                let alert = NSApp.modalWindow
+                alert?.orderFrontRegardless()
+                dlog("Update", "modal alert \(alert == nil ? "not found" : "ordered front"), "
+                     + "app \(NSApp.isActive ? "active" : "not active")")
+            }
         }
     }
 
@@ -143,13 +149,16 @@ final class UpdateChecker: NSObject, SPUStandardUserDriverDelegate {
                                                    forUpdate update: SUAppcastItem,
                                                    state: SPUUserUpdateState) {
         guard state.userInitiated else { return }
+        let version = update.displayVersionString
         RunLoop.main.perform(inModes: [.default, .modalPanel]) {
-            // `orderedWindows` leaves panels out, so the overlay cannot be taken for it.
-            let window = NSApp.orderedWindows.first { $0.isVisible }
-            window?.orderFrontRegardless()
-            dlog("Update", "update \(update.displayVersionString) window "
-                 + "\(window == nil ? "not found" : "ordered front"), "
-                 + "app \(NSApp.isActive ? "active" : "not active")")
+            MainActor.assumeIsolated {
+                // `orderedWindows` leaves panels out, so the overlay cannot be taken for it.
+                let window = NSApp.orderedWindows.first { $0.isVisible }
+                window?.orderFrontRegardless()
+                dlog("Update", "update \(version) window "
+                     + "\(window == nil ? "not found" : "ordered front"), "
+                     + "app \(NSApp.isActive ? "active" : "not active")")
+            }
         }
     }
 

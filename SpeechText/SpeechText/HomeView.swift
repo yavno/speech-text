@@ -717,11 +717,14 @@ struct RecordWindowMark: View {
 /// line of text and the display's dots, the knob, the button rail and the ✕ — built from
 /// the panel's own parts at their real size, still. Drawn once into an image: a list of
 /// History rows would otherwise lay out a whole moulded window per row.
+@MainActor
 struct RecordWindowPicture: View {
     static let size = CGSize(width: 362, height: 284)
     static var aspect: CGFloat { size.width / size.height }
 
-    @MainActor static let icon: Image = {
+    static let icon: Image = renderIcon()
+
+    private static func renderIcon() -> Image {
         let renderer = ImageRenderer(content: RecordWindowPicture()
             .environment(\.technoPalette, .green)
             .environment(\.colorScheme, .light))
@@ -729,7 +732,7 @@ struct RecordWindowPicture: View {
         renderer.isOpaque = false
         if let image = renderer.nsImage { return Image(nsImage: image).resizable().interpolation(.high) }
         return Image(systemName: "macwindow").resizable()
-    }()
+    }
 
     private static let levels: [CGFloat] = (0..<47).map { column in
         let x = Double(column)
@@ -1209,7 +1212,7 @@ struct HomeWays: View {
 /// card before it is used. Read from the window's own key events; a combination that is
 /// one of ours never arrives as a key event (Carbon takes it), so the whole shortcut lights
 /// from `HeldShortcuts` instead.
-@Observable
+@MainActor @Observable
 final class HomeKeyboard {
     static let shared = HomeKeyboard()
 
@@ -1226,7 +1229,9 @@ final class HomeKeyboard {
         }
         // Keys let go in another app never come back up here.
         resign = NotificationCenter.default.addObserver(forName: NSWindow.didResignKeyNotification, object: nil,
-                                                        queue: .main) { [weak self] _ in self?.clear() }
+                                                        queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.clear() }
+        }
     }
 
     func stop() {

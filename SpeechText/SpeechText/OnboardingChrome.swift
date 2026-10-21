@@ -1134,7 +1134,7 @@ struct LiveShortcutKeycaps: View {
 /// The modifier keys as they are now, for the views that draw them live. Kept from the
 /// system's flagsChanged events — the window's own, and every other app's (which needs
 /// the Accessibility permission a paste needs anyway) — only while such a view is shown.
-@Observable
+@MainActor @Observable
 final class ModifierKeys {
     static let shared = ModifierKeys()
 

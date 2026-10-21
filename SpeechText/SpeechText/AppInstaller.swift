@@ -42,7 +42,7 @@ enum AppInstaller {
     /// setup, no login item pointing into `/Volumes`, no settings written.
     /// Set once this copy has decided to go: it quits without touching anything the
     /// installed copy owns (History's folder included).
-    private(set) static var isLeaving = false
+    @MainActor private(set) static var isLeaving = false
 
     @MainActor
     static func moveIfRunningFromDiskImage() -> Bool {

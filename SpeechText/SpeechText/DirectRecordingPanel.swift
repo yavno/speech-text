@@ -42,7 +42,7 @@ final class DirectRecordingPanelWindow: NSPanel {
         skinObserver = NotificationCenter.default.addObserver(
             forName: .skinDidChange, object: nil, queue: .main
         ) { [weak self] _ in
-            self?.applySkin()
+            MainActor.assumeIsolated { self?.applySkin() }
         }
 
         center()
@@ -64,7 +64,10 @@ final class DirectRecordingPanelWindow: NSPanel {
     }
 
     deinit {
-        if let skinObserver { NotificationCenter.default.removeObserver(skinObserver) }
+        // A window is let go on main, as AppKit releases every one.
+        MainActor.assumeIsolated {
+            if let skinObserver { NotificationCenter.default.removeObserver(skinObserver) }
+        }
     }
 
     /// `.nonactivatingPanel` normally refuses key status, but the panel's whole point
@@ -111,6 +114,7 @@ final class DirectRecordingPanelWindow: NSPanel {
 /// The Record Window is Tier A by definition — our own surface, the result visible
 /// immediately — so it is where the "remember the range, replace exactly that span"
 /// machinery is kept honest. The ledger is the same pure type inline delivery uses.
+@MainActor
 final class TextInsertionHandler {
     weak var textView: NSTextView?
     /// Where each inserted span sits in the text view. Read by `replaceSpan`; reset
