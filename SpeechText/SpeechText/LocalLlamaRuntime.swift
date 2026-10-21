@@ -125,7 +125,7 @@ final class LlamaModel {
         var buffer = [CChar](repeating: 0, count: 256 * 1024)
         let length = llama_model_meta_val_str(model, key, &buffer, buffer.count)
         guard length >= 0 else { return nil }
-        return String(cString: buffer)
+        return String(decoding: buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
     }
 
     /// The prompt as token IDs, exactly as `complete` feeds it — special markers parsed,
