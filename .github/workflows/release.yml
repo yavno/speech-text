@@ -51,7 +51,10 @@ permissions:
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  # A newer push to a pull request's branch makes its older unsigned build moot,
+  # and on the one runner it would only hold up the next. A tag or a manual run
+  # signs and notarizes, and is never cut short for another.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   package:
