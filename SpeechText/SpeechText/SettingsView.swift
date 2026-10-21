@@ -1159,6 +1159,7 @@ private func keyboardLanguageCodes() -> Set<String> {
 /// gestures read as part of Hold to talk rather than as settings of their own.
 private struct HoldGestureList: View {
     let showsSwitch: Bool
+    @State private var windowVisible = true
 
     var body: some View {
         let inline = shortcutKeys(shortcutText(for: .inline))
@@ -1166,7 +1167,11 @@ private struct HoldGestureList: View {
         let letter = inline.last ?? ""
         let modifiers = inline.filter(isModifierCap).joined()
         let switchKeys = SwitchKeys(inline: inline, ai: ai)
-        TimelineView(.animation(minimumInterval: 1 / 30)) { context in
+        // The demo moves in steps, so it is redrawn only when a step changes — at 30 frames
+        // a second the whole Settings page was laid out again each frame, about 30% of a core.
+        TimelineView(DemoSchedule(paused: !windowVisible) { time in
+            [HoldTip.holdFrame(at: time), HoldTip.lockFrame(at: time), HoldTip.switchFrame(at: time)]
+        }) { context in
             let time = context.date.timeIntervalSinceReferenceDate
             Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 0) {
                 let hold = HoldTip.holdFrame(at: time)
@@ -1197,6 +1202,7 @@ private struct HoldGestureList: View {
         .overlay(alignment: .leading) {
             Capsule().fill(SetupColor.separator).frame(width: 2)
         }
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Hold the shortcut to record; once recording, the letter alone keeps it going. Double-tap it to record without holding."
                             + (showsSwitch ? " " + switchKeys.detail : ""))
@@ -1257,6 +1263,43 @@ private struct HoldGestureList: View {
                 if frame.otherDown { lit.formUnion(keys.indices.dropFirst()) }
             }
             return lit
+        }
+    }
+}
+
+/// A timeline for a demo drawn in steps: it looks at the demo's frame every 1/30 s, as an
+/// animation schedule would, but gives SwiftUI a date only when the frame changes. While
+/// paused it gives the start and nothing more.
+private struct DemoSchedule<Frame: Equatable>: TimelineSchedule {
+    let paused: Bool
+    let frame: (TimeInterval) -> Frame
+
+    func entries(from startDate: Date, mode: TimelineScheduleMode) -> Entries {
+        Entries(time: startDate.timeIntervalSinceReferenceDate, paused: paused, frame: frame)
+    }
+
+    struct Entries: Sequence, IteratorProtocol {
+        var time: TimeInterval
+        let paused: Bool
+        let frame: (TimeInterval) -> Frame
+        var shown: Frame?
+
+        mutating func next() -> Date? {
+            guard let last = shown else {
+                shown = frame(time)
+                return Date(timeIntervalSinceReferenceDate: time)
+            }
+            if paused { return nil }
+            // A minute without a change is no demo; give SwiftUI a date anyway.
+            for _ in 0..<1800 {
+                time += 1 / 30
+                let next = frame(time)
+                if next != last {
+                    shown = next
+                    break
+                }
+            }
+            return Date(timeIntervalSinceReferenceDate: time)
         }
     }
 }

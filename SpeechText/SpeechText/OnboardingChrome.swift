@@ -114,9 +114,13 @@ extension View {
 // MARK: - Frame
 
 /// A slow glow in the app's greens that turns and drifts under the window, seen through
-/// its glass rim — clipped to the window's shape, never spilling out.
+/// its glass rim — clipped to the window's shape, never spilling out. Drawn on the GPU
+/// (`drawingGroup`): left to Core Graphics, the blurred gradients were rasterised on the
+/// main thread 30 times a second, about 30% of a core while Settings or setup was open.
+/// It stands still while its window cannot be seen.
 struct SetupAura: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var windowVisible = true
 
     private struct Blob {
         let color: Color
@@ -137,7 +141,7 @@ struct SetupAura: View {
     ]
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { context in
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || !windowVisible)) { context in
             let t = reduceMotion ? 0 : context.date.timeIntervalSinceReferenceDate
             GeometryReader { proxy in
                 let size = proxy.size
@@ -171,7 +175,53 @@ struct SetupAura: View {
                 }
                 .frame(width: size.width, height: size.height)
                 .blur(radius: 22)
+                .drawingGroup()
             }
+        }
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
+    }
+}
+
+/// Whether the window a view is in can be seen at all — false while it is covered,
+/// minimised, on another Space or not ordered in — so an animation can stop drawing
+/// frames nobody sees.
+struct WindowVisibilityReader: NSViewRepresentable {
+    @Binding var isVisible: Bool
+
+    func makeNSView(context: Context) -> ReaderView {
+        let view = ReaderView()
+        view.onChange = { visible in
+            if isVisible != visible { isVisible = visible }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: ReaderView, context: Context) {}
+
+    final class ReaderView: NSView {
+        var onChange: ((Bool) -> Void)?
+        private var observer: Any?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let observer { NotificationCenter.default.removeObserver(observer) }
+            observer = nil
+            guard let window else { return report(false) }
+            observer = NotificationCenter.default.addObserver(
+                forName: NSWindow.didChangeOcclusionStateNotification, object: window, queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated { self?.reportWindowState() }
+            }
+            reportWindowState()
+        }
+
+        private func reportWindowState() {
+            report(window?.occlusionState.contains(.visible) ?? false)
+        }
+
+        // Never during the view update that moved it into the window.
+        private func report(_ visible: Bool) {
+            DispatchQueue.main.async { [weak self] in self?.onChange?(visible) }
         }
     }
 }
@@ -1056,7 +1106,8 @@ struct SetupKeycaps: View {
 /// key is down, and — with hold to talk, once the letter is down — the modifiers faded
 /// and the letter ringed, since the letter alone now keeps the recording going.
 /// The letter comes from `HeldShortcuts` (Carbon takes the key event; no window sees
-/// it), the modifiers from `NSEvent.modifierFlags`.
+/// it), the modifiers from `ModifierKeys`; both are observed, so the caps are redrawn
+/// when a key moves rather than on a timer.
 struct LiveShortcutKeycaps: View {
     let action: ShortcutAction
     /// The combination to draw; the stored one when nil.
@@ -1068,20 +1119,59 @@ struct LiveShortcutKeycaps: View {
 
     var body: some View {
         let keys = shortcutKeys(text ?? shortcutText(for: action))
-        TimelineView(.animation(minimumInterval: 1 / 30)) { _ in
-            let caps = liveKeycapStates(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action),
-                                        holdToTalk: holdToTalk && action != .recordWindow)
-            SetupKeycaps(keys: keys, size: size,
-                         litKeys: caps.indexes(of: .down), fadedKeys: caps.indexes(of: .notNeeded),
-                         ringKeys: caps.contains(.notNeeded) ? caps.indexes(of: .down) : [],
-                         pulsing: pulsing, ai: ai)
+        let caps = liveKeycapStates(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action),
+                                    holdToTalk: holdToTalk && action != .recordWindow,
+                                    flags: ModifierKeys.shared.flags)
+        SetupKeycaps(keys: keys, size: size,
+                     litKeys: caps.indexes(of: .down), fadedKeys: caps.indexes(of: .notNeeded),
+                     ringKeys: caps.contains(.notNeeded) ? caps.indexes(of: .down) : [],
+                     pulsing: pulsing, ai: ai)
+            .onAppear { ModifierKeys.shared.watch() }
+            .onDisappear { ModifierKeys.shared.unwatch() }
+    }
+}
+
+/// The modifier keys as they are now, for the views that draw them live. Kept from the
+/// system's flagsChanged events — the window's own, and every other app's (which needs
+/// the Accessibility permission a paste needs anyway) — only while such a view is shown.
+@Observable
+final class ModifierKeys {
+    static let shared = ModifierKeys()
+
+    private(set) var flags: NSEvent.ModifierFlags = []
+    @ObservationIgnored private var monitors: [Any] = []
+    @ObservationIgnored private var watchers = 0
+
+    func watch() {
+        watchers += 1
+        guard monitors.isEmpty else { return }
+        take(NSEvent.modifierFlags)
+        let local = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.take(event.modifierFlags)
+            return event
         }
+        let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.take(event.modifierFlags)
+        }
+        monitors = [local, global].compactMap { $0 }
+    }
+
+    func unwatch() {
+        watchers = max(watchers - 1, 0)
+        guard watchers == 0 else { return }
+        monitors.forEach(NSEvent.removeMonitor)
+        monitors = []
+    }
+
+    private func take(_ raw: NSEvent.ModifierFlags) {
+        let next = raw.intersection([.control, .option, .shift, .command])
+        if next != flags { flags = next }
     }
 }
 
 /// Each cap's state for `keys` ("⌃", "⇧", "Q") as the keyboard is now.
-func liveKeycapStates(keys: [String], letterDown: Bool, holdToTalk: Bool) -> [KeycapState] {
-    let flags = NSEvent.modifierFlags
+func liveKeycapStates(keys: [String], letterDown: Bool, holdToTalk: Bool,
+                      flags: NSEvent.ModifierFlags = NSEvent.modifierFlags) -> [KeycapState] {
     let modifierKeys = keys.filter(isModifierCap)
     let modifiersDown = modifierKeys.map { key in
         switch key {
