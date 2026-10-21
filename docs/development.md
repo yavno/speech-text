@@ -120,10 +120,11 @@ settings take care of the rest:
 The *DCO sign-off* check fails a pull request with an unsigned commit; the one exemption is
 Dependabot's own commits (`.github/dependabot.yml`), and only in a pull request that
 Dependabot itself opened. On this private
-repository, though, that failure does not block anything: branch protection and
-required checks need GitHub Pro or a public repository. A red *DCO sign-off* check
-therefore means "do not merge", and pushing straight to `main` skips it
-altogether.
+repository, though, that failure does not block anything — and neither does any
+other: branch protection and required checks need GitHub Pro or a public
+repository (the API answers 403 for both, checked 2026-10-21), so a red Tests run
+can be merged as easily as a red sign-off. Every red check therefore means "do not
+merge", and pushing straight to `main` skips them altogether.
 
 ### Known unsigned history
 
@@ -236,6 +237,13 @@ request, and there is no window in which the arrangement is wrong. The polarity
 is deliberate: an unrecognised visibility falls through to the hosted runner, so
 the failure is a job that does not start rather than a stranger's code on
 someone's Mac.
+
+**No check blocks a merge while the repository is private.** Branch protection,
+rulesets and required checks need GitHub Pro or a public repository, so every job
+here is a signal for whoever merges, not a gate: a red run is "do not merge" by
+agreement only, and a push straight to `main` is checked after the fact. Going
+public makes the gate possible; it still has to be set up — a ruleset on `main`
+requiring Tests, Swift lint and Checks.
 
 Actions minutes are free for a public repository on the standard runners. The
 Checks job then runs on Linux, where it is faster and costs a tenth as
