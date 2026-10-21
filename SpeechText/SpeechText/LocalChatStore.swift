@@ -158,7 +158,7 @@ func sha256Hex(of file: URL) throws -> String {
 final class GGUFDownload: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
     private let staging: URL
     private let expectedBytes: Int64
-    private let progress: (Double) -> Void
+    private let progress: @Sendable (Double) -> Void
     private let lock = NSLock()
     private var continuation: CheckedContinuation<URL, Error>?
     private var task: URLSessionDownloadTask?
@@ -181,7 +181,7 @@ final class GGUFDownload: NSObject, URLSessionDownloadDelegate, @unchecked Senda
         return Int64(text.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0
     }
 
-    init(staging: URL, expectedBytes: Int64, progress: @escaping (Double) -> Void) {
+    init(staging: URL, expectedBytes: Int64, progress: @escaping @Sendable (Double) -> Void) {
         self.staging = staging
         self.expectedBytes = expectedBytes
         self.progress = progress

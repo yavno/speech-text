@@ -39,7 +39,8 @@ final class OfflineRetry {
 
     /// Starts watching the network. Called once, at launch.
     func start() {
-        monitor.pathUpdateHandler = { path in
+        // `@Sendable`, so it is not taken for main-actor code: the monitor calls it on its own queue.
+        monitor.pathUpdateHandler = { @Sendable path in
             let isUp = path.status == .satisfied
             Task { @MainActor in OfflineRetry.shared.networkChanged(isUp: isUp) }
         }
