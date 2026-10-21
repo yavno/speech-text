@@ -62,7 +62,9 @@ Two consequences follow, and both matter more than they look:
 2. Done: the continuous-integration rework. Every `runs-on` in `ci.yml`, and
    the pull-request run in `release.yml`, is keyed on the repository's visibility, so once
    it is public a pull request runs on a GitHub-hosted machine, never on the
-   organisation's self-hosted Mac.
+   organisation's self-hosted Mac. That hosted half has never run, so the first pull
+   request after the flip is watched job by job (docs/development.md › The first run
+   after going public).
 
 ## One-time setup
 

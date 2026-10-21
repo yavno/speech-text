@@ -315,6 +315,28 @@ Mac's number: that build is warm and incremental (16 s on 2026-09-22), whereas a
 hosted run resolves and builds all three Swift packages from nothing, which is
 exactly what the cache above exists for.
 
+### The first run after going public
+
+The hosted half of every `runs-on` has never run: since 2026-09-22 everything has
+gone to the self-hosted Mac. One part of it has been tried by hand: on
+2026-10-21 the Checks job's steps (all but Base branch, which needs the API) ran
+in an `ubuntu:24.04` container under both mawk, the image's `awk`, and gawk — and
+each failed as it should on a tree with a violation of its own planted in it.
+Tests, Swift lint and `release.yml`'s pull-request Package have never run on
+`macos-latest`. So the first pull request after the flip is a test of CI itself,
+and is watched rather than trusted:
+
+1. Every job's log names a GitHub-hosted runner, never `Vlad-DO-Laptop`, and
+   Package's first step (the self-hosted refusal) is skipped, not run.
+2. Tests: *Select the newest Xcode* prints a version, *Cache the resolved
+   packages* misses and its post step saves; the next run restores it. Put both
+   runs' times under *Run time on a hosted runner* above.
+3. Swift lint: `xcrun swift-format` exists in the Xcode that was selected.
+4. Checks runs on Ubuntu and *Base branch* reads the labels.
+5. A pull request that touches the packaging (`release.yml`'s `paths:`) gets an
+   unsigned image from Package on `macos-latest` — the `dmgbuild` venv included.
+6. Then the ruleset on `main` (*No check blocks a merge* above).
+
 The self-hosted Mac keeps the tag-triggered packaging in
 [`release.yml`](../.github/workflows/release.yml), because that is where the
 signing certificate lives and only someone who can push a tag can start it. That
