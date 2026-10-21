@@ -298,114 +298,169 @@ public enum HoldTip {
         }
     }
 
-    // The looping demo beside Settings › Hold to talk.
-
-    static let demoPeriod: TimeInterval = 4.8
-
-    enum DemoStep: Equatable {
-        /// Nothing pressed.
-        case rest
-        /// The modifiers going down.
-        case chord
-        /// The whole shortcut down: recording.
-        case held
-        /// The modifiers let go, the letter held: still recording.
-        case letterOnly
-        /// Everything up: pasted.
-        case done
-    }
-
-    /// Where the demo is `time` seconds in; it loops every `demoPeriod`.
-    static func demoStep(at time: TimeInterval) -> DemoStep {
-        let t = time.truncatingRemainder(dividingBy: demoPeriod)
-        switch t {
-        case ..<0.6: return .rest
-        case ..<0.9: return .chord
-        case ..<1.9: return .held
-        case ..<3.9: return .letterOnly
-        default: return .done
-        }
-    }
-
-    /// The keys the demo has down at a step.
-    static func demoKeys(_ step: DemoStep) -> (modifiersDown: Bool, letterDown: Bool) {
-        switch step {
-        case .rest, .done: return (false, false)
-        case .chord: return (true, false)
-        case .held: return (true, true)
-        case .letterOnly: return (false, true)
-        }
-    }
-
-    // Settings › Hold to talk draws each gesture as keys and what the dictation is
-    // doing, one frame at a time: the hold above, the double tap and the switch below.
+    // Settings › Recording plays each gesture as the user's own keys going down one
+    // after another and what the dictation does, one frame at a time.
 
     /// What the dictation is doing in a demo frame.
     public enum DemoState: Equatable {
         case idle, recording, locked, ai, pasted
     }
 
-    /// One frame of a gesture demo: which keys are down — the shortcut's modifiers and
-    /// letter, and for the switch the other shortcut — and what that does.
+    /// A gesture Settings demonstrates. With hold to talk: the hold, the double tap that
+    /// locks it on, and the switch to AI Rewrite and back while the letter is held.
+    /// Without: a press to start and a press to paste, and the switch by the other
+    /// shortcut.
+    public enum DemoGesture: CaseIterable {
+        case hold, lock, holdSwitch, toggle, toggleSwitch
+
+        /// Whether the gesture uses the other dictation shortcut, whose caps follow this one's.
+        public var usesOtherShortcut: Bool { self == .holdSwitch || self == .toggleSwitch }
+        var holdsToTalk: Bool { self == .hold || self == .lock || self == .holdSwitch }
+    }
+
+    /// Where each key of a demo is drawn. The shortcut's caps come first, its modifiers
+    /// then its letter; a switch adds the other shortcut — only its letter when the two
+    /// share their modifiers (⌃ ⇧ Q A, the same ⌃⇧ pressed again), all of it otherwise.
+    public struct DemoLayout: Equatable {
+        public let modifiers: Int
+        public let otherModifiers: Int
+        public let sharesModifiers: Bool
+
+        public init(modifiers: Int, otherModifiers: Int = 0, sharesModifiers: Bool = true) {
+            self.modifiers = modifiers
+            self.otherModifiers = otherModifiers
+            self.sharesModifiers = sharesModifiers
+        }
+
+        var letter: Int { modifiers }
+        func otherModifier(_ index: Int) -> Int { sharesModifiers ? index : modifiers + 1 + index }
+        var otherLetter: Int { sharesModifiers ? modifiers + 1 : modifiers + 1 + otherModifiers }
+        var otherModifierCount: Int { sharesModifiers ? modifiers : otherModifiers }
+
+        public func capCount(_ gesture: DemoGesture) -> Int {
+            gesture.usesOtherShortcut ? otherLetter + 1 : modifiers + 1
+        }
+    }
+
+    /// One frame: how each cap is drawn, which caps are ringed (the letter that alone
+    /// keeps a hold recording going), and what the dictation is doing.
     public struct DemoFrame: Equatable {
-        public var modifiersDown = false
-        public var letterDown = false
-        public var otherDown = false
-        public var state: DemoState = .idle
+        public var caps: [KeycapState]
+        public var ringed: Set<Int>
+        public var state: DemoState
     }
 
-    /// The hold, as a frame.
-    public static func holdFrame(at time: TimeInterval) -> DemoFrame {
-        let step = demoStep(at: time)
-        let keys = demoKeys(step)
-        let state: DemoState = switch step {
-        case .rest, .chord: .idle
-        case .held, .letterOnly: .recording
-        case .done: .pasted
+    /// A gesture as a list of moments, each the keys down from then on and the state.
+    struct DemoScript {
+        private(set) var moments: [(at: TimeInterval, down: Set<Int>, state: DemoState)] = []
+        private(set) var time: TimeInterval = 0
+        private var down: Set<Int> = []
+        private var state: DemoState = .idle
+
+        /// The gap between two keys of one shortcut going down.
+        static let keyGap: TimeInterval = 0.22
+
+        /// `press` go down and `release` come up now, the dictation becomes `state`, and
+        /// that holds for `seconds`.
+        mutating func step(_ seconds: TimeInterval, press: [Int] = [], release: [Int] = [], state: DemoState? = nil) {
+            down.formUnion(press)
+            down.subtract(release)
+            if let state { self.state = state }
+            moments.append((time, down, self.state))
+            time += seconds
         }
-        return DemoFrame(modifiersDown: keys.modifiersDown, letterDown: keys.letterDown, state: state)
+
+        /// The modifiers going down one after another; the letter is the caller's step.
+        mutating func pressModifiers(_ caps: [Int]) {
+            for cap in caps { step(Self.keyGap, press: [cap]) }
+        }
+
+        func moment(at time: TimeInterval) -> (down: Set<Int>, state: DemoState) {
+            let t = time.truncatingRemainder(dividingBy: self.time)
+            let moment = moments.last { $0.at <= t } ?? moments[0]
+            return (moment.down, moment.state)
+        }
     }
 
-    static let lockDemoPeriod: TimeInterval = 5.0
-
-    /// The double tap: two quick presses lock the dictation on, nothing is held while it
-    /// records, and the next press stops it.
-    public static func lockFrame(at time: TimeInterval) -> DemoFrame {
-        let t = time.truncatingRemainder(dividingBy: lockDemoPeriod)
-        let down = DemoFrame(modifiersDown: true, letterDown: true, state: .recording)
-        switch t {
-        case ..<0.6: return DemoFrame()
-        case ..<0.8: return down
-        case ..<0.95: return DemoFrame(state: .recording)
-        case ..<1.15: return down
-        case ..<3.6: return DemoFrame(state: .locked)
-        case ..<3.8: return DemoFrame(modifiersDown: true, letterDown: true, state: .locked)
-        default: return DemoFrame(state: .pasted)
+    static func demoScript(_ gesture: DemoGesture, layout: DemoLayout) -> DemoScript {
+        var s = DemoScript()
+        let modifiers = Array(0..<layout.modifiers)
+        let letter = layout.letter
+        let otherModifiers = (0..<layout.otherModifierCount).map(layout.otherModifier)
+        let other = layout.otherLetter
+        let all = Array(0..<layout.capCount(gesture))
+        s.step(0.6)
+        switch gesture {
+        case .hold:
+            // ⌃ → ⇧ → Q, then ⌃ and ⇧ let go together: Q alone keeps it recording.
+            s.pressModifiers(modifiers)
+            s.step(0.6, press: [letter], state: .recording)
+            s.step(2.0, release: modifiers)
+            s.step(1.4, release: [letter], state: .pasted)
+        case .lock:
+            // ⌃ → ⇧ → Q → Q, then everything let go: it records with nothing held.
+            s.pressModifiers(modifiers)
+            s.step(0.18, press: [letter], state: .recording)
+            s.step(0.16, release: [letter])
+            s.step(0.3, press: [letter])
+            s.step(2.0, release: all, state: .locked)
+            // The next press stops it.
+            s.pressModifiers(modifiers)
+            s.step(0.25, press: [letter], state: .pasted)
+            s.step(1.3, release: all)
+        case .holdSwitch:
+            // Q held on its own, ⌃ → ⇧ → A for AI Rewrite and the same again to come back.
+            s.pressModifiers(modifiers)
+            s.step(0.5, press: [letter], state: .recording)
+            s.step(0.7, release: modifiers)
+            for state in [DemoState.ai, .recording] {
+                s.pressModifiers(otherModifiers)
+                s.step(0.25, press: [other], state: state)
+                s.step(0.9, release: otherModifiers + [other])
+            }
+            s.step(1.4, release: [letter], state: .pasted)
+        case .toggle:
+            // ⌃ → ⇧ → Q, let go: it records with nothing held; the same again pastes.
+            s.pressModifiers(modifiers)
+            s.step(0.25, press: [letter], state: .recording)
+            s.step(1.8, release: all)
+            s.pressModifiers(modifiers)
+            s.step(0.25, press: [letter], state: .pasted)
+            s.step(1.3, release: all)
+        case .toggleSwitch:
+            // Started with ⌃⇧Q, ⌃⇧A turns it into an AI Rewrite and ⌃⇧Q back, and ⌃⇧Q
+            // again pastes.
+            let presses: [(modifiers: [Int], letter: Int, state: DemoState)] = [
+                (modifiers, letter, .recording), (otherModifiers, other, .ai),
+                (modifiers, letter, .recording), (modifiers, letter, .pasted),
+            ]
+            for press in presses {
+                s.pressModifiers(press.modifiers)
+                s.step(0.25, press: [press.letter], state: press.state)
+                s.step(press.state == .pasted ? 1.3 : 0.8, release: press.modifiers + [press.letter])
+            }
         }
+        return s
     }
 
-    static let switchDemoPeriod: TimeInterval = 5.6
+    /// How long a gesture's loop lasts.
+    public static func demoPeriod(_ gesture: DemoGesture, layout: DemoLayout) -> TimeInterval {
+        demoScript(gesture, layout: layout).time
+    }
 
-    /// The switch: the shortcut held, a tap of the other one turns the dictation into an
-    /// AI Rewrite, a second tap turns it back, and letting go pastes.
-    public static func switchFrame(at time: TimeInterval) -> DemoFrame {
-        let t = time.truncatingRemainder(dividingBy: switchDemoPeriod)
-        let held = DemoFrame(modifiersDown: true, letterDown: true)
-        func frame(_ state: DemoState, otherDown: Bool = false) -> DemoFrame {
-            var frame = held
-            frame.state = state
-            frame.otherDown = otherDown
-            return frame
+    /// The gesture `time` seconds in; it loops. In a hold, a modifier of the held
+    /// shortcut that is up while its letter is down is *not needed* — faded, as the live
+    /// caps draw it — and the letter is ringed; while the modifiers are still down they
+    /// are drawn down.
+    public static func demoFrame(_ gesture: DemoGesture, layout: DemoLayout, at time: TimeInterval) -> DemoFrame {
+        let moment = demoScript(gesture, layout: layout).moment(at: time)
+        let letterHeld = gesture.holdsToTalk && moment.down.contains(layout.letter)
+        var caps = (0..<layout.capCount(gesture)).map { moment.down.contains($0) ? KeycapState.down : .up }
+        var ringed = Set<Int>()
+        if letterHeld {
+            for modifier in 0..<layout.modifiers where caps[modifier] == .up { caps[modifier] = .notNeeded }
+            if caps.contains(.notNeeded) { ringed.insert(layout.letter) }
         }
-        switch t {
-        case ..<0.5: return DemoFrame()
-        case ..<0.8: return DemoFrame(modifiersDown: true)
-        case ..<1.7: return frame(.recording)
-        case ..<1.95: return frame(.ai, otherDown: true)
-        case ..<3.0: return frame(.ai)
-        case ..<3.25: return frame(.recording, otherDown: true)
-        case ..<4.1: return frame(.recording)
-        default: return DemoFrame(state: .pasted)
-        }
+        return DemoFrame(caps: caps, ringed: ringed, state: moment.state)
     }
 }

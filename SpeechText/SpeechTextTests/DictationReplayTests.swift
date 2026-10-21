@@ -1083,50 +1083,84 @@ final class HoldTipTests: XCTestCase {
         }
     }
 
-    func testTheDemoLoopsThroughTheGesture() {
-        let steps = stride(from: 0.0, to: HoldTip.demoPeriod, by: 0.1).map(HoldTip.demoStep(at:))
-        var order: [HoldTip.DemoStep] = []
-        for step in steps where order.last != step { order.append(step) }
-        XCTAssertEqual(order, [.rest, .chord, .held, .letterOnly, .done])
-        XCTAssertEqual(HoldTip.demoStep(at: HoldTip.demoPeriod + 2.5), HoldTip.demoStep(at: 2.5))
-        XCTAssertEqual(HoldTip.demoKeys(.letterOnly).modifiersDown, false)
-        XCTAssertEqual(HoldTip.demoKeys(.letterOnly).letterDown, true)
-    }
+    // The Settings demos, with ⌃⇧Q and ⌃⇧A: caps 0 ⌃, 1 ⇧, 2 Q and, for a switch, 3 A.
 
-    private func states(_ frame: (TimeInterval) -> HoldTip.DemoFrame, period: TimeInterval) -> [HoldTip.DemoState] {
-        var order: [HoldTip.DemoState] = []
-        for time in stride(from: 0.0, to: period, by: 0.05) where order.last != frame(time).state {
-            order.append(frame(time).state)
+    private let layout = HoldTip.DemoLayout(modifiers: 2, otherModifiers: 2, sharesModifiers: true)
+
+    /// Each change of the caps, as the keys down (`d` down, `n` not needed, `.` up), with
+    /// the state, over one loop.
+    private func script(_ gesture: HoldTip.DemoGesture, layout: HoldTip.DemoLayout? = nil) -> [String] {
+        let layout = layout ?? self.layout
+        let period = HoldTip.demoPeriod(gesture, layout: layout)
+        var order: [String] = []
+        for time in stride(from: 0.0, to: period, by: 0.01) {
+            let frame = HoldTip.demoFrame(gesture, layout: layout, at: time)
+            let caps = frame.caps.map { $0 == .down ? "d" : $0 == .notNeeded ? "n" : "." }.joined()
+            let line = "\(caps) \(frame.state)"
+            if order.last != line { order.append(line) }
         }
         return order
     }
 
-    func testTheDoubleTapDemoLocksWithNothingHeld() {
-        XCTAssertEqual(states(HoldTip.lockFrame(at:), period: HoldTip.lockDemoPeriod),
-                       [.idle, .recording, .locked, .pasted])
-        // Two presses before the lock, and nothing down while it records.
-        var presses = 0
-        var wasDown = false
-        for time in stride(from: 0.0, to: HoldTip.lockDemoPeriod, by: 0.05) {
-            let frame = HoldTip.lockFrame(at: time)
-            if frame.letterDown, !wasDown, frame.state == .recording { presses += 1 }
-            wasDown = frame.letterDown
-        }
-        XCTAssertEqual(presses, 2)
-        XCTAssertFalse(HoldTip.lockFrame(at: 2.5).letterDown)
-        XCTAssertEqual(HoldTip.lockFrame(at: 2.5).state, .locked)
+    /// ⌃ → ⇧ → Q, the modifiers still drawn down; then both let go together, faded, and
+    /// Q ringed alone; then Q let go pastes.
+    func testTheHoldDemoPressesOneKeyAfterAnotherAndLetsTheModifiersGoTogether() {
+        XCTAssertEqual(script(.hold), ["... idle", "d.. idle", "dd. idle", "ddd recording", "nnd recording", "... pasted"])
+        let lettersOnly = HoldTip.demoFrame(.hold, layout: layout, at: 2.0)
+        XCTAssertEqual(lettersOnly.ringed, [2])
+        XCTAssertEqual(HoldTip.demoFrame(.hold, layout: layout, at: 1.3).ringed, [])
     }
 
-    func testTheSwitchDemoGoesToAIAndBackWhileHeld() {
-        XCTAssertEqual(states(HoldTip.switchFrame(at:), period: HoldTip.switchDemoPeriod),
-                       [.idle, .recording, .ai, .recording, .pasted])
-        for time in stride(from: 0.0, to: HoldTip.switchDemoPeriod, by: 0.05) {
-            let frame = HoldTip.switchFrame(at: time)
-            // The mode changes only on a tap of the other shortcut, with this one held.
-            if frame.otherDown { XCTAssertTrue(frame.letterDown && frame.modifiersDown) }
+    /// The double tap is of the letter alone: ⌃ → ⇧ → Q → Q with ⌃⇧ held, then all
+    /// three let go; it records with nothing held until the next press.
+    func testTheDoubleTapDemoTapsTheLetterTwiceWithTheModifiersHeld() {
+        XCTAssertEqual(script(.lock), ["... idle", "d.. idle", "dd. idle", "ddd recording", "dd. recording",
+                                       "ddd recording", "... locked", "d.. locked", "dd. locked", "ddd pasted",
+                                       "... pasted"])
+    }
+
+    /// Q held alone, ⌃ → ⇧ → A switches to AI Rewrite and the same again back; Q let go
+    /// pastes. The modifiers are drawn down while they are, and faded between.
+    func testTheHoldSwitchDemoPressesTheWholeOtherShortcutWhileTheLetterIsHeld() {
+        XCTAssertEqual(script(.holdSwitch), [
+            ".... idle", "d... idle", "dd.. idle", "ddd. recording", "nnd. recording",
+            "dnd. recording", "ddd. recording", "dddd ai", "nnd. ai",
+            "dnd. ai", "ddd. ai", "dddd recording", "nnd. recording", ".... pasted",
+        ])
+    }
+
+    /// Two shortcuts with different modifiers: the other one's caps are its own, never faded.
+    func testTheHoldSwitchDemoWithOtherModifiersPressesTheirOwnCaps() {
+        let layout = HoldTip.DemoLayout(modifiers: 2, otherModifiers: 1, sharesModifiers: false)
+        XCTAssertEqual(layout.capCount(.holdSwitch), 5)
+        let script = script(.holdSwitch, layout: layout)
+        XCTAssertTrue(script.contains("nnd.. recording"))
+        XCTAssertTrue(script.contains("nndd. recording"))
+        XCTAssertTrue(script.contains("nnddd ai"))
+    }
+
+    /// Without hold to talk: a press starts it, nothing is held while it records, a
+    /// second press pastes — and nothing is ever faded.
+    func testTheToggleDemosPressAndLetGo() {
+        XCTAssertEqual(script(.toggle), ["... idle", "d.. idle", "dd. idle", "ddd recording", "... recording",
+                                         "d.. recording", "dd. recording", "ddd pasted", "... pasted"])
+        let toggleSwitch = script(.toggleSwitch)
+        XCTAssertFalse(toggleSwitch.contains { $0.split(separator: " ")[0].contains("n") })
+        var states: [String] = []
+        for line in toggleSwitch {
+            let state = String(line.split(separator: " ")[1])
+            if states.last != state { states.append(state) }
         }
-        XCTAssertEqual(HoldTip.holdFrame(at: 3.0).state, .recording)
-        XCTAssertFalse(HoldTip.holdFrame(at: 3.0).modifiersDown)
+        XCTAssertEqual(states, ["idle", "recording", "ai", "recording", "pasted"])
+        XCTAssertTrue(toggleSwitch.contains("dd.d ai"))
+    }
+
+    func testEveryDemoLoops() {
+        for gesture in HoldTip.DemoGesture.allCases {
+            let period = HoldTip.demoPeriod(gesture, layout: layout)
+            XCTAssertEqual(HoldTip.demoFrame(gesture, layout: layout, at: period + 1.5),
+                           HoldTip.demoFrame(gesture, layout: layout, at: 1.5))
+        }
     }
 }
 
