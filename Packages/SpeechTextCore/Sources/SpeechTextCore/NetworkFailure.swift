@@ -64,7 +64,7 @@ public enum NetworkFailure {
 /// dictation's text rests on — the new socket did not hear the outage, so the stop takes
 /// the upload, which has the whole segment on disk. That is why the policy can afford to
 /// give up early: giving up costs only the live text.
-public struct StreamReconnectPolicy {
+public struct StreamReconnectPolicy: Sendable {
     /// The wait before each attempt within one outage — about 26 s of trying, which is
     /// what "a short outage" means here. Longer than the outage itself: once the Wi-Fi is
     /// back, macOS still needs a few seconds to join, take an address and answer DNS. An

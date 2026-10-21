@@ -52,7 +52,7 @@ public enum InlineDelivery {
     ///
     /// Asked by every paste into another app: the stop's (`AppState.deliver`), the Edit
     /// shortcut's rewrite and put-back, and the Record Window's Insert.
-    public enum PasteCheck: Equatable {
+    public enum PasteCheck: Equatable, Sendable {
         case paste
         /// The app quit since it was chosen.
         case quit
@@ -70,7 +70,7 @@ public enum InlineDelivery {
     }
 
     /// What a stop's result comes to, once the engine has gone idle.
-    public enum StopResult: Equatable {
+    public enum StopResult: Equatable, Sendable {
         /// The transcription failed. `partial` is whatever text there was, for the
         /// Record Window; nil or empty when there is nothing to hand over.
         case failed(partial: String?)

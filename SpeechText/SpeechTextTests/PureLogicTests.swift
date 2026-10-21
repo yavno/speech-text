@@ -606,6 +606,7 @@ final class ShortcutKeyPressTests: XCTestCase {
 /// The Debug Log's levels: their order, what the window's filter keeps, what Copy writes,
 /// and which entries the in-memory buffer keeps. Each test logs into a fresh `DebugLog`
 /// on the main thread, where `log` appends at once.
+@MainActor
 final class DebugLogLevelTests: XCTestCase {
 
     func testTheLevelsRunFromDebugToFaultAndMapOntoTheSystemLogs() {

@@ -7,8 +7,9 @@ import AVFoundation
 // MARK: - Batch upload
 
 /// Writes the segment the engine's writer collected and uploads it. No live text.
+@MainActor
 public final class BatchRecognitionSession: RecognitionSession {
-    public var onEvent: ((RecognitionEvent) -> Void)?
+    public var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)?
 
     private let provider: BatchTranscriber
     private let writer: AudioBufferWriter
@@ -18,7 +19,7 @@ public final class BatchRecognitionSession: RecognitionSession {
     /// (`HallucinationFilter.rejection`); empty judges no script.
     private let languages: [String]
 
-    public init(provider: BatchTranscriber, writer: AudioBufferWriter, language: String?, languages: [String]) {
+    public nonisolated init(provider: BatchTranscriber, writer: AudioBufferWriter, language: String?, languages: [String]) {
         self.provider = provider
         self.writer = writer
         self.language = language
@@ -29,14 +30,14 @@ public final class BatchRecognitionSession: RecognitionSession {
     public func start() throws {}
 
     /// The engine's writer already has the audio.
-    public func feed(native: AVAudioPCMBuffer, pcm16: Data?) {}
+    public nonisolated func feed(native: AVAudioPCMBuffer, pcm16: Data?) {}
 
     /// The segment's text needs the upload.
     public func pause() -> String? { nil }
 
     /// On failure the audio file is handed back rather than deleted, so the engine can
     /// archive it for a retry — a failed upload no longer means the speech is gone.
-    public func finish() async -> RecognitionOutcome {
+    public nonisolated func finish() async -> RecognitionOutcome {
         // Before the file is written: a press-and-release of the shortcut is not a
         // recording to archive, and a provider handed a fraction of a second answers
         // with an error (or, for Whisper, with a hallucinated sentence).

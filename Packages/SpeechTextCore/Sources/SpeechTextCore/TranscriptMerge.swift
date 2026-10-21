@@ -20,7 +20,9 @@ public func joinedTranscript(_ head: String, _ tail: String) -> String {
 /// state, or a Mac with no dictionary for the language) nothing is a word and every
 /// boundary keeps its space — exactly the behaviour before this existed.
 enum TranscriptJoin {
-    static var isWord: (String) -> Bool = { _ in false }
+    /// Set once at launch, before the first dictation reads it (and by the tests, between
+    /// their cases), which is what makes the unchecked access safe.
+    nonisolated(unsafe) static var isWord: (String) -> Bool = { _ in false }
 
     /// One-letter words, which a spell checker accepts for *every* letter — so "х" would
     /// otherwise pass as a word and a cut "дани|х" would never be glued back. Ukrainian,
@@ -120,7 +122,7 @@ private func lowercasingFirstLetter(_ text: String) -> String {
 /// One word of a transcript, normalised for comparison and anchored in its source.
 /// Lowercased with the punctuation trimmed off both ends, so "Це…" and "Це" — the same
 /// word before and after the server revised the sentence around it — compare equal.
-public struct TranscriptWord: Equatable {
+public struct TranscriptWord: Equatable, Sendable {
     /// Lowercased, punctuation-stripped. Never empty.
     let text: String
     /// Where the word starts in the string it was read from.

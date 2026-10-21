@@ -23,7 +23,7 @@ struct VocabularyTerm: Codable, Hashable, Identifiable {
 
 /// How many terms a model takes, and what shape each must have. Every limit is the
 /// vendor's documented one unless its comment in the catalogue says it is ours.
-public struct TermListLimits: Hashable {
+public struct TermListLimits: Hashable, Sendable {
     let maxTerms: Int
     /// Inclusive.
     let maxCharacters: Int

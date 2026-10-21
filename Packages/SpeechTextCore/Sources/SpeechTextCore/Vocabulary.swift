@@ -21,7 +21,7 @@ import Foundation
 // Pure. The page is DictionaryView.swift.
 
 /// One word the user taught: how it is spelled, and how it has come out wrong.
-public struct VocabularyEntry: Identifiable, Codable, Hashable {
+public struct VocabularyEntry: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var term: String
     /// Spellings that are replaced by `term` — what the engine wrote instead.

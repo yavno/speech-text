@@ -22,7 +22,10 @@ private let abwLog = Logger(subsystem: Bundle.main.bundleIdentifier ?? "SpeechTe
 /// If no converter can be built for the hardware format (it happens on exotic devices),
 /// the writer falls back to what it did before: native buffer copies, converted at stop,
 /// with a native-format WAV as the last resort. Losing the recording is never an option.
-public final class AudioBufferWriter {
+///
+/// `@unchecked Sendable`: the tap's thread appends while main and the stop's task read and
+/// write the file, and every stored `var` is read and written under `lock` only.
+public final class AudioBufferWriter: @unchecked Sendable {
     /// Speech-to-text APIs downsample to 16 kHz mono internally, so uploading the mic's
     /// native format (typically 48 kHz float32 ≈ 192 KB/s) wastes ~12x the bytes for no
     /// accuracy gain — and blows past provider upload limits after ~2 minutes of speech.
@@ -107,8 +110,14 @@ public final class AudioBufferWriter {
     /// True while the session's converter is producing 16 kHz bytes. Cleared by `append`
     /// (on the audio thread) if the converter ever errors, after which the buffers are
     /// kept natively and the stream — which only ever gets converted bytes — is starved;
-    /// the engine watches for that and lets the batch fallback take the segment.
-    public private(set) var isConvertingLive = false
+    /// the engine watches for that and lets the batch fallback take the segment. Read from
+    /// main and from the tap's thread, so under `lock` like the rest.
+    public var isConvertingLive: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return convertingLive
+    }
+    private var convertingLive = false
 
     public init() {}
 
@@ -119,7 +128,7 @@ public final class AudioBufferWriter {
         let downsampler = PCMDownsampler(sourceFormat: sourceFormat, targetRate: Self.uploadSampleRate)
         lock.lock()
         self.downsampler = downsampler
-        isConvertingLive = downsampler != nil
+        convertingLive = downsampler != nil
         lock.unlock()
         if downsampler == nil {
             dlog("Audio", "prepare: no converter for \(sourceFormat) — keeping native copies, converting at stop", level: .notice)
@@ -154,7 +163,7 @@ public final class AudioBufferWriter {
             // so far and the native tail are written back to back at stop.
             abwLog.error("append: converter failed on a \(buffer.frameLength) frame buffer — keeping native copies from here on")
             self.downsampler = nil
-            isConvertingLive = false
+            convertingLive = false
         }
 
         appendNative(buffer)

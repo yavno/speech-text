@@ -10,7 +10,7 @@ import Foundation
 /// instead ("кома" → ","). Unlike a Dictionary word it is never sent to an engine or to
 /// AI Rewrite — it only corrects text. `replace` is matched as whole words, ignoring
 /// case; `with` is written exactly as typed.
-public struct TextReplacementPair: Codable, Hashable, Identifiable {
+public struct TextReplacementPair: Codable, Hashable, Identifiable, Sendable {
     public var id: UUID
     public var replace: String
     public var with: String
@@ -115,7 +115,7 @@ struct TextReplacementRules {
 /// The Replacements table's store, and what it may hold. Only the Dictionary page writes
 /// it: a stored setting is evidence of an earlier install to `OnboardingGate`.
 public enum TextReplacements {
-    public enum EntryProblem: Equatable {
+    public enum EntryProblem: Equatable, Sendable {
         case emptyReplace
         case emptyWith
         case noWord

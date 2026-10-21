@@ -158,22 +158,23 @@ final class ScriptedStreamingTranscriber: StreamingTranscriber, @unchecked Senda
 }
 
 /// The batch upload the stream falls back to, with its answer decided in advance.
+@MainActor
 final class ScriptedSegment: RecognitionSession {
-    var onEvent: ((RecognitionEvent) -> Void)?
+    var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)?
     private let outcome: RecognitionOutcome
 
-    init(text: String) {
+    nonisolated init(text: String) {
         outcome = RecognitionOutcome(text: text, error: nil, audioFileURL: nil, cancelled: false)
     }
 
-    init(error: String) {
+    nonisolated init(error: String) {
         outcome = RecognitionOutcome(text: "", error: error, audioFileURL: nil, cancelled: false)
     }
 
     func start() throws {}
-    func feed(native: AVAudioPCMBuffer, pcm16: Data?) {}
+    nonisolated func feed(native: AVAudioPCMBuffer, pcm16: Data?) {}
     func pause() -> String? { nil }
-    func finish() async -> RecognitionOutcome { outcome }
+    nonisolated func finish() async -> RecognitionOutcome { outcome }
     func cancel() {}
 }
 

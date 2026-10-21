@@ -251,7 +251,7 @@ public let openAIRealtimeSTTModel = "gpt-live-transcribe"
 /// One language the user can say they speak. `id` is the ISO-639-1 code the stored
 /// list holds and the cloud providers are sent; `localeIdentifier` is the regional
 /// locale Apple's recogniser needs, since it takes nothing else.
-public struct SpokenLanguage: Identifiable, Hashable {
+public struct SpokenLanguage: Identifiable, Hashable, Sendable {
     public let id: String
     public let displayName: String
     public let localeIdentifier: String
@@ -536,11 +536,13 @@ public func resolvedLocale() -> String {
 // MARK: - Keyboard Change Observer
 
 /// Observes keyboard input source changes using .deliverImmediately so
-/// notifications arrive even when the app is in the background.
+/// notifications arrive even when the app is in the background. Main-actor: the
+/// notification is delivered on the main thread, and every handler is a view's.
+@MainActor
 public final class KeyboardChangeObserver: NSObject {
     public static let shared = KeyboardChangeObserver()
 
-    private var handlers: [(id: UUID, block: () -> Void)] = []
+    private var handlers: [(id: UUID, block: @MainActor () -> Void)] = []
 
     override init() {
         super.init()
@@ -557,7 +559,7 @@ public final class KeyboardChangeObserver: NSObject {
         handlers.forEach { $0.block() }
     }
 
-    public func addHandler(_ block: @escaping () -> Void) -> UUID {
+    public func addHandler(_ block: @escaping @MainActor () -> Void) -> UUID {
         let id = UUID()
         handlers.append((id: id, block: block))
         return id

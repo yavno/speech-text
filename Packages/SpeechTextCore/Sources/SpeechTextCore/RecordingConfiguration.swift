@@ -7,7 +7,7 @@ import Foundation
 /// read from UserDefaults exactly once (`current()`) and carried through the session.
 /// Settings changed mid-recording must not affect the running session — a picker
 /// change while the mic was live used to switch the provider between pause and stop.
-public struct RecordingConfiguration {
+public struct RecordingConfiguration: Sendable {
     public let provider: STTProviderType
     /// The recognition locale, always a concrete identifier. `var` because
     /// `SpeechEngine.resumeRecording(locale:)` follows the keyboard layout across

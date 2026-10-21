@@ -9,7 +9,7 @@ import Foundation
 /// selected-range *write* and then hand back a different range when asked, so anything
 /// that trusts the return code alone classifies VS Code and Slack as correctable and
 /// then scribbles over the user's text.
-public struct AXTextProbe: Equatable {
+public struct AXTextProbe: Equatable, Sendable {
     /// `kAXValueAttribute` could be read as a string.
     public var valueReadable: Bool = false
     /// `kAXSelectedTextRangeAttribute` could be read.
@@ -41,7 +41,7 @@ public struct AXTextProbe: Equatable {
 /// while the user spoke, and whether the stop could correct what was already pasted.
 /// Every inline dictation is now shown on the overlay and pasted once, at the stop, so
 /// only the selection read is left.
-public enum DeliveryTier: String, Equatable, CustomStringConvertible {
+public enum DeliveryTier: String, Equatable, CustomStringConvertible, Sendable {
     /// Our own surface, or a foreign app whose text the Accessibility API can read and
     /// re-select. Text there can be found again and replaced.
     case a

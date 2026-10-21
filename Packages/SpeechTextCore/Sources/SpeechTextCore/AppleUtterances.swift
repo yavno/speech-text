@@ -16,7 +16,7 @@ import Foundation
 ///   heard.
 ///
 /// Pure logic, so the rules are tested without `Speech`.
-public struct AppleUtterances: Equatable {
+public struct AppleUtterances: Equatable, Sendable {
     /// Utterances the recogniser has moved past.
     public private(set) var settled = ""
     /// The utterance in progress, as the latest partial spells it.
@@ -96,11 +96,11 @@ public struct AppleUtterances: Equatable {
 ///
 /// Pure logic: the session hands in its clock (`systemUptime`), the tests
 /// a fake one.
-public struct AppleErrorRotation: Equatable {
+public struct AppleErrorRotation: Equatable, Sendable {
     static let minimumChunkSeconds: TimeInterval = 1
     public static let barrenRotationLimit = 3
 
-    public enum Decision: Equatable {
+    public enum Decision: Equatable, Sendable {
         /// Start a fresh chunk this many seconds from now; 0 is at once.
         case rotate(after: TimeInterval)
         /// Leave the dead chunk to the 50 s rotation.

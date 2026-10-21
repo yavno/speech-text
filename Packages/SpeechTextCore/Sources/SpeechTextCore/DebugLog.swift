@@ -5,13 +5,17 @@ import Foundation
 import os
 import os.log
 
-@Observable
+/// Main-actor state behind a `nonisolated` front door: `log` is called from every
+/// thread, `entries` is changed and read on main only.
+@MainActor @Observable
 public final class DebugLog {
-    public static let shared = DebugLog()
+    public nonisolated static let shared = DebugLog()
+
+    public nonisolated init() {}
 
     /// How much an entry matters, in the system log's own levels. `notice` is what
     /// `os.Logger` calls `default`; there is no "warning" level.
-    public enum Level: Int, Comparable, CaseIterable {
+    public enum Level: Int, Comparable, CaseIterable, Sendable {
         /// High-frequency detail (every partial, every posted key event): kept in the
         /// window only while `keepsDebugEntries` is on, and never persisted by the system
         /// log, which shows it only to a `log stream --debug` running at the time.
@@ -49,7 +53,7 @@ public final class DebugLog {
         }
     }
 
-    public struct Entry: Identifiable {
+    public struct Entry: Identifiable, Sendable {
         public let id = UUID()
         public let timestamp: Date
         public let level: Level
@@ -76,12 +80,12 @@ public final class DebugLog {
         #endif
     }()
 
-    private static let subsystem = Bundle.main.bundleIdentifier ?? "SpeechText"
+    private nonisolated static let subsystem = Bundle.main.bundleIdentifier ?? "SpeechText"
     /// One `Logger` per dlog category, so Console and `log stream --predicate
     /// 'category == "ElevenLabs"'` can pick one out. Made on first use from any thread.
-    private static let loggers = OSAllocatedUnfairLock(initialState: [String: Logger]())
+    private nonisolated static let loggers = OSAllocatedUnfairLock(initialState: [String: Logger]())
 
-    private static func logger(for category: String) -> Logger {
+    private nonisolated static func logger(for category: String) -> Logger {
         loggers.withLock { loggers in
             if let logger = loggers[category] { return logger }
             let logger = Logger(subsystem: subsystem, category: category)
@@ -90,13 +94,13 @@ public final class DebugLog {
         }
     }
 
-    private static let dateFormatter: DateFormatter = {
+    private nonisolated static let dateFormatter: DateFormatter = {
         let df = DateFormatter()
         df.dateFormat = "HH:mm:ss.SSS"
         return df
     }()
 
-    func log(_ category: String, _ message: String, level: Level = .info) {
+    nonisolated func log(_ category: String, _ message: String, level: Level = .info) {
         let entry = Entry(timestamp: Date(), level: level, category: category, message: message)
         // The category stays in the text too: what reads `log stream` output by line
         // (scripts/e2e/check.py's `[App] stopRecording`) keeps finding it.
@@ -104,7 +108,7 @@ public final class DebugLog {
                                        "[\(category, privacy: .public)] \(message, privacy: .public)")
 
         if Thread.isMainThread {
-            appendEntry(entry)
+            MainActor.assumeIsolated { appendEntry(entry) }
         } else {
             DispatchQueue.main.async { [weak self] in
                 self?.appendEntry(entry)
@@ -127,7 +131,7 @@ public final class DebugLog {
 
     /// `12:03:04.567 ERROR  [Groq] message`, one per line — the Debug Log window's Copy
     /// writes a filtered list the same way.
-    public static func formatted(_ entries: [Entry]) -> String {
+    public nonisolated static func formatted(_ entries: [Entry]) -> String {
         entries.map {
             "\(dateFormatter.string(from: $0.timestamp)) \($0.level.label) [\($0.category)] \($0.message)"
         }.joined(separator: "\n")
@@ -135,7 +139,7 @@ public final class DebugLog {
 
     /// The entries at `minimumLevel` or above whose category or message holds `query`,
     /// ignoring case — what the Debug Log window lists.
-    public static func filtered(_ entries: [Entry], minimumLevel: Level, matching query: String) -> [Entry] {
+    public nonisolated static func filtered(_ entries: [Entry], minimumLevel: Level, matching query: String) -> [Entry] {
         let query = query.lowercased()
         return entries.filter {
             $0.level >= minimumLevel

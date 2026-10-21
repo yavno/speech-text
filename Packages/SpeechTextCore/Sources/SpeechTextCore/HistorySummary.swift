@@ -11,7 +11,7 @@ import Foundation
 
 /// The page's filters: every dictation, the ones AI Rewrite rewrote, the edits of a
 /// selection, and the ones that did not come out as asked.
-public enum HistoryFilter: String, CaseIterable, Identifiable {
+public enum HistoryFilter: String, CaseIterable, Identifiable, Sendable {
     case all, rewritten, edits, failed
 
     public var id: String { rawValue }
@@ -207,7 +207,7 @@ enum HistorySearch {
 // MARK: - App and date
 
 /// The day range History is narrowed to, beside the search and the filters.
-public enum HistoryDates: Equatable, Hashable {
+public enum HistoryDates: Equatable, Hashable, Sendable {
     case anyTime, today, last7Days, last30Days
     /// One day the user picked.
     case day(Date)
@@ -253,7 +253,7 @@ public enum HistoryDates: Equatable, Hashable {
 /// What History is narrowed to besides the filter and the search: the app a dictation went
 /// to — named as its row names it (`HomeRecentEntry.place`, so "Record Window" and "Not
 /// pasted" are there too) — and a range of days.
-public struct HistoryNarrowing: Equatable {
+public struct HistoryNarrowing: Equatable, Sendable {
     public var app: String?
     public var dates: HistoryDates = .anyTime
 
@@ -330,7 +330,7 @@ public enum AppIdentity {
 /// what an AI pass attaches to, what the "No connection" notice's Retry and the offline
 /// drain read, and where a failed dictation's audio waits for them. It goes at quit, and
 /// at the next launch should the app not have quit cleanly.
-public enum HistoryRetention: String, CaseIterable, Identifiable {
+public enum HistoryRetention: String, CaseIterable, Identifiable, Sendable {
     case session = "none"
     case days7 = "7d"
     case days30 = "30d"
@@ -430,7 +430,7 @@ public enum HistoryRetention: String, CaseIterable, Identifiable {
 // MARK: - Days
 
 /// One day of History: its records newest first, and what they came to.
-public struct HistoryDay: Identifiable, Equatable {
+public struct HistoryDay: Identifiable, Equatable, Sendable {
     let start: Date
     public let records: [TranscriptionRecord]
 
@@ -477,7 +477,7 @@ public struct HistoryDay: Identifiable, Equatable {
 /// What History's page shows for a filter, a search and a narrowing: the days, and beside
 /// the search each filter's count — worked out together in one pass, since the page needs
 /// both on every key typed. The search runs once a record, and the days' bounds once a day.
-public struct HistoryListing: Equatable {
+public struct HistoryListing: Equatable, Sendable {
     public var days: [HistoryDay] = []
     public var counts: [HistoryFilter: Int] = Dictionary(uniqueKeysWithValues: HistoryFilter.allCases.map { ($0, 0) })
 
@@ -562,7 +562,7 @@ public final class HistoryListingCache {
 /// that text, for the last few widths the rows were laid out at. The page keeps it past the
 /// rows themselves (`HistoryRowFit`, HistoryView.swift) — and kept every width a window
 /// was ever resized through, a frame at a time, for good.
-public struct HistoryRowFits {
+public struct HistoryRowFits: Sendable {
     /// The width the rows have now, the one a row has while its Copy says Copied, and the
     /// last ones before a resize stopped.
     static let widthsKept = 4

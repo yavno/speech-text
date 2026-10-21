@@ -139,7 +139,7 @@ enum TranscriptCleanupRules {
 /// A character swap is safe on cumulative text: the spacing it adds depends only on the
 /// characters either side of the dash, and a dash that ends the text gets no space after
 /// it until a word follows — which the span layer joins with a space anyway.
-public enum DashStyle: String, CaseIterable, Identifiable, Codable {
+public enum DashStyle: String, CaseIterable, Identifiable, Codable, Sendable {
     /// "–", what the Mac's own keyboard types with ⌥-.
     case enDash
     /// "-", what a keyboard without substitutions produces.

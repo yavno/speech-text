@@ -6,7 +6,7 @@ import ChatTemplates
 
 // MARK: - Provider Type
 
-public enum LLMProviderType: String, CaseIterable, Identifiable {
+public enum LLMProviderType: String, CaseIterable, Identifiable, Sendable {
     case groq = "groq"
     case anthropic = "anthropic"
     case openai = "openai"
@@ -58,7 +58,7 @@ enum ReasoningOutput: Equatable {
 /// the wrong one is an HTTP 400 and the whole rewrite lost — so they are written down per
 /// model here, and no request is built from a check on the model's name. The local
 /// entries are derived from `localChatModels`, so each model is written down once.
-public struct ChatModelDescriptor: Equatable {
+public struct ChatModelDescriptor: Equatable, Sendable {
     public let provider: LLMProviderType
     public let id: String
     public let displayName: String
@@ -76,7 +76,7 @@ public struct ChatModelDescriptor: Equatable {
 }
 
 /// What a vendor charges for a chat model's tokens.
-public struct ChatRates: Hashable {
+public struct ChatRates: Hashable, Sendable {
     public let inputPerToken: Double
     /// A cache read (`ChatUsage.cachedInputTokens`) — the input price where the vendor
     /// lists no cache.
@@ -233,7 +233,7 @@ public protocol ChatClient {
 }
 
 /// What a chat request returned: the reply and, when the provider reported it, its usage.
-public struct ChatReply: Equatable {
+public struct ChatReply: Equatable, Sendable {
     public let text: String
     public let usage: ChatUsage?
 
@@ -264,7 +264,7 @@ public struct ChatUsage: Codable, Equatable, Sendable {
     }
 }
 
-public enum LLMError: LocalizedError {
+public enum LLMError: LocalizedError, Sendable {
     case missingAPIKey(LLMProviderType)
     case invalidResponse
     case httpError(Int, String)
@@ -327,9 +327,9 @@ private let llmSession: URLSession = {
 /// Both Groq and OpenAI expose the same `/chat/completions` shape, so one
 /// implementation covers them. They diverge on which parameters they accept —
 /// see `Dialect`.
-public struct OpenAICompatibleChatClient: ChatClient {
+public struct OpenAICompatibleChatClient: ChatClient, Sendable {
     /// The two backends share an endpoint shape but not its parameters.
-    public enum Dialect {
+    public enum Dialect: Sendable {
         /// Groq: classic Chat Completions — `max_tokens` and sampling params accepted.
         case classic
         /// OpenAI's GPT-5.x reasoning models: `max_tokens` and `temperature` are both

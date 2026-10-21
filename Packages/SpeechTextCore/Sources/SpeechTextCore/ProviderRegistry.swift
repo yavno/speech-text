@@ -147,7 +147,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
 }
 
 /// What the app knows about a provider. See `Provider.descriptor`.
-public struct ProviderDescriptor {
+public struct ProviderDescriptor: Sendable {
     /// The company, as Settings, setup and History name it.
     let displayName: String
     /// The steps it can serve. A provider serving both has one key for both.
@@ -165,7 +165,7 @@ public struct ProviderDescriptor {
 
 /// Where the user's pick of one of a provider's models is stored, and what is used
 /// while nothing is.
-public struct ModelSetting {
+public struct ModelSetting: Sendable {
     /// Its `SettingsKeys` name, which is in `portable`; nil when there is nothing to
     /// pick (Apple's recogniser is one model).
     public let settingsKey: String?
@@ -180,7 +180,7 @@ public struct ModelSetting {
     public var caption: String? = nil
 }
 
-public struct ProviderRoles: OptionSet, Hashable {
+public struct ProviderRoles: OptionSet, Hashable, Sendable {
     public let rawValue: Int
 
     public init(rawValue: Int) {
@@ -193,7 +193,7 @@ public struct ProviderRoles: OptionSet, Hashable {
 
 /// A provider's API key: where it is kept, where the user gets one, and how setup tells
 /// it apart and checks it.
-public struct APIKeyDescriptor {
+public struct APIKeyDescriptor: Sendable {
     /// Its `SettingsKeys` name: the key's name in `APIKeyStore`, its keychain account,
     /// and the name it had in UserDefaults before it moved.
     public let settingsKey: String

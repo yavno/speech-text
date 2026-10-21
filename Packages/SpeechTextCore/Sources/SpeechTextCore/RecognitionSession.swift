@@ -7,7 +7,7 @@ import AVFoundation
 // MARK: - Protocol
 
 /// What a session tells the engine while a segment is open. Always delivered on the main thread.
-public enum RecognitionEvent {
+public enum RecognitionEvent: Sendable {
     /// The text so far. `committed` will not change again; `partial` may still be revised.
     /// Kept apart (rather than pre-joined) so a later span layer can map them onto
     /// partial / commit / revise without re-splitting a string.
@@ -21,7 +21,7 @@ public enum RecognitionEvent {
 
 /// A recogniser error as the engine acts on it: what the user is told, and whether the
 /// recording can go on.
-public struct RecognitionFailure: Equatable {
+public struct RecognitionFailure: Equatable, Sendable {
     /// What the status notice, the Record Window's status line and the History row say.
     public var message: String
     /// The recogniser failed before it produced any text. Nothing follows an error — the
@@ -132,12 +132,16 @@ public struct RecognitionOutcome: Sendable {
 /// One segment of recognition, whatever the tier. Created by `makeRecognitionSession`
 /// once per segment (a resume is a new session); the engine owns the microphone, the
 /// tap and the `AudioBufferWriter`, and the session gets the writer by reference.
-public protocol RecognitionSession: AnyObject {
+///
+/// Three threads reach a session, and each requirement says which: the engine drives it
+/// on the main actor, the tap feeds it from the audio thread, and `finish()` runs off
+/// main, hopping there for whatever state it shares with the rest.
+public protocol RecognitionSession: AnyObject, Sendable {
     /// Set by the engine before `start()`. Invoked on the main thread.
-    var onEvent: ((RecognitionEvent) -> Void)? { get set }
+    @MainActor var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)? { get set }
     /// Opens sockets / recognisers. Called before the tap is installed and before the
     /// audio engine starts, so a TLS handshake overlaps the hardware start.
-    func start() throws
+    @MainActor func start() throws
     /// One tap buffer, from the audio thread. `native` is the hardware-format buffer
     /// (Apple resamples itself); `pcm16` is the writer's 16 kHz mono Int16 conversion of
     /// the same buffer, nil on the writer's native-copy fallback path or on a converter error.
@@ -147,17 +151,17 @@ public protocol RecognitionSession: AnyObject {
     /// live text, no history entry), or nil when it must be waited for with `finish()`.
     /// Must be idempotent and synchronous on the main thread: the engine calls it before
     /// spawning the `finish()` task so no session-internal timer can fire in between.
-    func pause() -> String?
+    @MainActor func pause() -> String?
     /// Commits what is pending and returns the segment's text once known. Bounded: Apple
     /// waits ≤ 0.5 s for `isFinal`, streaming ≤ `STTTuning.streamFinishTimeoutSeconds`
     /// then falls back, batch is bounded by the provider's URLSession timeouts.
     /// Called at most once per session.
     func finish() async -> RecognitionOutcome
     /// Drops everything immediately. Idempotent; safe after `finish()` returned.
-    func cancel()
+    @MainActor func cancel()
 }
 
-public enum RecognitionSessionError: LocalizedError {
+public enum RecognitionSessionError: LocalizedError, Sendable {
     case recognizerUnavailable(String)
     /// Speech Recognition is denied or restricted for the app, so every task would fail.
     case speechPermissionDenied

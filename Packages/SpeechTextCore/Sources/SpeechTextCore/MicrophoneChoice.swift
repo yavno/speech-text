@@ -5,8 +5,8 @@ import Foundation
 
 /// A microphone as Core Audio lists it, reduced to what the choice needs. Built by
 /// `AudioInputDevices` (app target); the tests build it by hand.
-public struct AudioInputDevice: Equatable, Identifiable {
-    public enum Transport: Equatable {
+public struct AudioInputDevice: Equatable, Identifiable, Sendable {
+    public enum Transport: Equatable, Sendable {
         case builtIn
         /// Classic and LE alike: either turns a headset to call quality while its
         /// microphone is open.
@@ -34,7 +34,7 @@ public struct AudioInputDevice: Equatable, Identifiable {
 }
 
 /// Which microphone a dictation records from — the stored `SettingsKeys.microphone`.
-public enum MicrophoneChoice: Equatable {
+public enum MicrophoneChoice: Equatable, Sendable {
     /// The system's input, except that Bluetooth headphones are left to play and the
     /// Mac's own microphone records instead.
     case automatic
@@ -63,7 +63,7 @@ public enum MicrophoneChoice: Equatable {
 }
 
 /// What a choice comes to with the devices connected right now.
-public struct MicrophoneResolution: Equatable {
+public struct MicrophoneResolution: Equatable, Sendable {
     /// The device to record from; nil leaves the system's input alone, which is exactly
     /// the path the app took before the setting existed.
     public var device: AudioInputDevice?

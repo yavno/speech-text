@@ -7,7 +7,7 @@ import Foundation
 
 /// The steps of the setup window, in order. The raw values are what `onboardingStep`
 /// stores, so a window closed half-way opens where it was left.
-public enum OnboardingStep: String, CaseIterable, Comparable {
+public enum OnboardingStep: String, CaseIterable, Comparable, Sendable {
     case welcome
     case speech
     case ai
@@ -40,7 +40,7 @@ public enum OnboardingStep: String, CaseIterable, Comparable {
 /// or any setting that crosses a rename (which is also how a renamed install is caught,
 /// once `adoptPreRenameDefaults()` has carried its settings over). Such a user is marked
 /// done and never shown a flow for a setup they finished long ago.
-public enum OnboardingGate: Equatable {
+public enum OnboardingGate: Equatable, Sendable {
     case show
     /// An existing install: record setup as done, show nothing.
     case markCompleted
@@ -58,7 +58,7 @@ public enum OnboardingGate: Equatable {
 // MARK: - The online services setup offers
 
 /// A card on setup's Speech step: the service, the engine choosing it saves, and its words.
-public struct SpeechServiceCard {
+public struct SpeechServiceCard: Sendable {
     public let service: Provider
     public let engine: STTProviderType
     public let title: String
@@ -85,7 +85,7 @@ public struct SpeechServiceCard {
 }
 
 /// A card on setup's AI step: the service, the AI Rewrite pick choosing it saves, and its words.
-public struct AIServiceCard {
+public struct AIServiceCard: Sendable {
     public let service: Provider
     public let pick: LLMProviderType
     public let title: String
@@ -152,7 +152,7 @@ public enum APIKeyPage {
     }
 }
 
-public enum KeyVerdict: Equatable {
+public enum KeyVerdict: Equatable, Sendable {
     case valid
     case invalid
     /// No answer about the key: offline, or the service is down. The user may go on.
@@ -163,7 +163,7 @@ public enum KeyVerdict: Equatable {
 
 /// A disk image macOS has mounted, as `hdiutil info -plist` describes it: the `.dmg` file
 /// and where its volume is.
-public struct MountedDiskImage: Equatable {
+public struct MountedDiskImage: Equatable, Sendable {
     public let imagePath: String
     let mountPoint: String
 
@@ -189,7 +189,7 @@ public struct MountedDiskImage: Equatable {
 /// that copy: opened straight from the image, where it has to move itself first or it
 /// stops working the moment the image is ejected. The image, once the app is installed,
 /// is the user's to eject and throw away.
-public enum InstallLocation: Equatable {
+public enum InstallLocation: Equatable, Sendable {
     /// Running from inside a mounted image. `image` is nil when that is known only from
     /// App Translocation's path and no mounted image carries the app.
     case inDiskImage(MountedDiskImage?)

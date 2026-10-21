@@ -8,7 +8,7 @@ import Foundation
 /// One window of a vendor's rate limit, as its reply's headers state it: requests a
 /// day, tokens a minute, and whatever else the vendor meters. A free tier is spent
 /// against these, not against dollars, so how much of each is left is the useful number.
-public struct RateLimitWindow: Equatable {
+public struct RateLimitWindow: Equatable, Sendable {
     /// The vendor's own word for what is counted: `requests`, `tokens`, `input-tokens`…
     public let name: String
     public var limit: Int?
@@ -25,7 +25,7 @@ public struct RateLimitWindow: Equatable {
 
 /// The last limits a vendor reported for one model — Groq's apply per model, so a chat
 /// model's and a speech model's are kept apart.
-public struct RateLimitSnapshot: Equatable {
+public struct RateLimitSnapshot: Equatable, Sendable {
     public let vendor: Provider
     public let model: String
     let date: Date
@@ -124,14 +124,16 @@ enum RateLimits {
 
 /// The latest limits each vendor and model reported this session. Memory only: a limit
 /// read yesterday says nothing about today, and the next request refreshes it.
-@Observable
+@MainActor @Observable
 public final class RateLimitStore {
-    public static let shared = RateLimitStore()
+    public nonisolated static let shared = RateLimitStore()
+
+    nonisolated init() {}
 
     private(set) var latest: [String: RateLimitSnapshot] = [:]
 
     /// Called with each reply, from whatever thread the request finished on.
-    func record(vendor: Provider, model: String, response: URLResponse) {
+    nonisolated func record(vendor: Provider, model: String, response: URLResponse) {
         guard let http = response as? HTTPURLResponse,
               let snapshot = RateLimits.parse(vendor: vendor, model: model, headers: http.allHeaderFields)
         else { return }

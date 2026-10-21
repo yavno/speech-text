@@ -373,7 +373,7 @@ func localSTTRecommendationReason(for capabilities: SystemCapabilities, language
     return "\(model.displayName) for a \(tier.displayName) Mac."
 }
 
-public enum LocalModelError: LocalizedError, Equatable {
+public enum LocalModelError: LocalizedError, Equatable, Sendable {
     case notInstalled(String)
     case downloadFailed(String)
     /// `needed` counts the headroom, so it is the free space to make, as the user reads it.
@@ -519,7 +519,7 @@ public func isLocalModelInstalled(_ modelID: String, in directory: URL = localMo
 /// Stands in for the local engine when none was registered. It never silently returns
 /// empty text: a dictation that produced nothing has to surface as an error so the
 /// existing failure paths (status overlay, History entry with the audio kept) run.
-public struct UnavailableLocalTranscriber: BatchTranscriber {
+public struct UnavailableLocalTranscriber: BatchTranscriber, Sendable {
     let modelID: String
 
     public init(modelID: String) {

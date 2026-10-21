@@ -5,7 +5,7 @@ import Foundation
 
 // MARK: - Provider Type
 
-public enum STTProviderType: String, CaseIterable, Identifiable {
+public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
     case apple = "apple"
     case groq = "groq"
     case elevenlabs = "elevenlabs"
@@ -164,7 +164,7 @@ public enum STTTuning {
 
 // MARK: - Batch STT Protocol
 
-public protocol BatchTranscriber {
+public protocol BatchTranscriber: Sendable {
     func transcribe(audioFileURL: URL, language: String?) async throws -> String
     /// The text and what the vendor said it billed. Declared here, not only in the
     /// extension, so a transcriber's own version is the one called through
@@ -185,7 +185,7 @@ extension BatchTranscriber {
 }
 
 /// An upload's text, and what the vendor said it billed for it.
-public struct Transcription: Equatable {
+public struct Transcription: Equatable, Sendable {
     public let text: String
     public var billing: SpeechBilling? = nil
 }
@@ -193,7 +193,7 @@ public struct Transcription: Equatable {
 /// What one speech request was billed for, in the vendor's own words. Only what the
 /// reply said: a vendor that reports nothing leaves both nil, and `UsageMeter` supplies a
 /// documented rule where one exists.
-public struct SpeechBilling: Equatable {
+public struct SpeechBilling: Equatable, Sendable {
     /// OpenAI's `usage` of `type: "duration"`, ElevenLabs' `audio_duration_secs`.
     var seconds: Double? = nil
     /// OpenAI's `usage` of `type: "tokens"`: `inputTokens` counts the audio tokens.
@@ -221,7 +221,7 @@ public struct SpeechBilling: Equatable {
 /// Who a speech request is billed by: the vendor actually called (an Apple session's
 /// uploads go to Groq), the model, and the billing rule the vendor documents where its
 /// reply says nothing — Groq's ten-second minimum per request.
-public struct UsageMeter: Equatable {
+public struct UsageMeter: Equatable, Sendable {
     let vendor: Provider
     let model: String
     /// Data on the vendor's `OpenAICompatibleUpload`, never a check on its name.
@@ -453,7 +453,7 @@ private struct TranscriptionResponse: Decodable {
 
 /// A transcription that failed, in any provider's words: an upload's reply the app could
 /// not use, an HTTP error (`providerErrorMessage`), or a realtime socket's error event.
-public enum TranscriptionError: LocalizedError {
+public enum TranscriptionError: LocalizedError, Sendable {
     case invalidResponse(Provider)
     case httpError(Provider, Int, String)
     /// The realtime socket reported an error, or sent something unusable. The code is

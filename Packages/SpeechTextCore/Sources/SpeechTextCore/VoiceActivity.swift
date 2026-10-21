@@ -18,7 +18,7 @@ public protocol VoiceActivityDetector: AnyObject, Sendable {
 }
 
 /// What the detector said about one segment.
-public struct VoiceActivityReading: Equatable {
+public struct VoiceActivityReading: Equatable, Sendable {
     /// The highest probability of any window.
     public var maxProbability: Float
     /// How many windows were above `STTTuning.voiceProbabilityThreshold`.

@@ -9,7 +9,7 @@ import Foundation
 /// routinely stacks two ("a letter in English, keep it short").
 public enum TextRefinementService {
 
-    public struct Result {
+    public struct Result: Sendable {
         public let text: String
         /// Name of the preset the model routed to, when it reported one. Only the primary
         /// one: a dictation that also asked for another language or format reports the

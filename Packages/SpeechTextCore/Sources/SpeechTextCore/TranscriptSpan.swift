@@ -8,7 +8,7 @@ import Foundation
 /// Identity of a span. A counter rather than a UUID: the layer is pure logic and its
 /// tests read better when the third span is `#3`, and the debug log's span timeline is
 /// the thing these numbers exist for.
-public struct TranscriptSpanID: Hashable, CustomStringConvertible {
+public struct TranscriptSpanID: Hashable, CustomStringConvertible, Sendable {
     let rawValue: UInt64
     public var description: String { "#\(rawValue)" }
 }
@@ -16,7 +16,7 @@ public struct TranscriptSpanID: Hashable, CustomStringConvertible {
 /// One piece of issued text with an identity and a state. A span is *not* a phase:
 /// `RecordingPhase` describes the engine, a span describes a piece of text, and inside
 /// one `.recording` there can be ten settled spans and one still moving.
-public struct TranscriptSpan: Identifiable, Equatable {
+public struct TranscriptSpan: Identifiable, Equatable, Sendable {
     enum State: Equatable {
         /// Shown, but the recogniser may still replace it.
         case provisional
@@ -90,7 +90,7 @@ func joinedSpanTexts(_ spans: [TranscriptSpan]) -> String {
 ///
 /// Pure logic on purpose: no engine, no view, no clock. Everything that depends on the
 /// microphone stays in `SpeechEngine`, and this is covered by `PureLogicTests`.
-public struct TranscriptSpanLayer {
+public struct TranscriptSpanLayer: Sendable {
     private(set) var spans: [TranscriptSpan] = []
     /// Index of the segment being recorded. `beginSegment()` opens the next one.
     private(set) var segment: Int = 0

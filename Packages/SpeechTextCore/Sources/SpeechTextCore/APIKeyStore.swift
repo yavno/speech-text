@@ -37,7 +37,7 @@ public final class APIKeyStore: @unchecked Sendable {
     /// pinned literally in the tests.
     static let keys: [String] = Provider.allCases.compactMap { $0.descriptor.apiKey?.settingsKey }
 
-    public enum Mode: Equatable {
+    public enum Mode: Equatable, Sendable {
         /// Not opened: every key reads as empty. The test bundle's state.
         case unopened
         case keychain
@@ -45,7 +45,7 @@ public final class APIKeyStore: @unchecked Sendable {
     }
 
     /// What `open` did, for the Debug Log and the tests.
-    public struct Report: Equatable {
+    public struct Report: Equatable, Sendable {
         public var mode: Mode
         /// Keys written into the keychain from a preferences domain.
         public var moved: [String] = []

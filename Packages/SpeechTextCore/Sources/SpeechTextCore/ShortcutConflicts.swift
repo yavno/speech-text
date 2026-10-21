@@ -7,7 +7,7 @@ import Carbon.HIToolbox
 /// A key combination as Carbon's hotkey APIs see it: a virtual key code and the four
 /// modifiers a global shortcut can carry. Anything else in the mask (Caps Lock, the
 /// fn key) is dropped, so two routes to the same combination compare equal.
-public struct KeyShortcut: Hashable {
+public struct KeyShortcut: Hashable, Sendable {
     public let keyCode: UInt32
     public let carbonModifiers: UInt32
 
@@ -33,7 +33,7 @@ public struct KeyShortcut: Hashable {
 }
 
 /// What the shortcut recorder does with a key pressed while it listens.
-public enum ShortcutKeyPress: Equatable {
+public enum ShortcutKeyPress: Equatable, Sendable {
     /// Take it. `modifiers` holds ⌘⌥⌃⇧ only, so what is stored and drawn is what Carbon
     /// registers.
     case record(keyCode: UInt16, modifiers: NSEvent.ModifierFlags)
@@ -72,7 +72,7 @@ public enum ShortcutKeyPress: Equatable {
 
 /// The app's four global shortcuts, with where each is stored and what it is until
 /// the user changes it.
-public enum ShortcutAction: CaseIterable, Hashable {
+public enum ShortcutAction: CaseIterable, Hashable, Sendable {
     case inline
     case ai
     case edit
@@ -128,7 +128,7 @@ public enum ShortcutAction: CaseIterable, Hashable {
 }
 
 /// Who else already answers a combination.
-public enum ShortcutConflict: Equatable {
+public enum ShortcutConflict: Equatable, Sendable {
     /// Another of the app's own shortcuts. Carbon hands a combination to one
     /// registration only, so the second would never fire.
     case action(ShortcutAction)

@@ -9,8 +9,8 @@ private let histLog = Logger(subsystem: Bundle.main.bundleIdentifier ?? "SpeechT
 
 // MARK: - Record
 
-public struct TranscriptionRecord: Identifiable, Codable, Equatable {
-    public enum Status: String, Codable {
+public struct TranscriptionRecord: Identifiable, Codable, Equatable, Sendable {
+    public enum Status: String, Codable, Sendable {
         case success
         case empty
         case failed
@@ -18,7 +18,7 @@ public struct TranscriptionRecord: Identifiable, Codable, Equatable {
 
     /// The LLM pass, when the dictation went through one. `text` always stays the raw
     /// transcription, so both versions survive and can be compared after the fact.
-    public struct Refinement: Codable, Equatable {
+    public struct Refinement: Codable, Equatable, Sendable {
         /// What was actually sent to the model. Usually equals the record's `text`, but
         /// the Record Window refines its whole text area, which can span several
         /// segments and manual edits — so it is stored rather than assumed.
@@ -151,7 +151,9 @@ public struct UsageEvent: Codable, Equatable, Sendable {
 
 // MARK: - Store
 
-@Observable
+/// Main-actor, as every view and the engine that write it are; the file is written on
+/// `ioQueue`, which reaches nothing of the store but the paths and `unreadableCopyOwed`.
+@MainActor @Observable
 public final class TranscriptionHistory {
     public static let shared = TranscriptionHistory()
 
@@ -185,8 +187,8 @@ public final class TranscriptionHistory {
     @ObservationIgnored private var undecodable: [UndecodableRecord] = []
     /// `history.json` was there but could not be read at all, so a copy of it is owed before
     /// a write replaces it. Set by `load()` before any write is queued; after that read and
-    /// cleared on `ioQueue` only.
-    @ObservationIgnored private var unreadableCopyOwed = false
+    /// cleared on `ioQueue` only, which is what makes the unchecked access safe.
+    @ObservationIgnored private nonisolated(unsafe) var unreadableCopyOwed = false
 
     private init() {
         adoptPreRenameStore()
@@ -197,7 +199,7 @@ public final class TranscriptionHistory {
 
     // MARK: Paths
 
-    private var baseDirectory: URL {
+    private nonisolated var baseDirectory: URL {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return support.appendingPathComponent(E2EMode.supportFolderName, isDirectory: true)
     }
@@ -224,11 +226,11 @@ public final class TranscriptionHistory {
         }
     }
 
-    private var historyFileURL: URL {
+    private nonisolated var historyFileURL: URL {
         baseDirectory.appendingPathComponent("history.json")
     }
 
-    private var recordingsDirectory: URL {
+    private nonisolated var recordingsDirectory: URL {
         baseDirectory.appendingPathComponent("Recordings", isDirectory: true)
     }
 
@@ -252,7 +254,7 @@ public final class TranscriptionHistory {
         return FileManager.default.fileExists(atPath: url.path) ? url : nil
     }
 
-    private func ensureDirectories() {
+    private nonisolated func ensureDirectories() {
         try? FileManager.default.createDirectory(at: recordingsDirectory,
                                                  withIntermediateDirectories: true)
     }
@@ -357,7 +359,7 @@ public final class TranscriptionHistory {
     /// even one refused afterwards (the Record Window's collapse guard); one with no
     /// reply — a missing key, an HTTP error — sent no tokens anyone billed. Nil when the
     /// provider is one History cannot name.
-    static func chatEvent(for refinement: TranscriptionRecord.Refinement, latency: Double?,
+    nonisolated static func chatEvent(for refinement: TranscriptionRecord.Refinement, latency: Double?,
                           date: Date = Date()) -> UsageEvent? {
         guard let vendor = LLMProviderType(rawValue: refinement.provider)?.vendor else { return nil }
         return UsageEvent(date: date, kind: refinement.isSelectionEdit ? .edit : .rewrite, vendor: vendor,
@@ -573,13 +575,8 @@ public final class TranscriptionHistory {
     /// cancelled and re-scheduled instead of stacking, so a burst costs one encode. The
     /// snapshot is taken when the write *fires*, so it is always the latest state.
     ///
-    /// `records` and `pendingSave` are both main-thread-only — a `save()` from anywhere
-    /// else hops to main rather than taking a lock.
+    /// `records` and `pendingSave` are both main-actor state, so a burst never races its write.
     private func save() {
-        guard Thread.isMainThread else {
-            DispatchQueue.main.async { [weak self] in self?.save() }
-            return
-        }
         pendingSave?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
@@ -593,10 +590,6 @@ public final class TranscriptionHistory {
     /// Writes any pending change immediately, on the calling thread. Called at
     /// termination, where an asynchronous write would not land before the process exits.
     public func flush() {
-        guard Thread.isMainThread else {
-            DispatchQueue.main.sync { self.flush() }
-            return
-        }
         if let work = pendingSave {
             work.cancel()
             pendingSave = nil
@@ -610,7 +603,7 @@ public final class TranscriptionHistory {
     private func writeNow(records snapshot: [TranscriptionRecord], synchronously: Bool = false) {
         let url = historyFileURL
         let kept = undecodable
-        let write = { [weak self] in
+        let write: @Sendable () -> Void = { [weak self] in
             guard let self else { return }
             self.ensureDirectories()
             self.unreadableCopyOwed = HistoryFile.write(snapshot, keeping: kept, to: url,

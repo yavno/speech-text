@@ -268,6 +268,7 @@ private final class UnreachableBatchTranscriber: BatchTranscriber, @unchecked Se
 }
 
 /// a segment with no voice in it is neither sent nor pasted.
+@MainActor
 final class VoiceActivityTests: XCTestCase {
     private func writer(seconds: Double) -> AudioBufferWriter {
         let writer = AudioBufferWriter()
@@ -406,6 +407,7 @@ final class VoiceActivityTests: XCTestCase {
 }
 
 /// The upload's and the stream's guards against text nobody said.
+@MainActor
 final class HallucinationGuardTests: XCTestCase {
 
     private func writer(seconds: Double, amplitude: Float = 0.5) -> AudioBufferWriter {
@@ -853,6 +855,7 @@ private final class MeteredBatchTranscriber: BatchTranscriber, @unchecked Sendab
 
 /// What each request a segment makes leaves in History's ledger — the units Usage counts
 /// and prices, written whatever the request's answer was.
+@MainActor
 final class UsageLedgerTests: XCTestCase {
     private let groq = UsageMeter(vendor: .groq, model: "whisper-large-v3-turbo", minimumBilledSeconds: 10)
 
