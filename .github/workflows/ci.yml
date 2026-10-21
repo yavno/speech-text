@@ -52,6 +52,10 @@ jobs:
     # The one job that needs a Mac, and the one that runs a pull request's own
     # code. Public: it gets a disposable Mac.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'macos-latest' }}
+    # GitHub's default is six hours, and while private there is one runner: a hung
+    # xcodebuild would hold every queued run behind it. A warm run takes ~3 minutes;
+    # a hosted one builds three packages from nothing.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -153,6 +157,7 @@ jobs:
     # construct to avoid. scripts/lint-swift.sh holds the list and .swift-format the
     # configuration — an old finding elsewhere in a touched file is left alone.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'macos-latest' }}
+    timeout-minutes: 10
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -181,6 +186,7 @@ jobs:
     name: No development team
     # Greps a tracked file. No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -197,6 +203,7 @@ jobs:
     name: SPDX headers
     # Reads the first two lines of every Swift file (lines 2–3 of a Package.swift). No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -230,6 +237,7 @@ jobs:
     # of them is renamed or removed, or a capability is added, and the guide was not
     # updated with it. Shell and grep only. No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -240,6 +248,7 @@ jobs:
     name: DCO sign-off
     # Reads commit messages. No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -284,6 +293,7 @@ jobs:
     # repository is private, Linux once it is public and a stranger's pull
     # request could reach it.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     if: github.event_name == 'pull_request'
     permissions:
       pull-requests: read
@@ -350,6 +360,7 @@ jobs:
     # Every Debug Log entry also goes to the system log as public, so a dlog line may
     # say how long a dictation is, never what it says. Shell and awk only. No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -363,6 +374,7 @@ jobs:
     # engines are a build error there already (the manifest declares no dependency) and
     # are checked anyway. Shell and grep only. No Mac involved.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
