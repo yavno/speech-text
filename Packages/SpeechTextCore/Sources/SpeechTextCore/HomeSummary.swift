@@ -573,7 +573,10 @@ public struct HomeTalk: Equatable, Sendable {
     /// What the message holds: the selection waiting to be edited, nothing but the caret
     /// (before a paste, and once an edit's instruction is over and the selection is cut),
     /// or the text pasted.
-    public enum Message: Equatable, Sendable { case caret, selection(String), pasted }
+    public enum Message: Equatable, Sendable {
+        case caret, pasted
+        case selection(String)
+    }
 
     public var message: Message {
         if phase == .done { return .pasted }

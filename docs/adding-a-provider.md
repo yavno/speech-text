@@ -164,7 +164,11 @@ no clipboard pick-up) · a free authenticated request for the key check (usually
      for a new shape and pin it with a literal reply in `UsageLedgerTests` — and `meter`
      (`UsageMeter`: the vendor, the model, the terms sent). A transcriber without them
      leaves no entry in History's ledger and is counted as free;
-   - log sizes, timings and counts, never text, terms or keys; Foundation only, no SDK.
+   - log sizes, timings and counts, never text, terms or keys; Foundation only, no SDK;
+   - `BatchTranscriber` is `Sendable`: the upload runs off main, in the session's
+     `finish()`. A struct of `let`s is; a class is `@unchecked Sendable` with a line
+     saying which lock guards each mutable field. A closure handed to URLSession is
+     `@Sendable` (docs/development.md › Concurrency).
 3. Catalogue entries, each with its `price` (docs/prices.md) and `languages` (section 3), a model key in `SettingsKeys`, and the descriptor's `speechModel`
    (`ModelSetting`: that key and the default). `portable`, normalisation and
    `RecordingConfiguration`'s `apiKeys` / `models` and the Settings picker follow
