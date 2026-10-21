@@ -4,8 +4,8 @@ name: CI
 # these jobs by the time it merges, but the squash that lands it is a new commit:
 # two green pull requests that each passed alone can combine into a red main, and
 # the README's CI badge reads main's latest run, so a workflow that never ran on
-# main showed nothing true. The jobs that only mean something for a pull request
-# (`dco`, `base`) are skipped on a push.
+# main showed nothing true. What only means something for a pull request (Swift
+# lint, and the DCO sign-off and Base branch steps of Checks) is skipped on a push.
 #
 # Once this repository is public, nothing here may run on the organisation's
 # self-hosted Mac. A pull request is code, and on a public repository anyone may
@@ -182,15 +182,28 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: scripts/lint-swift.sh "$BASE"
 
-  pbxproj:
-    name: No development team
-    # Greps a tracked file. No Mac involved.
+  checks:
+    name: Checks
+    # The checks that read the tree or the pull request and need no Mac, as one
+    # job. Seven jobs of ten seconds each queued one by one on the single
+    # self-hosted runner, and a failing grep could report last, after Tests. Every
+    # step runs whatever the one before it did (`!cancelled()`), so one run shows
+    # every check that fails, each under its own name. Once public: Linux.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # Base branch reads the pull request's labels.
+      pull-requests: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # DCO sign-off walks the pull request's commits.
+          fetch-depth: 0
 
-      - name: DEVELOPMENT_TEAM must be empty
+      # Greps a tracked file.
+      - name: No development team
+        if: ${{ !cancelled() }}
         run: |
           if grep -nE 'DEVELOPMENT_TEAM = "?[A-Z0-9]' SpeechText/SpeechText.xcodeproj/project.pbxproj; then
             echo
@@ -199,15 +212,9 @@ jobs:
             exit 1
           fi
 
-  spdx:
-    name: SPDX headers
-    # Reads the first two lines of every Swift file (lines 2–3 of a Package.swift). No Mac involved.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Every Swift file opens with the SPDX header
+      # Reads the first two lines of every Swift file (lines 2–3 of a Package.swift).
+      - name: SPDX headers
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           missing=""
@@ -230,32 +237,30 @@ jobs:
             exit 1
           fi
 
-  provider-guide:
-    name: Provider guide
-    # docs/adding-a-provider.md names the files and declarations a new provider
-    # touches, and explains every capability a model can have; this fails when one
-    # of them is renamed or removed, or a capability is added, and the guide was not
-    # updated with it. Shell and grep only. No Mac involved.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: The guide matches the provider code
+      # docs/adding-a-provider.md names the files and declarations a new
+      # provider touches, and explains every capability a model can have; this fails when
+      # one of them is renamed or removed, or a capability is added, and the guide was not
+      # updated with it.
+      - name: Provider guide
+        if: ${{ !cancelled() }}
         run: scripts/check-provider-guide.sh
 
-  dco:
-    name: DCO sign-off
-    # Reads commit messages. No Mac involved.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
+      # Every Debug Log entry also goes to the system log as public, so a dlog
+      # line may say how long a dictation is, never what it says.
+      - name: Log privacy
+        if: ${{ !cancelled() }}
+        run: scripts/check-log-privacy.sh
 
-      - name: Every commit is signed off
+      # Packages/SpeechTextCore is the logic the tests reach without the app,
+      # so no file there may import SwiftUI — a system framework its manifest cannot
+      # refuse. The engines are a build error there already and are checked anyway.
+      - name: Core imports
+        if: ${{ !cancelled() }}
+        run: scripts/check-core-imports.sh
+
+      # Reads the pull request's commit messages. Pull requests only.
+      - name: DCO sign-off
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
@@ -286,20 +291,9 @@ jobs:
           fi
           echo "All commits are signed off."
 
-  base:
-    name: Base branch
-    # Reads the pull request's metadata and nothing from the tree, so it can run
-    # anywhere. It follows the rest of ci.yml: the self-hosted Mac while the
-    # repository is private, Linux once it is public and a stranger's pull
-    # request could reach it.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: read
-    steps:
-      # No checkout: the answer is in the pull request's metadata, not in the tree.
-      - name: The base is main, or the stack says where this lands
+      # Reads the pull request's metadata, nothing from the tree. Pull requests only.
+      - name: Base branch
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
         env:
           BASE: ${{ github.event.pull_request.base.ref }}
           NUMBER: ${{ github.event.pull_request.number }}
@@ -325,7 +319,7 @@ jobs:
             echo "into a branch nobody was watching, and its commits never reached main."
             echo
             echo "Either retarget this pull request at main, or label it 'stacked' and"
-            echo "re-run this job — the label is a promise that someone lands it afterwards."
+            echo "re-run the Checks job — the label is a promise that someone lands it afterwards."
             exit 1
           fi
 
@@ -354,29 +348,3 @@ jobs:
           echo
           echo "Open the base's pull request first, or retarget this one at main."
           exit 1
-
-  log-privacy:
-    name: Log privacy
-    # Every Debug Log entry also goes to the system log as public, so a dlog line may
-    # say how long a dictation is, never what it says. Shell and awk only. No Mac involved.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: No Debug Log line interpolates the user's text
-        run: scripts/check-log-privacy.sh
-
-  core-imports:
-    name: Core imports
-    # Packages/SpeechTextCore is the logic the tests reach without the app, so no file
-    # there may import SwiftUI — a system framework its manifest cannot refuse. The
-    # engines are a build error there already (the manifest declares no dependency) and
-    # are checked anyway. Shell and grep only. No Mac involved.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: SpeechTextCore imports no view framework or engine
-        run: scripts/check-core-imports.sh
