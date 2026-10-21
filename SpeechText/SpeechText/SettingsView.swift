@@ -638,19 +638,10 @@ struct SettingsView: View {
             .padding(.top, -12)
 
         SettingsGroup(title: "Recording") {
-            SettingsRow(title: "Hold to talk",
-                        detail: holdToTalk
-                            ? "Hold a shortcut while you speak, let go to paste."
-                            : "Press a shortcut to start, press it again to paste.") {
-                SettingsSwitch(isOn: $holdToTalk)
-            }
-            if holdToTalk {
-                HoldGestureList(showsSwitch: hasLLMKey)
-                    .padding(.bottom, 12)
-            } else if hasLLMKey {
-                SettingsNote("While dictating with \(shortcutText(for: .inline)), press \(shortcutText(for: .ai)) to switch to AI Rewrite — and \(shortcutText(for: .inline)) to switch back.")
-                    .padding(.bottom, 12)
-            }
+            RecordingModePicker(holdToTalk: $holdToTalk, shortcut: shortcutKeys(shortcutText(for: .inline)))
+                .padding(.top, 12)
+            GestureDemoList(holdToTalk: holdToTalk, showsSwitch: hasLLMKey)
+                .padding(.vertical, 12)
             SettingsDivider()
             SettingsRow(title: "Esc cancels a dictation",
                         detail: escapeCancelsDictation
@@ -1150,46 +1141,95 @@ private func keyboardLanguageCodes() -> Set<String> {
     return codes
 }
 
-/// Settings › Hold to talk: each gesture played on a loop, the way System Settings shows a
-/// trackpad gesture — the user's own keys going down and what the dictation does — beside
-/// its name. The hold lets the modifiers go while the letter keeps recording, the
-/// double tap locks the dictation on, and the switch to AI Rewrite is left out while AI
-/// Rewrite has no provider: the AI shortcut is then a second dictation shortcut
-/// (`AppState.effectiveKey`), with nothing to switch to. Indented behind a rule, so the
-/// gestures read as part of Hold to talk rather than as settings of their own.
-private struct HoldGestureList: View {
+/// Settings › Recording: how a dictation shortcut records, as two segments side by side —
+/// press it to start and again to paste, or hold it while speaking — each named and drawn
+/// with the user's own shortcut. Stored as `holdToTalk`.
+private struct RecordingModePicker: View {
+    @Binding var holdToTalk: Bool
+    let shortcut: [String]
+
+    var body: some View {
+        HStack(spacing: 4) {
+            segment(hold: false, title: "Press to toggle", caption: "press again to paste")
+            segment(hold: true, title: "Hold to talk", caption: "hold while you speak")
+        }
+        .padding(3)
+        .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(SetupColor.separator.opacity(0.55)))
+    }
+
+    private func segment(hold: Bool, title: String, caption: String) -> some View {
+        let selected = holdToTalk == hold
+        return Button {
+            withAnimation(.easeOut(duration: 0.15)) { holdToTalk = hold }
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(selected ? SetupColor.label : SetupColor.label2)
+                HStack(spacing: 6) {
+                    SetupKeycaps(keys: shortcut, size: 17, litKeys: selected ? Set(shortcut.indices) : [])
+                    Text(caption)
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(SetupColor.label2)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background {
+                if selected {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(SettingsColor.background)
+                        .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title): \(shortcut.joined()), \(caption)")
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+/// Settings › Recording: each gesture of the chosen mode played on a loop, the way System
+/// Settings shows a trackpad gesture — the user's own keys going down one after another
+/// and what the dictation does — beside its name (`HoldTip.demoFrame`). With hold to
+/// talk: the hold, whose modifiers may be let go once the letter is down, the double tap
+/// of the letter that locks it on, and the switch while the letter is held. Without: a
+/// press to start and one to paste, and the switch by the other shortcut. The switch is
+/// left out while AI Rewrite has no provider: the AI shortcut is then a second dictation
+/// shortcut (`AppState.effectiveKey`), with nothing to switch to. Indented behind a rule,
+/// so the gestures read as part of the mode rather than as settings of their own.
+private struct GestureDemoList: View {
+    let holdToTalk: Bool
     let showsSwitch: Bool
+
+    private struct Demo {
+        let gesture: HoldTip.DemoGesture
+        let title: String
+        let detail: String
+    }
 
     var body: some View {
         let inline = shortcutKeys(shortcutText(for: .inline))
         let ai = shortcutKeys(shortcutText(for: .ai))
-        let letter = inline.last ?? ""
-        let modifiers = inline.filter(isModifierCap).joined()
-        let switchKeys = SwitchKeys(inline: inline, ai: ai)
+        let modifiers = inline.filter(isModifierCap)
+        let aiModifiers = ai.filter(isModifierCap)
+        let shared = modifiers == aiModifiers
+        let layout = HoldTip.DemoLayout(modifiers: modifiers.count, otherModifiers: aiModifiers.count,
+                                        sharesModifiers: shared)
+        let switchKeys = shared ? inline + [ai.last ?? ""] : inline + ai
+        let demos = demos(letter: inline.last ?? "", modifiers: modifiers.joined(), inline: inline.joined(), ai: ai.joined())
         TimelineView(.animation(minimumInterval: 1 / 30)) { context in
             let time = context.date.timeIntervalSinceReferenceDate
             Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 0) {
-                let hold = HoldTip.holdFrame(at: time)
-                let caps = HoldTip.keycaps(modifiersDown: [hold.modifiersDown], letterDown: hold.letterDown, holdToTalk: true)
-                let states = inline.map { isModifierCap($0) ? caps.modifiers[0] : caps.letter }
-                row(SetupKeycaps(keys: inline, size: 22,
-                                 litKeys: states.indexes(of: .down), fadedKeys: states.indexes(of: .notNeeded),
-                                 ringKeys: states.contains(.notNeeded) ? states.indexes(of: .down) : []),
-                    state: hold.state, title: "Hold to record",
-                    detail: "Once it records, let go of \(modifiers) — \(letter) alone keeps it going. Let go of \(letter) to paste.")
-                rule
-                let lock = HoldTip.lockFrame(at: time)
-                row(SetupKeycaps(keys: inline, size: 22,
-                                 litKeys: lock.letterDown ? Set(inline.indices) : []),
-                    state: lock.state, title: "Double-tap to lock",
-                    detail: "It records with nothing held, until you press \(modifiers)\(letter) again.")
-                if showsSwitch {
-                    rule
-                    let frame = HoldTip.switchFrame(at: time)
-                    row(SetupKeycaps(keys: switchKeys.keys, size: 22, litKeys: switchKeys.lit(frame),
-                                     ai: frame.state == .ai),
-                        state: frame.state, title: "Switch to AI Rewrite",
-                        detail: switchKeys.detail)
+                ForEach(Array(demos.enumerated()), id: \.offset) { index, demo in
+                    let frame = HoldTip.demoFrame(demo.gesture, layout: layout, at: time)
+                    if index > 0 { SettingsDivider().gridCellColumns(3) }
+                    row(keys: demo.gesture.usesOtherShortcut ? switchKeys : inline, frame: frame,
+                        ai: demo.gesture.usesOtherShortcut && frame.state == .ai,
+                        title: demo.title, detail: demo.detail)
                 }
             }
         }
@@ -1198,14 +1238,44 @@ private struct HoldGestureList: View {
             Capsule().fill(SetupColor.separator).frame(width: 2)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Hold the shortcut to record; once recording, the letter alone keeps it going. Double-tap it to record without holding."
-                            + (showsSwitch ? " " + switchKeys.detail : ""))
+        .accessibilityLabel(demos.map { "\($0.title). \($0.detail)" }.joined(separator: " "))
     }
 
-    private func row(_ keys: SetupKeycaps, state: HoldTip.DemoState, title: String, detail: String) -> some View {
+    private func demos(letter: String, modifiers: String, inline: String, ai: String) -> [Demo] {
+        var demos: [Demo]
+        if holdToTalk {
+            demos = [
+                Demo(gesture: .hold, title: "Hold to record",
+                     detail: modifiers.isEmpty
+                        ? "It records while \(letter) is down. Let go of \(letter) to paste."
+                        : "Once it records, let go of \(modifiers) — \(letter) alone keeps it going. Let go of \(letter) to paste."),
+                Demo(gesture: .lock, title: "Double-tap to lock",
+                     detail: (modifiers.isEmpty ? "Tap \(letter) twice" : "Hold \(modifiers) and tap \(letter) twice")
+                        + ": it records with nothing held, until you press \(inline) again."),
+            ]
+            if showsSwitch {
+                demos.append(Demo(gesture: .holdSwitch, title: "Switch to AI Rewrite",
+                                  detail: "While holding \(letter), press \(ai) to switch to AI Rewrite, and again to switch back. Started with \(ai), \(inline) switches the other way."))
+            }
+        } else {
+            demos = [
+                Demo(gesture: .toggle, title: "Press to start, again to paste",
+                     detail: "Press \(inline) and let go — it records with nothing held. Press \(inline) again to paste."),
+            ]
+            if showsSwitch {
+                demos.append(Demo(gesture: .toggleSwitch, title: "Switch to AI Rewrite",
+                                  detail: "While it records, press \(ai) to switch to AI Rewrite and \(inline) to switch back. Started with \(ai), it works the other way round."))
+            }
+        }
+        return demos
+    }
+
+    private func row(keys: [String], frame: HoldTip.DemoFrame, ai: Bool, title: String, detail: String) -> some View {
         GridRow(alignment: .center) {
-            keys
-            DemoStatus(state: state)
+            SetupKeycaps(keys: keys, size: 22,
+                         litKeys: frame.caps.indexes(of: .down), fadedKeys: frame.caps.indexes(of: .notNeeded),
+                         ringKeys: frame.ringed, ai: ai)
+            DemoStatus(state: frame.state)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 12, weight: .semibold))
@@ -1220,43 +1290,6 @@ private struct HoldGestureList: View {
             .padding(.leading, 4)
             // On the cell, not the row: a modified GridRow stops being a row.
             .padding(.vertical, 8)
-        }
-    }
-
-    private var rule: some View {
-        SettingsDivider().gridCellColumns(3)
-    }
-
-    /// The switch's keys. When both shortcuts share their modifiers, they are held once
-    /// and the other letter tapped beside them (⌃⇧ Q A); otherwise the letter alone is
-    /// held — all hold to talk needs — and the other shortcut pressed whole.
-    private struct SwitchKeys {
-        let keys: [String]
-        let shared: Bool
-        let detail: String
-
-        init(inline: [String], ai: [String]) {
-            let modifiers = inline.filter(isModifierCap)
-            let letter = inline.last ?? ""
-            let aiLetter = ai.last ?? ""
-            shared = modifiers == ai.filter(isModifierCap)
-            keys = shared ? inline + [aiLetter] : [letter] + ai
-            detail = shared
-                ? "While holding \(inline.joined()), tap \(aiLetter) as well. Tap it again to switch back."
-                : "While holding \(letter), press \(ai.joined()). Press it again to switch back."
-        }
-
-        func lit(_ frame: HoldTip.DemoFrame) -> Set<Int> {
-            var lit = Set<Int>()
-            if shared {
-                if frame.modifiersDown { lit.formUnion(keys.indices.dropLast(2)) }
-                if frame.letterDown { lit.insert(keys.count - 2) }
-                if frame.otherDown { lit.insert(keys.count - 1) }
-            } else {
-                if frame.letterDown { lit.insert(0) }
-                if frame.otherDown { lit.formUnion(keys.indices.dropFirst()) }
-            }
-            return lit
         }
     }
 }
