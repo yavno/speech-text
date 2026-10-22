@@ -151,17 +151,22 @@ quit_e2e() {
     for pid in $(e2e_pids); do kill -9 "$pid" 2>/dev/null || true; done
 }
 
-OPEN_DOCS=()   # "app|name"
+OPEN_DOCS=()   # "app|handle" — see new_doc
 cleanup() {
     quit_e2e
     if [ "$KEEP" -eq 0 ]; then
         local doc app name
         for doc in "${OPEN_DOCS[@]+"${OPEN_DOCS[@]}"}"; do
             app="${doc%%|*}"; name="${doc#*|}"
-            # By name, not `every document whose name is`: Script Editor ignores that
-            # form silently, and a document left open can share a later one's name.
-            osascript -e 'on run argv' -e 'tell application (item 1 of argv) to close document (item 2 of argv) saving no' \
-                -e 'end run' "$app" "$name" > /dev/null 2>&1 || true
+            if [ "$app" = "TextEdit" ]; then
+                osascript -e 'on run argv' -e 'tell application "TextEdit" to close document of window id ((item 1 of argv) as integer) saving no' \
+                    -e 'end run' "$name" > /dev/null 2>> "$OUT/harness.log" || true
+            else
+                # By name, not `every document whose name is`: Script Editor ignores that
+                # form silently, and a document left open can share a later one's name.
+                osascript -e 'on run argv' -e 'tell application (item 1 of argv) to close document (item 2 of argv) saving no' \
+                    -e 'end run' "$app" "$name" > /dev/null 2>> "$OUT/harness.log" || true
+            fi
         done
     fi
     local path
@@ -237,7 +242,13 @@ launch() {  # launch <scenario> <clip>[,<clip>…]
 
 # MARK: Documents
 
-new_doc() {  # new_doc textedit|textedit-plain|script-editor [text] — prints "app|name"
+# A TextEdit document is known by its window's id, not its name. TextEdit reuses an
+# untitled number as soon as it is free — three documents in a row can all be "Untitled 342"
+# — and its `documents` list can lag behind its windows (an autosaved plain-text document
+# stayed under another's name), so `document "Untitled N"` found nothing, or another
+# document: the paste landed and the run read an empty one, and never closed it.
+new_doc() {  # new_doc textedit|textedit-plain|script-editor [text] — prints "app|handle":
+             # a window id for TextEdit, a document name for Script Editor
     local kind="$1" text="${2:-}" app name
     case "$kind" in
         textedit|textedit-plain) app="TextEdit" ;;
@@ -246,7 +257,9 @@ new_doc() {  # new_doc textedit|textedit-plain|script-editor [text] — prints "
     if [ "$app" = "TextEdit" ]; then
         name="$(osascript -e 'on run argv' -e 'tell application "TextEdit"' -e 'activate' \
             -e 'set d to make new document with properties {text:(item 1 of argv)}' \
-            -e 'return name of d' -e 'end tell' -e 'end run' "$text")"
+            -e 'set n to name of d' \
+            -e 'return id of first window whose name is n and visible is true' \
+            -e 'end tell' -e 'end run' "$text")"
     else
         name="$(osascript -e 'on run argv' -e 'tell application "Script Editor"' -e 'activate' \
             -e 'set d to make new document with properties {contents:(item 1 of argv)}' \
@@ -257,14 +270,16 @@ new_doc() {  # new_doc textedit|textedit-plain|script-editor [text] — prints "
     echo "$app|$name"
 }
 
-doc_text() {  # doc_text "app|name"
+doc_text() {  # doc_text "app|handle"
     local app="${1%%|*}" name="${1#*|}"
+    # A lookup that fails reads as empty; its error goes to harness.log, so a scenario
+    # that finds "nothing was pasted" says whether the document could be read at all.
     if [ "$app" = "TextEdit" ]; then
-        osascript -e 'on run argv' -e 'tell application "TextEdit" to return text of document (item 1 of argv)' \
-            -e 'end run' "$name" 2>/dev/null || true
+        osascript -e 'on run argv' -e 'tell application "TextEdit" to return text of document of window id ((item 1 of argv) as integer)' \
+            -e 'end run' "$name" 2>> "$OUT/harness.log" || true
     else
         osascript -e 'on run argv' -e 'tell application "Script Editor" to return contents of document (item 1 of argv)' \
-            -e 'end run' "$name" 2>/dev/null || true
+            -e 'end run' "$name" 2>> "$OUT/harness.log" || true
     fi
 }
 
