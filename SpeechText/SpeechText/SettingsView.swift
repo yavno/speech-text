@@ -638,7 +638,7 @@ struct SettingsView: View {
             .padding(.top, -12)
 
         SettingsGroup(title: "Recording") {
-            RecordingModePicker(holdToTalk: $holdToTalk, shortcut: shortcutKeys(shortcutText(for: .inline)))
+            RecordingModePicker(holdToTalk: $holdToTalk)
                 .padding(.top, 12)
             GestureDemoList(holdToTalk: holdToTalk, showsSwitch: hasLLMKey)
                 .padding(.vertical, 12)
@@ -1201,16 +1201,15 @@ private func keyboardLanguageCodes() -> Set<String> {
 }
 
 /// Settings › Recording: how a dictation shortcut records, as two segments side by side —
-/// press it to start and again to paste, or hold it while speaking — each named and drawn
-/// with the user's own shortcut. Stored as `holdToTalk`.
+/// press it to start and again to paste, or hold it while speaking. Words only: the keys
+/// are drawn, live, by the gestures under it. Stored as `holdToTalk`.
 private struct RecordingModePicker: View {
     @Binding var holdToTalk: Bool
-    let shortcut: [String]
 
     var body: some View {
         HStack(spacing: 4) {
-            segment(hold: false, title: "Press to toggle", caption: "press again to paste")
-            segment(hold: true, title: "Hold to talk", caption: "hold while you speak")
+            segment(hold: false, title: "Press to toggle", caption: "Press the shortcut again to paste")
+            segment(hold: true, title: "Hold to talk", caption: "Hold the shortcut while you speak")
         }
         .padding(3)
         .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(SetupColor.separator.opacity(0.55)))
@@ -1225,13 +1224,10 @@ private struct RecordingModePicker: View {
                 Text(title)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(selected ? SetupColor.label : SetupColor.label2)
-                HStack(spacing: 6) {
-                    SetupKeycaps(keys: shortcut, size: 17, litKeys: selected ? Set(shortcut.indices) : [])
-                    Text(caption)
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(SetupColor.label2)
-                        .lineLimit(1)
-                }
+                Text(caption)
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(SetupColor.label2)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 12)
@@ -1246,7 +1242,7 @@ private struct RecordingModePicker: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title): \(shortcut.joined()), \(caption)")
+        .accessibilityLabel("\(title): \(caption)")
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
