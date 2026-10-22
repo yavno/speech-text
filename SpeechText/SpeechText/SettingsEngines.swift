@@ -256,7 +256,7 @@ struct SpeechEngineSettings: View {
                         languageBadge: languageBadge(model.languages, spoken: spoken), facts: speechModelSubtitle(model),
                         detail: speechModelLine(model, spoken: spoken),
                         isSelected: engine == .local && localModelID == model.id,
-                        action: { pickLocal(model) }) {
+                        action: { pickLocal(model) }, extra: {
             HStack(spacing: 8) {
                 switch state {
                 case .notInstalled:
@@ -291,7 +291,7 @@ struct SpeechEngineSettings: View {
                 }
             }
             .padding(.top, 4)
-        }
+        })
     }
 
     /// The local model that supersedes this one, when it is not on the Mac already — the

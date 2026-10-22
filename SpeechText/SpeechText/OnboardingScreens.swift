@@ -583,7 +583,7 @@ private struct SpeechScreen: View {
         return SetupRow(title: speechModelName(speech), badge: badge,
                         languageBadge: languageBadge(speech.languages, spoken: spoken), facts: speechModelSubtitle(speech),
                         detail: speechModelLine(speech, spoken: spoken), isSelected: !model.speechUsesApple && model.speechModelID == speech.id,
-                        action: { model.pickSpeechModel(speech.id) }) {
+                        action: { model.pickSpeechModel(speech.id) }, extra: {
             switch state {
             case .downloading(let f):
                 SetupProgressBar(fraction: f).padding(.top, 6)
@@ -599,7 +599,7 @@ private struct SpeechScreen: View {
             default:
                 EmptyView()
             }
-        }
+        })
     }
 
     /// With no language stated, nothing tells a row that lacks one apart: asked here, in place.
