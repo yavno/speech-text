@@ -787,23 +787,40 @@ private struct MicrophoneField: View {
     private var inUse: AudioInputDevice? { resolution.device ?? systemDevice }
 
     var body: some View {
-        SettingsRow(title: "Microphone", detail: caption) {
-            Picker("Microphone", selection: selection) {
-                Text("Automatic").tag(MicrophoneChoice.automatic.stored)
-                Text("System Default").tag(MicrophoneChoice.systemDefault.stored)
-                Divider()
-                ForEach(monitor.devices) { device in
-                    Text(device.name).tag(device.uid)
-                }
-                // A picked device that is not connected keeps its row, so the picker
-                // never renders blank.
-                if case .device(let uid) = choice, !monitor.devices.contains(where: { $0.uid == uid }) {
-                    Text("\(storedName.isEmpty ? "Microphone" : storedName) (not connected)").tag(uid)
-                }
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Microphone")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(SetupColor.label)
+                InUseMicrophone(device: inUse)
+                Text(caption)
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(SetupColor.label2)
+                    .lineSpacing(1.5)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .labelsHidden()
-            .fixedSize()
+            Spacer(minLength: 12)
+            picker
         }
+        .padding(.vertical, 11)
+    }
+
+    private var picker: some View {
+        Picker("Microphone", selection: selection) {
+            Text("Automatic").tag(MicrophoneChoice.automatic.stored)
+            Text("System Default").tag(MicrophoneChoice.systemDefault.stored)
+            Divider()
+            ForEach(monitor.devices) { device in
+                Text(device.name).tag(device.uid)
+            }
+            // A picked device that is not connected keeps its row, so the picker
+            // never renders blank.
+            if case .device(let uid) = choice, !monitor.devices.contains(where: { $0.uid == uid }) {
+                Text("\(storedName.isEmpty ? "Microphone" : storedName) (not connected)").tag(uid)
+            }
+        }
+        .labelsHidden()
+        .fixedSize()
     }
 
     private var selection: Binding<String> {
@@ -815,27 +832,69 @@ private struct MicrophoneField: View {
         })
     }
 
+    /// Why the device above is the one in use; the device itself is drawn apart from it,
+    /// so it can be found at a glance rather than read out of a sentence.
     private var caption: String {
-        let now = inUse.map { "Now: \($0.name)." } ?? "No microphone is connected."
         switch choice {
         case .automatic:
             if let avoided = resolution.avoided {
-                return "\(now) Used instead of \(avoided.name), so they keep playing at full quality."
+                return "Used instead of \(avoided.name), so they keep playing at full quality."
             }
             if systemDevice?.transport == .bluetooth {
-                return "\(now) With the lid closed, these headphones drop to call quality while you dictate."
+                return "With the lid closed, these headphones drop to call quality while you dictate."
             }
-            return "\(now) Bluetooth headphones are skipped for the Mac's own microphone, so they keep playing."
+            return "Bluetooth headphones are skipped for the Mac's own microphone, so they keep playing."
         case .systemDefault:
-            return "\(now) As set in System Settings › Sound."
+            return "As set in System Settings › Sound."
         case .device:
             if resolution.pickedIsMissing {
-                return "Not connected — Automatic decides until it is. \(now)"
+                return "The one you picked is not connected — Automatic decides until it is."
             }
             if resolution.device?.transport == .bluetooth {
                 return "These headphones drop to call quality while you dictate."
             }
-            return now
+            return "Kept even when the system's input changes."
+        }
+    }
+}
+
+/// The microphone a dictation records from right now: a lit dot, the kind of device and
+/// its name, on a pill of its own — or a warning when there is none.
+private struct InUseMicrophone: View {
+    let device: AudioInputDevice?
+
+    var body: some View {
+        if let device {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(SetupColor.ok)
+                    .frame(width: 6, height: 6)
+                Image(systemName: symbol(for: device.transport))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SetupColor.label2)
+                Text(device.name)
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(SetupColor.label)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(SetupColor.control))
+            .overlay(Capsule().strokeBorder(SetupColor.panelBorder))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("In use: \(device.name)")
+        } else {
+            SettingsStatus(text: "No microphone is connected", ok: false)
+        }
+    }
+
+    private func symbol(for transport: AudioInputDevice.Transport) -> String {
+        switch transport {
+        case .builtIn: "laptopcomputer"
+        case .bluetooth: "headphones"
+        case .usb: "mic"
+        case .other: "mic"
         }
     }
 }
