@@ -40,6 +40,10 @@ public struct RecognitionFailure: Equatable, Sendable {
     /// kLSRErrorDomain 102, "Failed to access assets": the recogniser could not load its
     /// model for the language.
     static let assetsCode = 102
+    /// kLSRErrorDomain 201, "Siri and Dictation are disabled": macOS Dictation is off for
+    /// this account — a new account's state. `isAvailable` still answers true, so nothing
+    /// tells before the task fails (measured 2026-10-22, macOS 26).
+    static let dictationOffCode = 201
 
     /// What Apple's recogniser reported, as the user will read it — nil for a
     /// cancellation. Pure: the session reads the error, the text it holds and the Speech
@@ -58,11 +62,17 @@ public struct RecognitionFailure: Equatable, Sendable {
             // come from. "Not downloaded yet" is the usual reason, but not one it names.
             let language = languageName(locale)
             message = "Couldn't load the \(language) speech model. Add it to Dictation in System Settings › Keyboard."
+        } else if domain == localSpeechDomain, code == dictationOffCode {
+            message = dictationOffMessage
         } else {
             message = description
         }
         return RecognitionFailure(message: message, endsRecording: !hasText)
     }
+
+    /// macOS Dictation is off: Apple's engine is that recogniser, so it works only with it on.
+    static let dictationOffMessage =
+        "Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation."
 
     /// Also the start failure when the permission is already known to be off.
     static let speechPermissionMessage =

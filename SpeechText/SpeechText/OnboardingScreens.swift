@@ -642,7 +642,7 @@ private struct SpeechScreen: View {
     }
 
     private var onlineDetails: some View {
-        ScrollView {
+        SetupCenteredScroll {
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(SetupCards.speech, id: \.service) { card in
                     SetupRow(title: card.title, subtitle: card.subtitle, detail: card.detail,
@@ -655,8 +655,6 @@ private struct SpeechScreen: View {
             .padding(EdgeInsets(top: 14, leading: 12, bottom: 12, trailing: 12))
             .frame(maxWidth: .infinity)
         }
-        .scrollIndicators(.never)
-        .defaultScrollAnchor(.center)
     }
 }
 
@@ -842,7 +840,7 @@ private struct AIScreen: View {
     // MARK: Online
 
     private var onlineDetails: some View {
-        ScrollView {
+        SetupCenteredScroll {
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(SetupCards.ai, id: \.service) { card in
                     SetupRow(title: card.title, subtitle: card.subtitle,
@@ -858,8 +856,6 @@ private struct AIScreen: View {
             }
             .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
         }
-        .scrollIndicators(.never)
-        .defaultScrollAnchor(.center)
     }
 }
 

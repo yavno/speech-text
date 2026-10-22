@@ -614,6 +614,18 @@ final class RecognitionFailureTests: XCTestCase {
         XCTAssertEqual(sameCodeOtherDomain.message, "Something else")
     }
 
+    /// A new macOS account has Dictation off, and Apple's recogniser refuses every task
+    /// with kLSRErrorDomain 201 — setup's Try it failed with Apple's bare words.
+    func testDictationTurnedOffSaysWhereToTurnItOn() throws {
+        let failure = try XCTUnwrap(apple(code: 201, description: "Siri and Dictation are disabled"))
+
+        XCTAssertEqual(failure.message, RecognitionFailure.dictationOffMessage)
+        XCTAssertTrue(failure.endsRecording)
+        XCTAssertEqual(try XCTUnwrap(apple(domain: "kAFAssistantErrorDomain", code: 201,
+                                           description: "Something else")).message,
+                       "Something else", "the code is the on-device recogniser's own")
+    }
+
     /// The permission is read, not inferred — and when it is off, that is the remedy,
     /// whatever the error said.
     func testADeniedPermissionIsWhatTheUserIsTold() throws {
@@ -641,7 +653,7 @@ final class RecognitionFailureTests: XCTestCase {
     /// `AppState.friendlySTTError` rewrites a message containing an HTTP status or a
     /// network word, so none may appear in these.
     func testEveryExplanationFitsTheNoticeAndPassesThroughUnchanged() throws {
-        var messages = [RecognitionFailure.speechPermissionMessage]
+        var messages = [RecognitionFailure.speechPermissionMessage, RecognitionFailure.dictationOffMessage]
         for language in spokenLanguageCatalog {
             messages.append(try XCTUnwrap(apple(locale: language.localeIdentifier)).message)
         }

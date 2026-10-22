@@ -498,6 +498,23 @@ struct SetupPanel<Content: View>: View {
     }
 }
 
+/// A panel's scrolling content: centred while it fits, starting at its top once it does
+/// not. `.defaultScrollAnchor(.center)` centred the *offset* too, so a list taller than
+/// the panel (Groq's rows above its key block) opened scrolled half-way, its first row cut
+/// off; the variant that tells the two apart needs macOS 15.
+struct SetupCenteredScroll<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                content.frame(minHeight: proxy.size.height)
+            }
+            .scrollIndicators(.never)
+        }
+    }
+}
+
 /// One answer of a step's question, as a card in a radio group.
 struct SetupChoiceCard: View {
     enum Glyph { case mac, cloud }
