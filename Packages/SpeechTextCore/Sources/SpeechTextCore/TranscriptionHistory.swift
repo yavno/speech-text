@@ -398,7 +398,8 @@ public final class TranscriptionHistory {
     /// Records a failure and *keeps* the audio so the user can retry it. Passing the temp
     /// audio file here transfers ownership — do not call `AudioBufferWriter.cleanup` on it after.
     /// Returns the new record's id, so a failure the user can retry can name its row.
-    /// `offline`: the failure was the network's — the record is marked `undelivered`, which
+    /// `offline`: the failure was the network's and `OfflineRetry` will retry it (never an
+    /// Edit instruction or a Try it dictation) — the record is marked `undelivered`, which
     /// the inline flow then fills in with where the text was going.
     @discardableResult
     public func recordFailure(error: String, provider: String, model: String? = nil, locale: String?,

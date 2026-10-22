@@ -914,7 +914,7 @@ final class SpeechEngine {
             if outcome.modelUnavailable, !superseded { failedForModel = true }
             let id = history.recordFailure(error: error, provider: provider, model: model, locale: locale,
                                            duration: duration, audioURL: audioURL, usage: outcome.usage,
-                                           offline: outcome.offline && audioURL != nil)
+                                           offline: outcome.offline && audioURL != nil && onSavedOffline != nil)
             if outcome.offline, !superseded, history.record(id: id)?.isRetryable == true {
                 offlineRecordID = id
                 onSavedOffline?(id)
