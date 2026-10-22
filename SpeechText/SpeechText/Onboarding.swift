@@ -111,9 +111,24 @@ final class OnboardingModel {
         didSet { stepChanged() }
     }
 
+    // ① Welcome — the languages are written as they change, as Settings writes them: the
+    // Speech step's rows and recommendation read them at once.
+    var spokenLanguages: [String] {
+        didSet {
+            guard spokenLanguages != oldValue else { return }
+            UserDefaults.standard.set(encodeSpokenLanguages(spokenLanguages), forKey: SettingsKeys.spokenLanguages)
+            dlog("Setup", "spoken languages: \(spokenLanguages.count)")
+            // The recommendation follows the languages until the user picks a model.
+            if !speechModelChosen, let recommended = recommendedSpeechModel { speechModelID = recommended.id }
+        }
+    }
+
     // ② Speech
     var speechPath = SpeechPath.local
     var speechModelID: String
+    /// A model the user picked, or one an earlier run of setup stored: a language added
+    /// afterwards no longer moves the pick to the recommended model.
+    private var speechModelChosen = false
     /// On this Mac, Apple Dictation rather than a downloaded model: nothing to download,
     /// and `speechModelID` keeps the model a switch back would pick.
     var speechUsesApple = false
@@ -156,7 +171,9 @@ final class OnboardingModel {
         let saved = defaults.string(forKey: SettingsKeys.onboardingStep).flatMap(OnboardingStep.init) ?? .welcome
         step = saved == .done ? .tryIt : saved
 
-        speechModelID = recommendedLocalSTTModel(for: caps, languages: storedSpokenLanguages())?.id
+        let spoken = storedSpokenLanguages()
+        spokenLanguages = spoken
+        speechModelID = recommendedLocalSTTModel(for: caps, languages: spoken)?.id
             ?? Provider.local.defaultSpeechModel
         aiModelID = recommendedLocalChatModel(for: caps)?.id ?? Provider.local.defaultChatModel
 
@@ -168,6 +185,7 @@ final class OnboardingModel {
         } else if storedEngine == .local,
                   let stored = defaults.string(forKey: SettingsKeys.localSTTModel), localSTTModel(id: stored) != nil {
             speechModelID = stored
+            speechModelChosen = true
         } else if storedEngine == .apple {
             speechUsesApple = true
         }
@@ -239,10 +257,10 @@ final class OnboardingModel {
     // MARK: ② Speech
 
     var recommendedSpeechModel: LocalSTTModel? {
-        recommendedLocalSTTModel(for: capabilities, languages: storedSpokenLanguages())
+        recommendedLocalSTTModel(for: capabilities, languages: spokenLanguages)
     }
     var bestSpeechModel: LocalSTTModel? {
-        bestQualityLocalSTTModel(for: capabilities, languages: storedSpokenLanguages())
+        bestQualityLocalSTTModel(for: capabilities, languages: spokenLanguages)
     }
 
     /// The model the Continue button would install: the pick, unless a switch is pending.
@@ -252,6 +270,7 @@ final class OnboardingModel {
 
     func pickSpeechModel(_ id: String) {
         speechUsesApple = false
+        speechModelChosen = true
         if let busy = speechDownloadID, busy != id, case .downloading = store.state(for: busy) {
             pendingSpeechSwitch = id
             return
@@ -289,6 +308,9 @@ final class OnboardingModel {
 
     func continueFromSpeech() {
         let defaults = UserDefaults.standard
+        // Accepted, the recommendation included: a language added on going back to
+        // Welcome must not move it under a download.
+        speechModelChosen = true
         switch speechPath {
         case .local where speechUsesApple:
             defaults.set(STTProviderType.apple.rawValue, forKey: SettingsKeys.sttProvider)

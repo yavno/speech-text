@@ -57,7 +57,7 @@ struct OnboardingView: View {
     @ViewBuilder
     private var screen: some View {
         switch model.step {
-        case .welcome: WelcomeScreen()
+        case .welcome: WelcomeScreen(model: model)
         case .speech: SpeechScreen(model: model)
         case .ai: AIScreen(model: model)
         case .permissions: PermissionsScreen(model: model)
@@ -156,24 +156,50 @@ private struct StepColumns<Copy: View, Panel: View>: View {
 // MARK: - ① Welcome
 
 private struct WelcomeScreen: View {
+    @Bindable var model: OnboardingModel
+
     var body: some View {
         StepColumns(copyWidth: 320, spacing: 36, insets: EdgeInsets(top: 44, leading: 40, bottom: 24, trailing: 32),
                     copyAlignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
                 Image(nsImage: NSApp.applicationIconImage)
                     .resizable()
-                    .frame(width: 60, height: 60)
+                    .frame(width: 52, height: 52)
                     .shadow(color: .black.opacity(0.18), radius: 3, y: 3)
                     .padding(.leading, -4)
-                    .padding(.bottom, 22)
-                Text("Talk instead of typing").setupTitle(52).padding(.bottom, 18)
+                    .padding(.bottom, 14)
+                Text("Talk instead of typing").setupTitle(44).padding(.bottom, 12)
                 Text("Press a shortcut, say what you want to write, and your words appear wherever your cursor is — in any app.")
-                    .setupLead()
+                    .setupLead(15)
+                    .padding(.bottom, 18)
+                WelcomeLanguages(model: model)
             }
         } panel: {
             SetupPanel { WelcomeDemo() }
                 .accessibilityLabel("How SpeechText works")
         }
+    }
+}
+
+/// *Languages I speak*, asked early but not required: with none stated every dictation's
+/// language is detected, and the Speech step marks the models that lack a stated one.
+private struct WelcomeLanguages: View {
+    @Bindable var model: OnboardingModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("Your languages, for better accuracy")
+                    .font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("Optional").font(.system(size: 11)).foregroundStyle(SetupColor.label3)
+            }
+            SpokenLanguagesChips(selected: model.spokenLanguages) { model.spokenLanguages = $0 }
+        }
+        .padding(EdgeInsets(top: 12, leading: 14, bottom: 12, trailing: 14))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 14).fill(SetupColor.panel))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(SetupColor.panelBorder, lineWidth: 1))
     }
 }
 
@@ -477,8 +503,7 @@ private struct DemoStrip: View {
 
 private struct SpeechScreen: View {
     @Bindable var model: OnboardingModel
-    @AppStorage(SettingsKeys.spokenLanguages) private var spokenLanguages = ""
-    private var spoken: [String] { parseSpokenLanguages(spokenLanguages) }
+    private var spoken: [String] { model.spokenLanguages }
 
     private var appleSilicon: Bool { model.capabilities.isAppleSilicon }
 
@@ -510,6 +535,7 @@ private struct SpeechScreen: View {
     private var localDetails: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {
+                if spoken.isEmpty { languagesNudge }
                 (Text("Recommended for your ") + Text(macDescription(model.capabilities)).fontWeight(.semibold).foregroundColor(SetupColor.label))
                     .font(.system(size: 11.5))
                     .foregroundStyle(SetupColor.label2)
@@ -554,8 +580,8 @@ private struct SpeechScreen: View {
                 nil
             }
         }
-        return SetupRow(title: speechModelName(speech), subtitle: speechModelSubtitle(speech), badge: badge,
-                        languageBadge: languageBadge(speech.languages, spoken: spoken),
+        return SetupRow(title: speechModelName(speech), badge: badge,
+                        languageBadge: languageBadge(speech.languages, spoken: spoken), facts: speechModelSubtitle(speech),
                         detail: speechModelLine(speech, spoken: spoken), isSelected: !model.speechUsesApple && model.speechModelID == speech.id,
                         action: { model.pickSpeechModel(speech.id) }) {
             switch state {
@@ -574,6 +600,23 @@ private struct SpeechScreen: View {
                 EmptyView()
             }
         }
+    }
+
+    /// With no language stated, nothing tells a row that lacks one apart: asked here, in place.
+    private var languagesNudge: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Add the languages you speak to see which models know them.")
+                .font(.system(size: 12))
+                .foregroundStyle(SetupColor.label)
+                .fixedSize(horizontal: false, vertical: true)
+            SpokenLanguagesChips(selected: spoken, addTitle: "Add languages", showsAnyLanguage: false) { model.spokenLanguages = $0 }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 12).fill(SetupColor.control))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(SetupColor.panelBorder, lineWidth: 1))
+        .padding(.bottom, 10)
     }
 
     private func switchConfirm(_ target: LocalSTTModel) -> some View {

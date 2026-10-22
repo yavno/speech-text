@@ -3,6 +3,7 @@
 
 import SwiftUI
 import AppKit
+import Carbon
 import SpeechTextCore
 
 // The setup window's parts, shared by every step. Values follow the design in
@@ -595,6 +596,9 @@ struct SetupRow<Detail: View>: View {
     /// A language the model lacks ("No Spanish"), beside whatever `badge` says — a
     /// recommendation or an install state never hides it.
     var languageBadge: SetupBadge? = nil
+    /// The model's facts ("483 MB · 25 languages") on a line of their own under the name,
+    /// where `subtitle` would share the name's line with the badges and wrap beside them.
+    var facts: String? = nil
     var detail: String?
     let isSelected: Bool
     var dimmed = false
@@ -627,6 +631,10 @@ struct SetupRow<Detail: View>: View {
                     if let badge { badge.padding(.leading, 4) }
                     if let languageBadge { languageBadge.padding(.leading, badge == nil ? 4 : 0) }
                 }
+                if let facts {
+                    Text(facts).font(.system(size: 11.5).monospacedDigit()).foregroundStyle(SetupColor.label3)
+                        .padding(.bottom, 1)
+                }
                 if let detail {
                     Text(detail).font(.system(size: 11.5)).foregroundStyle(SetupColor.label2)
                         .fixedSize(horizontal: false, vertical: true)
@@ -653,9 +661,10 @@ struct SetupRow<Detail: View>: View {
 
 extension SetupRow where Detail == EmptyView {
     init(title: String, subtitle: String? = nil, badge: SetupBadge? = nil, languageBadge: SetupBadge? = nil,
-         detail: String? = nil, isSelected: Bool, dimmed: Bool = false, compact: Bool = false,
+         facts: String? = nil, detail: String? = nil, isSelected: Bool, dimmed: Bool = false, compact: Bool = false,
          action: @escaping () -> Void) {
-        self.init(title: title, subtitle: subtitle, badge: badge, languageBadge: languageBadge, detail: detail, isSelected: isSelected,
+        self.init(title: title, subtitle: subtitle, badge: badge, languageBadge: languageBadge, facts: facts, detail: detail,
+                  isSelected: isSelected,
                   dimmed: dimmed, compact: compact, action: action, extra: { EmptyView() })
     }
 }
@@ -1211,4 +1220,212 @@ func shortcutKeys(_ text: String) -> [String] {
     }
     if !rest.isEmpty { keys.append(String(rest)) }
     return keys
+}
+
+// MARK: - Languages I speak
+
+/// The *Languages I speak* chips — each stated language, in the stored order, dragged to
+/// reorder — and Add, which opens the search. Settings › Dictation and setup's Welcome step
+/// both draw it; `set` writes the list wherever its owner keeps it.
+struct SpokenLanguagesChips: View {
+    let selected: [String]
+    var addTitle = "Add"
+    /// "Any language" while none is stated — left out where the words beside it ask for one.
+    var showsAnyLanguage = true
+    let set: ([String]) -> Void
+    @State private var adding = false
+    @Environment(\.setupTint) private var tint
+
+    var body: some View {
+        FlowLayout(spacing: 6) {
+            if selected.isEmpty && showsAnyLanguage {
+                LanguageChip(title: "Any language", symbol: "globe", placeholder: true)
+            }
+            ForEach(selected, id: \.self) { code in
+                LanguageChip(title: spokenLanguage(id: code)?.displayName ?? code,
+                             remove: { set(selected.filter { $0 != code }) })
+                    .draggable(code)
+                    .dropDestination(for: String.self) { codes, _ in
+                        // Only a chip of ours: text dragged in from another app is not a language.
+                        guard let moved = codes.first, moved != code, selected.contains(moved) else { return false }
+                        move(moved, before: code)
+                        return true
+                    }
+                    .help(selected.count > 1 ? "Drag to reorder" : "")
+            }
+            Button { adding = true } label: {
+                Label(addTitle, systemImage: "plus")
+                    .font(.system(size: 12, weight: .semibold))
+                    .padding(.horizontal, 10)
+                    .frame(height: 26)
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(tint.accent)
+            .popover(isPresented: $adding, arrowEdge: .bottom) {
+                LanguagePicker(selected: selected) { code in
+                    // Appended: the user's own order is what `resolveLocale` falls
+                    // back to when the keyboard layout matches none of them.
+                    set(selected + [code])
+                }
+            }
+        }
+    }
+
+    private func move(_ code: String, before target: String) {
+        var codes = selected.filter { $0 != code }
+        let index = codes.firstIndex(of: target) ?? codes.endIndex
+        codes.insert(code, at: index)
+        set(codes)
+    }
+}
+
+/// One stated language — or, with none stated, what that means.
+struct LanguageChip: View {
+    let title: String
+    var symbol: String?
+    var placeholder = false
+    var remove: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if let symbol { Image(systemName: symbol).font(.system(size: 11)) }
+            Text(title).font(.system(size: 12.5, weight: .semibold))
+            if let remove {
+                Button(action: remove) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 8.5, weight: .bold))
+                        .frame(width: 16, height: 16)
+                        .background(Circle().fill(SetupColor.label.opacity(0.07)))
+                }
+                .buttonStyle(.plain)
+                .help("Remove \(title)")
+            }
+        }
+        .foregroundStyle(placeholder ? SetupColor.label2 : SetupColor.label)
+        .padding(.leading, 11)
+        .padding(.trailing, remove == nil ? 11 : 5)
+        .frame(height: 26)
+        .background {
+            if placeholder {
+                Capsule().strokeBorder(SetupColor.label3, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+            } else {
+                Capsule().fill(SetupColor.control)
+                    .shadow(color: .black.opacity(0.06), radius: 1, y: 0.5)
+            }
+        }
+        .fixedSize()
+    }
+}
+
+/// Add's popover: a search field over the languages not stated yet, the ones this Mac
+/// has a keyboard for first.
+struct LanguagePicker: View {
+    let selected: [String]
+    let add: (String) -> Void
+    @State private var query = ""
+    @Environment(\.dismiss) private var dismiss
+
+    private var available: [SpokenLanguage] {
+        spokenLanguageCatalog.filter { !selected.contains($0.id) }
+    }
+
+    private var matches: [SpokenLanguage] {
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return available }
+        return available.filter {
+            $0.displayName.range(of: trimmed, options: [.caseInsensitive, .diacriticInsensitive, .anchored]) != nil
+                || $0.id.caseInsensitiveCompare(trimmed) == .orderedSame
+        }
+    }
+
+    var body: some View {
+        let keyboards = keyboardLanguageCodes()
+        let suggested = matches.filter { keyboards.contains($0.id) }
+        let rest = matches.filter { !keyboards.contains($0.id) }
+            .sorted { $0.displayName.localizedCompare($1.displayName) == .orderedAscending }
+        VStack(alignment: .leading, spacing: 0) {
+            TextField("Search languages", text: $query)
+                .textFieldStyle(.roundedBorder)
+                .padding(10)
+                .onSubmit { if let first = suggested.first ?? rest.first { pick(first) } }
+            Divider()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    if !suggested.isEmpty {
+                        section("On your keyboards")
+                        ForEach(suggested) { row($0) }
+                    }
+                    if !rest.isEmpty {
+                        if !suggested.isEmpty { section("All languages") }
+                        ForEach(rest) { row($0) }
+                    }
+                    if suggested.isEmpty && rest.isEmpty {
+                        Text("No match")
+                            .font(.system(size: 12))
+                            .foregroundStyle(SetupColor.label2)
+                            .padding(12)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .frame(width: 240, height: 300)
+    }
+
+    private func section(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(SetupColor.label2)
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+            .padding(.bottom, 2)
+    }
+
+    private func row(_ language: SpokenLanguage) -> some View {
+        LanguagePickerRow(title: language.displayName) { pick(language) }
+    }
+
+    private func pick(_ language: SpokenLanguage) {
+        add(language.id)
+        dismiss()
+    }
+}
+
+private struct LanguagePickerRow: View {
+    let title: String
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13))
+                .foregroundStyle(SetupColor.label)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 8)
+                .frame(height: 26)
+                .background(RoundedRectangle(cornerRadius: 6).fill(hovering ? SettingsColor.panel : .clear))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 4)
+        .onHover { hovering = $0 }
+    }
+}
+
+/// The languages of the keyboards enabled on this Mac, as ISO 639-1 codes.
+func keyboardLanguageCodes() -> Set<String> {
+    let filter = [kTISPropertyInputSourceCategory as String: kTISCategoryKeyboardInputSource as String,
+                  kTISPropertyInputSourceIsEnabled as String: true] as CFDictionary
+    guard let list = TISCreateInputSourceList(filter, false)?.takeRetainedValue() as? [TISInputSource] else { return [] }
+    var codes = Set<String>()
+    for source in list {
+        guard let pointer = TISGetInputSourceProperty(source, kTISPropertyInputSourceLanguages) else { continue }
+        let languages = Unmanaged<CFArray>.fromOpaque(pointer).takeUnretainedValue() as? [String] ?? []
+        if let first = languages.first {
+            codes.insert(String(first.prefix { $0 != "-" && $0 != "_" }))
+        }
+    }
+    return codes
 }

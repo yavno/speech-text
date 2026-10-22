@@ -252,8 +252,8 @@ struct SpeechEngineSettings: View {
         } else {
             nil
         }
-        return SetupRow(title: speechModelName(model), subtitle: speechModelSubtitle(model), badge: badge,
-                        languageBadge: languageBadge(model.languages, spoken: spoken),
+        return SetupRow(title: speechModelName(model), badge: badge,
+                        languageBadge: languageBadge(model.languages, spoken: spoken), facts: speechModelSubtitle(model),
                         detail: speechModelLine(model, spoken: spoken),
                         isSelected: engine == .local && localModelID == model.id,
                         action: { pickLocal(model) }) {
