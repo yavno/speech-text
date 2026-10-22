@@ -11,18 +11,24 @@ import SpeechTextCore
 /// to History for want of one, through `HistoryRetry`. The decisions — what is waiting,
 /// when to start, when to stop — are `OfflineRetryQueue`'s; this does the I/O.
 ///
-/// Results are handed to `onTranscribed` together, oldest first, once a drain is over,
-/// so several dictations that waited for the same outage reach the clipboard as one
-/// write instead of each replacing the one before. The owner puts them there — never
-/// into an app: by the time the network is back the user may be typing anywhere.
+/// Nothing a retry transcribes goes anywhere: not into an app — by the time the network
+/// is back the user may be typing anywhere — and not onto the clipboard, which would
+/// replace whatever the user copied meanwhile. It stays in History, and once a drain is
+/// over `onDrained` says how many dictations are waiting there, so the owner can say so
+/// once for the whole outage.
 ///
 /// App target only: it retries through `HistoryRetry`, which reads the user's settings.
 @MainActor
 final class OfflineRetry {
     static let shared = OfflineRetry()
 
-    /// Texts a finished drain transcribed, oldest first. Not called when none did.
-    var onTranscribed: (([String]) -> Void)?
+    /// What a finished drain came to: the dictations it transcribed and the ones it
+    /// could not (any failure but no network — a timeout, a file too large). Not called
+    /// when it finished none.
+    var onDrained: ((_ transcribed: Int, _ failed: Int) -> Void)?
+
+    /// Dictations saved offline and not yet transcribed — what the "No connection" notice counts.
+    var pendingCount: Int { queue.pending.count }
 
     /// How long the network has to stay up before the first retry. The path turns
     /// satisfied as soon as an interface has an address, which is often a moment before
@@ -33,7 +39,9 @@ final class OfflineRetry {
     private var queue = OfflineRetryQueue()
     private let monitor = NWPathMonitor()
     private var settleTask: Task<Void, Never>?
-    private var transcribed: [String] = []
+    /// The running drain's results so far.
+    private var transcribed = 0
+    private var failed = 0
 
     private init() {}
 
@@ -78,16 +86,16 @@ final class OfflineRetry {
     private func drain() async {
         guard var next = queue.beginDrain() else { return }
         dlog("Network", "retrying \(queue.pending.count) dictation(s) saved offline")
-        transcribed = []
+        transcribed = 0
+        failed = 0
         while true {
             let result = await retry(next)
             guard let following = queue.finished(next, result) else { break }
             next = following
         }
-        let texts = transcribed
-        transcribed = []
-        if !texts.isEmpty {
-            onTranscribed?(texts)
+        if transcribed + failed > 0 {
+            dlog("Network", "drain over: \(transcribed) transcribed, \(failed) failed")
+            onDrained?(transcribed, failed)
         }
         // The network came back while this drain ran and its last retry still found none:
         // no edge will come for what is left, so it is tried again — after the same settle.
@@ -101,12 +109,14 @@ final class OfflineRetry {
         // Retried by the user meanwhile, deleted, or its audio expired: nothing to do.
         guard TranscriptionHistory.shared.record(id: recordID)?.isRetryable == true else { return .dropped }
         switch await HistoryRetry.shared.retry(recordID) {
-        case .succeeded(let text):
-            transcribed.append(text)
+        case .succeeded:
+            transcribed += 1
             return .succeeded
         case .offline:
             return .offline
         case .failed:
+            // Said, not dropped in silence: its row has the error and Retry.
+            failed += 1
             return .dropped
         case .alreadyRunning:
             // A retry the user started reports to them itself; the record stays queued

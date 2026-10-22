@@ -52,7 +52,7 @@ enum HistorySearch {
     struct Fields: Equatable {
         let text: String
         let errorMessage, originApp, destinationApp: String?
-        let inputText, outputText, presetName, contextApp: String?
+        let inputText, outputText, presetName, contextApp, undeliveredApp: String?
 
         init(_ record: TranscriptionRecord) {
             text = record.text
@@ -63,11 +63,12 @@ enum HistorySearch {
             outputText = record.refinement?.outputText
             presetName = record.refinement?.presetName
             contextApp = record.refinement?.context?.appName
+            undeliveredApp = record.undelivered?.app
         }
 
         /// Every field there is, a line each — what a word is looked for in.
         var joined: String {
-            [text, errorMessage, originApp, destinationApp, inputText, outputText, presetName, contextApp]
+            [text, errorMessage, originApp, destinationApp, inputText, outputText, presetName, contextApp, undeliveredApp]
                 .compactMap { $0 }.joined(separator: "\n")
         }
     }

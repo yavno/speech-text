@@ -21,7 +21,8 @@ final class HistoryRetry {
     private(set) var inFlight: Set<UUID> = []
 
     enum Result: Equatable {
-        /// The record now holds this text.
+        /// The record now holds this text — AI Rewrite's, for a dictation made with the AI
+        /// shortcut and saved offline, unless the rewrite failed.
         case succeeded(String)
         /// Still no network; the record keeps its audio and its row says so.
         case offline
@@ -92,12 +93,39 @@ final class HistoryRetry {
             history.markRetrySucceeded(id: recordID, text: trimmed,
                                        provider: configuration.batchProvider.rawValue,
                                        model: configuration.batchModel, event: billed)
-            return .succeeded(trimmed)
+            guard record.retryRewrites else { return .succeeded(trimmed) }
+            return .succeeded(await rewrite(trimmed, of: record))
         } catch {
             dlog("History", "retry \(recordID.uuidString.prefix(8)) failed: \(error.localizedDescription)", level: .error)
             history.markRetryFailed(id: recordID, error: error.localizedDescription,
                                     event: NetworkFailure.isOffline(error) ? nil : event(nil, succeeded: false))
             return NetworkFailure.isOffline(error) ? .offline : .failed(error.localizedDescription)
+        }
+    }
+
+    /// AI Rewrite's half of a dictation made with the AI shortcut and saved offline: the
+    /// rewrite it would have had at its stop, told the context read then. Any failure
+    /// leaves the transcription, as a rewrite at the stop does, and says why on the row.
+    /// Returns the text the record now delivers.
+    private func rewrite(_ text: String, of record: TranscriptionRecord) async -> String {
+        guard TextRefinementService.isConfigured else {
+            dlog("History", "retry \(record.id.uuidString.prefix(8)): AI Rewrite not configured — transcription kept", level: .notice)
+            return text
+        }
+        let context = record.undelivered?.context
+        do {
+            let result = try await TextRefinementService.refine(text, context: context)
+            history.recordRefinement(id: record.id, input: text, output: result.text,
+                                     presetName: result.presetName, provider: result.provider, model: result.model,
+                                     context: context, usage: result.usage, latency: result.latency)
+            return result.text
+        } catch {
+            dlog("History", "retry \(record.id.uuidString.prefix(8)): rewrite failed: \(error.localizedDescription)", level: .error)
+            let type = LLMConfiguration.providerType
+            history.recordRefinementFailure(id: record.id, input: text, error: error.localizedDescription,
+                                            provider: type.rawValue, model: LLMConfiguration.model(for: type),
+                                            context: context)
+            return text
         }
     }
 }

@@ -797,7 +797,8 @@ struct SlackMark: View {
 
 /// A small tag in a row: the preset that rewrote it, an edit, a failure.
 struct HomeTag: View {
-    enum Tint { case ai, problem }
+    /// `neutral`: a fact rather than something AI did or something that went wrong.
+    enum Tint { case ai, problem, neutral }
     var symbol: String?
     let title: String
     let tint: Tint
@@ -810,12 +811,28 @@ struct HomeTag: View {
             }
             Text(title).font(.system(size: size, weight: .medium))
         }
-        .foregroundStyle(tint == .ai ? MainColor.aiInk : MainColor.problem)
+        .foregroundStyle(ink)
         .padding(.leading, 6)
         .padding(.trailing, 7)
         .padding(.vertical, 3)
-        .background(RoundedRectangle(cornerRadius: 7).fill(tint == .ai ? MainColor.aiSoft : MainColor.problemSoft))
+        .background(RoundedRectangle(cornerRadius: 7).fill(soft))
         .fixedSize()
+    }
+
+    private var ink: Color {
+        switch tint {
+        case .ai: MainColor.aiInk
+        case .problem: MainColor.problem
+        case .neutral: MainColor.ink2
+        }
+    }
+
+    private var soft: Color {
+        switch tint {
+        case .ai: MainColor.aiSoft
+        case .problem: MainColor.problemSoft
+        case .neutral: MainColor.ink2.opacity(0.1)
+        }
     }
 }
 
@@ -1470,6 +1487,10 @@ struct HomeEntryTags: View {
             case .edit: HomeTag(symbol: "pencil", title: "Edit", tint: .ai).padding(.leading, 8)
             case .rewriteFailed: HomeTag(symbol: "sparkles", title: "Rewrite failed", tint: .problem).padding(.leading, 8)
             case .failed: HomeTag(symbol: "exclamationmark.circle", title: "Failed", tint: .problem).padding(.leading, 8)
+            // Saved with no connection: where it was going, since the row's mark says "Not pasted".
+            case .notPasted(let app):
+                HomeTag(symbol: "wifi.slash", title: app.map { "For \($0)" } ?? "Offline", tint: .neutral)
+                    .padding(.leading, 8)
             }
         }
     }

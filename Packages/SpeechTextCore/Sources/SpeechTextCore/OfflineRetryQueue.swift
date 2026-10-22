@@ -23,7 +23,7 @@ import Foundation
 /// while the drain ran (`drainOwed`).
 public struct OfflineRetryQueue: Sendable {
     public enum Result: Equatable, Sendable {
-        /// Transcribed: it leaves the queue, and its text goes to the clipboard.
+        /// Transcribed: it leaves the queue; its text waits in History, never pasted.
         case succeeded
         /// No network again: it stays, and so does everything after it.
         case offline

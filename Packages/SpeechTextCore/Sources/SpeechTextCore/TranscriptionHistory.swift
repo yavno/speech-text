@@ -84,8 +84,38 @@ public struct TranscriptionRecord: Identifiable, Codable, Equatable {
     /// before they were kept, which are looked up by name alone.
     var originBundleID: String?
     var destinationBundleID: String?
+    /// Set when the dictation was saved for want of a network: nothing was pasted at its
+    /// stop, and nothing is pasted later either — it waits here, transcribed by itself once
+    /// the network is back, for the user to copy. Kept after that, so the row still says it
+    /// never reached its app. Nil for every other record, and for those from before it.
+    public var undelivered: Undelivered? = nil
+
+    /// Where a dictation saved offline was going, and whether AI Rewrite was to rewrite it.
+    public struct Undelivered: Codable, Equatable {
+        /// The app in front at the stop — where it would have been pasted. Nil for the
+        /// Record Window's segments, and for an inline dictation whose stop named none.
+        public var app: String?
+        var bundleID: String?
+        /// Made with the AI shortcut: a retry rewrites it too, told `context`.
+        public var rewrite: Bool
+        /// What AI Rewrite would have been told about where the text was going, read at
+        /// the stop as for any AI dictation (`FocusContext.capture`'s exclusions applied).
+        public var context: FocusContext?
+
+        public init(app: String? = nil, bundleID: String? = nil, rewrite: Bool = false,
+                    context: FocusContext? = nil) {
+            self.app = app
+            self.bundleID = bundleID
+            self.rewrite = rewrite
+            self.context = context
+        }
+    }
 
     public var isRetryable: Bool { audioFileName != nil && status != .success }
+
+    /// A retry of this record runs AI Rewrite after the transcription: it was dictated
+    /// with the AI shortcut and saved offline before the rewrite could run.
+    public var retryRewrites: Bool { undelivered?.rewrite == true }
 
     /// The `provider` of an edit sent with no instruction (a double press): nothing was
     /// recorded, so no engine heard anything and Usage counts no speech for it.
@@ -368,15 +398,27 @@ public final class TranscriptionHistory {
     /// Records a failure and *keeps* the audio so the user can retry it. Passing the temp
     /// audio file here transfers ownership — do not call `AudioBufferWriter.cleanup` on it after.
     /// Returns the new record's id, so a failure the user can retry can name its row.
+    /// `offline`: the failure was the network's — the record is marked `undelivered`, which
+    /// the inline flow then fills in with where the text was going.
     @discardableResult
     public func recordFailure(error: String, provider: String, model: String? = nil, locale: String?,
-                       duration: TimeInterval, audioURL: URL?, usage: [UsageEvent] = []) -> UUID {
+                       duration: TimeInterval, audioURL: URL?, usage: [UsageEvent] = [],
+                       offline: Bool = false) -> UUID {
         let archived = archive(audioURL: audioURL)
         let id = UUID()
         add(TranscriptionRecord(id: id, date: Date(), text: "", status: .failed,
                                 errorMessage: error, provider: provider, locale: locale,
-                                duration: duration, audioFileName: archived, sttModel: model, usageEvents: usage))
+                                duration: duration, audioFileName: archived, sttModel: model, usageEvents: usage,
+                                undelivered: offline ? TranscriptionRecord.Undelivered() : nil))
         return id
+    }
+
+    /// Where a dictation saved offline was going (`TranscriptionRecord.Undelivered`) — the
+    /// inline flow's half of the mark `recordFailure(offline:)` set.
+    public func recordUndelivered(id: UUID, _ undelivered: TranscriptionRecord.Undelivered) {
+        guard let index = records.firstIndex(where: { $0.id == id }) else { return }
+        records[index].undelivered = undelivered
+        save()
     }
 
     public func record(id: UUID) -> TranscriptionRecord? {

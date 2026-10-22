@@ -13,6 +13,7 @@ import SpeechTextCore
 /// parts — the hairline tables, the app marks, the tags — so the two read as one window.
 struct HistoryView: View {
     let actions: MainWindowActions
+    var navigation: MainWindowNavigation?
     @State private var query = ""
     @State private var filter: HistoryFilter = .all
     @State private var narrowing = HistoryNarrowing()
@@ -73,6 +74,19 @@ struct HistoryView: View {
         } message: {
             Text("Every dictation and the audio kept for a retry are deleted. This can't be undone.")
         }
+        // A notice's Show: the window may be opening on History or already showing it.
+        .onAppear(perform: takeRequestedNarrowing)
+        .onChange(of: navigation?.historyNarrowing) { takeRequestedNarrowing() }
+    }
+
+    /// Narrows to what a notice asked for, with nothing else hiding it — and gives the
+    /// request back, so the narrowing is the user's from here on.
+    private func takeRequestedNarrowing() {
+        guard let requested = navigation?.historyNarrowing else { return }
+        navigation?.historyNarrowing = nil
+        narrowing = requested
+        filter = .all
+        query = ""
     }
 
     // MARK: Title
@@ -884,6 +898,9 @@ private struct HistoryRow: View {
         if let origin = record.originApp, let destination = record.destinationApp, origin != destination {
             parts.append("started in \(origin), pasted into \(destination)")
         }
+        if let undelivered = record.undelivered {
+            parts.append(undelivered.app.map { "no connection, so not pasted into \($0)" } ?? "no connection, so not pasted")
+        }
         return parts.joined(separator: "  ·  ")
     }
 
@@ -1079,6 +1096,9 @@ private struct HistoryDetail: View {
         }
         if let origin = record.originApp, let destination = record.destinationApp, origin != destination {
             parts.append("started in \(origin), pasted into \(destination)")
+        }
+        if let undelivered = record.undelivered {
+            parts.append(undelivered.app.map { "no connection, so not pasted into \($0)" } ?? "no connection, so not pasted")
         }
         let context = record.refinement?.context?.summary
         return VStack(alignment: .leading, spacing: 4) {

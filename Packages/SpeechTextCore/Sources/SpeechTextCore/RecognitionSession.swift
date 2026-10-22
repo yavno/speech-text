@@ -94,7 +94,7 @@ public struct RecognitionOutcome: Sendable {
     /// The segment failed because there was no network (`NetworkFailure.isOffline`), not
     /// because a provider answered badly. The user is told it is saved to History rather
     /// than shown the provider's error, and the archived audio is retried once the
-    /// network is back.
+    /// network is back — into History, never pasted (`TranscriptionRecord.undelivered`).
     public var offline = false
     /// The vendor answered that the model is not served (`ModelUnavailableReply`): the
     /// failure notice offers the model picker. Nothing retries on it.

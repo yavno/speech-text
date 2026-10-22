@@ -54,7 +54,7 @@ A cloud engine could not be reached. The recording was kept:
 
 - **Retry** on the notice tries again.
 - Without a click, SpeechText retries by itself when the network comes back — for dictations saved since the app was opened.
-- A retried dictation is put on the **clipboard** with a notice, not pasted, because by then you may be typing somewhere else.
+- A retried dictation is **not pasted, and not copied**: by then you may be typing somewhere else, or have copied something of your own. It waits in History, marked with the app it was for, and a notice says how many are waiting — its **Show** opens History on them, to copy each where you want it. A dictation made with the AI shortcut is rewritten first.
 - Older failures can be retried from History. The audio of a failed dictation is kept for 7 days by default (Settings › Privacy & Data).
 
 A model on this Mac or Apple Dictation works without a network.

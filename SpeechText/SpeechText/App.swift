@@ -173,8 +173,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         // Dictations saved to History with no network are transcribed once it is back.
         MainActor.assumeIsolated {
-            OfflineRetry.shared.onTranscribed = { [weak appState] texts in
-                appState?.showTranscribedOnceOnline(texts)
+            OfflineRetry.shared.onDrained = { [weak appState] transcribed, failed in
+                appState?.showNotPastedOnceOnline(transcribed: transcribed, failed: failed)
             }
             OfflineRetry.shared.start()
         }
@@ -259,8 +259,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // The status overlay asks for History via notification (AppState doesn't own windows)
         NotificationCenter.default.addObserver(
             forName: .openHistoryWindow, object: nil, queue: .main
-        ) { [weak self] _ in
-            self?.openHistory()
+        ) { [weak self] note in
+            // A notice may name the place to narrow to — "Not pasted" for what waited offline.
+            self?.showMainWindow(on: .history,
+                                 historyNarrowing: (note.object as? String).map { HistoryNarrowing(app: $0) })
         }
         // Settings' Edit Prompts… asks for the main window's Prompts page the same way.
         NotificationCenter.default.addObserver(
@@ -617,7 +619,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         showMainWindow(on: .history)
     }
 
-    private func showMainWindow(on page: MainPage? = nil) {
+    private func showMainWindow(on page: MainPage? = nil, historyNarrowing: HistoryNarrowing? = nil) {
         MainActor.assumeIsolated {
             if mainWindow == nil {
                 let actions = MainWindowActions(
@@ -628,6 +630,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     self?.preparedSettingsWindow = nil
                 }
             }
+            if let historyNarrowing { mainWindow?.navigation.historyNarrowing = historyNarrowing }
             mainWindow?.present(page)
             prepareSettingsWindowSoon()
         }
@@ -1114,7 +1117,13 @@ final class AppState {
             dlog("App", "handleTranscriptionResult: error — \(rawError)", level: .error)
             hideOverlay()
             if let recordID = speechEngine.offlineRecordID {
-                // Not an error to read: nothing is lost, it is waiting in History.
+                // Not an error to read: nothing is lost, it is waiting in History — with
+                // where it was going and, for an AI dictation, what its rewrite is told.
+                if !isTestDictation {
+                    TranscriptionHistory.shared.recordUndelivered(id: recordID, TranscriptionRecord.Undelivered(
+                        app: pasteDestination?.localizedName, bundleID: pasteDestination?.bundleIdentifier,
+                        rewrite: isAIMode, context: isAIMode ? focusContext : nil))
+                }
                 showSavedOffline(recordID)
             } else if speechEngine.failedForModel {
                 // Not "switched off": the same reply means a key without access. The
@@ -2009,11 +2018,6 @@ final class AppState {
         removesSelection = false
         editInstruction = .listening
         hideOverlay()
-        if !heldOnlineTexts.isEmpty {
-            let texts = heldOnlineTexts
-            heldOnlineTexts = []
-            showTranscribedOnceOnline(texts)
-        }
     }
 
     private func showOverlay() {
@@ -2207,10 +2211,14 @@ final class AppState {
     /// History, so the notice says where it is instead of reading like a loss, and offers
     /// the retry. Stays up longer than a notice with nothing to act on.
     private func showSavedOffline(_ recordID: UUID) {
+        // Every dictation this outage saved, the one just stopped included.
+        let waiting = max(MainActor.assumeIsolated { OfflineRetry.shared.pendingCount }, 1)
         showStatus(
             icon: "wifi.slash",
             title: "No connection — saved to History",
-            detail: "It will be transcribed once you're back online.",
+            detail: waiting == 1
+                ? "It will be transcribed once you're back online."
+                : "\(waiting) dictations will be transcribed once you're back online.",
             tint: .orange,
             duration: 15,
             action: StatusOverlayAction(title: "Retry") { [weak self] in
@@ -2228,14 +2236,17 @@ final class AppState {
         }
     }
 
-    /// What a retry of a saved recording came to. A result goes to the clipboard, never
-    /// into an app: by the time it lands the user may be typing somewhere else entirely.
+    /// What a retry of a saved recording came to. A result stays in History — never pasted
+    /// into an app, where the user may by now be typing something else entirely, and never
+    /// put on the clipboard over whatever they copied meanwhile.
     private func reportRetry(_ result: HistoryRetry.Result, recordID: UUID) {
         switch result {
-        case .succeeded(let text):
-            PasteService.copyToClipboard(text)
-            showStatus(icon: "doc.on.clipboard", title: "Transcribed — copied to the clipboard",
-                       detail: text, tint: Semantic.confirmation, duration: 8)
+        case .succeeded:
+            showStatus(icon: "checkmark.circle", title: "Transcribed — not pasted",
+                       detail: "It's in History, ready to copy.", tint: Semantic.confirmation, duration: 8,
+                       action: StatusOverlayAction(title: "Show") { [weak self] in
+                           self?.openNotPasted()
+                       }, historyPlace: HomeRecentEntry.notPasted)
         case .offline:
             showSavedOffline(recordID)
         case .failed(let error):
@@ -2246,25 +2257,33 @@ final class AppState {
         }
     }
 
-    /// Texts transcribed once the network came back while an edit was running, held
-    /// until it ends.
-    private var heldOnlineTexts: [String] = []
-
-    /// Dictations saved offline and transcribed once the network came back: to the
-    /// clipboard, oldest first, as one write — never into the app in front. Held while an
-    /// edit runs: it reads the selection through the clipboard, and a write in the middle
-    /// of that ⌘C would make it abort.
-    func showTranscribedOnceOnline(_ texts: [String]) {
-        guard !isEditMode else {
-            heldOnlineTexts += texts
-            return
+    /// Dictations saved offline, once the network came back and a retry went through them:
+    /// how many are waiting in History, unpasted. One notice for the whole outage, whose
+    /// Show opens History on them. Nothing is pasted or copied — the user decides where each
+    /// one goes, and the app each was meant for is on its row.
+    func showNotPastedOnceOnline(transcribed: Int, failed: Int) {
+        let total = transcribed + failed
+        // The title sits beside Show, so it stays short; "back online" goes in the detail.
+        let title = total == 1 ? "1 dictation not pasted" : "\(total) dictations not pasted"
+        let detail: String
+        if failed == 0 {
+            detail = "Back online — transcribed, waiting in History."
+        } else if transcribed == 0 {
+            detail = "Back online, but couldn't transcribe — retry in History."
+        } else {
+            detail = "Back online — \(transcribed) transcribed, \(failed) couldn't be. All in History."
         }
-        PasteService.copyToClipboard(texts.joined(separator: "\n\n"))
-        // The title is the width of the notice (measured: 221 of 272 pt); the count goes
-        // in the detail, where a second line is allowed.
-        let detail = texts.count == 1 ? texts[0] : "\(texts.count) dictations, oldest first."
-        showStatus(icon: "doc.on.clipboard", title: "Back online — copied to the clipboard",
-                   detail: detail, tint: Semantic.confirmation, duration: 10)
+        showStatus(icon: "tray.full", title: title, detail: detail,
+                   tint: failed == 0 ? Semantic.confirmation : .orange, duration: 15,
+                   action: StatusOverlayAction(title: "Show") { [weak self] in
+                       self?.openNotPasted()
+                   }, historyPlace: HomeRecentEntry.notPasted)
+    }
+
+    /// History, narrowed to the dictations that reached no app.
+    private func openNotPasted() {
+        hideStatus()
+        openHistoryWindow(narrowedTo: HomeRecentEntry.notPasted)
     }
 
     // MARK: - Model lifecycle
@@ -2324,8 +2343,9 @@ final class AppState {
 
     // MARK: - Status Overlay
 
+    /// `historyPlace`: what a click on the notice narrows History to, as History's row names it.
     func showStatus(icon: String, title: String, detail: String?, tint: Color, duration: TimeInterval = 5,
-                    action: StatusOverlayAction? = nil) {
+                    action: StatusOverlayAction? = nil, historyPlace: String? = nil) {
         hideStatus()
 
         let panel = StatusOverlayPanel()
@@ -2337,7 +2357,7 @@ final class AppState {
             action: action,
             onTap: { [weak self] in
                 self?.hideStatus()
-                self?.openHistoryWindow()
+                self?.openHistoryWindow(narrowedTo: historyPlace)
             }
         ))
         panel.place(beside: (overlayPanel ?? confirmationPanel).flatMap { $0.isVisible ? $0.frame : nil })
@@ -2352,8 +2372,8 @@ final class AppState {
         DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: dismiss)
     }
 
-    func openHistoryWindow() {
-        NotificationCenter.default.post(name: .openHistoryWindow, object: nil)
+    func openHistoryWindow(narrowedTo place: String? = nil) {
+        NotificationCenter.default.post(name: .openHistoryWindow, object: place)
     }
 
     func hideStatus() {

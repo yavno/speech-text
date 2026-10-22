@@ -220,6 +220,61 @@ final class HistorySummaryTests: XCTestCase {
         XCTAssertEqual(HomeRecentEntry(record(app: "Slack")).place, "Slack")
     }
 
+    // MARK: Saved with no connection
+
+    private func offline(_ status: TranscriptionRecord.Status, app: String? = "Slack", rewrite: Bool = false,
+                         refinement: TranscriptionRecord.Refinement? = nil) -> TranscriptionRecord {
+        var saved = record(text: status == .success ? "buy milk" : "", status: status, refinement: refinement)
+        saved.undelivered = TranscriptionRecord.Undelivered(
+            app: app, rewrite: rewrite, context: app.map { FocusContext(appName: $0) })
+        return saved
+    }
+
+    /// A dictation saved offline reached no app, before its retry and after it — even once
+    /// the retry's rewrite records a context naming the app it was going to — so it stays
+    /// under "Not pasted", where the back-online notice's Show opens History.
+    func testADictationSavedOfflineIsNotPastedWhateverItsRetryDid() {
+        var told = refinement(output: "Buy milk.")
+        told.context = FocusContext(appName: "Slack")
+        let records = [offline(.failed), offline(.success), offline(.success, refinement: told), offline(.success, app: nil)]
+        for saved in records {
+            XCTAssertEqual(HomeRecentEntry(saved).place, HomeRecentEntry.notPasted)
+            XCTAssertEqual(HomeRecentEntry.place(of: saved), HomeRecentEntry.notPasted)
+            XCTAssertNil(HomeRecentEntry(saved).app)
+        }
+        XCTAssertEqual(HistoryNarrowing.apps(in: records).map(\.app), ["Not pasted"])
+        XCTAssertEqual(HistoryDay.group(records, narrowing: HistoryNarrowing(app: "Not pasted"), now: now, calendar: calendar)
+            .flatMap(\.records).count, 4)
+        XCTAssertEqual(HomeRecentEntry(records[0]).tags, [.failed, .notPasted("Slack")])
+        XCTAssertEqual(HomeRecentEntry(records[2]).tags, [.preset("Email / Message"), .notPasted("Slack")])
+        XCTAssertEqual(HomeRecentEntry(records[3]).tags, [.notPasted(nil)])
+        XCTAssertEqual(HomeRecentEntry(records[2]).text, "Buy milk.", "what the rewrite made of it, to copy")
+    }
+
+    func testAnOfflineDictationIsFoundByTheAppItWasFor() {
+        XCTAssertEqual(HistoryDay.group([offline(.success), record(app: "Mail")], filter: .all, query: "slack",
+                                        calendar: calendar).flatMap(\.records).count, 1)
+    }
+
+    /// The mark survives `history.json`, and a record written before it reads as delivered.
+    func testTheOfflineMarkIsStoredAndAnOlderRecordDecodesWithoutIt() throws {
+        let saved = offline(.failed, rewrite: true)
+        let data = try JSONEncoder().encode(saved)
+        XCTAssertEqual(try JSONDecoder().decode(TranscriptionRecord.self, from: data), saved)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        object.removeValue(forKey: "undelivered")
+        let older = try JSONDecoder().decode(TranscriptionRecord.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(older.undelivered)
+        XCTAssertFalse(older.retryRewrites)
+    }
+
+    /// Only a dictation made with the AI shortcut is rewritten by its retry.
+    func testOnlyAnAIDictationSavedOfflineIsRewrittenOnRetry() {
+        XCTAssertTrue(offline(.failed, rewrite: true).retryRewrites)
+        XCTAssertFalse(offline(.failed).retryRewrites)
+        XCTAssertFalse(record(status: .failed).retryRewrites)
+    }
+
     func testARowShowsALettersParagraphsOnOneLine() {
         let letter = "Hi Amie!\n\nOkay, thanks for the information.  Yes, I’ve learned Spanish.\n"
         let entry = HomeRecentEntry(record(text: letter))

@@ -3,6 +3,7 @@
 
 import SwiftUI
 import AppKit
+import SpeechTextCore
 
 // MARK: - The main window
 
@@ -73,6 +74,9 @@ struct MainWindowActions {
 @Observable
 final class MainWindowNavigation {
     var page: MainPage = .home
+    /// What History opens narrowed to, asked for by a notice; History takes it and sets
+    /// this back to nil, so the narrowing is the user's to change from then on.
+    var historyNarrowing: HistoryNarrowing?
 }
 
 // MARK: - Pages
@@ -208,7 +212,7 @@ struct MainWindowView: View {
         case .home:
             HomeView(actions: actions) { navigation.page = $0 }
         case .history:
-            HistoryView(actions: actions)
+            HistoryView(actions: actions, navigation: navigation)
         case .usage:
             UsageView()
         case .prompts:

@@ -353,19 +353,24 @@ public struct HomeRecentEntry: Equatable, Identifiable {
         /// selection left as it was.
         case rewriteFailed
         case failed
+        /// Saved for want of a network and never pasted; the app it was going to, if known.
+        case notPasted(String?)
     }
 
     public let id: UUID
     public let text: String
     /// The app the text went to; nil when History does not know (the Record Window, a
-    /// dictation that pasted nothing, and entries from before the stop recorded it).
+    /// dictation that pasted nothing — one saved offline included, whatever app it was
+    /// going to — and entries from before the stop recorded it).
     public let app: String?
     let date: Date
     public let status: TranscriptionRecord.Status
     public let tags: [Tag]
     public let canRetry: Bool
+    let undelivered: Bool
 
     public init(_ record: TranscriptionRecord) {
+        undelivered = record.undelivered != nil
         id = record.id
         date = record.date
         status = record.status
@@ -392,6 +397,7 @@ public struct HomeRecentEntry: Equatable, Identifiable {
         }
         if let refinement = record.refinement, !refinement.succeeded { tags.append(.rewriteFailed) }
         if record.status == .failed { tags.append(.failed) }
+        if let undelivered = record.undelivered { tags.append(.notPasted(undelivered.app)) }
         self.tags = tags
         canRetry = record.isRetryable
     }
@@ -405,21 +411,27 @@ public struct HomeRecentEntry: Equatable, Identifiable {
 
     /// Where the row says the text went: its app, the Record Window for a success that
     /// names none — or that nothing was pasted.
-    public var place: String { Self.place(app: app, status: status) }
+    public var place: String { Self.place(app: app, status: status, undelivered: undelivered) }
 
     /// `place` of a record, without the rest of its row — History narrows by it and Usage
     /// counts by it for every record, and the row's text and tags were worked out for nothing.
     public static func place(of record: TranscriptionRecord) -> String {
-        place(app: app(of: record), status: record.status)
+        place(app: app(of: record), status: record.status, undelivered: record.undelivered != nil)
     }
 
     private static func app(of record: TranscriptionRecord) -> String? {
-        record.destinationApp ?? record.refinement?.context?.appName ?? record.originApp
+        // Before the fallbacks: a retry's rewrite records a context naming the app the text
+        // was going to, and the row would then claim it went there.
+        guard record.undelivered == nil else { return nil }
+        return record.destinationApp ?? record.refinement?.context?.appName ?? record.originApp
     }
 
-    private static func place(app: String?, status: TranscriptionRecord.Status) -> String {
-        app ?? (status == .success ? "Record Window" : "Not pasted")
+    private static func place(app: String?, status: TranscriptionRecord.Status, undelivered: Bool) -> String {
+        app ?? (status == .success && !undelivered ? "Record Window" : notPasted)
     }
+
+    /// The place of a dictation that reached no app — what History's narrowing names it.
+    public static let notPasted = "Not pasted"
 
     /// "14:02" today, "Yesterday", a weekday within the week, a date before that.
     public func timeText(now: Date = Date(), calendar: Calendar = .current) -> String {
