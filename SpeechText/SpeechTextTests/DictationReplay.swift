@@ -575,7 +575,7 @@ final class DictationReplay {
         }
         let check = InlineDelivery.pasteCheck(quit: destination.hasQuit,
                                               inFront: front === destination && !speechTextInFront,
-                                              takesText: true)
+                                              menuOpen: false, takesText: true)
         guard check == .paste else {
             recordWindow = text + " "
             return

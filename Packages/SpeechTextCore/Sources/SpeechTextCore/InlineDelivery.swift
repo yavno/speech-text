@@ -58,14 +58,21 @@ public enum InlineDelivery {
         case quit
         /// Another app is in front.
         case notInFront
+        /// The app is in front, but a menu bar menu another app opened — Control Center,
+        /// Sound, Wi-Fi — has the keyboard: the ⌘V would go to it, and activating the app
+        /// does not close it (measured 2026-10-22).
+        case menuOpen
         /// Its focused element takes no text (a button, a list).
         case takesNoText
     }
 
-    /// `takesText` is asked only of an app in front: it is a round trip to that app.
-    public static func pasteCheck(quit: Bool, inFront: Bool, takesText: @autoclosure () -> Bool) -> PasteCheck {
+    /// `menuOpen` and `takesText` are asked only of an app in front: each is a round trip
+    /// to another process.
+    public static func pasteCheck(quit: Bool, inFront: Bool, menuOpen: @autoclosure () -> Bool,
+                                  takesText: @autoclosure () -> Bool) -> PasteCheck {
         if quit { return .quit }
         guard inFront else { return .notInFront }
+        if menuOpen() { return .menuOpen }
         return takesText() ? .paste : .takesNoText
     }
 

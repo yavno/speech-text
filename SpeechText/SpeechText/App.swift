@@ -1178,6 +1178,15 @@ final class AppState {
                                                destinationBundleID: pasteDestination?.bundleIdentifier)
     }
 
+    /// Takes back the destination `recordApps` wrote, once `deliver` hands the text to the
+    /// Record Window instead: History then says where it went, not where it was meant to.
+    private func recordNotPasted() {
+        guard !isTestDictation, let id = speechEngine.lastRecordID else { return }
+        TranscriptionHistory.shared.recordApps(id: id, origin: dictationOrigin?.localizedName,
+                                               originBundleID: dictationOrigin?.bundleIdentifier,
+                                               destination: nil)
+    }
+
     /// Hands a test dictation's result to setup instead of pasting it or raising a notice:
     /// the Try it step says in its own words what happened. False for an AI rewrite,
     /// which `refine` reports once the model has answered.
@@ -1322,6 +1331,7 @@ final class AppState {
         DictationTraceRecorder.record(.stopPaste, text: text)
         if !PasteService.isAccessibilityGranted {
             dlog("App", "deliver: no accessibility, showing record panel", level: .notice)
+            recordNotPasted()
             dismissOverlayConfirmation()
             PasteService.promptAccessibility()
             showDirectRecordingPanel(withText: text)
@@ -1344,20 +1354,26 @@ final class AppState {
 
         let tryPaste = { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: PasteService.canLikelyPasteText(in: app))
             guard check == .paste else {
-                dlog("App", "deliver: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front) — showing record panel", level: .notice)
+                dlog("App", "deliver: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front\(menu.map { ", \($0) open" } ?? "")) — showing record panel", level: .notice)
+                self?.recordNotPasted()
                 self?.dismissOverlayConfirmation()
                 self?.showDirectRecordingPanel(withText: text)
-                if check == .quit || check == .notInFront {
+                let detail: String? = switch check {
+                case .quit: "It quit before the text was ready. The text is in the Record Window."
+                case .notInFront: "It didn't come to the front. The text is in the Record Window."
+                case .menuOpen: "\(menu ?? "A menu") was open and had the keyboard. The text is in the Record Window."
+                case .takesNoText, .paste: nil
+                }
+                if let detail {
                     self?.showStatus(icon: "exclamationmark.triangle.fill",
                                      title: "Couldn't paste into \(app.localizedName ?? "the app")",
-                                     detail: check == .quit
-                                         ? "It quit before the text was ready. The text is in the Record Window."
-                                         : "It didn't come to the front. The text is in the Record Window.",
-                                     tint: .orange)
+                                     detail: detail, tint: .orange)
                 }
                 return
             }
@@ -1398,8 +1414,10 @@ final class AppState {
         // for ⌘V. No completion can replace this 0.5s.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: true)
             guard check == .paste else {
                 dlog("App", "pasteTextToTarget: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front)", level: .notice)
@@ -1407,7 +1425,9 @@ final class AppState {
                                  title: "Couldn't insert into \(app.localizedName ?? "the app")",
                                  detail: check == .quit
                                      ? "It quit. The text is still in the Record Window."
-                                     : "It didn't come to the front. The text is still in the Record Window.",
+                                     : check == .menuOpen
+                                         ? "\(menu ?? "A menu") was open and had the keyboard. The text is still in the Record Window."
+                                         : "It didn't come to the front. The text is still in the Record Window.",
                                  tint: .orange)
                 return
             }
@@ -1811,6 +1831,7 @@ final class AppState {
         let front = NSWorkspace.shared.frontmostApplication
         if let app, InlineDelivery.pasteCheck(quit: app.isTerminated,
                                               inFront: front?.processIdentifier == app.processIdentifier,
+                                              menuOpen: PasteService.openMenuBarMenu() != nil,
                                               takesText: true) == .paste {
             dlog("Edit", "the late cut goes back where it was")
             PasteService.pasteItems(items)
@@ -1936,16 +1957,12 @@ final class AppState {
                        detail: "The app it came from is gone.", tint: .orange, duration: 8)
             return
         }
-        if NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
-            paste()
-            return
-        }
-        PasteService.activateApp(app)
-        // Blind wait, as for every paste into an app brought back to the front.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        let tryPaste = { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: true)
             guard check == .paste else {
                 dlog("Edit", "not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front) — the text goes to the clipboard", level: .notice)
@@ -1953,12 +1970,21 @@ final class AppState {
                 self?.showStatus(icon: "doc.on.clipboard", title: "The text is on the clipboard",
                                  detail: check == .quit
                                      ? "The app it came from is gone."
-                                     : "\(app.localizedName ?? "The app") didn't come back to the front, so nothing was pasted into it.",
+                                     : check == .menuOpen
+                                         ? "\(menu ?? "A menu") was open and had the keyboard, so nothing was pasted into \(app.localizedName ?? "the app")."
+                                         : "\(app.localizedName ?? "The app") didn't come back to the front, so nothing was pasted into it.",
                                  tint: .orange, duration: 8)
                 return
             }
             paste()
         }
+        if NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
+            tryPaste()
+            return
+        }
+        PasteService.activateApp(app)
+        // Blind wait, as for every paste into an app brought back to the front.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { tryPaste() }
     }
 
     /// Abandons the edit wherever it is — cancelled, and says so.

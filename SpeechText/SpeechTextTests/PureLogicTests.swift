@@ -111,13 +111,24 @@ final class PasteDestinationTests: XCTestCase {
     /// The ⌘V goes to whatever is in front, so it is posted only when that is the app the
     /// text is for — and the focused element is asked about only then.
     func testAPasteIsPostedOnlyIntoTheAppInFront() {
-        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: true, takesText: true), .paste)
-        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: true, takesText: false), .takesNoText)
-        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: false, takesText: true), .notInFront)
-        XCTAssertEqual(InlineDelivery.pasteCheck(quit: true, inFront: false, takesText: true), .quit)
+        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: true, menuOpen: false, takesText: true), .paste)
+        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: true, menuOpen: false, takesText: false), .takesNoText)
+        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: false, menuOpen: false, takesText: true), .notInFront)
+        XCTAssertEqual(InlineDelivery.pasteCheck(quit: true, inFront: false, menuOpen: false, takesText: true), .quit)
         var asked = false
-        _ = InlineDelivery.pasteCheck(quit: false, inFront: false, takesText: { asked = true; return true }())
-        XCTAssertFalse(asked, "the focused element of an app not in front was asked about")
+        _ = InlineDelivery.pasteCheck(quit: false, inFront: false, menuOpen: { asked = true; return false }(),
+                                      takesText: { asked = true; return true }())
+        XCTAssertFalse(asked, "an app not in front was asked about its menus or its focused element")
+    }
+
+    /// Control Center open over the app in front has the keyboard, though the app is still
+    /// the frontmost one: a ⌘V posted then is lost, and "Pasted into TextEdit" was a lie
+    /// (22.10). Activation does not close it, so nothing is pasted.
+    func testAPasteIsNotPostedWhileAMenuBarMenuHasTheKeyboard() {
+        XCTAssertEqual(InlineDelivery.pasteCheck(quit: false, inFront: true, menuOpen: true, takesText: true), .menuOpen)
+        var asked = false
+        _ = InlineDelivery.pasteCheck(quit: false, inFront: true, menuOpen: true, takesText: { asked = true; return true }())
+        XCTAssertFalse(asked, "the focused element was asked about with a menu holding the keyboard")
     }
 }
 

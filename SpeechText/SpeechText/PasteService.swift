@@ -577,6 +577,24 @@ struct PasteService {
         }
     }
 
+    /// The name of the app whose menu bar menu has the keyboard — Control Center, or one
+    /// of its extras (Sound, Wi-Fi, Bluetooth) — or nil. While one is open the app beneath
+    /// is still `frontmostApplication`, but a ⌘V goes to the menu and is lost, and
+    /// activating the app does not close it. Control Center answers a focused window only
+    /// while one of its menus is open (measured 2026-10-22, macOS 26); the system-wide
+    /// focused application cannot be read instead — it failed with and without the menu.
+    /// Another app's status menu is not checked: unmeasured.
+    static func openMenuBarMenu() -> String? {
+        guard AXIsProcessTrusted() else { return nil }
+        _ = messagingTimeout
+        guard let controlCenter = NSRunningApplication.runningApplications(
+            withBundleIdentifier: "com.apple.controlcenter").first else { return nil }
+        var window: CFTypeRef?
+        let result = AXUIElementCopyAttributeValue(AXUIElementCreateApplication(controlCenter.processIdentifier),
+                                                   kAXFocusedWindowAttribute as CFString, &window)
+        return result == .success ? controlCenter.localizedName ?? "Control Center" : nil
+    }
+
     /// Check whether the given app likely accepts pasted text.
     /// Uses a denylist approach: returns true unless the focused element is a known
     /// non-text role (button, table, list, etc.). Unknown roles (including Electron/Chromium
