@@ -52,7 +52,7 @@ struct PasteService {
                 completion(.nothingSelected)
                 return
             }
-            dlog("Edit", "selection: \(record.text.count) chars at \(record.range.location)+\(record.range.length), read through AX")
+            dlog("Edit", "selection: \(record.text.count) chars at \(record.range.location)+\(record.range.length) (selected \(range.location)+\(range.length)), read through AX")
             completion(.selected(CapturedSelection(text: record.text, record: record)))
             return
         }
@@ -274,7 +274,12 @@ struct PasteService {
             dlog("Edit", "select: the selected words are no longer there untouched")
             return .changed
         }
-        if selectedRange(of: element) != range {
+        // The record is the selection trimmed to its words, so a field still holding the
+        // user's selection — a trailing newline and all — is left as it is. Writing the
+        // trimmed range there was no improvement and Slack (Electron) applied it elsewhere:
+        // the read-back failed and the ⌘X cut other text (2026-10-22).
+        let current = selectedRange(of: element)
+        if current != range, current.flatMap({ SelectionEdit.words(in: $0, of: document)?.range }) != range {
             guard setSelectedRange(range, of: element), selectedRange(of: element) == range else {
                 dlog("Edit", "select: selecting \(range.location)+\(range.length) did not read back", level: .notice)
                 return .unconfirmed
