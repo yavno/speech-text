@@ -330,10 +330,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func openSetup() {
         MainActor.assumeIsolated {
             if setupWindow == nil {
-                setupWindow = OnboardingWindow(appState: appState) { [weak self] in
+                setupWindow = OnboardingWindow(appState: appState, onClose: { [weak self] in
                     self?.setupWindow = nil
                     self?.rebuildMenu()
-                }
+                }, onFinish: { [weak self] in
+                    self?.showMainWindow()
+                })
             }
             setupWindow?.present()
         }
@@ -1033,6 +1035,12 @@ final class AppState {
         dlog("App", "startRecording failed: \(message)", level: .error)
         DictationTraceRecorder.current = nil
         hideOverlay()
+        // Setup's Try it says it in its own panel, with Try again, rather than in a
+        // notice in the corner of the screen.
+        if isTestDictation {
+            dictationTest.finished(.failed(friendlySTTError(message)), ai: isAIMode)
+            return
+        }
         showStatus(
             icon: "exclamationmark.triangle.fill",
             title: "Couldn't start recording",

@@ -67,6 +67,12 @@ final class DictationTest {
         outcome = nil
         rewrite = nil
     }
+
+    /// Try again after an AI dictation failed: back to the AI shortcut's offer, with the
+    /// plain dictation that worked kept.
+    func resetRewrite() {
+        rewrite = nil
+    }
 }
 
 // MARK: - Model

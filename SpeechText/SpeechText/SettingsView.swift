@@ -1022,8 +1022,9 @@ private struct SpokenLanguagesField: View {
 
 /// Settings › Recording: how a dictation shortcut records, as two segments side by side —
 /// press it to start and again to paste, or hold it while speaking. Words only: the keys
-/// are drawn, live, by the gestures under it. Stored as `holdToTalk`.
-private struct RecordingModePicker: View {
+/// are drawn, live, by the gestures under it. Stored as `holdToTalk`. Setup's Try it
+/// step offers the same choice.
+struct RecordingModePicker: View {
     @Binding var holdToTalk: Bool
 
     var body: some View {

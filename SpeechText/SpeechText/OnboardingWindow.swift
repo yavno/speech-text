@@ -15,11 +15,13 @@ final class OnboardingWindow: NSWindow {
 
     let model: OnboardingModel
     private let onClose: () -> Void
+    private let onFinish: () -> Void
     private var hasBeenShown = false
 
-    init(appState: AppState, onClose: @escaping () -> Void) {
+    init(appState: AppState, onClose: @escaping () -> Void, onFinish: @escaping () -> Void) {
         model = OnboardingModel(appState: appState)
         self.onClose = onClose
+        self.onFinish = onFinish
         super.init(contentRect: NSRect(origin: .zero, size: Self.size),
                    styleMask: [.borderless, .miniaturizable],
                    backing: .buffered, defer: false)
@@ -52,6 +54,13 @@ final class OnboardingWindow: NSWindow {
         model.tearDown()
         super.close()
         onClose()
+    }
+
+    /// Done's Start using SpeechText: setup closes and the main window opens.
+    func finishAndOpenApp() {
+        model.finish()
+        close()
+        onFinish()
     }
 
     /// ⌘W and ⌘M, which a borderless window does not get from a title bar.

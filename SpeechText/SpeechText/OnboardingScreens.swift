@@ -102,8 +102,12 @@ struct OnboardingView: View {
             }
         case .done:
             Primary(title: "Start using SpeechText", enabled: true) {
-                model.finish()
-                window.window?.close()
+                if let setup = window.window as? OnboardingWindow {
+                    setup.finishAndOpenApp()
+                } else {
+                    model.finish()
+                    window.window?.close()
+                }
             }
         }
     }
@@ -1063,6 +1067,12 @@ private struct WaitingDot: View {
 
 // MARK: - ⑤ Try it
 
+/// The practice step. Three stages share one layout — the step's words and the
+/// shortcut on the left, what came of it on the right: a plain dictation; once it
+/// worked and AI polish is set up, the same step offering the AI shortcut, drawn as the
+/// plain one was; and an AI dictation, whose panel holds only what was said and what the
+/// AI wrote. A failure says what happened and offers Try again, which goes back to the
+/// stage's opening words.
 private struct TryItScreen: View {
     @Bindable var model: OnboardingModel
     @Environment(\.setupTint) private var tint
@@ -1076,6 +1086,7 @@ private struct TryItScreen: View {
     /// ⌃⇧ of "⌃⇧Q", and Q.
     private var qModifiers: String { shortcutKeys(q).filter(isModifierCap).joined() }
     private var qLetter: String { shortcutKeys(q).last ?? q }
+    private var aLetter: String { shortcutKeys(a).last ?? a }
 
     private enum Phase { case ready, listening, transcribing, success, nothing, rejected, offline, failed(String) }
     private enum AIPhase { case ready, listening, polishing, success(said: String, wrote: String), failed(said: String, reason: String) }
@@ -1108,6 +1119,20 @@ private struct TryItScreen: View {
     }
 
     private var pending: (model: LocalSTTModel, state: LocalModelStore.InstallState)? { model.pendingSpeechModel }
+
+    /// An AI dictation is under way or has ended: the step is about it alone.
+    private var aiStage: Bool {
+        guard pending == nil, model.aiIsSetUp else { return false }
+        if case .ready = aiPhase { return false }
+        return true
+    }
+
+    /// The plain dictation worked and AI polish is set up: the AI shortcut is offered.
+    private var aiOffered: Bool {
+        guard pending == nil, model.aiIsSetUp, !aiStage else { return false }
+        if case .success = phase { return true }
+        return false
+    }
 
     var body: some View {
         StepColumns(copyWidth: 310, insets: EdgeInsets(top: 44, leading: 36, bottom: 24, trailing: 32), copyAlignment: .leading) {
@@ -1149,49 +1174,111 @@ private struct TryItScreen: View {
                     title(Text("Your speech model isn't downloaded"))
                     body(Text("Download it to try dictating here."))
                 }
+            } else if aiStage {
+                aiCopy
+            } else if aiOffered {
+                aiOfferCopy
             } else {
-                switch phase {
-                case .ready:
-                    Text(holdToTalk ? "Try it: hold" : "Try it: press").setupTitle(32)
-                    LiveShortcutKeycaps(action: .inline, size: 52).padding(.top, 14).padding(.bottom, 18)
-                    body(Text("Say anything, like ") + Text("“This is my first dictation.”").italic()
-                         + Text(holdToTalk ? " Let go when you're done." : " Press the keys again when you're done."))
-                case .listening:
-                    if holdToTalk && HeldShortcuts.shared.down.contains(.inline) {
-                        // The practice step: the letter alone keeps it going.
-                        if appState.holdTipFollowed {
-                            title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("Just \(qLetter) — that's it"))
-                            body(Text("Clicks and ⌘Tab work as usual while you hold it. Let go of \(qLetter) when you're done."))
-                        } else {
-                            title(Text("Now let go of \(qModifiers)"))
-                            body(Text("Keep \(qLetter) down — it alone keeps recording, and your hand is free for the mouse and ⌘Tab."))
-                        }
-                        LiveShortcutKeycaps(action: .inline, size: 22).padding(.top, 10)
-                    } else {
-                        title(Text("Listening…"))
-                        body(Text("Press \(q) again when you're done."))
-                        LiveShortcutKeycaps(action: .inline, size: 22, pulsing: true).padding(.top, 10)
-                    }
-                    hint("See the small bar at the bottom of your screen? That's SpeechText listening.")
-                case .transcribing:
-                    title(Text("Turning your speech into text…"))
-                case .success:
-                    title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("It works!"))
-                    body(model.aiIsSetUp ? Text("That's your voice, typed. Now try AI polish: press \(a)") : Text("That's your voice, typed."))
-                case .nothing:
-                    title(Text("We didn't hear anything"))
-                    body(Text("Check that the right microphone is selected — it's shown on the right. Then press \(q) again."))
-                case .rejected:
-                    title(Text("Your key stopped working"))
-                    body(Text("Go back and paste your key again."))
-                case .offline:
-                    title(Text("No internet connection"))
-                    body(Text("Online services need internet. Connect, then press \(q) again."))
-                case .failed(let message):
-                    title(Text("That didn't work"))
-                    body(Text("\(message) Press \(q) to try again."))
-                }
+                plainCopy
             }
+            if showsModePicker {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("How the shortcut records").font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(SetupColor.label3)
+                    RecordingModePicker(holdToTalk: $holdToTalk)
+                }
+                .padding(.top, 26)
+            }
+        }
+    }
+
+    /// Before a dictation, after one, and after a failure — never while one runs, when a
+    /// change would leave the words on screen describing the other mode.
+    private var showsModePicker: Bool {
+        guard pending == nil, !listening, !engine.isTranscribing, !appState.isRefining else { return false }
+        if case .success = aiPhase { return false }
+        return true
+    }
+
+    @ViewBuilder
+    private var plainCopy: some View {
+        switch phase {
+        case .ready:
+            Text(holdToTalk ? "Try it: hold" : "Try it: press").setupTitle(32)
+            LiveShortcutKeycaps(action: .inline, size: 52).padding(.top, 14).padding(.bottom, 18)
+            body(Text("Say anything, like ") + Text("“This is my first dictation.”").italic()
+                 + Text(holdToTalk ? " Let go when you're done." : " Press the keys again when you're done."))
+        case .listening:
+            if holdToTalk && HeldShortcuts.shared.down.contains(.inline) {
+                // The practice step: the letter alone keeps it going.
+                if appState.holdTipFollowed {
+                    title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("Just \(qLetter) — that's it"))
+                    body(Text("Clicks and ⌘Tab work as usual while you hold it. Let go of \(qLetter) when you're done."))
+                } else {
+                    title(Text("Now let go of \(qModifiers)"))
+                    body(Text("Keep \(qLetter) down — it alone keeps recording, and your hand is free for the mouse and ⌘Tab."))
+                }
+                LiveShortcutKeycaps(action: .inline, size: 22).padding(.top, 10)
+            } else {
+                title(Text("Listening…"))
+                body(Text(holdToTalk ? "Let go of \(qLetter) when you're done." : "Press \(q) again when you're done."))
+                LiveShortcutKeycaps(action: .inline, size: 22, pulsing: true).padding(.top, 10)
+            }
+            hint("See the small bar at the bottom of your screen? That's SpeechText listening.")
+        case .transcribing:
+            title(Text("Turning your speech into text…"))
+        case .success:
+            title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("It works!"))
+            body(Text("That's your voice, typed."))
+        case .nothing:
+            title(Text("We didn't hear anything"))
+            body(Text("Check that the right microphone is selected — it's shown on the right — then try again."))
+        case .rejected:
+            title(Text("Your key stopped working"))
+            body(Text("Go back and paste your key again."))
+        case .offline:
+            title(Text("No internet connection"))
+            body(Text("Online services need internet. Connect, then try again."))
+        case .failed(let message):
+            title(Text("That didn't work"))
+            body(Text(message))
+        }
+    }
+
+    /// The plain dictation worked: the AI shortcut, drawn as the plain one was.
+    @ViewBuilder
+    private var aiOfferCopy: some View {
+        Text("✓ It works!").font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.ok)
+            .padding(.bottom, 8)
+        if let f = model.pendingAIFraction {
+            title(Text("AI polish is almost ready"))
+            body(Text("Its model is still downloading (\(Int(f * 100))%). You can wait here, or try it later."))
+        } else {
+            Text(holdToTalk ? "Now try AI polish: hold" : "Now try AI polish: press").setupTitle(32)
+            LiveShortcutKeycaps(action: .ai, size: 52, ai: true).padding(.top, 14).padding(.bottom, 18)
+            body(Text("Dictate an email the way you'd say it — for example ")
+                 + Text("“uh, write to Anna that the report will be ready on Friday, not Thursday, and say sorry for the delay.”").italic())
+        }
+    }
+
+    @ViewBuilder
+    private var aiCopy: some View {
+        switch aiPhase {
+        case .ready:
+            EmptyView()
+        case .listening:
+            title(Text("Listening…"))
+            body(Text(holdToTalk ? "Let go of \(aLetter) when you're done." : "Press \(a) again when you're done."))
+            LiveShortcutKeycaps(action: .ai, size: 22, pulsing: true, ai: true).padding(.top, 10)
+        case .polishing:
+            title(Text("AI is tidying up your text…"))
+            body(Text("This takes a few seconds."))
+        case .success:
+            title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("Here's the AI version"))
+            body(Text("What you said, and what AI polish wrote from it — in any app, only the AI version is typed."))
+        case .failed:
+            title(Text("AI couldn't answer this time"))
+            body(Text("In any app, your words would be typed as you said them."))
         }
     }
 
@@ -1204,18 +1291,12 @@ private struct TryItScreen: View {
 
     // MARK: Right
 
-    private var aiCardShown: Bool {
-        if case .success = phase { return model.aiIsSetUp }
-        return false
-    }
-
     private var panel: some View {
         let breathing = (listening && pending == nil)
         return VStack(spacing: 12) {
             Spacer(minLength: 0)
-            resultCard
+            if aiStage { aiResultCard } else { resultCard }
             if let pending { downloadStatus(pending) }
-            if aiCardShown { aiCard }
             links
             skipRow
             Spacer(minLength: 0)
@@ -1238,7 +1319,6 @@ private struct TryItScreen: View {
 
     private var resultCard: some View {
         let success: Bool = if case .success = phase { pending == nil } else { false }
-        let lines: CGFloat = aiCardShown ? 3 : 7
         return VStack(spacing: 0) {
             HStack {
                 Text("RESULT").font(.system(size: 11, weight: .semibold)).tracking(0.4).foregroundStyle(SetupColor.label3)
@@ -1256,7 +1336,7 @@ private struct TryItScreen: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
             }
-            .frame(height: lines * 20 + 16)
+            .frame(height: 7 * 20 + 16)
 
             meter
         }
@@ -1269,8 +1349,7 @@ private struct TryItScreen: View {
     @ViewBuilder
     private var resultText: some View {
         if listening && !inAI {
-            let live = (engine.spanLayer.stableText + " " + engine.spanLayer.segmentProvisionalText)
-                .trimmingCharacters(in: .whitespaces)
+            let live = liveText
             Text(live.isEmpty ? "Listening…" : live).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
         } else if engine.isTranscribing && !inAI {
             HStack(spacing: 8) { SetupSpinner(); Text("Turning your speech into text…").foregroundStyle(SetupColor.label2) }
@@ -1279,6 +1358,11 @@ private struct TryItScreen: View {
         } else {
             Text("Your words will appear here.").foregroundStyle(SetupColor.label3)
         }
+    }
+
+    private var liveText: String {
+        (engine.spanLayer.stableText + " " + engine.spanLayer.segmentProvisionalText)
+            .trimmingCharacters(in: .whitespaces)
     }
 
     @ViewBuilder
@@ -1291,11 +1375,101 @@ private struct TryItScreen: View {
         }
     }
 
+    /// An AI dictation's panel: what was said and what the AI wrote from it — nothing of
+    /// the plain dictation before it.
+    private var aiResultCard: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("AI POLISH").font(.system(size: 11, weight: .semibold)).tracking(0.4).foregroundStyle(SetupColor.label3)
+                Spacer()
+                aiChip
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 10)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    column("You said", highlighted: false) { saidText }
+                    column("✨ AI wrote", highlighted: true) { wroteText }
+                }
+                .font(.system(size: 13))
+                .lineSpacing(2)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+            }
+            .frame(height: 7 * 20 + 16)
+
+            meter
+        }
+        .background(RoundedRectangle(cornerRadius: 13).fill(SetupColor.control)
+            .overlay(RoundedRectangle(cornerRadius: 13).fill(SetupColor.ai.opacity(0.06))))
+        .overlay(RoundedRectangle(cornerRadius: 13).strokeBorder(SetupColor.ai.opacity(0.3), lineWidth: 1))
+    }
+
+    @ViewBuilder
+    private var saidText: some View {
+        switch aiPhase {
+        case .listening:
+            let live = liveText
+            Text(live.isEmpty ? "Listening…" : live).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
+        case .polishing:
+            let said = engine.spanLayer.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if said.isEmpty {
+                HStack(spacing: 8) { SetupSpinner(); Text("Turning your speech into text…").foregroundStyle(SetupColor.label2) }
+            } else {
+                Text(said).foregroundStyle(SetupColor.label)
+            }
+        case .success(let said, _), .failed(let said, _):
+            Text(said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label).textSelection(.enabled)
+        case .ready:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private var wroteText: some View {
+        switch aiPhase {
+        case .listening:
+            Text("Appears when you're done.").foregroundStyle(SetupColor.label3)
+        case .polishing:
+            HStack(spacing: 8) { SetupSpinner().environment(\.setupTint, .violet); Text("Rewriting…").foregroundStyle(SetupColor.label2) }
+        case .success(_, let wrote):
+            Text(wrote).foregroundStyle(SetupColor.label).textSelection(.enabled)
+        case .failed(_, let reason):
+            Text(reason).foregroundStyle(SetupColor.danger)
+        case .ready:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private var aiChip: some View {
+        switch aiPhase {
+        case .listening: ChipView(text: "Listening", on: true, dot: true)
+        case .polishing: ChipView(text: "Rewriting", on: false, spinner: true)
+        case .success: ChipView(text: "✓ Done", on: true)
+        case .failed, .ready: ChipView(text: "Waiting for \(a)", on: false)
+        }
+    }
+
+    private func column<Content: View>(_ label: String, highlighted: Bool, @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(SetupColor.label3)
+            content()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(RoundedRectangle(cornerRadius: 9).fill(SetupColor.control))
+        .overlay(RoundedRectangle(cornerRadius: 9).strokeBorder(highlighted ? SetupColor.ai.opacity(0.45) : SetupColor.panelBorder, lineWidth: 1))
+    }
+
     private var meter: some View {
         let levels = engine.barLevels
         let hot = listening && (levels.max() ?? 0) > 0.05
+        let accent = inAI ? SetupColor.ai : tint.accent
         return HStack(spacing: 8) {
-            Image(systemName: "mic.fill").font(.system(size: 10)).foregroundStyle(hot ? tint.accent : SetupColor.label3)
+            Image(systemName: "mic.fill").font(.system(size: 10)).foregroundStyle(hot ? accent : SetupColor.label3)
             Text(AVCaptureDevice.default(for: .audio)?.localizedName ?? "Microphone")
                 .lineLimit(1).truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1304,7 +1478,7 @@ private struct TryItScreen: View {
                     let level = levels.isEmpty ? 0 : levels[i * levels.count / 22]
                     let jitter = 0.55 + 0.45 * abs(sin(Double(i) * 12.9898))
                     RoundedRectangle(cornerRadius: 1.5)
-                        .fill(hot ? tint.accent : SetupColor.label3)
+                        .fill(hot ? accent : SetupColor.label3)
                         .frame(width: 3, height: max(3, min(16, level * 18 * jitter)))
                 }
             }
@@ -1339,64 +1513,14 @@ private struct TryItScreen: View {
         }
     }
 
-    private var aiCard: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            if let f = model.pendingAIFraction {
-                Text("AI model is still downloading (\(Int(f * 100))%)").aiCardTitle()
-                Text("You can try it later.")
-            } else {
-                switch aiPhase {
-                case .ready:
-                    HStack(spacing: 6) {
-                        Text("✨ Now try AI polish: press").aiCardTitle()
-                        LiveShortcutKeycaps(action: .ai, size: 20, ai: true)
-                    }
-                    (Text("Dictate an email the way you'd say it — for example ") + Text("“uh, write to Anna that the report will be ready on Friday, not Thursday, and say sorry for the delay.”").italic())
-                case .listening:
-                    Text("Listening…").aiCardTitle()
-                    Text("Press \(a) again when you're done.")
-                case .polishing:
-                    HStack(spacing: 6) { SetupSpinner().environment(\.setupTint, .violet); Text("AI is tidying up your text…").aiCardTitle() }
-                    Text("This takes a few seconds.")
-                case .success(let said, let wrote):
-                    Text("✓ Here's the AI version").aiCardTitle()
-                    // Before and after, one under the other; a whole email can be long.
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 6) {
-                            column("You said", said, highlighted: false)
-                            column("✨ AI wrote", wrote, highlighted: true)
-                        }
-                    }
-                    .scrollIndicators(.automatic)
-                    .frame(maxHeight: 150)
-                    .padding(.top, 5)
-                case .failed(let said, let reason):
-                    Text("AI couldn't answer this time").aiCardTitle()
-                    (Text("Here's your text as you said it: ") + Text(said.isEmpty ? "—" : said).italic())
-                    Text(reason).foregroundStyle(SetupColor.danger).padding(.top, 3)
-                }
-            }
+    /// A failed plain dictation, or a failed AI one, that Try again can take back.
+    private var canTryAgain: Bool {
+        if aiStage, case .failed = aiPhase { return true }
+        if aiStage { return false }
+        switch phase {
+        case .nothing, .offline, .failed: return true
+        default: return false
         }
-        .font(.system(size: 12))
-        .foregroundStyle(SetupColor.label2)
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal, 13)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 12).fill(SetupColor.control).overlay(RoundedRectangle(cornerRadius: 12).fill(SetupColor.ai.opacity(0.09))))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(SetupColor.ai.opacity(0.28), lineWidth: 1))
-    }
-
-    private func column(_ label: String, _ text: String, highlighted: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(SetupColor.label3)
-            Text(text).foregroundStyle(SetupColor.label).textSelection(.enabled)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(RoundedRectangle(cornerRadius: 9).fill(SetupColor.control))
-        .overlay(RoundedRectangle(cornerRadius: 9).strokeBorder(highlighted ? SetupColor.ai.opacity(0.45) : .clear, lineWidth: 1))
     }
 
     @ViewBuilder
@@ -1411,16 +1535,20 @@ private struct TryItScreen: View {
                     Button("Choose another option") { model.go(.speech) }.buttonStyle(SetupInlineLinkStyle(size: 12))
                 }
             } else {
-                switch phase {
-                case .nothing:
+                if canTryAgain {
+                    Button("Try again") {
+                        if aiStage { test.resetRewrite() } else { test.reset() }
+                    }
+                    .buttonStyle(SetupLinkButtonStyle(height: 26))
+                }
+                if !aiStage, case .nothing = phase {
                     Button("Open Sound Settings ↗") {
                         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension?input")!)
                     }
                     .buttonStyle(SetupInlineLinkStyle(size: 12))
-                case .rejected:
+                }
+                if !aiStage, case .rejected = phase {
                     Button("Back to Speech") { model.go(.speech) }.buttonStyle(SetupLinkButtonStyle(height: 26))
-                default:
-                    EmptyView()
                 }
             }
         }
@@ -1432,19 +1560,13 @@ private struct TryItScreen: View {
     private var skipRow: some View {
         if pending == nil, !isSuccess {
             SetupSkipButton(title: "Skip the test") { model.go(.done) }
-        } else if aiCardShown, !isAISuccess {
+        } else if aiOffered || (aiStage && !isAISuccess) {
             SetupSkipButton(title: "Skip AI test") { model.go(.done) }
         }
     }
 
     private var isSuccess: Bool { if case .success = phase { true } else { false } }
     private var isAISuccess: Bool { if case .success = aiPhase { true } else { false } }
-}
-
-private extension Text {
-    func aiCardTitle() -> some View {
-        font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
-    }
 }
 
 private struct ChipView: View {
@@ -1486,7 +1608,7 @@ private struct DoneScreen: View {
                 Text("You're all set").setupTitle(32).padding(.bottom, 10)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SpeechText lives in your menu bar").font(.system(size: 14, weight: .semibold)).foregroundStyle(SetupColor.label)
-                    Text("Once this window closes there's no Dock icon — click the icon at the top of your screen for settings and history.")
+                    Text("Its window opens next. Once you close it there's no Dock icon — click the icon at the top of your screen to open SpeechText again.")
                         .font(.system(size: 13)).foregroundStyle(SetupColor.label2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
