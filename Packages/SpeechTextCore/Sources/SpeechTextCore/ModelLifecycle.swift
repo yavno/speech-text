@@ -75,7 +75,7 @@ extension Deprecation {
 /// A model past its retirement term, kept as one line so History can still name and
 /// price records made with it. Never deleted. `replacement` lets an install that skipped
 /// releases still follow the chain to a model that is offered.
-struct ArchivedModel<Rates: Hashable>: Hashable {
+struct ArchivedModel<Rates: Hashable & Sendable>: Hashable, Sendable {
     let vendor: Provider
     let id: String
     let displayName: String
@@ -171,7 +171,7 @@ func chatLifecycleLink(provider: LLMProviderType, id: String) -> LifecycleLink? 
 
 /// One stored model choice the launch changed, kept so the first dictation after the
 /// update can say so (`SettingsKeys.modelMigrations`). Machine-local.
-public struct ModelMigration: Codable, Equatable {
+public struct ModelMigration: Codable, Equatable, Sendable {
     enum Reason: String, Codable {
         /// The vendor is switching the model off; `to` is its replacement.
         case deprecated
@@ -353,12 +353,12 @@ extension LLMError {
 /// A one-time notice about the model in use, or the one that says a dictation needs a
 /// model picked. Built here, shown by `AppState` as a status notice whose action is one of
 /// `Action`'s.
-public struct ModelNotice: Equatable {
-    public enum Role: Equatable {
+public struct ModelNotice: Equatable, Sendable {
+    public enum Role: Equatable, Sendable {
         case speech, chat
     }
 
-    public enum Action: Equatable {
+    public enum Action: Equatable, Sendable {
         /// Opens Settings on the role's page.
         case openSettings(Role)
         /// Stores `id` under `settingsKey`.
@@ -376,7 +376,7 @@ public struct ModelNotice: Equatable {
 /// The model settings a notice can be about: the speech engine's and the AI provider's
 /// in use (`nil` for one with no stored choice — Apple's speech, an AI provider without a
 /// list). Read from the store by `AppState`, handed in so the rules stay testable.
-public struct ModelSettingsInUse: Equatable {
+public struct ModelSettingsInUse: Equatable, Sendable {
     var speechKey: String?
     var chatKey: String?
 

@@ -10,7 +10,7 @@ import Foundation
 /// slightly different from what was pasted. A replacement guards on "is what I inserted
 /// still there, untouched", and that guard has to compare against the document's
 /// version or it refuses every correction it is asked to make.
-public struct InsertionRecord: Equatable {
+public struct InsertionRecord: Equatable, Sendable {
     /// The span this text came from. `nil` for text a sink was handed that the span
     /// layer could not account for — it is tracked for offsets, never rewritten.
     public let span: TranscriptSpanID?
@@ -34,7 +34,7 @@ public struct InsertionRecord: Equatable {
 /// builds a one-record ledger for the selection it read; the deciding is here, where
 /// `PureLogicTests` can reach it. An inline dictation keeps none: nothing is handed to
 /// another app before its stop, and the stop pastes once.
-public struct InsertionLedger {
+public struct InsertionLedger: Sendable {
     private(set) var records: [InsertionRecord] = []
 
     public init() {}

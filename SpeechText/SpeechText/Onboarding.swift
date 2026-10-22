@@ -507,7 +507,7 @@ final class OnboardingModel {
     /// in the list; then the pane opens, a helper points at the switch, and the grant is
     /// polled for every second.
     func openAccessibilitySettings() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        let options = [PasteService.trustedCheckOptionPrompt: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
         accessibilityChoice = .waiting

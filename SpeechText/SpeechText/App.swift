@@ -70,6 +70,7 @@ enum AppVersion {
 
 /// The About panel's credits: the update status, then the links. Centred, small, in
 /// the label colours so Dark Mode reads.
+@MainActor
 enum AboutCredits {
     static func make() -> NSAttributedString {
         let paragraph = NSMutableParagraphStyle()
@@ -121,16 +122,20 @@ enum AboutCredits {
 /// History is written on the main thread; read from anywhere else it gives nothing, the
 /// kept counts are left alone, and the terms keep their date order.
 func registerVocabularyHistory() {
-    let counts = HistoryTermCounts()
+    // Touched only on main, behind the guard below, which is what makes the unchecked
+    // capture safe.
+    nonisolated(unsafe) let counts = HistoryTermCounts()
     CustomVocabulary.historyUses = { needles in
         guard Thread.isMainThread else { return [:] }
-        return counts.uses(of: needles,
-                           in: TranscriptionHistory.shared.records.lazy.map { (id: $0.id, text: $0.text) })
+        return MainActor.assumeIsolated {
+            counts.uses(of: needles, in: TranscriptionHistory.shared.records.lazy.map { (id: $0.id, text: $0.text) })
+        }
     }
 }
 
 // MARK: - AppDelegate with NSStatusItem
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private let appState = AppState()
@@ -253,7 +258,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationCenter.default.addObserver(
             forName: .hotkeyDidChange, object: nil, queue: .main
         ) { [weak self] _ in
-            self?.rebuildMenu()
+            MainActor.assumeIsolated { self?.rebuildMenu() }
         }
 
         // The status overlay asks for History via notification (AppState doesn't own windows)
@@ -261,20 +266,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             forName: .openHistoryWindow, object: nil, queue: .main
         ) { [weak self] note in
             // A notice may name the place to narrow to — "Not pasted" for what waited offline.
-            self?.showMainWindow(on: .history,
-                                 historyNarrowing: (note.object as? String).map { HistoryNarrowing(app: $0) })
+            let place = note.object as? String
+            MainActor.assumeIsolated {
+                self?.showMainWindow(on: .history, historyNarrowing: place.map { HistoryNarrowing(app: $0) })
+            }
         }
         // Settings' Edit Prompts… asks for the main window's Prompts page the same way.
         NotificationCenter.default.addObserver(
             forName: .openMainWindowPage, object: nil, queue: .main
         ) { [weak self] note in
-            self?.showMainWindow(on: (note.object as? String).flatMap(MainPage.init(rawValue:)))
+            let page = (note.object as? String).flatMap(MainPage.init(rawValue:))
+            MainActor.assumeIsolated { self?.showMainWindow(on: page) }
         }
         // A notice's way to a Settings page — the microphone notice's Change.
         NotificationCenter.default.addObserver(
             forName: .openSettingsPage, object: nil, queue: .main
         ) { [weak self] note in
-            self?.showSettings(category: note.object as? SettingsCategory)
+            let category = note.object as? SettingsCategory
+            MainActor.assumeIsolated { self?.showSettings(category: category) }
         }
 
         // Auto-register as login item on first launch (default: ON) — unless setup is
@@ -701,7 +710,7 @@ extension Notification.Name {
 
 // MARK: - AppState
 
-@Observable
+@MainActor @Observable
 final class AppState {
     let speechEngine = SpeechEngine()
     let hotkeyManager = HotkeyManager()
@@ -1187,6 +1196,15 @@ final class AppState {
                                                destinationBundleID: pasteDestination?.bundleIdentifier)
     }
 
+    /// Takes back the destination `recordApps` wrote, once `deliver` hands the text to the
+    /// Record Window instead: History then says where it went, not where it was meant to.
+    private func recordNotPasted() {
+        guard !isTestDictation, let id = speechEngine.lastRecordID else { return }
+        TranscriptionHistory.shared.recordApps(id: id, origin: dictationOrigin?.localizedName,
+                                               originBundleID: dictationOrigin?.bundleIdentifier,
+                                               destination: nil)
+    }
+
     /// Hands a test dictation's result to setup instead of pasting it or raising a notice:
     /// the Try it step says in its own words what happened. False for an AI rewrite,
     /// which `refine` reports once the model has answered.
@@ -1331,6 +1349,7 @@ final class AppState {
         DictationTraceRecorder.record(.stopPaste, text: text)
         if !PasteService.isAccessibilityGranted {
             dlog("App", "deliver: no accessibility, showing record panel", level: .notice)
+            recordNotPasted()
             dismissOverlayConfirmation()
             PasteService.promptAccessibility()
             showDirectRecordingPanel(withText: text)
@@ -1353,20 +1372,26 @@ final class AppState {
 
         let tryPaste = { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: PasteService.canLikelyPasteText(in: app))
             guard check == .paste else {
-                dlog("App", "deliver: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front) — showing record panel", level: .notice)
+                dlog("App", "deliver: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front\(menu.map { ", \($0) open" } ?? "")) — showing record panel", level: .notice)
+                self?.recordNotPasted()
                 self?.dismissOverlayConfirmation()
                 self?.showDirectRecordingPanel(withText: text)
-                if check == .quit || check == .notInFront {
+                let detail: String? = switch check {
+                case .quit: "It quit before the text was ready. The text is in the Record Window."
+                case .notInFront: "It didn't come to the front. The text is in the Record Window."
+                case .menuOpen: "\(menu ?? "A menu") was open and had the keyboard. The text is in the Record Window."
+                case .takesNoText, .paste: nil
+                }
+                if let detail {
                     self?.showStatus(icon: "exclamationmark.triangle.fill",
                                      title: "Couldn't paste into \(app.localizedName ?? "the app")",
-                                     detail: check == .quit
-                                         ? "It quit before the text was ready. The text is in the Record Window."
-                                         : "It didn't come to the front. The text is in the Record Window.",
-                                     tint: .orange)
+                                     detail: detail, tint: .orange)
                 }
                 return
             }
@@ -1407,8 +1432,10 @@ final class AppState {
         // for ⌘V. No completion can replace this 0.5s.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: true)
             guard check == .paste else {
                 dlog("App", "pasteTextToTarget: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front)", level: .notice)
@@ -1416,7 +1443,9 @@ final class AppState {
                                  title: "Couldn't insert into \(app.localizedName ?? "the app")",
                                  detail: check == .quit
                                      ? "It quit. The text is still in the Record Window."
-                                     : "It didn't come to the front. The text is still in the Record Window.",
+                                     : check == .menuOpen
+                                         ? "\(menu ?? "A menu") was open and had the keyboard. The text is still in the Record Window."
+                                         : "It didn't come to the front. The text is still in the Record Window.",
                                  tint: .orange)
                 return
             }
@@ -1820,6 +1849,7 @@ final class AppState {
         let front = NSWorkspace.shared.frontmostApplication
         if let app, InlineDelivery.pasteCheck(quit: app.isTerminated,
                                               inFront: front?.processIdentifier == app.processIdentifier,
+                                              menuOpen: PasteService.openMenuBarMenu() != nil,
                                               takesText: true) == .paste {
             dlog("Edit", "the late cut goes back where it was")
             PasteService.pasteItems(items)
@@ -1945,16 +1975,12 @@ final class AppState {
                        detail: "The app it came from is gone.", tint: .orange, duration: 8)
             return
         }
-        if NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
-            paste()
-            return
-        }
-        PasteService.activateApp(app)
-        // Blind wait, as for every paste into an app brought back to the front.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        let tryPaste = { [weak self] in
             let front = NSWorkspace.shared.frontmostApplication
+            var menu: String?
             let check = InlineDelivery.pasteCheck(quit: app.isTerminated,
                                                   inFront: front?.processIdentifier == app.processIdentifier,
+                                                  menuOpen: { menu = PasteService.openMenuBarMenu(); return menu != nil }(),
                                                   takesText: true)
             guard check == .paste else {
                 dlog("Edit", "not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front) — the text goes to the clipboard", level: .notice)
@@ -1962,12 +1988,21 @@ final class AppState {
                 self?.showStatus(icon: "doc.on.clipboard", title: "The text is on the clipboard",
                                  detail: check == .quit
                                      ? "The app it came from is gone."
-                                     : "\(app.localizedName ?? "The app") didn't come back to the front, so nothing was pasted into it.",
+                                     : check == .menuOpen
+                                         ? "\(menu ?? "A menu") was open and had the keyboard, so nothing was pasted into \(app.localizedName ?? "the app")."
+                                         : "\(app.localizedName ?? "The app") didn't come back to the front, so nothing was pasted into it.",
                                  tint: .orange, duration: 8)
                 return
             }
             paste()
         }
+        if NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
+            tryPaste()
+            return
+        }
+        PasteService.activateApp(app)
+        // Blind wait, as for every paste into an app brought back to the front.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { tryPaste() }
     }
 
     /// Abandons the edit wherever it is — cancelled, and says so.
@@ -2144,12 +2179,15 @@ final class AppState {
         // Setup's Try it teaches the same thing on its own screen.
         holdTipStage = dictationTest.isActive ? .none : HoldTip.stage(count: count, canSwitch: canSwitch)
         let keys = shortcutKeys(shortcutText(for: action))
+        // Scheduled on the main run loop, so it fires on main.
         holdTipTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            guard let self, let action = self.holdTipAction, !self.holdTipFollowed else { return }
-            if modifiersOfHeldShortcutLetGo(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action)) {
-                self.holdTipFollowed = true
-                dlog("Hotkey", "hold: modifiers let go, \(action.title) still held")
-                self.refreshHoldTipPanel()
+            MainActor.assumeIsolated {
+                guard let self, let action = self.holdTipAction, !self.holdTipFollowed else { return }
+                if modifiersOfHeldShortcutLetGo(keys: keys, letterDown: HeldShortcuts.shared.down.contains(action)) {
+                    self.holdTipFollowed = true
+                    dlog("Hotkey", "hold: modifiers let go, \(action.title) still held")
+                    self.refreshHoldTipPanel()
+                }
             }
         }
         guard holdTipStage != .none else { return }
@@ -2171,8 +2209,10 @@ final class AppState {
         let center = NotificationCenter.default
         for name in [NSWindow.didResizeNotification, NSWindow.didMoveNotification] {
             holdTipObservers.append(center.addObserver(forName: name, object: overlay, queue: .main) { [weak self, weak overlay] _ in
-                guard let overlay else { return }
-                self?.holdTipPanel?.place(beside: overlay.frame)
+                MainActor.assumeIsolated {
+                    guard let overlay else { return }
+                    self?.holdTipPanel?.place(beside: overlay.frame)
+                }
             })
         }
     }
@@ -2212,7 +2252,7 @@ final class AppState {
     /// the retry. Stays up longer than a notice with nothing to act on.
     private func showSavedOffline(_ recordID: UUID) {
         // Every dictation this outage saved, the one just stopped included.
-        let waiting = max(MainActor.assumeIsolated { OfflineRetry.shared.pendingCount }, 1)
+        let waiting = max(OfflineRetry.shared.pendingCount, 1)
         showStatus(
             icon: "wifi.slash",
             title: "No connection — saved to History",
@@ -2493,11 +2533,13 @@ final class AppState {
         directRecordingCloseObserver = NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification, object: panel, queue: .main
         ) { [weak self, weak panel] _ in
-            guard let self, self.directRecordingPanel === panel else { return }
-            self.releaseDirectRecordingEngine()
-            self.removeDirectRecordingCloseObserver()
-            self.directRecordingPanel = nil
-            self.directRecordingInsertion = nil
+            MainActor.assumeIsolated {
+                guard let self, self.directRecordingPanel === panel else { return }
+                self.releaseDirectRecordingEngine()
+                self.removeDirectRecordingCloseObserver()
+                self.directRecordingPanel = nil
+                self.directRecordingInsertion = nil
+            }
         }
     }
 
@@ -2547,7 +2589,7 @@ final class AppState {
 }
 
 /// Where an ended dictation's text went, once the paste says — nil while it is on its way.
-@Observable
+@MainActor @Observable
 final class OverlayConfirmation {
     var text: String?
 }

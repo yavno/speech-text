@@ -11,8 +11,8 @@ import Foundation
 /// Home's week: what was dictated, the time it saved against typing, and roughly what the
 /// speaking cost at the providers' list prices (`UsagePrices`) — then each day's words,
 /// oldest first.
-public struct HomeWeek: Equatable {
-    public struct Day: Equatable {
+public struct HomeWeek: Equatable, Sendable {
+    public struct Day: Equatable, Sendable {
         public let date: Date
         public let words: Int
         public let isToday: Bool
@@ -222,7 +222,7 @@ extension ChatRates {
 /// where it reported them, each at its own model's price. One from before the ledger is
 /// priced by its length at its speech model's price (`UsagePrices.speech(provider:model:)`),
 /// and its AI pass from `ChatRates.cost(of:)`.
-public struct RecordCost: Equatable {
+public struct RecordCost: Equatable, Sendable {
     public var speech: Double = 0
     public var ai: Double = 0
     /// Speech and chat models used here with no price, by the names the pages give them.
@@ -345,8 +345,8 @@ public enum HomeFormat {
 
 /// One row of Home's Recent and of History: what was said, where it went and when, and
 /// what rewrote it.
-public struct HomeRecentEntry: Equatable, Identifiable {
-    public enum Tag: Equatable {
+public struct HomeRecentEntry: Equatable, Identifiable, Sendable {
+    public enum Tag: Equatable, Sendable {
         case preset(String)
         case edit
         /// AI Rewrite or an edit did not work: the dictated text was pasted, or the
@@ -465,11 +465,11 @@ public struct HomeRecentEntry: Equatable, Identifiable {
 /// stop are the design's approved animation. The keys press one after another, quickly,
 /// and with hold to talk the modifiers are let go while the letter stays down — changed at
 /// the owner's call on 2026-10-12, so the card teaches what the hold tip does.
-public struct HomeTalk: Equatable {
-    public enum Phase: Equatable { case idle, hear, work, done }
-    public enum Mode: Equatable { case dictate, ai, edit }
+public struct HomeTalk: Equatable, Sendable {
+    public enum Phase: Equatable, Sendable { case idle, hear, work, done }
+    public enum Mode: Equatable, Sendable { case dictate, ai, edit }
 
-    public struct Script: Equatable {
+    public struct Script: Equatable, Sendable {
         public let app: String
         public let place: String
         let said: [String]
@@ -572,7 +572,7 @@ public struct HomeTalk: Equatable {
     /// until then, as the overlay's has none), the words — kept while AI Rewrite works,
     /// with the comet on the display saying it is busy — and, once the text has landed,
     /// where it went, as the overlay says it for a few seconds after the paste.
-    public enum Caption: Equatable { case hidden, words, pasted }
+    public enum Caption: Equatable, Sendable { case hidden, words, pasted }
 
     public var caption: Caption {
         switch phase {
@@ -585,7 +585,10 @@ public struct HomeTalk: Equatable {
     /// What the message holds: the selection waiting to be edited, nothing but the caret
     /// (before a paste, and once an edit's instruction is over and the selection is cut),
     /// or the text pasted.
-    public enum Message: Equatable { case caret, selection(String), pasted }
+    public enum Message: Equatable, Sendable {
+        case caret, pasted
+        case selection(String)
+    }
 
     public var message: Message {
         if phase == .done { return .pasted }
@@ -595,7 +598,7 @@ public struct HomeTalk: Equatable {
 
     /// The dot matrix — `PixelDisplayMode`, which this file cannot name: the voice while
     /// it hears, the comet while AI Rewrite works, at rest before and after.
-    public enum Display: Equatable { case idle, level, busy }
+    public enum Display: Equatable, Sendable { case idle, level, busy }
 
     public var display: Display {
         phase == .hear ? .level : phase == .work && isAI ? .busy : .idle

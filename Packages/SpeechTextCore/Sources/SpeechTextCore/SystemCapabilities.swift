@@ -9,7 +9,7 @@ import Foundation
 /// *parameter* so the recommendation is a pure function of hardware rather than a
 /// function of the machine the test happens to run on. `current()` is the only part
 /// that touches sysctl, and nothing else in the app calls sysctl directly.
-public struct SystemCapabilities: Equatable {
+public struct SystemCapabilities: Equatable, Sendable {
     /// `machdep.cpu.brand_string` — "Apple M1 Pro", "Intel(R) Core(TM) i7-9750H…".
     public let chipName: String
     /// Apple Silicon has a Neural Engine; Core ML puts the Whisper encoder on it, which
@@ -93,7 +93,7 @@ private func sysctlString(_ name: String) -> String? {
     guard sysctlbyname(name, nil, &size, nil, 0) == 0, size > 0 else { return nil }
     var buffer = [CChar](repeating: 0, count: size)
     guard sysctlbyname(name, &buffer, &size, nil, 0) == 0 else { return nil }
-    return String(cString: buffer)
+    return String(decoding: buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
 }
 
 /// Reads an integer sysctl whose width is not known up front — `hw.memsize` is 64-bit
@@ -131,7 +131,7 @@ private func sysctlUInt64(_ name: String) -> UInt64? {
 /// Mac Studio M5 Ultra 96 GB), 256–512 GB (Mac Studio M5 Ultra). Each boundary is midway
 /// to the next configuration, so an odd older size (an 18 GB M3 Pro) lands in the tier
 /// it can actually run.
-public enum MacTier: Int, CaseIterable, Comparable {
+public enum MacTier: Int, CaseIterable, Comparable, Sendable {
     case intel
     case entry        // 8 GB
     case standard     // 16 GB

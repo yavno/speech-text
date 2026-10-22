@@ -12,7 +12,7 @@ import Foundation
 // "All" is what it holds. The page is UsageView.swift.
 
 /// The page's periods.
-public enum UsagePeriod: String, CaseIterable, Identifiable {
+public enum UsagePeriod: String, CaseIterable, Identifiable, Sendable {
     case week, month, quarter, all
 
     public var id: String { rawValue }
@@ -36,9 +36,9 @@ public enum UsagePeriod: String, CaseIterable, Identifiable {
     }
 }
 
-public struct UsageSummary: Equatable {
+public struct UsageSummary: Equatable, Sendable {
     /// One bar of the chart: a day, a week or a month.
-    public struct Bucket: Equatable, Identifiable {
+    public struct Bucket: Equatable, Identifiable, Sendable {
         public let start: Date
         /// Words pasted as dictated, and words AI Rewrite wrote.
         public var dictatedWords = 0
@@ -51,18 +51,18 @@ public struct UsageSummary: Equatable {
         public var cost: Double { speechCost + aiCost }
     }
 
-    public enum Granularity: Equatable { case day, week, month }
+    public enum Granularity: Equatable, Sendable { case day, week, month }
 
     /// What a dictation was: said and pasted, rewritten by AI Rewrite, or an edit of a
     /// selection. History does not record which shortcut started it, so the Record
     /// Window's dictations count as what they became.
-    public enum Kind: String, CaseIterable, Identifiable {
+    public enum Kind: String, CaseIterable, Identifiable, Sendable {
         case dictated, rewritten, edit
 
         public var id: String { rawValue }
     }
 
-    public struct KindUse: Equatable {
+    public struct KindUse: Equatable, Sendable {
         public var count = 0
         public var words = 0
         var speechCost: Double = 0
@@ -74,8 +74,8 @@ public struct UsageSummary: Equatable {
 
     /// One model that did the work: a speech model, or an AI Rewrite model — each model
     /// apart, so a user who changes models sees every one they used.
-    public struct EngineUse: Equatable, Identifiable {
-        public enum Step: Equatable { case speech, ai }
+    public struct EngineUse: Equatable, Identifiable, Sendable {
+        public enum Step: Equatable, Sendable { case speech, ai }
         public let step: Step
         /// The speech provider's raw value, or the chat model's ID.
         public let key: String
@@ -96,7 +96,7 @@ public struct UsageSummary: Equatable {
 
     /// One vendor's model as its own replies count it: the requests the ledger holds
     /// (`UsageEvent`), what was sent and billed, and how long an answer took.
-    public struct RequestUse: Equatable, Identifiable {
+    public struct RequestUse: Equatable, Identifiable, Sendable {
         public let step: EngineUse.Step
         public let vendor: Provider
         public let model: String
@@ -123,7 +123,7 @@ public struct UsageSummary: Equatable {
     }
 
     /// What was paid for without becoming the text, and what was never sent at all.
-    public struct Overhead: Equatable {
+    public struct Overhead: Equatable, Sendable {
         /// Audio streamed for a segment that the upload then transcribed again.
         public var paidTwiceSeconds: Double = 0
         public var retries = 0
@@ -136,7 +136,7 @@ public struct UsageSummary: Equatable {
         public var isEmpty: Bool { self == Overhead() }
     }
 
-    public struct AppUse: Equatable, Identifiable {
+    public struct AppUse: Equatable, Identifiable, Sendable {
         public let app: String
         public var words = 0
         var dictations = 0

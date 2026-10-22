@@ -77,7 +77,7 @@ public enum HallucinationFilter {
     }
 
     /// Why a segment's whole result is not speech, or nil to keep it.
-    public enum Rejection: Equatable, CustomStringConvertible {
+    public enum Rejection: Equatable, CustomStringConvertible, Sendable {
         /// A known phrase (`isHallucination`), the segment short enough to trust it.
         case knownPhrase
         /// Not one letter or digit: «.», «..», «…» — what a model makes of a breath.

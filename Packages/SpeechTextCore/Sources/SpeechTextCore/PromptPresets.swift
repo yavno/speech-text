@@ -12,7 +12,7 @@ import Foundation
 /// not the output. `instructions` is what the model applies once it has picked
 /// this preset; whatever else the dictation asked for is applied on top of them,
 /// so a preset need not anticipate every combination.
-public struct PromptPreset: Identifiable, Codable, Hashable {
+public struct PromptPreset: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var name: String
     public var whenToUse: String
@@ -162,7 +162,7 @@ public enum PromptPresetStore {
 /// ("EMAIL / MESSAGE"), so a name is matched ignoring case. An edit reports its own modes
 /// (Polish, Instruction) and is not a dictation's choice, so edits are left out.
 public enum PresetUsage {
-    public struct Use: Equatable {
+    public struct Use: Equatable, Sendable {
         public var count = 0
         public var last: Date?
     }

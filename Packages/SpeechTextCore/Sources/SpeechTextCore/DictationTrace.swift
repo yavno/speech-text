@@ -11,10 +11,10 @@ import Foundation
 ///
 /// Flat and hand-editable on purpose: after reviewing a trace, set `expectedDocument` to
 /// what the document *should* hold, and the replay checks that as well.
-public struct DictationTrace: Codable, Equatable {
+public struct DictationTrace: Codable, Equatable, Sendable {
     /// Traces recorded before the stop became the only paste also carry `aiDraft`, `livePreview` and `probe`, from
     /// when text could be pasted while the user spoke. The decoder ignores them.
-    public struct Setup: Codable, Equatable {
+    public struct Setup: Codable, Equatable, Sendable {
         var aiMode = false
         var removesDisfluencies = true
         /// Optional so a trace recorded before the setting existed still decodes; nil
@@ -36,8 +36,8 @@ public struct DictationTrace: Codable, Equatable {
         }
     }
 
-    public struct Event: Codable, Equatable {
-        public enum Kind: String, Codable {
+    public struct Event: Codable, Equatable, Sendable {
+        public enum Kind: String, Codable, Sendable {
             /// The provider's partial, as it arrived — before any merging.
             case partial
             /// The provider's committed segment, as it arrived.
@@ -99,7 +99,8 @@ public struct DictationTrace: Codable, Equatable {
     }
 }
 
-/// Collects one dictation's `DictationTrace`. Main thread only.
+/// Collects one dictation's `DictationTrace`, on the main actor.
+@MainActor
 public final class DictationTraceRecorder {
     /// The dictation being traced, or nil — which is always, unless the setting is on.
     public static var current: DictationTraceRecorder?

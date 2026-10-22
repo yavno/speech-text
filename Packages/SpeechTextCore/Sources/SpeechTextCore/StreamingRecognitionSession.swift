@@ -18,8 +18,12 @@ import AVFoundation
 /// new socket's words are merged after it (`TranscriptMerge`), never doubled. The new
 /// socket did not hear the outage, though, so a segment that had one is finished by
 /// the upload all the same — the reconnect is for the overlay, not for the text.
+///
+/// Main-actor state, with two ways in from elsewhere: `feed` on the audio thread, which
+/// touches only the `let`s and the audio-thread state below, and `finish()` off main.
+@MainActor
 public final class StreamingRecognitionSession: RecognitionSession {
-    public var onEvent: ((RecognitionEvent) -> Void)?
+    public var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)?
 
     /// The stream events are read from. Replaced on a reconnect; main-thread state.
     private var provider: StreamingTranscriber
@@ -27,7 +31,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
     /// sent — the stream failed for good, or is between a drop and its reconnect.
     private let sendTarget = TranscriberBox()
     /// A fresh provider for a reconnect; nil when the stream is not to be reopened.
-    private let reconnect: (() -> StreamingTranscriber?)?
+    private let reconnect: (@MainActor @Sendable () -> StreamingTranscriber?)?
     private let policy: StreamReconnectPolicy
     private let writer: AudioBufferWriter
     /// The user's stated languages, handed to the provider whole — see
@@ -67,7 +71,8 @@ public final class StreamingRecognitionSession: RecognitionSession {
     private var closing = false
 
     // Audio-thread state. `feed` is the only thing that touches these, and the tap
-    // calls it serially, so they need no lock.
+    // calls it serially, so they need no lock — which is what makes the unchecked
+    // access safe.
     //
     // A provider whose socket wants a rate other than the writer's owns a converter of
     // its own, fed from the *native* tap buffer rather than from the writer's output:
@@ -76,7 +81,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
     // mic feed to it"); before OpenAI's realtime tier, every provider happened to want
     // the writer's 16 kHz and the mismatch simply skipped the stream.
     private let needsResampling: Bool
-    private var resampler: PCMDownsampler?
+    private nonisolated(unsafe) var resampler: PCMDownsampler?
     /// The format `resampler` was built for. A device change hands the tap a new one
     /// mid-recording (see `SpeechEngine.restartAudioEngine`), and the converter cannot
     /// be re-pointed, so it is rebuilt — losing only the handful of frames in its delay
@@ -86,7 +91,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
     /// identity (`AVAudioFormatEqualityTests` pins that down): the tap hands out a fresh
     /// instance per buffer, so an identity test would rebuild the converter fifty times
     /// a second and throw away its delay line each time.
-    private var resamplerFormat: AVAudioFormat?
+    private nonisolated(unsafe) var resamplerFormat: AVAudioFormat?
 
     /// The socket's sample rate. Fixed for the session: a reconnect makes the same
     /// provider again, and the converter below is built for it.
@@ -100,9 +105,9 @@ public final class StreamingRecognitionSession: RecognitionSession {
     private let segments: OpenSegmentBox
     private let longestTrustedSegment: Double?
 
-    public init(provider: StreamingTranscriber, writer: AudioBufferWriter, languages: [String],
+    public nonisolated init(provider: StreamingTranscriber, writer: AudioBufferWriter, languages: [String],
          fallback: RecognitionSession,
-         reconnect: (() -> StreamingTranscriber?)? = nil,
+         reconnect: (@MainActor @Sendable () -> StreamingTranscriber?)? = nil,
          policy: StreamReconnectPolicy = StreamReconnectPolicy(),
          meter: UsageMeter? = nil,
          longestTrustedSegment: Double? = nil) {
@@ -140,15 +145,21 @@ public final class StreamingRecognitionSession: RecognitionSession {
         // A new socket opens a segment of its own.
         segments.segmentClosed()
         provider.connect(languages: languages)
-        // The session goes to the main actor unchecked, and still weak: it is not
-        // `Sendable`, but its main-thread state is touched only in `handle`, on main.
-        let weakSession = MainActorWeakRef(self)
-        eventsTask = Task {
+        eventsTask = Self.mirror(provider, into: self, generation: generation)
+        sendTarget.set(provider)
+    }
+
+    /// Reads `provider`'s events off main and hands each to `handle` there. Made in a
+    /// nonisolated function so the task is not the main actor's: the loop waits on the
+    /// socket off main, as it always has. The session is held weakly.
+    private nonisolated static func mirror(_ provider: StreamingTranscriber,
+                                           into session: StreamingRecognitionSession,
+                                           generation: Int) -> Task<Void, Never> {
+        Task { [weak session] in
             for await event in provider.events {
-                await MainActor.run { weakSession.object?.handle(event, generation: generation) }
+                await session?.handle(event, generation: generation)
             }
         }
-        sendTarget.set(provider)
     }
 
     private func handle(_ event: StreamingSTTEvent, generation: Int) {
@@ -260,15 +271,16 @@ public final class StreamingRecognitionSession: RecognitionSession {
         reconnectTask = nil
     }
 
-    public func feed(native: AVAudioPCMBuffer, pcm16: Data?) {
+    public nonisolated func feed(native: AVAudioPCMBuffer, pcm16: Data?) {
         guard let provider = sendTarget.current else { return }
         if needsResampling {
             // The writer's bytes are the wrong rate for this socket, so the stream does
             // not depend on the writer converting at all — only on this converter.
             guard let converted = resampled(native) else {
+                let nativeRate = native.format.sampleRate
                 DispatchQueue.main.async {
                     guard self.failure == nil else { return }
-                    dlog("Engine", "stream: cannot convert \(native.format.sampleRate) Hz to \(self.sampleRate) Hz — stream discarded, batch fallback at stop", level: .error)
+                    dlog("Engine", "stream: cannot convert \(nativeRate) Hz to \(self.sampleRate) Hz — stream discarded, batch fallback at stop", level: .error)
                     self.markFailed("Could not convert audio for streaming")
                 }
                 return
@@ -296,7 +308,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
     /// One tap buffer at the provider's rate. Returns an empty `Data` while the
     /// converter primes (it has taken the audio and not emitted any yet), and nil only
     /// when no converter can be made for this hardware format.
-    private func resampled(_ buffer: AVAudioPCMBuffer) -> Data? {
+    private nonisolated func resampled(_ buffer: AVAudioPCMBuffer) -> Data? {
         if resampler == nil || resamplerFormat != buffer.format {
             resampler = PCMDownsampler(sourceFormat: buffer.format, targetRate: sampleRate)
             resamplerFormat = resampler == nil ? nil : buffer.format
@@ -310,16 +322,13 @@ public final class StreamingRecognitionSession: RecognitionSession {
 
     public func pause() -> String? { nil }
 
-    public func finish() async -> RecognitionOutcome {
+    public nonisolated func finish() async -> RecognitionOutcome {
         // Snapshot under main-actor isolation: `cancel()` nils `eventsTask` on main, a
-        // reconnect replaces `provider` there, and this function runs off it.
-        //
-        // The session is handed to main unchecked for that reason: it is not `Sendable`,
-        // but its main-thread state is read and written below only inside
-        // `MainActor.run`. Off main this function touches only what the session holds as
-        // `let`s — the writer, the fallback, the meter and the lock-held segment clock —
-        // as it did before.
-        nonisolated(unsafe) let session = self
+        // reconnect replaces `provider` there, and this function runs off it. Its
+        // main-actor state is read and written below only inside `MainActor.run`; off main
+        // this function touches only what the session holds as `let`s — the writer, the
+        // fallback, the meter and the lock-held segment clock.
+        let session = self
         let stopped = Date()
         let longest = segments.clock
         let tooLong = longest.exceeded(longestTrustedSegment)
@@ -414,7 +423,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
     /// The silent and hallucinated segments are an empty result with no file: the engine
     /// archives the writer's audio for a History retry itself (`recordOutcome`). A writer
     /// that holds nothing measured nothing, and only the phrase test applies.
-    private func guardedStreamResult(_ text: String) async -> (RecognitionOutcome?, VoiceActivityReading?) {
+    private nonisolated func guardedStreamResult(_ text: String) async -> (RecognitionOutcome?, VoiceActivityReading?) {
         let duration = writer.bufferedDuration
         let empty = RecognitionOutcome(text: "", error: nil, audioFileURL: nil, cancelled: false)
         var dropped: RecognitionOutcome?
@@ -439,9 +448,7 @@ public final class StreamingRecognitionSession: RecognitionSession {
         }
         guard let dropped else { return (nil, reading) }
         // The overlay may still show what the stream said; it is not what the stop pastes.
-        // Unchecked as in `finish()`: `onEvent` is main-thread state, read only on main.
-        nonisolated(unsafe) let session = self
-        await MainActor.run { session.onEvent?(.live(committed: "", partial: "")) }
+        await MainActor.run { self.onEvent?(.live(committed: "", partial: "")) }
         return (dropped, reading)
     }
 
@@ -457,17 +464,8 @@ public final class StreamingRecognitionSession: RecognitionSession {
     }
 }
 
-/// A weak reference to an object that is not `Sendable`, carried into a
-/// `MainActor.run` hop and read only there, on main, where every other use of the
-/// object happens too. Swift 6.2 can say this with `nonisolated(unsafe) weak let`;
-/// the project still builds with Swift 6.0 tools (Xcode 16), so it is a box.
-public final class MainActorWeakRef<Object: AnyObject>: @unchecked Sendable {
-    public weak var object: Object?
-    public init(_ object: Object?) { self.object = object }
-}
-
 /// The session's `OpenSegmentClock`: fed on the audio thread, told on main that the
-/// server closed a segment.
+/// server closed a segment. `@unchecked Sendable`: `value` is held under `lock`.
 private final class OpenSegmentBox: @unchecked Sendable {
     private let lock = NSLock()
     private var value: OpenSegmentClock

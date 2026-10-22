@@ -11,6 +11,8 @@ import ChatTemplates
 /// Idle, the service exits: the weights are mapped from disk and the KV cache is
 /// gigabytes, which a menu bar app has no business holding between dictations. launchd
 /// starts it again on the next message, and the next rewrite pays the load.
+/// `@unchecked Sendable`: XPC calls it on any thread; `activity` and `idleTimer` are held
+/// under `lock`, and the runtime serialises its own jobs.
 final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sendable {
     static let shared = LocalChatService()
 
@@ -22,7 +24,7 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
     private var activity = LocalChatActivity()
     private var idleTimer: DispatchSourceTimer?
 
-    func complete(_ request: Data, reply: @escaping (Data?, String?) -> Void) {
+    func complete(_ request: Data, reply: @escaping @Sendable (Data?, String?) -> Void) {
         guard let request = try? JSONDecoder().decode(LocalChatRequest.self, from: request) else {
             reply(nil, "The request could not be read."); return
         }
@@ -56,7 +58,7 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
         }
     }
 
-    func prewarm(_ request: Data, reply: @escaping (String?) -> Void) {
+    func prewarm(_ request: Data, reply: @escaping @Sendable (String?) -> Void) {
         guard let request = try? JSONDecoder().decode(LocalChatRequest.self, from: request) else {
             reply("The request could not be read."); return
         }
@@ -83,7 +85,7 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
 
     /// A job like any other, so a service that this message started arms its idle exit
     /// rather than staying up holding nothing.
-    func unload(_ modelPath: String, reply: @escaping () -> Void) {
+    func unload(_ modelPath: String, reply: @escaping @Sendable () -> Void) {
         begin()
         Task {
             defer { self.end(nil) }

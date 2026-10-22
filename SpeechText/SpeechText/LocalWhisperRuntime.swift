@@ -77,25 +77,26 @@ actor WhisperKitPipelineCache {
     private var pipe: WhisperKit?
     private var tail: Task<Void, Never>?
 
-    /// Runs `job` after every job queued before it, success or failure.
-    private func serialized<T: Sendable>(_ job: @escaping () async throws -> T) async throws -> T {
+    /// Runs `job` after every job queued before it, success or failure. The job is handed
+    /// the cache isolated, so it runs on the actor as the task that calls it does.
+    private func serialized<T: Sendable>(_ job: @escaping @Sendable (isolated WhisperKitPipelineCache) async throws -> T) async throws -> T {
         let previous = tail
         let task = Task<T, Error> {
             await previous?.value
-            return try await job()
+            return try await job(self)
         }
         tail = Task { _ = try? await task.value }
         return try await task.value
     }
 
     func load(_ modelFolder: URL) async throws {
-        try await serialized { try await self.ensureLoaded(modelFolder) }
+        try await serialized { cache in try await cache.ensureLoaded(modelFolder) }
     }
 
     func transcribe(audioPath: String, modelFolder: URL, options: DecodingOptions) async throws -> String {
-        try await serialized {
-            try await self.ensureLoaded(modelFolder)
-            return try await self.decode(audioPath: audioPath, options: options)
+        try await serialized { cache in
+            try await cache.ensureLoaded(modelFolder)
+            return try await cache.decode(audioPath: audioPath, options: options)
         }
     }
 
@@ -133,10 +134,10 @@ actor WhisperKitPipelineCache {
     /// disk, so the memory goes with it, and with no folder by `LocalSTT.prewarm` of the
     /// other engine, so only one local model is ever resident.
     func unload(ifLoaded modelFolder: URL? = nil) async {
-        _ = try? await serialized {
-            guard modelFolder == nil || self.folder == modelFolder else { return }
-            self.pipe = nil
-            self.folder = nil
+        _ = try? await serialized { cache in
+            guard modelFolder == nil || cache.folder == modelFolder else { return }
+            cache.pipe = nil
+            cache.folder = nil
         }
     }
 }

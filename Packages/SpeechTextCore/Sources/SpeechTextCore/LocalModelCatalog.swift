@@ -373,7 +373,7 @@ func localSTTRecommendationReason(for capabilities: SystemCapabilities, language
     return "\(model.displayName) for a \(tier.displayName) Mac."
 }
 
-public enum LocalModelError: LocalizedError, Equatable {
+public enum LocalModelError: LocalizedError, Equatable, Sendable {
     case notInstalled(String)
     case downloadFailed(String)
     /// `needed` counts the headroom, so it is the free space to make, as the user reads it.
@@ -438,6 +438,9 @@ public final class DownloadProgressThrottle: @unchecked Sendable {
 /// on the catalogue entry's `LocalSTTEngine`) and everything else talks to this box.
 /// Unregistered — which is exactly the test target's state — the tier reports itself
 /// unavailable instead of crashing.
+///
+/// Each box is written once, on main, at launch, before anything reads it: that is what
+/// makes the unchecked access safe.
 public enum LocalSTT {
     /// Builds a batch provider for an installed model ID. Replaced at launch.
     public nonisolated(unsafe) static var transcriberFactory: (String) -> BatchTranscriber = {
@@ -519,7 +522,7 @@ public func isLocalModelInstalled(_ modelID: String, in directory: URL = localMo
 /// Stands in for the local engine when none was registered. It never silently returns
 /// empty text: a dictation that produced nothing has to surface as an error so the
 /// existing failure paths (status overlay, History entry with the audio kept) run.
-public struct UnavailableLocalTranscriber: BatchTranscriber {
+public struct UnavailableLocalTranscriber: BatchTranscriber, Sendable {
     let modelID: String
 
     public init(modelID: String) {

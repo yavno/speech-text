@@ -81,7 +81,9 @@ final class InlineDictationFlow {
 /// A clip as the tap hands it over: Float32 mono at 48 kHz in ~20 ms buffers (the tap's
 /// ~50 a second), so the writer converts 48 → 16 kHz and OpenAI's socket 48 → 24 kHz, as
 /// they do in the app — not the 16 kHz the file happens to be stored at.
-struct TapAudio {
+/// `@unchecked Sendable`: the buffers are filled once, when the clip is read, and only
+/// read after that.
+struct TapAudio: @unchecked Sendable {
     static let sampleRate: Double = 48_000
     static let framesPerBuffer: AVAudioFrameCount = 960
 
@@ -246,18 +248,19 @@ struct CorpusEngine {
 
 /// The upload a stream falls back to, noting that it was asked — which is how a row tells
 /// a realtime answer from the upload that stood in for it.
+@MainActor
 private final class ObservedFallback: RecognitionSession {
-    var onEvent: ((RecognitionEvent) -> Void)?
+    var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)?
     private let wrapped: RecognitionSession
     private(set) var answered = false
 
     init(_ wrapped: RecognitionSession) { self.wrapped = wrapped }
 
     func start() throws { try wrapped.start() }
-    func feed(native: AVAudioPCMBuffer, pcm16: Data?) { wrapped.feed(native: native, pcm16: pcm16) }
+    nonisolated func feed(native: AVAudioPCMBuffer, pcm16: Data?) { wrapped.feed(native: native, pcm16: pcm16) }
     func pause() -> String? { wrapped.pause() }
-    func finish() async -> RecognitionOutcome {
-        answered = true
+    nonisolated func finish() async -> RecognitionOutcome {
+        await MainActor.run { answered = true }
         return await wrapped.finish()
     }
     func cancel() { wrapped.cancel() }
@@ -370,11 +373,9 @@ enum LiveDictation {
     /// session — off the main thread, which the session's events need free.
     private static func play(_ audio: TapAudio, into writer: AudioBufferWriter,
                              session: RecognitionSession, paced: Bool) async {
-        // Handed to the queue unchecked, as the app's tap thread holds them: the writer
-        // and the session's `feed` are written for the audio thread, and the caller is
-        // suspended on the continuation until the loop has ended.
-        nonisolated(unsafe) let writer = writer
-        nonisolated(unsafe) let session = session
+        // The writer and the session's `feed` are written for the audio thread, as the
+        // app's tap holds them; the caller is suspended on the continuation until the
+        // loop has ended.
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             DispatchQueue.global(qos: .userInitiated).async {
                 let start = DispatchTime.now().uptimeNanoseconds

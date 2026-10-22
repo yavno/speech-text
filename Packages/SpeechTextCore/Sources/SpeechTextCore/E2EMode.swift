@@ -73,7 +73,8 @@ public enum E2EMode {
         return seconds > 0 ? seconds : nil
     }()
 
-    private static var streamCloserUsed = false
+    /// Read and set under `lock` only, which is what makes the unchecked access safe.
+    private nonisolated(unsafe) static var streamCloserUsed = false
 
     /// `-SPTAppleFailAfter`'s seconds; nil when the argument is absent or not positive.
     static let appleFailAfter: TimeInterval? = {
@@ -81,7 +82,8 @@ public enum E2EMode {
         return seconds > 0 ? seconds : nil
     }()
 
-    private static var appleFailureUsed = false
+    /// Under `lock`, as `streamCloserUsed` is.
+    private nonisolated(unsafe) static var appleFailureUsed = false
 
     /// `-SPTAppleFailAfter`'s seconds the first time it is asked in an e2e launch with the
     /// argument — an Apple chunk's first words — and nil every other time, so one chunk in
@@ -108,7 +110,8 @@ public enum E2EMode {
     }
 
     private static let lock = NSLock()
-    private static var playedInputs = 0
+    /// Under `lock`, as `streamCloserUsed` is.
+    private nonisolated(unsafe) static var playedInputs = 0
 
     /// The clip for the next capture, or nil once every one has played — that capture
     /// records silence, as a microphone in a quiet room would.

@@ -6,7 +6,7 @@ import CoreGraphics
 
 /// The inline overlay's shape, as far as placing it is concerned: the strip, and the
 /// transcript that grows out of it (from nothing, line by line, up to `maxTranscriptHeight`).
-public struct OverlayGeometry: Equatable {
+public struct OverlayGeometry: Equatable, Sendable {
     public var strip: CGSize
     /// Width of the transcript area; 0 when the recording shows none.
     public var transcriptWidth: CGFloat = 0
@@ -38,7 +38,7 @@ public struct OverlayGeometry: Equatable {
 
 /// Which way the transcript grows from the strip: away from the nearer edge of the screen,
 /// so a strip parked at the top can sit at the top.
-public enum OverlayGrowth: Equatable {
+public enum OverlayGrowth: Equatable, Sendable {
     case up, down
 }
 
@@ -53,7 +53,7 @@ public enum OverlayPlacement {
     /// How far the default corner is inset from the screen's edges.
     static let margin: CGFloat = 20
 
-    public struct Placement: Equatable {
+    public struct Placement: Equatable, Sendable {
         /// The strip's bottom-left corner.
         public var strip: CGPoint
         public var growth: OverlayGrowth

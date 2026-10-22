@@ -589,21 +589,26 @@ final class RecordingOverlayPanel: NSPanel {
 
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: .skinDidChange, object: nil, queue: .main) { [weak self] _ in
-            guard let self else { return }
-            self.geometry = AppSkin.current.overlayGeometry(showsTranscript: self.geometry.showsTranscript)
-            self.placeAtSavedSpot()
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.geometry = AppSkin.current.overlayGeometry(showsTranscript: self.geometry.showsTranscript)
+                self.placeAtSavedSpot()
+            }
         })
         observers.append(center.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
                                             object: nil, queue: .main) { [weak self] _ in
-            self?.placeAtSavedSpot()
+            MainActor.assumeIsolated { self?.placeAtSavedSpot() }
         })
 
         placeAtSavedSpot()
     }
 
     deinit {
-        observers.forEach(NotificationCenter.default.removeObserver)
-        settleWork?.cancel()
+        // A window is let go on main, as AppKit releases every one.
+        MainActor.assumeIsolated {
+            observers.forEach(NotificationCenter.default.removeObserver)
+            settleWork?.cancel()
+        }
     }
 
     /// The overlay's view, hosted at the panel's largest size — see the type's comment.
@@ -644,8 +649,9 @@ final class RecordingOverlayPanel: NSPanel {
             context.duration = 0.3
             animator().alphaValue = 0
         }, completionHandler: {
-            // Held until it closes: nothing else keeps it once AppState has let it go.
-            self.close()
+            // Held until it closes: nothing else keeps it once AppState has let it go. The
+            // completion comes on main.
+            MainActor.assumeIsolated { self.close() }
         })
     }
 

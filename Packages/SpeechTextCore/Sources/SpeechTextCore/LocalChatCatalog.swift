@@ -157,7 +157,8 @@ public func isLocalChatModelInstalled(_ model: LocalChatModel) -> Bool {
 /// The local chat runtime, reached through a box as the speech engines are (`LocalSTT`):
 /// `ChatClients.swift` is in SpeechTextCore and cannot name the XPC client, which is
 /// app-only. `registerLocalChat()` (LocalChatClient.swift) fills it at launch; unfilled —
-/// the test bundle — every client throws rather than answering with nothing.
+/// the test bundle — every client throws rather than answering with nothing. Written
+/// once, on main, at launch, before anything reads it, as `LocalSTT`'s boxes are.
 public enum LocalChat {
     public nonisolated(unsafe) static var clientFactory: (LocalChatModel) -> ChatClient = { _ in UnavailableLocalChatClient() }
     /// Loads the model in the service ahead of the first rewrite — after a download, and

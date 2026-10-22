@@ -5,7 +5,7 @@ import Foundation
 
 /// The two shortcuts that start an inline dictation. The Record Window's shortcut is not
 /// one of them: it opens a panel, and holding it means nothing.
-public enum DictationHotkey: Equatable {
+public enum DictationHotkey: Equatable, Sendable {
     case inline
     case ai
 
@@ -13,7 +13,7 @@ public enum DictationHotkey: Equatable {
 }
 
 /// What one press or release of a dictation shortcut does.
-public enum DictationHotkeyAction: Equatable {
+public enum DictationHotkeyAction: Equatable, Sendable {
     case start(ai: Bool)
     /// The recording goes on in the other mode: what is said is the same dictation, only
     /// what happens to it at the stop changes.
@@ -30,7 +30,7 @@ public enum DictationHotkeyAction: Equatable {
 /// Why a dictation was cancelled — what the notice says. No cancel is silent: a
 /// press that lands on the rewrite a moment after the stop throws the dictation away, and
 /// with nothing on screen the user could not tell a cancel from a paste that failed.
-public enum DictationCancelReason: Equatable {
+public enum DictationCancelReason: Equatable, Sendable {
     /// A dictation shortcut pressed while the microphone was opening, or while the
     /// recording was being transcribed or rewritten.
     case shortcut
@@ -87,8 +87,8 @@ public enum DictationCancelReason: Equatable {
 /// the table, so a missed release costs one extra press rather than a stuck recording.
 ///
 /// Pure logic; `AppState` supplies the phase and performs the action.
-public struct DictationHotkeyGesture {
-    public enum Phase: Equatable {
+public struct DictationHotkeyGesture: Sendable {
+    public enum Phase: Equatable, Sendable {
         case idle
         /// The microphone is not open yet. Nothing has been recorded, so a stop here
         /// is a cancel.
@@ -219,7 +219,7 @@ public struct DictationHotkeyGesture {
 // MARK: - Holding only the letter
 
 /// How a key of a shortcut is drawn.
-public enum KeycapState: Equatable {
+public enum KeycapState: Equatable, Sendable {
     case up
     case down
     /// A modifier of a held shortcut once its letter is down: with hold to talk the
@@ -240,7 +240,7 @@ public enum HoldTip {
     /// letter still down — before it stops appearing.
     static let lessons = 3
 
-    public enum Stage: Equatable {
+    public enum Stage: Equatable, Sendable {
         /// "Keep Q down — you can let go of ⌃⇧."
         case keepHolding
         /// "While holding, ⌃⇧A switches to AI." Shown once, after the lessons.
@@ -302,7 +302,7 @@ public enum HoldTip {
     // after another and what the dictation does, one frame at a time.
 
     /// What the dictation is doing in a demo frame.
-    public enum DemoState: Equatable {
+    public enum DemoState: Equatable, Sendable {
         case idle, recording, locked, ai, pasted
     }
 
@@ -310,7 +310,7 @@ public enum HoldTip {
     /// locks it on, and the switch to AI Rewrite and back while the letter is held.
     /// Without: a press to start and a press to paste, and the switch by the other
     /// shortcut.
-    public enum DemoGesture: CaseIterable {
+    public enum DemoGesture: CaseIterable, Sendable {
         case hold, lock, holdSwitch, toggle, toggleSwitch
 
         /// Whether the gesture uses the other dictation shortcut, whose caps follow this one's.
@@ -321,7 +321,7 @@ public enum HoldTip {
     /// Where each key of a demo is drawn. The shortcut's caps come first, its modifiers
     /// then its letter; a switch adds the other shortcut — only its letter when the two
     /// share their modifiers (⌃ ⇧ Q A, the same ⌃⇧ pressed again), all of it otherwise.
-    public struct DemoLayout: Equatable {
+    public struct DemoLayout: Equatable, Sendable {
         public let modifiers: Int
         public let otherModifiers: Int
         public let sharesModifiers: Bool
@@ -344,7 +344,7 @@ public enum HoldTip {
 
     /// One frame: how each cap is drawn, which caps are ringed (the letter that alone
     /// keeps a hold recording going), and what the dictation is doing.
-    public struct DemoFrame: Equatable {
+    public struct DemoFrame: Equatable, Sendable {
         public var caps: [KeycapState]
         public var ringed: Set<Int>
         public var state: DemoState

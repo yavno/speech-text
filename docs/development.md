@@ -8,7 +8,7 @@ cd speech-text
 open SpeechText/SpeechText.xcodeproj
 ```
 
-Build with `Cmd+B`, run with `Cmd+R`. The first build resolves three Swift packages, all pinned in `Package.resolved`: [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) and [FluidAudio](https://github.com/FluidInference/FluidAudio) for the two local speech engines and the voice activity detector, and [Sparkle](https://sparkle-project.org) for updates. The fourth dependency, [llama.cpp](https://github.com/ggml-org/llama.cpp), is not resolved: it is a local package, `Packages/LlamaBinary/`, a binary target at ggml-org's prebuilt `llama.xcframework` pinned by build and checksum, linked only by the `SpeechTextLLM` XPC service and the `SpeechTextEvaluation` tool — never by the app. Everything else is Apple frameworks. FluidAudio declares Swift 6 tools, so it takes Xcode 16 or later.
+Build with `Cmd+B`, run with `Cmd+R`. The first build resolves three Swift packages, all pinned in `Package.resolved`: [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) and [FluidAudio](https://github.com/FluidInference/FluidAudio) for the two local speech engines and the voice activity detector, and [Sparkle](https://sparkle-project.org) for updates. The fourth dependency, [llama.cpp](https://github.com/ggml-org/llama.cpp), is not resolved: it is a local package, `Packages/LlamaBinary/`, a binary target at ggml-org's prebuilt `llama.xcframework` pinned by build and checksum, linked only by the `SpeechTextLLM` XPC service and the `SpeechTextEvaluation` tool — never by the app. Everything else is Apple frameworks. Every target builds in the Swift 6 language mode with Swift 6.4 tools (`swift-tools-version:6.4` in `Packages/SpeechTextCore`), so the project takes Xcode 27.1 or later, which runs on macOS 26.6 or later — the app itself still runs on macOS 14 (see **Concurrency** below).
 
 Their licences — and those of the code each carries inside it — ship in the app as `Resources/ThirdPartyNotices.txt` (Settings › General › Acknowledgements). It is generated: after adding, removing or updating a package, run `scripts/third-party-notices.sh` and commit the result; `ThirdPartyNoticesTests` fails while the file names a version `Package.resolved` no longer pins.
 
@@ -260,12 +260,11 @@ cleaned, while xcodebuild resolves from SwiftPM's own cache there in seconds.
 ### Compiler warnings
 
 The app, its tests, the `SpeechTextLLM` service and the `SpeechTextEvaluation`
-tool build with no compiler warnings, under targeted strict concurrency, and CI
+tool build with no compiler warnings, in the Swift 6 language mode, and CI
 keeps it that way: both of the Tests job's builds pass `SPT_WARNINGS_AS_ERRORS=YES`,
 so a warning a pull request adds in our code fails the job, named as an `error:`
 at its line. A warning is cheap to fix the day it is written and expensive once
-forty others hide it, and one under strict concurrency is often the only sign
-of a data race the Swift 6 language mode would refuse to compile.
+forty others hide it.
 
 The project sets `SWIFT_TREAT_WARNINGS_AS_ERRORS` to `$(SPT_WARNINGS_AS_ERRORS)`,
 which is `NO` unless a build says otherwise. The indirection is what keeps the
@@ -301,7 +300,42 @@ causes is yours to fix. One that appears without your change — a newer Xcode o
 the runner deprecating an API, or tightening a concurrency check — fails every
 pull request at once; fix it in a pull request of its own if it is small, and
 otherwise say so in your pull request rather than switching the flag off. Do not
-silence a warning by lowering `SWIFT_STRICT_CONCURRENCY`.
+silence a diagnostic by lowering `SWIFT_VERSION` or the package's language mode.
+
+### Concurrency
+
+Every target — the app, the tests, `SpeechTextLLM`, `SpeechTextEvaluation` and
+`Packages/SpeechTextCore` — builds in the Swift 6 language mode, so a data race
+the compiler can see is an error, not a warning. Isolation is written out on each
+type, and none of the later opt-in defaults is turned on: no default main-actor
+isolation, which would make the audio and socket types main-actor code, and no
+`NonisolatedNonsendingByDefault` (Approachable Concurrency in Xcode's settings),
+which would run every session's `finish()` on its caller's actor — the main one —
+instead of off it. Xcode's templates switch both on for a new project; leave them off
+here.
+
+- **Main-actor types, with doors for other threads.** The engine, the sessions,
+  History, the Debug Log's buffer and every window are `@MainActor`. What another
+  thread must reach is `nonisolated` and says so: a session's `feed` runs on the
+  audio thread and touches only its `let`s and the audio-thread state, its `finish()`
+  runs off main and hops there for what it shares, and `dlog` may be called from
+  anywhere.
+- **A closure an API calls off main is written `@Sendable`.** In the Swift 6 mode a
+  closure written inside main-actor code is taken for main-actor code unless its type
+  says otherwise, and the runtime checks it: an audio tap, a recogniser's result
+  handler, a network monitor's or a download's progress callback that ran on its own
+  queue would stop the app there. So such closures are `@Sendable` (`{ @Sendable result,
+  error in … }`), and so is every closure parameter of ours that is called off main.
+- **A callback that comes on main says so.** A `NotificationCenter` observer on
+  `.main`, a timer on the main run loop, an animation's completion, a deinit of a
+  window: the closure is `@Sendable` in the SDK, and its body is wrapped in
+  `MainActor.assumeIsolated`, which checks the claim.
+- **Every `@unchecked Sendable` and `nonisolated(unsafe)` says why it is safe**, in a
+  line beside it: the lock that guards each field, the queue that owns it, or that it
+  is written once at launch before anything reads it (the registration boxes).
+  `StreamingTranscribers.swift` keeps a field-to-guard map for each socket, and its
+  lock order — `sendLock` before `lock`, never a send under `lock` — is a rule the
+  compiler does not check.
 
 <!-- ci-timings -->
 **Run time on a hosted runner: not yet measured.** As of 2026-09-22 this account

@@ -70,7 +70,8 @@ enum LocalChatError: LocalizedError {
 
 /// The one connection to the service. launchd starts the service on the first message
 /// and again after it exits (idle, or a crash): an interrupted connection stays usable, so
-/// only an invalidated one is replaced.
+/// only an invalidated one is replaced. `@unchecked Sendable`: `connection` and
+/// `serviceMayBeRunning` are held under `lock`.
 final class LocalChatConnection: @unchecked Sendable {
     static let shared = LocalChatConnection()
 
@@ -116,7 +117,7 @@ final class LocalChatConnection: @unchecked Sendable {
     /// or a reply that never comes (a timeout) stops the completion named `requestID` in
     /// the service, and only that one; a task already cancelled sends nothing.
     func call<T: Sendable>(cancelling requestID: String? = nil,
-                           _ body: @escaping (LocalChatServiceProtocol, @escaping (Result<T, Error>) -> Void) -> Void) async throws -> T {
+                           _ body: @escaping @Sendable (LocalChatServiceProtocol, @escaping @Sendable (Result<T, Error>) -> Void) -> Void) async throws -> T {
         let once = Once<T>()
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
@@ -174,7 +175,7 @@ final class LocalChatConnection: @unchecked Sendable {
 
 /// Resumes a continuation exactly once, whichever of the reply, the error handler, the
 /// timeout or the cancel gets there first.
-private final class Once<T>: @unchecked Sendable {
+private final class Once<T: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
     private var continuation: CheckedContinuation<T, Error>?
 

@@ -376,15 +376,18 @@ struct SettingsStepSlider<Value: Hashable>: View {
         ZStack(alignment: .topLeading) {
             ForEach(values.indices, id: \.self) { index in
                 let isShown = index == shownIndex
+                let position = x(index, width: width)
+                let last = values.count - 1
+                let knob = knobWidth
                 Text(title(values[index]))
                     .font(.system(size: 11.5, weight: isShown ? .semibold : .regular))
                     .foregroundStyle(isShown ? SetupColor.label : SetupColor.label2)
                     .fixedSize()
                     .alignmentGuide(.leading) { d in
                         // The first and last names are held inside the track's ends.
-                        if index == 0 { return -max(x(index, width: width) - knobWidth / 2, 0) }
-                        if index == values.count - 1 { return d.width - width }
-                        return d.width / 2 - x(index, width: width)
+                        if index == 0 { return -max(position - knob / 2, 0) }
+                        if index == last { return d.width - width }
+                        return d.width / 2 - position
                     }
             }
         }

@@ -26,7 +26,7 @@ extension STTProviderType {
 /// Vendor-protocol quirks — OpenAI's deltas, Scribe's echo, the pre-session buffer, the
 /// commit padding — stay inside each provider. A descriptor says *what* a model does,
 /// never how its socket is spoken to.
-public struct STTModelDescriptor: Identifiable, Hashable {
+public struct STTModelDescriptor: Identifiable, Hashable, Sendable {
     /// The ID the vendor's API takes and the settings store. Unique within a vendor only:
     /// a model is always looked up by vendor *and* ID (`sttModel(vendor:id:)`), because a
     /// realtime ID stored for one engine must not make another engine stream.
@@ -60,7 +60,7 @@ public struct STTModelDescriptor: Identifiable, Hashable {
     /// reaches a picker, setup or a recommendation; every one is still known to History.
     public var lifecycle: ModelLifecycle = .current
 
-    public enum Delivery: Hashable {
+    public enum Delivery: Hashable, Sendable {
         /// A file POSTed after the segment ends.
         case upload
         /// A WebSocket that returns text while the user speaks.
@@ -73,7 +73,7 @@ public struct STTModelDescriptor: Identifiable, Hashable {
     }
 
     /// How a realtime model's socket behaves, as far as the rest of the app can tell.
-    public struct RealtimeShape: Hashable {
+    public struct RealtimeShape: Hashable, Sendable {
         /// The only rate the socket takes — 16 kHz for Scribe, exactly 24 kHz for
         /// OpenAI (which calls 16 kHz "below minimum").
         let sampleRate: Double
@@ -103,7 +103,7 @@ public struct STTModelDescriptor: Identifiable, Hashable {
         case set
     }
 
-    public enum BatchUpload: Hashable {
+    public enum BatchUpload: Hashable, Sendable {
         /// The model is its own upload model.
         case itself
         /// A realtime model: the same vendor's upload model with this ID, since the
@@ -114,7 +114,7 @@ public struct STTModelDescriptor: Identifiable, Hashable {
         case selectedModel(of: Provider)
     }
 
-    public enum Requirement: Hashable {
+    public enum Requirement: Hashable, Sendable {
         case none
         /// An API key stored under this `SettingsKeys` name.
         case apiKey(String)
@@ -125,7 +125,7 @@ public struct STTModelDescriptor: Identifiable, Hashable {
     /// Whether a model is handed the user's vocabulary (`CustomVocabulary`). Only a
     /// *list* parameter counts: a free-text prompt (Groq's `prompt`, WhisperKit's prompt
     /// tokens) is reported to be echoed back on silence, and waits for the audio corpus.
-    public enum Vocabulary: Hashable {
+    public enum Vocabulary: Hashable, Sendable {
         case none
         case termList(TermListLimits)
 
@@ -166,14 +166,14 @@ extension TermListLimits {
 
 /// A model's list price: free (it runs on the Mac), the vendor's rates, or explicitly
 /// not priced — a vendor that publishes none, which Usage names instead of guessing.
-public enum ListPrice<Rates: Hashable>: Hashable {
+public enum ListPrice<Rates: Hashable & Sendable>: Hashable, Sendable {
     case free
     case listed(Rates)
     case notPriced
 }
 
 /// What a vendor charges for speech, a minute of audio at a time.
-public struct SpeechRates: Hashable {
+public struct SpeechRates: Hashable, Sendable {
     public let perMinute: Double
     /// Added for a request that carried the user's words (`UsageEvent.keyterms`) — Scribe's
     /// keyterm prompting. Zero where sending them costs nothing extra.

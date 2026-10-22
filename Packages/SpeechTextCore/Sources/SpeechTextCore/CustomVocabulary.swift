@@ -23,7 +23,7 @@ struct VocabularyTerm: Codable, Hashable, Identifiable {
 
 /// How many terms a model takes, and what shape each must have. Every limit is the
 /// vendor's documented one unless its comment in the catalogue says it is ours.
-public struct TermListLimits: Hashable {
+public struct TermListLimits: Hashable, Sendable {
     let maxTerms: Int
     /// Inclusive.
     let maxCharacters: Int
@@ -56,7 +56,8 @@ public enum CustomVocabulary {
 
     /// Replaced at launch by History's count of each needle asked for (`searchable` of a
     /// term), kept between dictations by a `HistoryTermCounts`. No counts until then, which
-    /// is the test bundle's state: nothing is ranked by use there.
+    /// is the test bundle's state: nothing is ranked by use there. Written once, on main,
+    /// before the first dictation reads it, which is what makes the unchecked access safe.
     public nonisolated(unsafe) static var historyUses: (Set<String>) -> [String: Int] = { _ in [:] }
 
     /// Whether the Dictionary's words are sent to the speech engine — the one switch, on

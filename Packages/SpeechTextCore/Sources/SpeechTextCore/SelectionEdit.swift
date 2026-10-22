@@ -4,7 +4,7 @@
 import Foundation
 
 /// What one press or release of the Edit shortcut does.
-public enum EditHotkeyAction: Equatable {
+public enum EditHotkeyAction: Equatable, Sendable {
     /// Read the selection and open the microphone for an instruction.
     case start
     /// Close the microphone and rewrite the selection as the instruction says.
@@ -18,7 +18,7 @@ public enum EditHotkeyAction: Equatable {
 /// Why an edit was cancelled — what its notice says. No cancel is silent, as for a
 /// dictation: the selection may already have been cut and put back, and with
 /// nothing on screen the text blinking out and in again reads as a fault.
-public enum EditCancelReason: Equatable {
+public enum EditCancelReason: Equatable, Sendable {
     /// The Edit shortcut pressed while the instruction was transcribed or rewritten.
     case shortcut
     /// Hold to talk: a lone tap.
@@ -71,8 +71,8 @@ public enum EditCancelReason: Equatable {
 /// the edit, and the Edit shortcut is ignored while a dictation runs.
 ///
 /// Pure logic; `AppState` supplies the phase and performs the action.
-public struct EditHotkeyGesture {
-    public enum Phase: Equatable {
+public struct EditHotkeyGesture: Sendable {
+    public enum Phase: Equatable, Sendable {
         case idle
         /// The microphone is not open yet.
         case starting
@@ -190,7 +190,7 @@ public struct EditHotkeyGesture {
 }
 
 /// What the Edit shortcut found selected in the app in front.
-public struct CapturedSelection: Equatable {
+public struct CapturedSelection: Equatable, Sendable {
     public let text: String
     /// Where it is, when the AX API could say (Tier A): these words are found again and
     /// re-selected before the cut. Nil when it was read with ⌘C — the cut then takes what
@@ -209,7 +209,7 @@ public enum SelectionEdit {
     /// is *then*, read again, not the one read at the first press — the user may have
     /// selected other text while speaking, and the text they can see selected is the
     /// text they mean. The first read still stops an edit with nothing selected at once.
-    public enum Target: Equatable {
+    public enum Target: Equatable, Sendable {
         /// The same text, where it was.
         case unchanged(CapturedSelection)
         /// Other text is selected now; this is what gets rewritten.

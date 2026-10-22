@@ -14,14 +14,20 @@ import SpeechTextCore
 /// a chunk's task fails after the segment has words, since a failed task takes no more
 /// audio either (`AppleErrorRotation`).
 ///
-/// State is main-thread only, except `request`, which `feed` reads from the audio thread
-/// while a rotation swaps it on main — the same unsynchronised handoff the engine did.
+/// Main-actor state, except the request the tap appends to, which `feed` reads from the
+/// audio thread while a rotation swaps it on main — so it is held under a lock.
+@MainActor
 final class AppleRecognitionSession: RecognitionSession {
-    var onEvent: ((RecognitionEvent) -> Void)?
+    var onEvent: (@MainActor @Sendable (RecognitionEvent) -> Void)?
 
     private let recognizer: SFSpeechRecognizer?
     private let locale: String
-    private var request: SFSpeechAudioBufferRecognitionRequest?
+    /// The current chunk's request. Set and cleared on main; read by `feed`.
+    private var request: SFSpeechAudioBufferRecognitionRequest? {
+        get { requestBox.current }
+        set { requestBox.set(newValue) }
+    }
+    private let requestBox = RequestBox()
     private var task: SFSpeechRecognitionTask?
     /// Transcript committed from earlier chunks (see `rotate`).
     private var committedText = ""
@@ -95,7 +101,9 @@ final class AppleRecognitionSession: RecognitionSession {
         chunkToken += 1
         let token = chunkToken
 
-        task = recognizer.recognitionTask(with: request) { [weak self] result, error in
+        // `@Sendable`, so it is not taken for main-actor code: the recogniser calls it on
+        // a queue of its own, and it hops to main for everything but reading the result.
+        task = recognizer.recognitionTask(with: request) { @Sendable [weak self] result, error in
             guard let self else { return }
             if let result {
                 let partial = result.bestTranscription.formattedString
@@ -205,7 +213,7 @@ final class AppleRecognitionSession: RecognitionSession {
     private func scheduleChunkRotation(after interval: TimeInterval? = nil) {
         chunkTimer?.invalidate()
         let timer = Timer(timeInterval: interval ?? chunkDuration, repeats: false) { [weak self] _ in
-            self?.rotate()
+            MainActor.assumeIsolated { self?.rotate() }
         }
         RunLoop.main.add(timer, forMode: .common)
         chunkTimer = timer
@@ -240,9 +248,9 @@ final class AppleRecognitionSession: RecognitionSession {
         chunkTimer = nil
     }
 
-    func feed(native: AVAudioPCMBuffer, pcm16: Data?) {
+    nonisolated func feed(native: AVAudioPCMBuffer, pcm16: Data?) {
         // Apple's recognizer gets the native buffer — it does its own resampling.
-        request?.append(native)
+        requestBox.current?.append(native)
     }
 
     /// The task and request stay alive, so a stop from a pause that had recognised
@@ -257,15 +265,9 @@ final class AppleRecognitionSession: RecognitionSession {
         return joinedTranscript(committedText, utterances.text).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    func finish() async -> RecognitionOutcome {
-        // Handed to the main queue unchecked: the closure below runs on main, and
-        // everything it touches — `isCancelled`, `isFeeding`, the chunk timer, the
-        // request's `endAudio`, `chunkFailed`, the transcript it logs,
-        // `finishContinuation`, `finishDeadline` — is otherwise only changed on main too
-        // (the recogniser's callbacks and the timer hop there), so this shares nothing
-        // across threads. The class is not `Sendable` as a whole: `feed` reads `request`
-        // from the audio thread.
-        nonisolated(unsafe) let session = self
+    nonisolated func finish() async -> RecognitionOutcome {
+        // Everything the closures below touch is main-actor state, read and written there.
+        let session = self
         let cancelled: Bool = await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
                 guard !session.isCancelled else {
@@ -295,7 +297,6 @@ final class AppleRecognitionSession: RecognitionSession {
         }
         guard !cancelled else { return .cancelled }
 
-        // On main again, for the same reason the hand-off above is safe.
         return await MainActor.run {
             var text = session.finalText
             if text.isEmpty {
@@ -357,6 +358,27 @@ final class AppleRecognitionSession: RecognitionSession {
         chunkDidFail(NSError(domain: "kAFAssistantErrorDomain", code: 1101))
     }
     #endif
+}
+
+/// The request `feed` appends to, shared between main (which swaps it on a rotation) and
+/// the audio thread (which reads it for every buffer). The lock is held only to read or
+/// write the reference, never across an `append`. `@unchecked Sendable`: `request` is held
+/// under `lock`.
+private final class RequestBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var request: SFSpeechAudioBufferRecognitionRequest?
+
+    var current: SFSpeechAudioBufferRecognitionRequest? {
+        lock.lock()
+        defer { lock.unlock() }
+        return request
+    }
+
+    func set(_ request: SFSpeechAudioBufferRecognitionRequest?) {
+        lock.lock()
+        self.request = request
+        lock.unlock()
+    }
 }
 
 // MARK: - Languages on this Mac

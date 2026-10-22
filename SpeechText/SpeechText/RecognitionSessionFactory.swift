@@ -11,6 +11,7 @@ import SpeechTextCore
 /// The one place that knows which tier a configuration selects. Streaming is a
 /// composition: `StreamingRecognitionSession` wraps a `BatchRecognitionSession` and
 /// hands over to it when the stream fails or returns nothing.
+@MainActor
 func makeRecognitionSession(configuration: RecordingConfiguration,
                             writer: AudioBufferWriter,
                             recognizer: SFSpeechRecognizer?) -> RecognitionSession {

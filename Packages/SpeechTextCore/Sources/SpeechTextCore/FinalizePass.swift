@@ -4,7 +4,7 @@
 import Foundation
 
 /// One write into a sink: select `range`, put `text` there.
-public struct TextReplacement: Equatable {
+public struct TextReplacement: Equatable, Sendable {
     public let range: NSRange
     public let text: String
 }

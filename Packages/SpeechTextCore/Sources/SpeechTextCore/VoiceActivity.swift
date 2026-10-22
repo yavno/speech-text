@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
+import os
 
 // Voice activity detection: whether a segment's audio holds a human voice at all,
 // asked before an upload and before a stream's answer is pasted. Keyboard typing and room
@@ -18,7 +19,7 @@ public protocol VoiceActivityDetector: AnyObject, Sendable {
 }
 
 /// What the detector said about one segment.
-public struct VoiceActivityReading: Equatable {
+public struct VoiceActivityReading: Equatable, Sendable {
     /// The highest probability of any window.
     public var maxProbability: Float
     /// How many windows were above `STTTuning.voiceProbabilityThreshold`.
@@ -63,7 +64,12 @@ public struct VoiceActivityReading: Equatable {
 public enum VoiceActivity {
     /// Set at launch by `registerVoiceActivity`, once the model has loaded; nil — the test
     /// bundle, or a model that would not load — lets every segment through, as before.
-    public nonisolated(unsafe) static var detector: VoiceActivityDetector?
+    /// Under a lock: the model loads in the background while a dictation may already ask.
+    public static var detector: VoiceActivityDetector? {
+        get { detectorLock.withLock { $0 } }
+        set { detectorLock.withLock { $0 = newValue } }
+    }
+    private static let detectorLock = OSAllocatedUnfairLock<VoiceActivityDetector?>(initialState: nil)
 
     /// The detector's reading of what `writer` holds; nil when there is nothing to judge
     /// with — no detector, audio that was never converted (the native fallback, which is

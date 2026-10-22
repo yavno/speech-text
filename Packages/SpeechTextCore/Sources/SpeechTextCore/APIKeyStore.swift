@@ -28,6 +28,9 @@ public protocol SecretStorage: AnyObject {
 ///   and then deleted from every domain the app has run under.
 /// - **defaults** — a build without the profile (Xcode ⌘R, a contributor's clone) cannot
 ///   reach that keychain at all, so it keeps the keys in UserDefaults as before.
+///
+/// `@unchecked Sendable`: every reader may be on any thread, and the stored values are read
+/// and written under `lock` (`mode` read bare only by the tests, after `open`).
 @Observable
 public final class APIKeyStore: @unchecked Sendable {
     public static let shared = APIKeyStore()
@@ -37,7 +40,7 @@ public final class APIKeyStore: @unchecked Sendable {
     /// pinned literally in the tests.
     static let keys: [String] = Provider.allCases.compactMap { $0.descriptor.apiKey?.settingsKey }
 
-    public enum Mode: Equatable {
+    public enum Mode: Equatable, Sendable {
         /// Not opened: every key reads as empty. The test bundle's state.
         case unopened
         case keychain
@@ -45,7 +48,7 @@ public final class APIKeyStore: @unchecked Sendable {
     }
 
     /// What `open` did, for the Debug Log and the tests.
-    public struct Report: Equatable {
+    public struct Report: Equatable, Sendable {
         public var mode: Mode
         /// Keys written into the keychain from a preferences domain.
         public var moved: [String] = []

@@ -23,15 +23,18 @@ import SpeechTextCore
 ///   format against the microphone's 44.1 kHz, and the start failed with -10868.
 ///
 /// `start`, `stop` and `removeTap` run on `SpeechEngine`'s `engineQueue`; `format`,
-/// `installTap` and `onConfigurationChange` are used from main.
-protocol AudioCapture: AnyObject {
+/// `installTap` and `onConfigurationChange` are used from main. Each capture is
+/// `@unchecked Sendable` on that discipline: whatever else two threads share is under a
+/// lock, or is the system object the queue serialises.
+protocol AudioCapture: AnyObject, Sendable {
     /// The hardware format the tap delivers.
     var format: AVAudioFormat { get }
     var isRunning: Bool { get }
     /// The device changed under the capture (it went away, or its format changed),
     /// delivered on main. A change that leaves `isRunning` true needs nothing.
-    var onConfigurationChange: (() -> Void)? { get set }
-    func installTap(_ block: @escaping (AVAudioPCMBuffer) -> Void)
+    var onConfigurationChange: (@MainActor () -> Void)? { get set }
+    /// `@Sendable`: the block runs on the tap's thread, never main.
+    func installTap(_ block: @escaping @Sendable (AVAudioPCMBuffer) -> Void)
     /// Returns once no tap callback is running or can run again.
     func removeTap()
     func start() throws
@@ -40,10 +43,10 @@ protocol AudioCapture: AnyObject {
 
 // MARK: - The system's input
 
-final class EngineCapture: AudioCapture {
+final class EngineCapture: AudioCapture, @unchecked Sendable {
     private let engine = AVAudioEngine()
     private var observer: NSObjectProtocol?
-    var onConfigurationChange: (() -> Void)?
+    var onConfigurationChange: (@MainActor () -> Void)?
 
     init() {
         // Device plugged or unplugged, AirPods switching: AVAudioEngine stops itself and
@@ -51,7 +54,7 @@ final class EngineCapture: AudioCapture {
         observer = NotificationCenter.default.addObserver(
             forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main
         ) { [weak self] _ in
-            self?.onConfigurationChange?()
+            MainActor.assumeIsolated { self?.onConfigurationChange?() }
         }
     }
 
@@ -62,7 +65,7 @@ final class EngineCapture: AudioCapture {
     var format: AVAudioFormat { engine.inputNode.outputFormat(forBus: 0) }
     var isRunning: Bool { engine.isRunning }
 
-    func installTap(_ block: @escaping (AVAudioPCMBuffer) -> Void) {
+    func installTap(_ block: @escaping @Sendable (AVAudioPCMBuffer) -> Void) {
         // nil: the hardware's own format, which avoids "format mismatch" ObjC exceptions
         // that Swift cannot catch.
         engine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { buffer, _ in
@@ -88,10 +91,10 @@ enum DeviceCaptureError: LocalizedError {
     var errorDescription: String? { "The microphone offers no input" }
 }
 
-final class DeviceCapture: AudioCapture {
+final class DeviceCapture: AudioCapture, @unchecked Sendable {
     let deviceID: AudioDeviceID
     let format: AVAudioFormat
-    var onConfigurationChange: (() -> Void)?
+    var onConfigurationChange: (@MainActor () -> Void)?
 
     private let unit: AUAudioUnit
     /// Tap callbacks run here, in order, off the HAL's real-time I/O thread: the tap
@@ -99,7 +102,7 @@ final class DeviceCapture: AudioCapture {
     /// hold up the device. `AVAudioEngine`'s tap is off that thread too.
     private let tapQueue = DispatchQueue(label: "SpeechText.DeviceCapture.tap", qos: .userInitiated)
     private let lock = NSLock()
-    private var tap: ((AVAudioPCMBuffer) -> Void)?
+    private var tap: (@Sendable (AVAudioPCMBuffer) -> Void)?
     private var running = false
     private var reportedRenderFailure = false
     private var listeners: [(AudioObjectPropertyAddress, AudioObjectPropertyListenerBlock)] = []
@@ -149,7 +152,10 @@ final class DeviceCapture: AudioCapture {
                 }
                 return
             }
-            self.tapQueue.async { block(buffer) }
+            // Handed over whole: made for this callback and never touched here again,
+            // which is what makes the unchecked hand-off safe.
+            nonisolated(unsafe) let rendered = buffer
+            self.tapQueue.async { block(rendered) }
         }
         watchDevice()
     }
@@ -163,7 +169,7 @@ final class DeviceCapture: AudioCapture {
 
     var isRunning: Bool { lock.withLock { running } }
 
-    func installTap(_ block: @escaping (AVAudioPCMBuffer) -> Void) {
+    func installTap(_ block: @escaping @Sendable (AVAudioPCMBuffer) -> Void) {
         lock.withLock { tap = block }
     }
 
@@ -184,7 +190,7 @@ final class DeviceCapture: AudioCapture {
         unit.stopHardware()
     }
 
-    private func currentTap() -> ((AVAudioPCMBuffer) -> Void)? {
+    private func currentTap() -> (@Sendable (AVAudioPCMBuffer) -> Void)? {
         lock.withLock { tap }
     }
 
@@ -219,7 +225,8 @@ final class DeviceCapture: AudioCapture {
         guard changed else { return }
         dlog("Engine", "microphone changed under the capture (alive: \(alive), rate: \(rate.map { "\(Int($0)) Hz" } ?? "?"))")
         lock.withLock { running = false }
-        onConfigurationChange?()
+        // The listeners are registered on the main queue.
+        MainActor.assumeIsolated { onConfigurationChange?() }
     }
 }
 
@@ -233,9 +240,9 @@ final class DeviceCapture: AudioCapture {
 /// downsampler and the stream's converter run exactly as they do on a microphone. Once
 /// the file has played, or with no file at all, it delivers silence until stopped: a
 /// hold that outlasts the clip keeps recording, as it would in a quiet room.
-final class FileCapture: AudioCapture {
+final class FileCapture: AudioCapture, @unchecked Sendable {
     let format: AVAudioFormat
-    var onConfigurationChange: (() -> Void)?
+    var onConfigurationChange: (@MainActor () -> Void)?
 
     private let samples: AVAudioPCMBuffer?
     /// Frames per tap callback: 100 ms at 48 kHz, about what `AVAudioEngine`'s input
@@ -243,7 +250,7 @@ final class FileCapture: AudioCapture {
     private let chunkFrames: AVAudioFrameCount
     private let queue = DispatchQueue(label: "SpeechText.FileCapture.tap", qos: .userInitiated)
     private let lock = NSLock()
-    private var tap: ((AVAudioPCMBuffer) -> Void)?
+    private var tap: (@Sendable (AVAudioPCMBuffer) -> Void)?
     private var timer: DispatchSourceTimer?
     private var startedAt: TimeInterval = 0
     private var delivered: AVAudioFramePosition = 0
@@ -266,7 +273,7 @@ final class FileCapture: AudioCapture {
 
     var isRunning: Bool { lock.withLock { timer != nil } }
 
-    func installTap(_ block: @escaping (AVAudioPCMBuffer) -> Void) {
+    func installTap(_ block: @escaping @Sendable (AVAudioPCMBuffer) -> Void) {
         lock.withLock { tap = block }
     }
 
@@ -298,7 +305,7 @@ final class FileCapture: AudioCapture {
     /// Everything the clock says is due, in whole chunks — the pace is the wall clock's,
     /// never the timer's, so a late firing catches up instead of slowing the clip down.
     private func deliverDue() {
-        let (block, due) = lock.withLock { () -> (((AVAudioPCMBuffer) -> Void)?, AVAudioFramePosition) in
+        let (block, due) = lock.withLock { () -> ((@Sendable (AVAudioPCMBuffer) -> Void)?, AVAudioFramePosition) in
             let elapsed = ProcessInfo.processInfo.systemUptime - startedAt
             return (tap, AVAudioFramePosition(elapsed * format.sampleRate))
         }
