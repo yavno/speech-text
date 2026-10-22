@@ -234,6 +234,16 @@ struct SettingsView: View {
             }
             VersionRow()
             SettingsDivider()
+            SettingsRow(title: "Follow SpeechText",
+                        detail: "What's new, and where it's built.") {
+                HStack(spacing: 8) {
+                    LinkIconButton(image: Image(systemName: "globe"), label: "Website",
+                                   url: ProjectLinks.website)
+                    LinkIconButton(image: Image("GitHubMark"), label: "GitHub",
+                                   url: ProjectLinks.repository)
+                }
+            }
+            SettingsDivider()
             // The licences the bundled third-party code requires to travel with every copy
             // (scripts/third-party-notices.sh); opened in the system's text viewer.
             SettingsRow(title: "Acknowledgements",
@@ -1230,6 +1240,35 @@ private struct DemoStatus: View {
         .opacity(state == .idle ? 0 : 1)
         .frame(width: 86, alignment: .leading)
         .animation(.easeOut(duration: 0.2), value: state)
+    }
+}
+
+/// A round button holding only a link's glyph, drawn as the secondary buttons beside it
+/// are; the link's name is its tooltip and its VoiceOver label.
+private struct LinkIconButton: View {
+    let image: Image
+    let label: String
+    let url: URL
+
+    var body: some View {
+        Button { NSWorkspace.shared.open(url) } label: {
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 14, height: 14)
+                .foregroundStyle(SetupColor.label)
+                .frame(width: 28, height: 28)
+                .background {
+                    Circle().fill(SetupColor.control)
+                        .overlay(Circle().strokeBorder(.black.opacity(0.18), lineWidth: 0.5))
+                        .shadow(color: .black.opacity(0.06), radius: 0.5, y: 1)
+                }
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .pointingHandCursor()
+        .help("\(label) — \(url.host() ?? url.absoluteString)")
+        .accessibilityLabel(label)
     }
 }
 

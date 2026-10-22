@@ -68,6 +68,13 @@ enum AppVersion {
     }
 }
 
+/// The project's pages, named once for About SpeechText and Settings › General.
+enum ProjectLinks {
+    static let website = URL(string: "https://speech-text.app")!
+    static let repository = URL(string: "https://github.com/yavno/speech-text")!
+    static let issues = URL(string: "https://github.com/yavno/speech-text/issues")!
+}
+
 /// The About panel's credits: the update status, then the links. Centred, small, in
 /// the label colours so Dark Mode reads.
 @MainActor
@@ -83,8 +90,8 @@ enum AboutCredits {
         ]
         let text = NSMutableAttributedString(string: updateStatus + "\n", attributes: base)
         let links: [(String, URL?)] = [
-            ("speech-text.app", URL(string: "https://speech-text.app")),
-            ("Report a problem", URL(string: "https://github.com/yavno/speech-text/issues")),
+            ("speech-text.app", ProjectLinks.website),
+            ("Report a problem", ProjectLinks.issues),
             ("Acknowledgements", Bundle.main.url(forResource: "ThirdPartyNotices", withExtension: "txt")),
         ]
         for (index, (title, url)) in links.enumerated() where url != nil {
