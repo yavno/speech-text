@@ -123,11 +123,24 @@ final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelega
     /// then activates the app. `runModal` starts right after this returns, so the alert
     /// is not yet `NSApp.modalWindow`: the block runs on the modal run loop's first turn,
     /// which is in `.modalPanel` mode — hence a run-loop block that names that mode.
+    ///
+    /// Ordered front once is not enough, though: a click into another app covered it
+    /// again, and Hide (⌘H, or Hide Others from another app) took it off screen — the
+    /// menu stayed dead with nothing visible to answer. So the alert floats above every
+    /// ordinary window, stays when the app is hidden or deactivated, and follows the user
+    /// across Spaces until its button is pressed: closing it is the only way out of the
+    /// modal session, so it must never be out of sight.
     func standardUserDriverWillShowModalAlert() {
         Self.activateApp()
         RunLoop.main.perform(inModes: [.modalPanel, .default]) {
             MainActor.assumeIsolated {
                 let alert = NSApp.modalWindow
+                if let alert {
+                    alert.level = .floating
+                    alert.hidesOnDeactivate = false
+                    alert.canHide = false
+                    alert.collectionBehavior.insert([.canJoinAllSpaces, .fullScreenAuxiliary])
+                }
                 alert?.orderFrontRegardless()
                 dlog("Update", "modal alert \(alert == nil ? "not found" : "ordered front"), "
                      + "app \(NSApp.isActive ? "active" : "not active")")
