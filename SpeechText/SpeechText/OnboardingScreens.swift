@@ -1185,18 +1185,18 @@ private struct TryItScreen: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("How the shortcut records").font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(SetupColor.label3)
-                    RecordingModePicker(holdToTalk: $holdToTalk)
+                    RecordingModePicker(holdToTalk: $holdToTalk, compact: true)
                 }
                 .padding(.top, 26)
             }
         }
     }
 
-    /// Before a dictation, after one, and after a failure — never while one runs, when a
-    /// change would leave the words on screen describing the other mode.
+    /// The plain dictation's stage, before it and after a failure — never while one runs,
+    /// when a change would leave the words on screen describing the other mode, nor in the
+    /// AI stages, whose column is full and whose mode was chosen by then.
     private var showsModePicker: Bool {
-        guard pending == nil, !listening, !engine.isTranscribing, !appState.isRefining else { return false }
-        if case .success = aiPhase { return false }
+        guard pending == nil, !aiStage, !aiOffered, !listening, !engine.isTranscribing else { return false }
         return true
     }
 
