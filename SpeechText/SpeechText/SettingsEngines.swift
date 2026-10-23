@@ -146,15 +146,18 @@ struct SpeechEngineSettings: View {
                 .foregroundStyle(SetupColor.label2)), inset: 5) {
             // A model this Mac cannot hold waits behind a link, as AI Rewrite's do — unless
             // it is the one in use or on disk, which must stay in sight to be changed or removed.
-            let offered = offeredLocalSTTModels(for: capabilities)
-            let heavy = offered.filter { model in
-                !localModelFitsMemory(model.memoryFloorBytes, capabilities)
-                    && !(engine == .local && localModelID == model.id)
-                    && store.state(for: model.id) == .notInstalled
+            let listing = localSTTListing(for: capabilities, languages: spoken) { model in
+                (engine == .local && localModelID == model.id) || store.state(for: model.id) != .notInstalled
             }
+            let heavy = listing.heavy
             // Once a render, not twice a row: a download renders the page ten times a second.
             let picks = LocalPicks(recommended: recommended?.id, bestQuality: bestQuality?.id)
-            ForEach(offered.filter { model in !heavy.contains { $0.id == model.id } }) { localRow($0, picks: picks) }
+            ForEach(listing.picks) { localRow($0, picks: picks) }
+            SetupRow(title: "Apple Dictation", subtitle: "Built in",
+                     languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
+                     detail: appleDictationLine,
+                     isSelected: engine == .apple) { sttProvider = STTProviderType.apple.rawValue }
+            ForEach(listing.others + listing.lackingLanguage) { localRow($0, picks: picks) }
             if !heavy.isEmpty {
                 Button(showHeavyModels ? "Hide models too heavy for this Mac"
                                        : "Show \(heavy.count) \(heavy.count == 1 ? "model" : "models") too heavy for this Mac") {
@@ -165,10 +168,6 @@ struct SpeechEngineSettings: View {
                 .padding(.vertical, 6)
                 if showHeavyModels { ForEach(heavy) { localRow($0, picks: picks) } }
             }
-            SetupRow(title: "Apple Dictation", subtitle: "Built in",
-                     languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
-                     detail: appleDictationLine,
-                     isSelected: engine == .apple) { sttProvider = STTProviderType.apple.rawValue }
             HStack {
                 Text(store.hasAnyModel
                      ? "\(ByteCountFormatter.string(fromByteCount: store.installedBytes, countStyle: .file)) of models on this Mac"

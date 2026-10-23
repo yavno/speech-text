@@ -507,6 +507,7 @@ private struct DemoStrip: View {
 
 private struct SpeechScreen: View {
     @Bindable var model: OnboardingModel
+    @State private var showHeavyModels = false
     private var spoken: [String] { model.spokenLanguages }
 
     private var appleSilicon: Bool { model.capabilities.isAppleSilicon }
@@ -545,14 +546,30 @@ private struct SpeechScreen: View {
                     .foregroundStyle(SetupColor.label2)
                     .padding(.leading, 10)
                     .padding(.bottom, 2)
-                ForEach(offeredLocalSTTModels(for: model.capabilities)) { speech in
-                    row(speech)
+                // Settings' order: the picks, Apple Dictation, the rest, and the models
+                // this Mac cannot hold behind a link — the one chosen or on disk stays in sight.
+                let listing = localSTTListing(for: model.capabilities, languages: spoken) { speech in
+                    (!model.speechUsesApple && model.speechModelID == speech.id)
+                        || model.store.state(for: speech.id) != .notInstalled
                 }
+                ForEach(listing.picks) { row($0) }
                 // macOS asks for Speech Recognition at the first Apple dictation — Try it, here.
                 SetupRow(title: "Apple Dictation", subtitle: "Built in",
                          languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
                          detail: appleDictationLine + " macOS asks to allow Speech Recognition the first time.",
                          isSelected: model.speechUsesApple) { model.pickAppleDictation() }
+                ForEach(listing.others + listing.lackingLanguage) { row($0) }
+                if !listing.heavy.isEmpty {
+                    let count = listing.heavy.count
+                    Button(showHeavyModels ? "Hide models too heavy for this Mac"
+                                           : "Show \(count) \(count == 1 ? "model" : "models") too heavy for this Mac") {
+                        withAnimation(.easeOut(duration: 0.2)) { showHeavyModels.toggle() }
+                    }
+                    .buttonStyle(SetupInlineLinkStyle())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    if showHeavyModels { ForEach(listing.heavy) { row($0) } }
+                }
                 if let pending = model.pendingSpeechSwitch, let target = localSTTModel(id: pending) {
                     switchConfirm(target)
                 }
@@ -872,7 +889,7 @@ private struct PermissionsScreen: View {
     var body: some View {
         StepColumns(copyWidth: 280, copyAlignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
-                Text("Two quick permissions").setupTitle(32).padding(.bottom, 10)
+                Text(model.needsMacDictation ? "Three quick settings" : "Two quick permissions").setupTitle(32).padding(.bottom, 10)
                 Text("SpeechText needs these to hear you and to type for you.").setupLead().padding(.bottom, 22)
                 VStack(alignment: .leading, spacing: 10) {
                     promise("Listens only while you dictate", "— from one press of the shortcut to the next.")
@@ -889,6 +906,10 @@ private struct PermissionsScreen: View {
                         Divider().overlay(SetupColor.separator)
                         accessibilityRow
                         Divider().overlay(SetupColor.separator)
+                        if model.needsMacDictation {
+                            dictationRow
+                            Divider().overlay(SetupColor.separator)
+                        }
                         loginRow
                         if !model.micGranted {
                             Text("Allow the microphone to continue — SpeechText can't work without it.")
@@ -978,6 +999,24 @@ private struct PermissionsScreen: View {
         }
     }
 
+    /// Apple Dictation is macOS's recogniser, and works only while macOS Dictation is on —
+    /// off on a new account. Read again whenever setup comes back to the front.
+    private var dictationRow: some View {
+        PermissionRow(icon: "waveform", title: "Dictation", detail: "Apple Dictation works only while it's on in macOS.",
+                      granted: model.dictationOn, glowID: model.justGranted.row == "dictation" ? model.justGranted.count : 0) {
+            if !model.dictationOn {
+                PermissionState(tone: .warn) { Text("Dictation is off on this Mac. Turn it on in Keyboard settings.") }
+            }
+        } actions: {
+            if !model.dictationOn {
+                Button("Open Keyboard Settings") { OnboardingModel.openKeyboardSettings() }
+                    .buttonStyle(SetupLinkButtonStyle(height: 28))
+            }
+        } control: {
+            if model.dictationOn { AllowedLabel(text: "On") }
+        }
+    }
+
     private var loginRow: some View {
         PermissionRow(icon: "power", title: "Open at login", detail: "So SpeechText is always ready when you start your Mac.",
                       granted: model.launchAtLogin, glowID: 0) {
@@ -1049,8 +1088,9 @@ private struct PermissionState<Content: View>: View {
 }
 
 private struct AllowedLabel: View {
+    var text = "Allowed"
     var body: some View {
-        Text("✓ Allowed").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(SetupColor.ok).fixedSize()
+        Text("✓ \(text)").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(SetupColor.ok).fixedSize()
     }
 }
 
@@ -1159,6 +1199,14 @@ private struct TryItScreen: View {
     @ViewBuilder
     private var copy: some View {
         VStack(alignment: .leading, spacing: 0) {
+            if showsModePicker {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("How the shortcut records").font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(SetupColor.label3)
+                    RecordingModePicker(holdToTalk: $holdToTalk, compact: true)
+                }
+                .padding(.bottom, 26)
+            }
             if let pending {
                 switch pending.state {
                 case .downloading(let f):
@@ -1180,14 +1228,6 @@ private struct TryItScreen: View {
                 aiOfferCopy
             } else {
                 plainCopy
-            }
-            if showsModePicker {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("How the shortcut records").font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(SetupColor.label3)
-                    RecordingModePicker(holdToTalk: $holdToTalk, compact: true)
-                }
-                .padding(.top, 26)
             }
         }
     }
@@ -1242,7 +1282,26 @@ private struct TryItScreen: View {
         case .failed(let message):
             title(Text("That didn't work"))
             body(Text(message))
+            if let fix = settingsFix(for: message) {
+                Button(fix.title, action: fix.open)
+                    .buttonStyle(SetupLinkButtonStyle(height: 32))
+                    .padding(.top, 16)
+            }
         }
+    }
+
+    /// A failure whose remedy is a System Settings page gets a button to that page: the
+    /// path in the message alone was easy to miss.
+    private func settingsFix(for message: String) -> (title: String, open: () -> Void)? {
+        if message == RecognitionFailure.dictationOffMessage || message.contains("System Settings › Keyboard") {
+            return ("Open Keyboard Settings", { OnboardingModel.openKeyboardSettings() })
+        }
+        if message == RecognitionFailure.speechPermissionMessage {
+            return ("Open Privacy Settings", {
+                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition")!)
+            })
+        }
+        return nil
     }
 
     /// The plain dictation worked: the AI shortcut, drawn as the plain one was.

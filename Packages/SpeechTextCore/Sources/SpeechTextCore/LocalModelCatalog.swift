@@ -351,6 +351,35 @@ public func bestQualityLocalSTTModel(for capabilities: SystemCapabilities, langu
                  id: \.id, floor: \.memoryFloorBytes, bytes: \.downloadBytes, capabilities: capabilities)
 }
 
+/// The local speech models as Settings and setup list them, in four runs: the two picks
+/// (recommended, then best quality) — the views put Apple Dictation straight after them —
+/// then every other model that knows the user's languages, then the ones that lack one,
+/// and last the ones this Mac lacks the memory for, which the views keep behind a link.
+/// `inSight` is a model that must not hide (the one in use, one on disk, one downloading):
+/// a heavy one stays with the models that fit.
+public struct LocalSTTListing: Equatable, Sendable {
+    public let picks: [LocalSTTModel]
+    public let others: [LocalSTTModel]
+    public let lackingLanguage: [LocalSTTModel]
+    public let heavy: [LocalSTTModel]
+}
+
+public func localSTTListing(for capabilities: SystemCapabilities, languages: [String],
+                            inSight: (LocalSTTModel) -> Bool = { _ in false }) -> LocalSTTListing {
+    let offered = offeredLocalSTTModels(for: capabilities)
+    let pickIDs = [recommendedLocalSTTModel(for: capabilities, languages: languages),
+                   bestQualityLocalSTTModel(for: capabilities, languages: languages)].compactMap { $0?.id }
+    let picks = pickIDs.reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
+        .compactMap { id in offered.first { $0.id == id } }
+    let rest = offered.filter { !pickIDs.contains($0.id) }
+    let heavy = rest.filter { !localModelFitsMemory($0.memoryFloorBytes, capabilities) && !inSight($0) }
+    let fitting = rest.filter { model in !heavy.contains { $0.id == model.id } }
+    return LocalSTTListing(picks: picks,
+                           others: fitting.filter { $0.knows(languages) },
+                           lackingLanguage: fitting.filter { !$0.knows(languages) },
+                           heavy: heavy)
+}
+
 /// Whether the Mac has the memory for a model at all — Settings labels heavier ones
 /// rather than hiding them, since the user may know better (a Mac that does nothing else).
 public func localModelFitsMemory(_ floorBytes: UInt64, _ capabilities: SystemCapabilities) -> Bool {

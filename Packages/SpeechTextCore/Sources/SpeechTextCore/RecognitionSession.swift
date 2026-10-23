@@ -71,11 +71,11 @@ public struct RecognitionFailure: Equatable, Sendable {
     }
 
     /// macOS Dictation is off: Apple's engine is that recogniser, so it works only with it on.
-    static let dictationOffMessage =
+    public static let dictationOffMessage =
         "Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation."
 
     /// Also the start failure when the permission is already known to be off.
-    static let speechPermissionMessage =
+    public static let speechPermissionMessage =
         "Speech Recognition is off for SpeechText. Turn it on in System Settings › Privacy & Security."
 
     /// "English" for "en", "en-US" or "en_US" — named in English, as the rest of the UI

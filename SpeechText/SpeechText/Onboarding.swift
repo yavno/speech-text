@@ -157,6 +157,9 @@ final class OnboardingModel {
     private(set) var accessibilityGranted = AXIsProcessTrusted()
     var accessibilityChoice = AccessibilityChoice.idle
     private(set) var launchAtLogin = SMAppService.mainApp.status == .enabled
+    /// macOS Dictation, read only while Apple Dictation is the engine — the one engine
+    /// that is that recogniser and fails without it (kLSRErrorDomain 201).
+    private(set) var dictationOn = true
     /// Bumped when a permission turns on, so its row can glow once.
     private(set) var justGranted: (row: String, count: Int) = ("", 0)
     private var accessibilityPoll: Timer?
@@ -174,6 +177,12 @@ final class OnboardingModel {
         let defaults = UserDefaults.standard
         let caps = SystemCapabilities.current()
         capabilities = caps
+        // A new install learns the shortcuts held: Try it opens on Hold to talk. Only
+        // when nothing is stored — a choice made before stays, and an install that never
+        // saw setup keeps the app's own default.
+        if defaults.object(forKey: SettingsKeys.holdToTalk) == nil {
+            defaults.set(true, forKey: SettingsKeys.holdToTalk)
+        }
         let saved = defaults.string(forKey: SettingsKeys.onboardingStep).flatMap(OnboardingStep.init) ?? .welcome
         step = saved == .done ? .tryIt : saved
 
@@ -511,6 +520,24 @@ final class OnboardingModel {
         if ax && !accessibilityGranted { flash("ax") }
         accessibilityGranted = ax
         launchAtLogin = SMAppService.mainApp.status == .enabled
+        let dictation = Self.macDictationIsOn()
+        if dictation && !dictationOn && needsMacDictation { flash("dictation") }
+        dictationOn = dictation
+    }
+
+    /// The Permissions step shows a Dictation row: Apple Dictation is the engine chosen.
+    var needsMacDictation: Bool { speechPath == .local && speechUsesApple }
+
+    /// Whether macOS Dictation is on for this account, as System Settings › Keyboard
+    /// stores it. A new account has no value until it is turned on, which reads as off.
+    static func macDictationIsOn() -> Bool {
+        let value = CFPreferencesCopyAppValue("Dictation Enabled" as CFString, "com.apple.assistant.support" as CFString)
+        return (value as? Bool) ?? false
+    }
+
+    /// System Settings › Keyboard, where Dictation is turned on.
+    static func openKeyboardSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
     }
 
     private func flash(_ row: String) {

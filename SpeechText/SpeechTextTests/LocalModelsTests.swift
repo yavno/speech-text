@@ -579,4 +579,27 @@ final class LocalModelPickMatrixTests: XCTestCase {
             }
         }
     }
+
+    /// Settings and setup list the models alike: the picks first, a model lacking one of
+    /// the user's languages below the rest, a model too heavy for the Mac behind the link
+    /// unless it must stay in sight — and every offered model exactly once.
+    func testTheListingGroupsEveryOfferedModelOnce() {
+        let listing = localSTTListing(for: mac(ram: 32), languages: ["uk"])
+        let all = listing.picks + listing.others + listing.lackingLanguage + listing.heavy
+        XCTAssertEqual(all.map(\.id).sorted(), offeredLocalSTTModels(for: mac(ram: 32)).map(\.id).sorted())
+        XCTAssertEqual(listing.picks.map(\.id),
+                       [recommendedLocalSTTModel(for: mac(ram: 32), languages: ["uk"]),
+                        bestQualityLocalSTTModel(for: mac(ram: 32), languages: ["uk"])]
+                        .compactMap { $0?.id }.reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } })
+        XCTAssertTrue(listing.lackingLanguage.contains { $0.id == "phonon-2" })
+        XCTAssertFalse(listing.others.contains { $0.id == "phonon-2" })
+        XCTAssertTrue(listing.heavy.isEmpty)
+
+        let small = localSTTListing(for: mac(ram: 8), languages: ["uk"])
+        let large = "openai_whisper-large-v3-v20240930"
+        XCTAssertTrue(small.heavy.contains { $0.id == large })
+        let kept = localSTTListing(for: mac(ram: 8), languages: ["uk"], inSight: { $0.id == large })
+        XCTAssertFalse(kept.heavy.contains { $0.id == large })
+        XCTAssertTrue((kept.others + kept.lackingLanguage).contains { $0.id == large })
+    }
 }
