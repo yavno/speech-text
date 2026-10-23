@@ -106,7 +106,7 @@ final class OnboardingModel {
         var status = KeyStatus.empty
     }
 
-    enum AccessibilityChoice { case idle, waiting, skipped }
+    enum AccessibilityChoice { case idle, waiting }
 
     let appState: AppState
     let store = LocalModelStore.shared
@@ -570,11 +570,6 @@ final class OnboardingModel {
         startWatchingAccessibility()
     }
 
-    func skipAccessibility() {
-        stopWatchingAccessibility()
-        accessibilityChoice = .skipped
-    }
-
     private func startWatchingAccessibility() {
         accessibilityPoll?.invalidate()
         accessibilityPoll = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -623,8 +618,8 @@ final class OnboardingModel {
     var micGranted: Bool { micStatus == .authorized }
 
     func continueFromPermissions() {
-        guard micGranted else { return }
-        if !accessibilityGranted { skipAccessibility() }
+        // Both are needed: without Accessibility a dictation is never typed.
+        guard micGranted, accessibilityGranted else { return }
         go(.tryIt)
     }
 

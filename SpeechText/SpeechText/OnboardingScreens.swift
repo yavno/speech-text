@@ -93,7 +93,7 @@ struct OnboardingView: View {
         case .ai:
             Primary(title: model.aiPrimaryTitle, enabled: model.aiCanContinue) { model.continueFromAI() }
         case .permissions:
-            Primary(title: "Continue", enabled: model.micGranted) { model.continueFromPermissions() }
+            Primary(title: "Continue", enabled: model.micGranted && model.accessibilityGranted) { model.continueFromPermissions() }
         case .tryIt:
             // Without AI the step moves on by itself after a success; with it, Continue
             // waits for the dictation, and "Skip AI test" is the way past the rest.
@@ -911,21 +911,35 @@ private struct PermissionsScreen: View {
                             Divider().overlay(SetupColor.separator)
                         }
                         loginRow
-                        if !model.micGranted {
-                            Text("Allow the microphone to continue — SpeechText can't work without it.")
-                                .font(.system(size: 11.5))
-                                .foregroundStyle(SetupColor.label2)
-                                .padding(.bottom, 12)
-                        }
                     }
                     .padding(.horizontal, 18)
                     .padding(.top, 2)
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
+                // Right above Continue, which it explains.
+                if let missing = missingNote {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "exclamationmark.circle.fill").foregroundStyle(SetupColor.warn)
+                        Text(missing).foregroundStyle(SetupColor.label)
+                    }
+                    .font(.system(size: 12.5, weight: .medium))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.bottom, 4)
+                }
             }
         }
         .onAppear { model.refreshPermissions() }
+    }
+
+    /// What Continue waits for: both permissions — without Accessibility nothing is typed.
+    private var missingNote: String? {
+        switch (model.micGranted, model.accessibilityGranted) {
+        case (true, true): nil
+        case (false, false): "Allow the microphone and Type for you to continue."
+        case (false, true): "Allow the microphone to continue."
+        case (true, false): "Allow Type for you to continue."
+        }
     }
 
     private func promise(_ bold: String, _ rest: String) -> some View {
@@ -977,9 +991,6 @@ private struct PermissionsScreen: View {
                         }
                     }
                     Button("Open again") { model.openAccessibilitySettings() }.buttonStyle(SetupInlineLinkStyle())
-                case .skipped:
-                    PermissionState(tone: .plain) { Text("Skipped — your text will appear in a small window, ready to copy.") }
-                    Button("Turn on") { model.openAccessibilitySettings() }.buttonStyle(SetupInlineLinkStyle())
                 }
             }
         } actions: {
@@ -987,10 +998,7 @@ private struct PermissionsScreen: View {
                 switch model.accessibilityChoice {
                 case .idle:
                     Button("Open System Settings") { model.openAccessibilitySettings() }.buttonStyle(SetupLinkButtonStyle(height: 28))
-                    SetupSkipButton(title: "Skip for now") { model.skipAccessibility() }
                 case .waiting:
-                    SetupSkipButton(title: "Skip for now") { model.skipAccessibility() }
-                case .skipped:
                     EmptyView()
                 }
             }
@@ -1121,6 +1129,8 @@ private struct TryItScreen: View {
     private var q: String { shortcutText(for: .inline) }
     private var a: String { shortcutText(for: .ai) }
     @AppStorage(SettingsKeys.holdToTalk) private var holdToTalk = false
+    /// "You said" opened past its two lines, after an AI dictation.
+    @State private var saidExpanded = false
     /// ⌃⇧ of "⌃⇧Q", and Q.
     private var qModifiers: String { shortcutKeys(q).filter(isModifierCap).joined() }
     private var qLetter: String { shortcutKeys(q).last ?? q }
@@ -1190,6 +1200,7 @@ private struct TryItScreen: View {
             }
         }
         .onAppear { model.refreshTestBlock() }
+        .onChange(of: listening) { saidExpanded = false }
     }
 
     // MARK: Left
@@ -1416,7 +1427,7 @@ private struct TryItScreen: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
             }
-            .frame(height: 7 * 20 + 16)
+            .frame(height: 13 * 20 + 16)
 
             meter
         }
@@ -1500,7 +1511,21 @@ private struct TryItScreen: View {
                 Text(said).foregroundStyle(SetupColor.label)
             }
         case .success(let said, _), .failed(let said, _):
-            Text(said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label).textSelection(.enabled)
+            // Once the AI has written, what was said gives it the room: two lines, the
+            // rest a click away.
+            let long = said.count > 90
+            VStack(alignment: .leading, spacing: 4) {
+                Text(said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label2).textSelection(.enabled)
+                    .lineLimit(long && !saidExpanded ? 2 : nil)
+                    .truncationMode(.tail)
+                if long {
+                    Button(saidExpanded ? "Show less" : "Show all") {
+                        withAnimation(.easeOut(duration: 0.2)) { saidExpanded.toggle() }
+                    }
+                    .buttonStyle(SetupInlineLinkStyle())
+                    .font(.system(size: 11.5))
+                }
+            }
         case .ready:
             EmptyView()
         }
