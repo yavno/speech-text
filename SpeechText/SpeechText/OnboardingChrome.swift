@@ -1239,7 +1239,13 @@ struct SpokenLanguagesChips: View {
     var body: some View {
         FlowLayout(spacing: 6) {
             if selected.isEmpty && showsAnyLanguage {
-                LanguageChip(title: "Any language", symbol: "globe", placeholder: true)
+                // A click on it is a click on Add: it is the empty list, and the list is filled there.
+                Button { adding = true } label: {
+                    LanguageChip(title: "Any language", symbol: "globe", placeholder: true)
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .help("Add a language")
             }
             ForEach(selected, id: \.self) { code in
                 LanguageChip(title: spokenLanguage(id: code)?.displayName ?? code,
