@@ -1002,11 +1002,9 @@ private struct PermissionsScreen: View {
     /// Apple Dictation is macOS's recogniser, and works only while macOS Dictation is on —
     /// off on a new account. Read again whenever setup comes back to the front.
     private var dictationRow: some View {
-        PermissionRow(icon: "waveform", title: "Dictation", detail: "Apple Dictation works only while it's on in macOS.",
+        PermissionRow(icon: "waveform", title: "Dictation", detail: "Apple Dictation needs it on.",
                       granted: model.dictationOn, glowID: model.justGranted.row == "dictation" ? model.justGranted.count : 0) {
-            if !model.dictationOn {
-                PermissionState(tone: .warn) { Text("Dictation is off on this Mac. Turn it on in Keyboard settings.") }
-            }
+            EmptyView()
         } actions: {
             if !model.dictationOn {
                 Button("Open Keyboard Settings") { OnboardingModel.openKeyboardSettings() }
@@ -1246,8 +1244,8 @@ private struct TryItScreen: View {
         case .ready:
             Text(holdToTalk ? "Try it: hold" : "Try it: press").setupTitle(32)
             LiveShortcutKeycaps(action: .inline, size: 52).padding(.top, 14).padding(.bottom, 18)
-            body(Text("Say anything, like ") + Text("“This is my first dictation.”").italic()
-                 + Text(holdToTalk ? " Let go when you're done." : " Press the keys again when you're done."))
+            body(Text(holdToTalk ? "Say anything — or read this out, then let go." : "Say anything — or read this out, then press the keys again."))
+            example(Self.plainExample)
         case .listening:
             if holdToTalk && HeldShortcuts.shared.down.contains(.inline) {
                 // The practice step: the letter alone keeps it going.
@@ -1264,6 +1262,7 @@ private struct TryItScreen: View {
                 body(Text(holdToTalk ? "Let go of \(qLetter) when you're done." : "Press \(q) again when you're done."))
                 LiveShortcutKeycaps(action: .inline, size: 22, pulsing: true).padding(.top, 10)
             }
+            example(Self.plainExample)
             hint("See the small bar at the bottom of your screen? That's SpeechText listening.")
         case .transcribing:
             title(Text("Turning your speech into text…"))
@@ -1315,8 +1314,8 @@ private struct TryItScreen: View {
         } else {
             Text(holdToTalk ? "Now try AI polish: hold" : "Now try AI polish: press").setupTitle(32)
             LiveShortcutKeycaps(action: .ai, size: 52, ai: true).padding(.top, 14).padding(.bottom, 18)
-            body(Text("Dictate an email the way you'd say it — for example ")
-                 + Text("“uh, write to Anna that the report will be ready on Friday, not Thursday, and say sorry for the delay.”").italic())
+            body(Text("Ask for an email the way you'd say it — for example:"))
+            example(Self.aiExample, ai: true)
         }
     }
 
@@ -1329,6 +1328,7 @@ private struct TryItScreen: View {
             title(Text("Listening…"))
             body(Text(holdToTalk ? "Let go of \(aLetter) when you're done." : "Press \(a) again when you're done."))
             LiveShortcutKeycaps(action: .ai, size: 22, pulsing: true, ai: true).padding(.top, 10)
+            example(Self.aiExample, ai: true)
         case .polishing:
             title(Text("AI is tidying up your text…"))
             body(Text("This takes a few seconds."))
@@ -1339,6 +1339,27 @@ private struct TryItScreen: View {
             title(Text("AI couldn't answer this time"))
             body(Text("In any app, your words would be typed as you said them."))
         }
+    }
+
+    /// What to say, kept on screen while the shortcut is down, so there is something to
+    /// read from: a short email for the plain dictation, the request for one for AI polish.
+    private static let plainExample = "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."
+    private static let aiExample = "Uh, write to Josh that the report will be ready on Friday, not Thursday, and say sorry for the delay."
+
+    private func example(_ words: String, ai: Bool = false) -> some View {
+        Text("“\(words)”")
+            .font(.system(size: 13.5).italic())
+            .foregroundStyle(SetupColor.label)
+            .lineSpacing(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 10).fill(ai ? SetupTint.violet.accent.opacity(0.08) : SetupColor.control))
+            .overlay(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 1.5).fill(ai ? SetupTint.violet.accent : SetupTint.green.accent).frame(width: 3).padding(.vertical, 8)
+            }
+            .padding(.top, 14)
     }
 
     private func title(_ text: Text) -> some View { text.setupTitle(32).padding(.bottom, 10) }

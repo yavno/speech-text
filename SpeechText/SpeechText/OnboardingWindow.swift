@@ -238,7 +238,7 @@ struct AccessibilityHelperView: View {
             .padding(.vertical, 6)
             .background(RoundedRectangle(cornerRadius: 9).strokeBorder(Color.primary.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [4, 3])))
             .contentShape(Rectangle())
-            .onDrag { NSItemProvider(contentsOf: Bundle.main.bundleURL) ?? NSItemProvider() }
+            .overlay(AppBundleDragSource())
             .help("Drag into the Accessibility list")
             HStack {
                 Spacer()
@@ -257,6 +257,39 @@ struct AccessibilityHelperView: View {
         .onAppear {
             withAnimation(.easeInOut(duration: 0.6).repeatForever()) { nudge = true }
             withAnimation(.easeInOut(duration: 0.4).delay(0.9).repeatForever(autoreverses: true)) { switchOn = true }
+        }
+    }
+}
+
+/// The helper's SpeechText row as a drag of the app itself, as Finder drags it: a file
+/// URL on the pasteboard. SwiftUI's `onDrag` with `NSItemProvider(contentsOf:)` offered the
+/// bundle as a promised file, which the Accessibility list does not take.
+struct AppBundleDragSource: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView { DragView() }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private final class DragView: NSView, NSDraggingSource {
+        private var start: NSPoint?
+
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+        override var mouseDownCanMoveWindow: Bool { false }
+
+        override func mouseDown(with event: NSEvent) { start = event.locationInWindow }
+
+        override func mouseDragged(with event: NSEvent) {
+            guard let start, hypot(event.locationInWindow.x - start.x, event.locationInWindow.y - start.y) > 3 else { return }
+            self.start = nil
+            let url = Bundle.main.bundleURL as NSURL
+            let item = NSDraggingItem(pasteboardWriter: url)
+            let icon = NSWorkspace.shared.icon(forFile: Bundle.main.bundlePath)
+            let point = convert(event.locationInWindow, from: nil)
+            item.setDraggingFrame(NSRect(x: point.x - 16, y: point.y - 16, width: 32, height: 32), contents: icon)
+            beginDraggingSession(with: [item], event: event, source: self)
+        }
+
+        func draggingSession(_ session: NSDraggingSession,
+                             sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
+            [.copy, .link, .generic]
         }
     }
 }
