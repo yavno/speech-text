@@ -34,7 +34,7 @@ struct HomeView: View {
                         HomeEngines(actions: actions, go: go)
                         HomeWeekCard(pageWidth: width) { go(.usage) }
                         HomeWays(actions: actions)
-                        HomeRecent(go: go)
+                        HomeRecent(go: go, openSettings: actions.openSettings)
                     }
                     .frame(maxWidth: Self.columnWidth)
                     .padding(.horizontal, 48)
@@ -1367,6 +1367,7 @@ private struct HomeWayTile: View {
 /// marked by its app.
 struct HomeRecent: View {
     let go: (MainPage) -> Void
+    let openSettings: (SettingsCategory?) -> Void
     private var history: TranscriptionHistory { .shared }
 
     var body: some View {
@@ -1384,7 +1385,7 @@ struct HomeRecent: View {
                 }
                 ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                     if index > 0 { Rectangle().fill(MainColor.separator).frame(height: 1) }
-                    HomeRecentRow(entry: entry)
+                    HomeRecentRow(entry: entry, openSettings: openSettings)
                 }
             }
             .background(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(MainColor.panelBorder, lineWidth: 1))
@@ -1395,6 +1396,7 @@ struct HomeRecent: View {
 
 private struct HomeRecentRow: View {
     let entry: HomeRecentEntry
+    let openSettings: (SettingsCategory?) -> Void
     @State private var hovering = false
     @State private var copied = false
 
@@ -1433,7 +1435,7 @@ private struct HomeRecentRow: View {
     @ViewBuilder
     private var actionButton: some View {
         if failed {
-            if entry.canRetry { HomeRetryButton(id: entry.id) }
+            if entry.canRetry { HomeRetryButton(id: entry.id, openSettings: openSettings) }
         } else {
             HomeCopyButton(text: entry.text, copied: $copied)
                 .opacity(hovering || copied ? 1 : 0)
@@ -1502,28 +1504,52 @@ struct HomeEntryTags: View {
 }
 
 /// Retry a failed dictation from its saved audio — whoever else is retrying it, the
-/// spinner shows.
+/// spinner shows. While the local model the settings select is not on this Mac a retry
+/// could only fail on it again, so the button is Install instead: it starts the download
+/// and opens Settings › Speech to text, where the model's row shows how it goes, and
+/// turns back into Retry once the model is usable.
 struct HomeRetryButton: View {
     let id: UUID
     var title = "Retry"
     var height: CGFloat = 28
+    let openSettings: (SettingsCategory?) -> Void
+    @AppStorage(SettingsKeys.sttProvider) private var sttProvider = STTProviderType.apple.rawValue
+    @AppStorage(SettingsKeys.localSTTModel) private var localModelID = Provider.local.defaultSpeechModel
     @State private var hovering = false
 
     var body: some View {
-        let running = HistoryRetry.shared.inFlight.contains(id)
-        Button {
-            Task { @MainActor in await HistoryRetry.shared.retry(id) }
-        } label: {
-            HStack(spacing: 5) {
-                if running { SetupSpinner(size: 10) } else { Image(systemName: "arrow.clockwise") }
-                Text(running ? "Retrying…" : title)
+        let store = LocalModelStore.shared
+        if let missing = store.missingSelectedModel(engine: sttProvider, modelID: localModelID) {
+            let installing = store.state(for: missing.id).isBusy
+            Button {
+                if !installing { store.install(missing) }
+                openSettings(.speech)
+            } label: {
+                HStack(spacing: 5) {
+                    if installing { SetupSpinner(size: 10) } else { Image(systemName: "arrow.down.circle") }
+                    Text(installing ? "Installing…" : "Install")
+                }
+                .font(.system(size: 11.5, weight: .medium))
             }
-            .font(.system(size: 11.5, weight: .medium))
+            .buttonStyle(SetupButtonStyle(kind: .secondary, height: height, hovered: hovering))
+            .onHover { hovering = $0 }
+            .help("Download \(speechModelName(missing)) (\(missing.downloadSizeDescription)) and show it in Settings — then retry")
+        } else {
+            let running = HistoryRetry.shared.inFlight.contains(id)
+            Button {
+                Task { @MainActor in await HistoryRetry.shared.retry(id) }
+            } label: {
+                HStack(spacing: 5) {
+                    if running { SetupSpinner(size: 10) } else { Image(systemName: "arrow.clockwise") }
+                    Text(running ? "Retrying…" : title)
+                }
+                .font(.system(size: 11.5, weight: .medium))
+            }
+            .buttonStyle(SetupButtonStyle(kind: .secondary, height: height, hovered: hovering))
+            .onHover { hovering = $0 }
+            .disabled(running)
+            .help("Transcribe the saved audio again, with the settings you have now")
         }
-        .buttonStyle(SetupButtonStyle(kind: .secondary, height: height, hovered: hovering))
-        .onHover { hovering = $0 }
-        .disabled(running)
-        .help("Transcribe the saved audio again, with the settings you have now")
     }
 }
 

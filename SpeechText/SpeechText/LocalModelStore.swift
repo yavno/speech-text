@@ -88,6 +88,23 @@ final class LocalModelStore {
     /// know before it offers the local tier as usable.
     var hasAnyModel: Bool { !installedModels.isEmpty }
 
+    /// The local model the settings select, when it is not on this Mac yet — what a
+    /// failed dictation's Retry would only fail on again, so it offers Install instead.
+    /// Nil for another engine, a cleared choice (`""` asks for a pick, not a download),
+    /// an ID the catalogue does not know, a model this macOS cannot run, and a model
+    /// already usable.
+    func missingSelectedModel(engine: String, modelID: String) -> LocalSTTModel? {
+        guard engine == STTProviderType.local.rawValue, !modelID.isEmpty,
+              let model = Self.offeredHere.first(where: { $0.id == modelID }),
+              !state(for: model.id).isUsable
+        else { return nil }
+        return model
+    }
+
+    /// The models this Mac's macOS can run, read once: a History row asks on every render,
+    /// and neither the catalogue nor the macOS version changes while the app runs.
+    private static let offeredHere = offeredLocalSTTModels(for: SystemCapabilities.current())
+
     func refresh() {
         for model in localSTTModels where !(states[model.id]?.isBusy ?? false) {
             states[model.id] = isInstalled(model.id) ? .installed : .notInstalled

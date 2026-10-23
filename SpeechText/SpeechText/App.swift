@@ -1163,6 +1163,23 @@ final class AppState {
                         self?.perform(.openSettings(.speech))
                     }
                 )
+            } else if let missing = LocalModelStore.shared.missingSelectedModel(
+                engine: UserDefaults.standard.string(forKey: SettingsKeys.sttProvider) ?? "",
+                modelID: UserDefaults.standard.string(forKey: SettingsKeys.localSTTModel)
+                    ?? Provider.local.defaultSpeechModel) {
+                // The model this Mac transcribes with is not on it: Install starts the
+                // download and opens the page that shows it; the recording waits in History.
+                showStatus(
+                    icon: "exclamationmark.triangle.fill",
+                    title: "\(speechModelName(missing)) isn't installed",
+                    detail: "Install it, then retry from History.",
+                    tint: .orange,
+                    duration: 10,
+                    action: StatusOverlayAction(title: "Install") { [weak self] in
+                        LocalModelStore.shared.install(missing)
+                        self?.perform(.openSettings(.speech))
+                    }
+                )
             } else {
                 showStatus(
                     icon: "exclamationmark.triangle.fill",

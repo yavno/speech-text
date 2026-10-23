@@ -45,7 +45,8 @@ struct HistoryView: View {
                     ForEach(days) { day in
                         HistoryDaySection(day: day, expanded: $expanded,
                                           showsAll: Binding(get: { openDays.contains(day.id) },
-                                                            set: { if $0 { openDays.insert(day.id) } else { openDays.remove(day.id) } }))
+                                                            set: { if $0 { openDays.insert(day.id) } else { openDays.remove(day.id) } }),
+                                          openSettings: actions.openSettings)
                             .padding(.top, 26)
                     }
                     if !records.isEmpty { footer.padding(.top, 34) }
@@ -633,6 +634,7 @@ private struct HistoryDaySection: View {
     let day: HistoryDay
     @Binding var expanded: UUID?
     @Binding var showsAll: Bool
+    let openSettings: (SettingsCategory?) -> Void
 
     /// Enough for a morning's dictations, and about a screen.
     static let shown = 8
@@ -666,7 +668,7 @@ private struct HistoryDaySection: View {
             VStack(spacing: 0) {
                 ForEach(Array(records.enumerated()), id: \.element.id) { index, record in
                     if index > 0 { Rectangle().fill(MainColor.separator).frame(height: 1) }
-                    HistoryRow(record: record, isExpanded: expanded == record.id) {
+                    HistoryRow(record: record, isExpanded: expanded == record.id, openSettings: openSettings) {
                         withAnimation(.easeOut(duration: 0.2)) {
                             expanded = expanded == record.id ? nil : record.id
                         }
@@ -726,6 +728,7 @@ private struct HistoryShowAllRow: View {
 private struct HistoryRow: View {
     let record: TranscriptionRecord
     let isExpanded: Bool
+    let openSettings: (SettingsCategory?) -> Void
     let toggle: () -> Void
     /// Worked out once per row, not on every redraw of it.
     private let entry: HomeRecentEntry
@@ -736,9 +739,11 @@ private struct HistoryRow: View {
     @State private var textSize: CGSize = .zero
     @State private var fullTextHeight: CGFloat = 0
 
-    init(record: TranscriptionRecord, isExpanded: Bool, toggle: @escaping () -> Void) {
+    init(record: TranscriptionRecord, isExpanded: Bool,
+         openSettings: @escaping (SettingsCategory?) -> Void, toggle: @escaping () -> Void) {
         self.record = record
         self.isExpanded = isExpanded
+        self.openSettings = openSettings
         self.toggle = toggle
         entry = HomeRecentEntry(record)
     }
@@ -836,7 +841,7 @@ private struct HistoryRow: View {
             .padding(.vertical, 14)
 
             if isOpen {
-                HistoryDetail(record: record)
+                HistoryDetail(record: record, openSettings: openSettings)
                     .transition(.opacity)
             }
         }
@@ -910,7 +915,7 @@ private struct HistoryRow: View {
     @ViewBuilder
     private func quickAction(_ entry: HomeRecentEntry) -> some View {
         if entry.status != .success {
-            if entry.canRetry && !isOpen { HomeRetryButton(id: record.id) }
+            if entry.canRetry && !isOpen { HomeRetryButton(id: record.id, openSettings: openSettings) }
         } else {
             if hovering || isOpen || copied {
                 HomeCopyButton(text: record.deliveredText, copied: $copied)
@@ -990,6 +995,7 @@ enum HistoryClipboard {
 /// what went wrong and the way to retry; where it went, what heard it, and the actions.
 private struct HistoryDetail: View {
     let record: TranscriptionRecord
+    let openSettings: (SettingsCategory?) -> Void
     @State private var copiedSaid = false
 
     var body: some View {
@@ -1073,7 +1079,7 @@ private struct HistoryDetail: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             if record.isRetryable {
-                HomeRetryButton(id: record.id, title: "Retry", height: 30)
+                HomeRetryButton(id: record.id, title: "Retry", height: 30, openSettings: openSettings)
             }
         }
         .padding(.horizontal, 14)
