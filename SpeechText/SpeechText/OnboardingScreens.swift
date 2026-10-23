@@ -93,7 +93,7 @@ struct OnboardingView: View {
         case .ai:
             Primary(title: model.aiPrimaryTitle, enabled: model.aiCanContinue) { model.continueFromAI() }
         case .permissions:
-            Primary(title: "Continue", enabled: model.micGranted && model.accessibilityGranted) { model.continueFromPermissions() }
+            Primary(title: "Continue", enabled: model.permissionsComplete) { model.continueFromPermissions() }
         case .tryIt:
             // Without AI the step moves on by itself after a success; with it, Continue
             // waits for the dictation, and "Skip AI test" is the way past the rest.
@@ -917,29 +917,9 @@ private struct PermissionsScreen: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
-                // Right above Continue, which it explains.
-                if let missing = missingNote {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Image(systemName: "exclamationmark.circle.fill").foregroundStyle(SetupColor.warn)
-                        Text(missing).foregroundStyle(SetupColor.label)
-                    }
-                    .font(.system(size: 12.5, weight: .medium))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.bottom, 4)
-                }
             }
         }
         .onAppear { model.refreshPermissions() }
-    }
-
-    /// What Continue waits for: both permissions — without Accessibility nothing is typed.
-    private var missingNote: String? {
-        switch (model.micGranted, model.accessibilityGranted) {
-        case (true, true): nil
-        case (false, false): "Allow the microphone and Type for you to continue."
-        case (false, true): "Allow the microphone to continue."
-        case (true, false): "Allow Type for you to continue."
-        }
     }
 
     private func promise(_ bold: String, _ rest: String) -> some View {
@@ -1035,7 +1015,6 @@ private struct PermissionsScreen: View {
                 .tint(tint.accent)
                 .labelsHidden()
         }
-        .padding(.bottom, 12)
     }
 }
 
@@ -1201,6 +1180,7 @@ private struct TryItScreen: View {
         }
         .onAppear { model.refreshTestBlock() }
         .onChange(of: listening) { saidExpanded = false }
+        .animation(.easeInOut(duration: 0.18), value: stageKey)
     }
 
     // MARK: Left
@@ -1214,6 +1194,10 @@ private struct TryItScreen: View {
                         .foregroundStyle(SetupColor.label3)
                     RecordingModePicker(holdToTalk: $holdToTalk, compact: true)
                 }
+                // Kept in place while a dictation runs, only dimmed: taking it away and
+                // back moved the whole column at each press and release.
+                .disabled(!modePickerEnabled)
+                .opacity(modePickerEnabled ? 1 : 0.4)
                 .padding(.bottom, 26)
             }
             if let pending {
@@ -1241,12 +1225,20 @@ private struct TryItScreen: View {
         }
     }
 
-    /// The plain dictation's stage, before it and after a failure — never while one runs,
-    /// when a change would leave the words on screen describing the other mode, nor in the
-    /// AI stages, whose column is full and whose mode was chosen by then.
+    /// The plain dictation's stage — not the AI stages, whose column is full and whose
+    /// mode was chosen by then.
     private var showsModePicker: Bool {
-        guard pending == nil, !aiStage, !aiOffered, !listening, !engine.isTranscribing else { return false }
-        return true
+        pending == nil && !aiStage && !aiOffered
+    }
+
+    /// Never while a dictation runs, when a change would leave the words on screen
+    /// describing the other mode.
+    private var modePickerEnabled: Bool { !listening && !engine.isTranscribing }
+
+    /// One value for every state the step draws, so a change between them is animated
+    /// as one cross-fade rather than popping in and out a frame at a time.
+    private var stageKey: String {
+        "\(phase)|\(aiPhase)|\(aiStage)|\(aiOffered)|\(HeldShortcuts.shared.down.contains(.inline))|\(appState.holdTipFollowed)"
     }
 
     @ViewBuilder
@@ -1325,7 +1317,7 @@ private struct TryItScreen: View {
         } else {
             Text(holdToTalk ? "Now try AI polish: hold" : "Now try AI polish: press").setupTitle(32)
             LiveShortcutKeycaps(action: .ai, size: 52, ai: true).padding(.top, 14).padding(.bottom, 18)
-            body(Text("Ask for an email the way you'd say it — for example:"))
+            body(Text("Say something the way you'd say it, hesitations and all — for example:"))
             example(Self.aiExample, ai: true)
         }
     }
@@ -1353,9 +1345,9 @@ private struct TryItScreen: View {
     }
 
     /// What to say, kept on screen while the shortcut is down, so there is something to
-    /// read from: a short email for the plain dictation, the request for one for AI polish.
+    /// read from: a short email for the plain dictation, a sentence to tidy for AI polish.
     private static let plainExample = "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."
-    private static let aiExample = "Uh, write to Josh that the report will be ready on Friday, not Thursday, and say sorry for the delay."
+    private static let aiExample = "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too."
 
     private func example(_ words: String, ai: Bool = false) -> some View {
         Text("“\(words)”")
@@ -1427,7 +1419,7 @@ private struct TryItScreen: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
             }
-            .frame(height: 13 * 20 + 16)
+            .frame(height: 7 * 20 + 16)
 
             meter
         }
@@ -1488,7 +1480,9 @@ private struct TryItScreen: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
             }
-            .frame(height: 7 * 20 + 16)
+            // Up to 18 lines, as far as the panel has room: the AI's text is what this
+            // stage is for.
+            .frame(minHeight: 7 * 20 + 16, maxHeight: 18 * 20 + 16)
 
             meter
         }
@@ -1511,12 +1505,12 @@ private struct TryItScreen: View {
                 Text(said).foregroundStyle(SetupColor.label)
             }
         case .success(let said, _), .failed(let said, _):
-            // Once the AI has written, what was said gives it the room: two lines, the
+            // Once the AI has written, what was said gives it the room: one line, the
             // rest a click away.
-            let long = said.count > 90
+            let long = said.count > 40
             VStack(alignment: .leading, spacing: 4) {
                 Text(said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label2).textSelection(.enabled)
-                    .lineLimit(long && !saidExpanded ? 2 : nil)
+                    .lineLimit(long && !saidExpanded ? 1 : nil)
                     .truncationMode(.tail)
                 if long {
                     Button(saidExpanded ? "Show less" : "Show all") {

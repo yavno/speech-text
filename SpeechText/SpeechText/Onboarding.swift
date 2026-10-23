@@ -617,9 +617,15 @@ final class OnboardingModel {
 
     var micGranted: Bool { micStatus == .authorized }
 
+    /// What Continue waits for: the microphone and Accessibility always — without
+    /// Accessibility a dictation is never typed — and macOS Dictation when Apple Dictation
+    /// is the engine, which fails without it.
+    var permissionsComplete: Bool {
+        micGranted && accessibilityGranted && (!needsMacDictation || dictationOn)
+    }
+
     func continueFromPermissions() {
-        // Both are needed: without Accessibility a dictation is never typed.
-        guard micGranted, accessibilityGranted else { return }
+        guard permissionsComplete else { return }
         go(.tryIt)
     }
 
