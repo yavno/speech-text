@@ -668,15 +668,6 @@ struct PasteService {
         AXIsProcessTrusted()
     }
 
-    /// `kAXTrustedCheckOptionPrompt`'s value. The constant is a C global `var`, which Swift 6
-    /// will not read from a nonisolated context; its value is this string, and fixed.
-    static let trustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt"
-
-    /// Prompt the user to grant accessibility permission
-    static func promptAccessibility() {
-        let options = [trustedCheckOptionPrompt: true] as CFDictionary
-        AXIsProcessTrustedWithOptions(options)
-    }
 
     private static func simulatePasteCGEvent() {
         simulateCommandKey("v", name: "⌘V")

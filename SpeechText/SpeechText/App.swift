@@ -207,10 +207,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 }
             }
 
-            // Prompt for accessibility permission on launch if not already granted.
-            // This is required for pasting text at the cursor via the inline recorder.
+            // No alert at launch for a missing Accessibility grant: Home says so, and a
+            // dictation that could not be pasted offers the way to turn it on. Listed
+            // quietly, so the switch is there to find.
             if !PasteService.isAccessibilityGranted {
-                PasteService.promptAccessibility()
+                AccessibilityGuide.registerQuietly()
             }
         }
 
@@ -339,6 +340,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
             setupWindow?.present()
         }
+    }
+
+    /// Home's Skip: setup counts as done — everything it asks is in Settings — and its
+    /// window and menu item go.
+    private func skipSetup() {
+        let defaults = UserDefaults.standard
+        defaults.set(true, forKey: SettingsKeys.onboardingCompleted)
+        defaults.removeObject(forKey: SettingsKeys.onboardingStep)
+        setupWindow?.close()
+        setupWindow = nil
+        rebuildMenu()
+        dlog("Setup", "skipped from Home")
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -642,7 +655,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             if mainWindow == nil {
                 let actions = MainWindowActions(
                     openSettings: { [weak self] category in self?.showSettings(category: category) },
-                    openSettingsAt: { [weak self] anchor in self?.showSettings(at: anchor) })
+                    openSettingsAt: { [weak self] anchor in self?.showSettings(at: anchor) },
+                    openSetup: { [weak self] in self?.openSetup() },
+                    skipSetup: { [weak self] in self?.skipSetup() })
                 mainWindow = MainWindow(actions: actions) { [weak self] in
                     self?.mainWindow = nil
                     self?.preparedSettingsWindow = nil
@@ -1297,7 +1312,7 @@ final class AppState {
             var output = aiInput
             var rewritten = false
             do {
-                let result = try await TextRefinementService.refine(aiInput, context: context, cleanUpOnly: isTest)
+                let result = try await TextRefinementService.refine(aiInput, context: context)
                 rewritten = true
                 if Task.isCancelled { return }
                 output = result.text
@@ -1383,8 +1398,10 @@ final class AppState {
             dlog("App", "deliver: no accessibility, showing record panel", level: .notice)
             recordNotPasted()
             dismissOverlayConfirmation()
-            PasteService.promptAccessibility()
             showDirectRecordingPanel(withText: text)
+            showStatus(icon: "hand.raised.fill", title: "Not pasted — Accessibility is off",
+                       detail: "Your text is in the Record Window. Turn on Accessibility so SpeechText can type for you.",
+                       tint: .orange, duration: 8, action: Self.allowAccessibilityAction)
             return
         }
 
@@ -1631,9 +1648,9 @@ final class AppState {
         LLMConfiguration.prewarmIfLocal()
         guard PasteService.isAccessibilityGranted else {
             editGesture.reset()
-            PasteService.promptAccessibility()
             showStatus(icon: "hand.raised.fill", title: "Accessibility access needed",
-                       detail: "SpeechText needs it to read the selected text and replace it.", tint: .orange)
+                       detail: "SpeechText needs it to read the selected text and replace it.", tint: .orange,
+                       duration: 8, action: Self.allowAccessibilityAction)
             return
         }
         previousApp = front
@@ -2416,6 +2433,11 @@ final class AppState {
     // MARK: - Status Overlay
 
     /// `historyPlace`: what a click on the notice narrows History to, as History's row names it.
+    /// A notice's way to Accessibility: the pane and the helper, never macOS's alert.
+    static let allowAccessibilityAction = StatusOverlayAction(title: "Turn On…") {
+        AccessibilityGuide.shared.start { _ in }
+    }
+
     func showStatus(icon: String, title: String, detail: String?, tint: Color, duration: TimeInterval = 5,
                     action: StatusOverlayAction? = nil, historyPlace: String? = nil) {
         hideStatus()

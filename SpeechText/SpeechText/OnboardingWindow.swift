@@ -77,6 +77,61 @@ final class OnboardingWindow: NSWindow {
 
 // MARK: - The Accessibility helper
 
+/// Turning Accessibility on, from setup's Permissions step and from Home alike: the pane
+/// opens, the helper floats beside it, and the grant is polled for every second until it
+/// comes, the helper's Done is clicked, or `stop()`.
+@MainActor
+final class AccessibilityGuide {
+    static let shared = AccessibilityGuide()
+
+    private var poll: Timer?
+    private var helper: AccessibilityHelperPanel?
+    private var finished: ((Bool) -> Void)?
+
+    /// `finished` gets whether Accessibility is allowed: on the grant, or on Done.
+    func start(finished: @escaping (Bool) -> Void) {
+        stop()
+        self.finished = finished
+        Self.registerQuietly()
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+        let panel = AccessibilityHelperPanel { [weak self] in self?.end() }
+        helper = panel
+        panel.showBesideSystemSettings()
+        poll = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                if AXIsProcessTrusted() { self?.end() }
+            }
+        }
+    }
+
+    func stop() {
+        poll?.invalidate()
+        poll = nil
+        helper?.close()
+        helper = nil
+        finished = nil
+    }
+
+    private func end() {
+        let done = finished
+        stop()
+        done?(AXIsProcessTrusted())
+    }
+
+    /// Puts SpeechText in the Accessibility list without macOS's "would like to control
+    /// this computer" alert, which `AXIsProcessTrustedWithOptions` with the prompt raises
+    /// on top of the pane the helper already explains. The assumption, to be confirmed on
+    /// a new account: an Accessibility read refused for want of the grant is enough for
+    /// macOS to list the app, switched off. If it is not, the helper's drag row and +
+    /// are the way in.
+    static func registerQuietly() {
+        guard !AXIsProcessTrusted() else { return }
+        var value: CFTypeRef?
+        let result = AXUIElementCopyAttributeValue(AXUIElementCreateSystemWide(), kAXFocusedApplicationAttribute as CFString, &value)
+        dlog("Setup", "accessibility: quiet registration read answered \(result.rawValue)")
+    }
+}
+
 /// Floats beside System Settings while the user looks for SpeechText's switch in
 /// Privacy & Security › Accessibility — the one grant with no dialog of its own, and the
 /// hardest moment of setup for someone who has never been in that pane.

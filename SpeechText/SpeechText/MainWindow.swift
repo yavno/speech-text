@@ -69,6 +69,10 @@ struct MainWindowActions {
     var openSettings: (SettingsCategory?) -> Void
     /// Settings scrolled to one group — the setting a page is talking about.
     var openSettingsAt: (SettingsAnchor) -> Void = { _ in }
+    /// The setup window, on the step it was left on.
+    var openSetup: () -> Void = {}
+    /// Setup marked done without finishing it — Home's Skip.
+    var skipSetup: () -> Void = {}
 }
 
 @Observable

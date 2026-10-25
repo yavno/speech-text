@@ -36,14 +36,6 @@ public enum PromptPresetStore {
 
     static let cleanupPresetID = fixedID("01")
 
-    /// Clean-up alone — the user's version of it if they edited it — for setup's Try it,
-    /// whose AI dictation shows what polishing does: with every prompt on offer, a
-    /// sentence that mentions a meeting and a name came back as an email.
-    public static func cleanUpOnly(from stored: [PromptPreset] = load()) -> [PromptPreset] {
-        let edited = stored.first { $0.id == cleanupPresetID }
-        return [edited ?? builtInDefaults.first { $0.id == cleanupPresetID }!]
-    }
-
     /// Each one says what it is for and what to do, and stops there. They go out in full
     /// on every AI dictation and every edit, they are more than half the prompt, and the
     /// model fills in the obvious — so a built-in prompt that explains itself is spending

@@ -30,9 +30,7 @@ public enum TextRefinementService {
     /// `context` is where the text is going, read when the recording started. The Record
     /// Window passes none: it is our own surface, and its text as often ends up on the
     /// clipboard as in the app that was in front before it opened.
-    /// `cleanUpOnly` offers the model Clean-up alone (setup's Try it).
-    public static func refine(_ transcript: String, context: FocusContext? = nil,
-                              cleanUpOnly: Bool = false) async throws -> Result {
+    public static func refine(_ transcript: String, context: FocusContext? = nil) async throws -> Result {
         let source = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
         let providerType = LLMConfiguration.providerType
         let modelID = LLMConfiguration.model(for: providerType)
@@ -42,14 +40,14 @@ public enum TextRefinementService {
         }
 
         let provider = try LLMConfiguration.makeChatClient()
-        let presets = cleanUpOnly ? PromptPresetStore.cleanUpOnly() : PromptPresetStore.load()
+        let presets = PromptPresetStore.load()
         // The system prompt describes <context> whether or not this dictation has one:
         // it stays the same from one recording to the next, and a missing block needs
         // no explanation.
         let sent = Date()
         let reply = try await provider.complete(
             system: buildSystemPrompt(presets: presets,
-                                      defaultPresetID: cleanUpOnly ? presets.first?.id : PromptPresetStore.storedDefaultPresetID()),
+                                      defaultPresetID: PromptPresetStore.storedDefaultPresetID()),
             user: userMessage(transcript: source, context: context,
                               vocabulary: Vocabulary.promptBlock(Vocabulary.load()))
         )

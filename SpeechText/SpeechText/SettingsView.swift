@@ -734,7 +734,7 @@ struct SettingsView: View {
                                       ? "So your words appear where your cursor is."
                                       : "Without it your text opens in the Record Window, ready to copy.",
                                   granted: accessibilityGranted) {
-                Button("Grant Access") { PasteService.promptAccessibility() }
+                Button("Grant Access") { AccessibilityGuide.shared.start { _ in } }
                     .buttonStyle(SetupLinkButtonStyle(height: 28))
             }
         }

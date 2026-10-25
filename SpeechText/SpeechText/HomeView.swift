@@ -15,6 +15,8 @@ struct HomeView: View {
     let actions: MainWindowActions
     let go: (MainPage) -> Void
     @AppStorage(SettingsKeys.homeIntroHidden) private var introHidden = false
+    @AppStorage(SettingsKeys.onboardingCompleted) private var setupDone = true
+    @State private var access = HomeAccess()
 
     /// Everything under the intro card is a centred column no wider than this.
     static let columnWidth: CGFloat = 1050
@@ -24,6 +26,12 @@ struct HomeView: View {
             let width = proxy.size.width
             ScrollView {
                 VStack(spacing: 34) {
+                    if !setupDone || !access.mic || !access.ax {
+                        HomeAttention(actions: actions, setupDone: setupDone, access: access)
+                            .frame(maxWidth: Self.columnWidth)
+                            .padding(.horizontal, 48)
+                            .padding(.top, 10)
+                    }
                     // Hidden and shown again from Settings › Appearance, not from the card.
                     if !introHidden {
                         HomeIntroCard(pageWidth: width, actions: actions)
@@ -45,6 +53,129 @@ struct HomeView: View {
             }
             .scrollIndicators(.automatic)
         }
+        .onAppear { access.watch() }
+        .onDisappear { access.unwatch() }
+    }
+}
+
+// MARK: - What still needs doing
+
+/// Above everything on Home, and only while something is missing: setup left unfinished —
+/// its window closed half-way is easy to lose — with what it still lacks, Continue Setup
+/// and Skip; and, once setup is done, a microphone or an Accessibility grant that is not
+/// there (turned off later, or a rebuild that dropped it). Re-read every second, so a
+/// grant made in System Settings shows here at once.
+struct HomeAttention: View {
+    let actions: MainWindowActions
+    let setupDone: Bool
+    let access: HomeAccess
+
+    var body: some View {
+        if !setupDone {
+            setupCard(engineChosen: access.engineChosen, mic: access.mic, ax: access.ax)
+        } else {
+            permissionsRow(mic: access.mic, ax: access.ax)
+        }
+    }
+
+    private func setupCard(engineChosen: Bool, mic: Bool, ax: Bool) -> some View {
+        MainPanel {
+            HStack(alignment: .center, spacing: 24) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Finish setting up SpeechText")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(MainColor.ink)
+                    HStack(spacing: 18) {
+                        item("Speech engine", done: engineChosen)
+                        item("Microphone", done: mic)
+                        item("Type for you", done: ax)
+                    }
+                }
+                Spacer(minLength: 12)
+                Button("Skip") { actions.skipSetup() }
+                    .buttonStyle(SetupButtonStyle(kind: .secondary, height: 36))
+                    .help("Mark setup as done. Everything it asks is in Settings.")
+                Button("Continue Setup") { actions.openSetup() }
+                    .buttonStyle(SetupButtonStyle(kind: .primary, height: 36))
+            }
+        }
+    }
+
+    private func permissionsRow(mic: Bool, ax: Bool) -> some View {
+        MainPanel(padding: EdgeInsets(top: 14, leading: 20, bottom: 14, trailing: 16)) {
+            VStack(alignment: .leading, spacing: 10) {
+                if !mic {
+                    problem("SpeechText can't hear you", "The microphone is off for SpeechText.") {
+                        if AVCaptureDevice.authorizationStatus(for: .audio) == .notDetermined {
+                            AVCaptureDevice.requestAccess(for: .audio) { _ in }
+                        } else {
+                            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!)
+                        }
+                    }
+                }
+                if !ax {
+                    problem("SpeechText can't type for you", "Accessibility is off, so your text opens in the Record Window instead.") {
+                        AccessibilityGuide.shared.start { _ in }
+                    }
+                }
+            }
+        }
+    }
+
+    private func item(_ title: String, done: Bool) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(done ? MainColor.okInk : MainColor.ink3)
+            Text(title).foregroundStyle(done ? MainColor.ink2 : MainColor.ink)
+        }
+        .font(.system(size: 13))
+    }
+
+    private func problem(_ title: String, _ detail: String, fix: @escaping () -> Void) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(MainColor.problem)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.system(size: 13.5, weight: .semibold)).foregroundStyle(MainColor.ink)
+                Text(detail).font(.system(size: 12.5)).foregroundStyle(MainColor.ink2)
+            }
+            Spacer(minLength: 12)
+            Button("Turn On…", action: fix)
+                .buttonStyle(SetupButtonStyle(kind: .primary, height: 32))
+        }
+    }
+}
+
+/// The microphone and Accessibility grants, and whether an engine was chosen, re-read every
+/// second while Home is shown — nothing tells the app when one changes in System Settings.
+@MainActor @Observable
+final class HomeAccess {
+    private(set) var mic = true
+    private(set) var ax = true
+    private(set) var engineChosen = true
+    @ObservationIgnored private var timer: Timer?
+
+    func watch() {
+        read()
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.read() }
+        }
+    }
+
+    func unwatch() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func read() {
+        let mic = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
+        let ax = AXIsProcessTrusted()
+        let engine = UserDefaults.standard.string(forKey: SettingsKeys.sttProvider) != nil
+        if mic != self.mic { self.mic = mic }
+        if ax != self.ax { self.ax = ax }
+        if engine != engineChosen { engineChosen = engine }
     }
 }
 

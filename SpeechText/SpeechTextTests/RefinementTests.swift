@@ -392,17 +392,3 @@ final class FocusContextTests: XCTestCase {
     }
 
 }
-
-/// Setup's Try it offers the model Clean-up alone, so its AI dictation shows polishing —
-/// the user's own Clean-up when they edited it, the built-in one otherwise.
-final class TryItPresetTests: XCTestCase {
-    func testTryItOffersCleanUpAlone() {
-        let builtIn = PromptPresetStore.cleanUpOnly(from: PromptPresetStore.builtInDefaults)
-        XCTAssertEqual(builtIn.map(\.name), ["Clean-up"])
-        XCTAssertEqual(PromptPresetStore.cleanUpOnly(from: []).map(\.name), ["Clean-up"])
-
-        var edited = PromptPresetStore.builtInDefaults
-        edited[0].instructions = "Mine."
-        XCTAssertEqual(PromptPresetStore.cleanUpOnly(from: edited).map(\.instructions), ["Mine."])
-    }
-}

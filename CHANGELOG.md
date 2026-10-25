@@ -24,8 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Setup no longer raises the Accessibility alert again and again.** The live shortcut keys asked to watch the keyboard before Accessibility was allowed, and macOS answered each time with its own alert.
-- **Setup's Try it AI dictation tidies the text, nothing more.** It is offered Clean-up alone, so it no longer turns a sentence into an email. With Press to toggle, it says the keys can be let go once the dictation has started. The Welcome picture shows holding the shortcut as well as pressing it, and the Permissions step notices a permission turned off in System Settings.
+- **No more macOS "would like to control this computer" alert.** Turning on Accessibility — from setup, Home, Settings or a notice — opens System Settings with SpeechText's helper beside it, and nothing else. A dictation that could not be pasted because Accessibility is off says so, with *Turn On…*, instead of raising the alert each time.
+- **Home says what is still missing.** While setup is unfinished, Home offers to continue it or skip it, with what it still lacks; afterwards it says when the microphone or Accessibility is off, with a way to turn it on.
+- **Setup's Try it step, continued.** With Press to toggle, it says the keys can be let go once the dictation has started. The Welcome picture shows holding the shortcut as well as pressing it, and the Permissions step notices a permission turned off in System Settings.
 - **Setup's Try it step has one way past it**, *Skip test and finish setup*, always at the foot of the right panel; a microphone problem offers Open Sound Settings under its explanation; Hold to talk comes first; and a model getting ready says the same time everywhere.
 - **Setup asks for both permissions before it goes on.** Accessibility, which lets SpeechText type for you, can no longer be skipped; with Apple Dictation chosen, macOS Dictation has to be on too.
 - **Setup's Accessibility helper follows System Settings.** It moves with the window, hides while System Settings is closed, minimised or behind another app, and says what to do when SpeechText is not in the list: drag it in from the helper, or add it with +.
