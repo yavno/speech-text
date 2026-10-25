@@ -1029,14 +1029,21 @@ struct RecordingModePicker: View {
     /// Titles only: setup's column is too narrow for the captions, and its own words
     /// already say what the shortcut does.
     var compact = false
+    /// Hold to talk on the left: setup's Try it, which starts on it.
+    var holdFirst = false
 
     var body: some View {
         HStack(spacing: 4) {
+            if holdFirst { holdSegment }
             segment(hold: false, title: "Press to toggle", caption: "Press the shortcut again to paste")
-            segment(hold: true, title: "Hold to talk", caption: "Hold the shortcut while you speak")
+            if !holdFirst { holdSegment }
         }
         .padding(3)
         .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(SetupColor.separator.opacity(0.55)))
+    }
+
+    private var holdSegment: some View {
+        segment(hold: true, title: "Hold to talk", caption: "Hold the shortcut while you speak")
     }
 
     private func segment(hold: Bool, title: String, caption: String) -> some View {

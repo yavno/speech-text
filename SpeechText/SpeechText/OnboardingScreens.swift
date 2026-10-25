@@ -1192,7 +1192,7 @@ private struct TryItScreen: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("How the shortcut records").font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(SetupColor.label3)
-                    RecordingModePicker(holdToTalk: $holdToTalk, compact: true)
+                    RecordingModePicker(holdToTalk: $holdToTalk, compact: true, holdFirst: true)
                 }
                 // Kept in place while a dictation runs, only dimmed: taking it away and
                 // back moved the whole column at each press and release.
@@ -1207,7 +1207,7 @@ private struct TryItScreen: View {
                     body(Text("Your speech model is still downloading (\(Int(f * 100))%). You can wait here or finish setup now — we'll let you know when it's ready."))
                 case .optimizing:
                     title(Text("Getting ready for your Mac…"))
-                    body(Text("This happens only once and takes \(pending.model.downloadBytes > 500_000_000 ? "about 10 minutes" : "under a minute"). You can wait here or finish setup now — we'll let you know when it's ready."))
+                    body(Text("This happens only once and takes \(preparationEstimate(pending.model)). You can wait here or finish setup now — we'll let you know when it's ready."))
                 case .failed:
                     title(Text("The download didn't finish"))
                     body(Text("Check your internet connection and try again."))
@@ -1275,6 +1275,11 @@ private struct TryItScreen: View {
         case .nothing:
             title(Text("We didn't hear anything"))
             body(Text("Check that the right microphone is selected — it's shown on the right — then try again."))
+            Button("Open Sound Settings") {
+                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension?input")!)
+            }
+            .buttonStyle(SetupLinkButtonStyle(height: 32))
+            .padding(.top, 16)
         case .rejected:
             title(Text("Your key stopped working"))
             body(Text("Go back and paste your key again."))
@@ -1381,8 +1386,8 @@ private struct TryItScreen: View {
             if aiStage { aiResultCard } else { resultCard }
             if let pending { downloadStatus(pending) }
             links
-            skipRow
             Spacer(minLength: 0)
+            skipRow
         }
         .padding(14)
         .frame(maxHeight: .infinity)
@@ -1628,7 +1633,7 @@ private struct TryItScreen: View {
             if let pending {
                 switch pending.state {
                 case .downloading, .optimizing:
-                    Button("Finish setup") { model.go(.done) }.buttonStyle(SetupInlineLinkStyle(size: 12))
+                    EmptyView()
                 default:
                     Button("Retry") { model.retrySpeechDownload() }.buttonStyle(SetupLinkButtonStyle(height: 26))
                     Button("Choose another option") { model.go(.speech) }.buttonStyle(SetupInlineLinkStyle(size: 12))
@@ -1640,12 +1645,6 @@ private struct TryItScreen: View {
                     }
                     .buttonStyle(SetupLinkButtonStyle(height: 26))
                 }
-                if !aiStage, case .nothing = phase {
-                    Button("Open Sound Settings ↗") {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension?input")!)
-                    }
-                    .buttonStyle(SetupInlineLinkStyle(size: 12))
-                }
                 if !aiStage, case .rejected = phase {
                     Button("Back to Speech") { model.go(.speech) }.buttonStyle(SetupLinkButtonStyle(height: 26))
                 }
@@ -1655,12 +1654,12 @@ private struct TryItScreen: View {
         .padding(.horizontal, 4)
     }
 
+    /// The one way past the step without finishing it, always in the same place — the
+    /// panel's foot — whatever the step is waiting for: a download, a dictation, the AI.
     @ViewBuilder
     private var skipRow: some View {
-        if pending == nil, !isSuccess {
-            SetupSkipButton(title: "Skip the test") { model.go(.done) }
-        } else if aiOffered || (aiStage && !isAISuccess) {
-            SetupSkipButton(title: "Skip AI test") { model.go(.done) }
+        if pending != nil || !isSuccess || aiOffered || (aiStage && !isAISuccess) {
+            SetupSkipButton(title: "Skip test and finish setup") { model.go(.done) }
         }
     }
 

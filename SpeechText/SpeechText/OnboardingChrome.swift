@@ -900,6 +900,8 @@ struct SetupTaskPill: View {
         let name: String
         let size: String
         let phase: Phase
+        /// How long "Getting ready" takes, as the Try it step says it too.
+        var preparation = "a few minutes"
     }
 
     private var tasks: [Task] {
@@ -914,7 +916,8 @@ struct SetupTaskPill: View {
             }
             if let phase {
                 tasks.append(Task(id: "speech", label: "Speech model", name: speech.displayName,
-                                  size: speech.downloadSizeDescription, phase: phase))
+                                  size: speech.downloadSizeDescription, phase: phase,
+                                  preparation: preparationEstimate(speech)))
             }
         }
         if let id = model.aiDownloadID, let chat = localChatModel(id: id) {
@@ -1007,7 +1010,7 @@ struct SetupTaskPill: View {
                         Text("Downloading · \(Int(f * 100))%").foregroundStyle(.secondary)
                         cancel(task)
                     case .preparing:
-                        Text("Getting ready for your Mac. This happens only once and can take up to 10 minutes. You can keep going.")
+                        Text("Getting ready for your Mac. This happens only once and takes \(task.preparation). You can keep going.")
                             .foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     case .ready:
                         Text("Ready.").foregroundStyle(.secondary)
@@ -1157,6 +1160,13 @@ struct LiveShortcutKeycaps: View {
     }
 }
 
+/// How long a local speech model's first load on this Mac takes, in the words setup uses
+/// wherever it says so. Measured on an M1 Pro (2026-10-16): Whisper Turbo nine minutes,
+/// every Parakeet and Whisper Small under two.
+func preparationEstimate(_ model: LocalSTTModel) -> String {
+    model.engine == .whisperKit && model.downloadBytes > 500_000_000 ? "up to 10 minutes" : "a minute or two"
+}
+
 /// The modifier keys as they are now, for the views that draw them live. Kept from the
 /// system's flagsChanged events — the window's own, and every other app's (which needs
 /// the Accessibility permission a paste needs anyway) — only while such a view is shown.
@@ -1165,28 +1175,36 @@ final class ModifierKeys {
     static let shared = ModifierKeys()
 
     private(set) var flags: NSEvent.ModifierFlags = []
-    @ObservationIgnored private var monitors: [Any] = []
+    @ObservationIgnored private var local: Any?
+    @ObservationIgnored private var global: Any?
     @ObservationIgnored private var watchers = 0
 
     func watch() {
         watchers += 1
-        guard monitors.isEmpty else { return }
-        take(NSEvent.modifierFlags)
-        let local = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-            self?.take(event.modifierFlags)
-            return event
+        if local == nil {
+            take(NSEvent.modifierFlags)
+            local = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+                self?.take(event.modifierFlags)
+                return event
+            }
         }
-        let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-            self?.take(event.modifierFlags)
+        // Other apps' events only once Accessibility is allowed: a global key monitor
+        // asked for without it raises macOS's "would like to control this computer"
+        // alert — once per view that appeared, five times over during setup. Asked again
+        // at the next view to appear, which picks up a grant made meanwhile.
+        if global == nil, AXIsProcessTrusted() {
+            global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+                self?.take(event.modifierFlags)
+            }
         }
-        monitors = [local, global].compactMap { $0 }
     }
 
     func unwatch() {
         watchers = max(watchers - 1, 0)
         guard watchers == 0 else { return }
-        monitors.forEach(NSEvent.removeMonitor)
-        monitors = []
+        [local, global].compactMap { $0 }.forEach(NSEvent.removeMonitor)
+        local = nil
+        global = nil
     }
 
     private func take(_ raw: NSEvent.ModifierFlags) {
