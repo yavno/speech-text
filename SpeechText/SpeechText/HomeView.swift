@@ -25,18 +25,24 @@ struct HomeView: View {
         GeometryReader { proxy in
             let width = proxy.size.width
             ScrollView {
+                let attention = !setupDone || !access.mic || !access.ax
                 VStack(spacing: 34) {
-                    if !setupDone || !access.mic || !access.ax {
-                        HomeAttention(actions: actions, setupDone: setupDone, access: access)
-                            .frame(maxWidth: Self.columnWidth)
-                            .padding(.horizontal, 48)
-                            .padding(.top, 10)
-                    }
-                    // Hidden and shown again from Settings › Appearance, not from the card.
-                    if !introHidden {
-                        HomeIntroCard(pageWidth: width, actions: actions)
-                            .padding(.horizontal, 10)
-                            .padding(.top, 10)
+                    // What still needs doing sits as close above the intro card as the
+                    // card sits below the window's edge.
+                    if attention || !introHidden {
+                        VStack(spacing: 10) {
+                            if attention {
+                                HomeAttention(actions: actions, setupDone: setupDone, access: access)
+                                    .frame(maxWidth: Self.columnWidth)
+                                    .padding(.horizontal, 48)
+                            }
+                            // Hidden and shown again from Settings › Appearance, not from the card.
+                            if !introHidden {
+                                HomeIntroCard(pageWidth: width, actions: actions)
+                                    .padding(.horizontal, 10)
+                            }
+                        }
+                        .padding(.top, 10)
                     }
                     VStack(spacing: 34) {
                         HomeEngines(actions: actions, go: go)
@@ -46,7 +52,7 @@ struct HomeView: View {
                     }
                     .frame(maxWidth: Self.columnWidth)
                     .padding(.horizontal, 48)
-                    .padding(.top, introHidden ? 32 : 0)
+                    .padding(.top, introHidden && !attention ? 32 : 0)
                 }
                 .padding(.bottom, 40)
                 .frame(width: width)
