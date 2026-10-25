@@ -130,10 +130,16 @@ final class AccessibilityHelperPanel: NSPanel {
 
     private func track() {
         let settings = Self.systemSettingsFrame()
+        if settings != nil, !foundSettings {
+            dlog("Setup", "helper: System Settings found after \(String(format: "%.1f", Date().timeIntervalSince(shownAt))) s")
+        }
         if settings != nil { foundSettings = true }
         guard foundSettings else {
             // Still opening: the corner, for a few seconds, then for good.
-            if Date().timeIntervalSince(shownAt) > 4 { foundSettings = true }
+            if Date().timeIntervalSince(shownAt) > 4 {
+                dlog("Setup", "helper: System Settings not on screen after 4 s", level: .notice)
+                foundSettings = true
+            }
             return
         }
         guard let settings, !Self.anotherAppInFront() else {

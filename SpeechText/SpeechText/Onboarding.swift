@@ -163,6 +163,10 @@ final class OnboardingModel {
     /// Bumped when a permission turns on, so its row can glow once.
     private(set) var justGranted: (row: String, count: Int) = ("", 0)
     private var accessibilityPoll: Timer?
+    /// The Permissions step re-reads every permission each second while it is shown: a
+    /// switch turned *off* in System Settings never brings setup to the front, and the
+    /// row went on saying Allowed.
+    private var permissionsPoll: Timer?
     private var helper: AccessibilityHelperPanel?
 
     /// When the local speech model was downloaded from this window, so the task pill and
@@ -235,6 +239,8 @@ final class OnboardingModel {
     func tearDown() {
         observers.forEach(NotificationCenter.default.removeObserver)
         observers = []
+        permissionsPoll?.invalidate()
+        permissionsPoll = nil
         stopWatchingAccessibility()
         checks.values.forEach { $0.cancel() }
         appState.dictationTest.isActive = false
@@ -257,7 +263,12 @@ final class OnboardingModel {
         } else if !defaults.bool(forKey: SettingsKeys.onboardingCompleted) {
             defaults.set(step.rawValue, forKey: SettingsKeys.onboardingStep)
         }
+        permissionsPoll?.invalidate()
+        permissionsPoll = nil
         if step == .permissions {
+            permissionsPoll = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                MainActor.assumeIsolated { self?.refreshPermissions() }
+            }
             // On by default, like every install before setup existed — turned on here, on
             // the screen whose switch turns it off, rather than silently at launch.
             if !defaults.bool(forKey: SettingsKeys.hasRegisteredLaunchAtLogin) { setLaunchAtLogin(true) }
@@ -514,15 +525,25 @@ final class OnboardingModel {
 
     func refreshPermissions() {
         let mic = AVCaptureDevice.authorizationStatus(for: .audio)
-        if mic == .authorized && micStatus != .authorized { flash("mic") }
-        micStatus = mic
+        // Written only on a change: this runs every second on the Permissions step, and an
+        // observed write redraws the step even when the value is the same.
+        if mic != micStatus {
+            if mic == .authorized { flash("mic") }
+            micStatus = mic
+        }
         let ax = AXIsProcessTrusted()
-        if ax && !accessibilityGranted { flash("ax") }
-        accessibilityGranted = ax
-        launchAtLogin = SMAppService.mainApp.status == .enabled
+        if ax != accessibilityGranted {
+            if ax { flash("ax") } else { accessibilityChoice = .idle }
+            dlog("Setup", "accessibility: \(ax ? "allowed" : "not allowed")")
+            accessibilityGranted = ax
+        }
+        let login = SMAppService.mainApp.status == .enabled
+        if login != launchAtLogin { launchAtLogin = login }
         let dictation = Self.macDictationIsOn()
-        if dictation && !dictationOn && needsMacDictation { flash("dictation") }
-        dictationOn = dictation
+        if dictation != dictationOn {
+            if dictation && needsMacDictation { flash("dictation") }
+            dictationOn = dictation
+        }
     }
 
     /// The Permissions step shows a Dictation row: Apple Dictation is the engine chosen.

@@ -1297,7 +1297,7 @@ final class AppState {
             var output = aiInput
             var rewritten = false
             do {
-                let result = try await TextRefinementService.refine(aiInput, context: context)
+                let result = try await TextRefinementService.refine(aiInput, context: context, cleanUpOnly: isTest)
                 rewritten = true
                 if Task.isCancelled { return }
                 output = result.text

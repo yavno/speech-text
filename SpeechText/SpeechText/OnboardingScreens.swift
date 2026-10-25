@@ -209,9 +209,13 @@ private struct WelcomeLanguages: View {
 
 /// A scripted loop, not the recording flow: the shortcut lights up → the recording strip
 /// appears in the corner → words type themselves into a message field → the strip goes.
+/// Rounds take turns between the two ways a shortcut records: held while speaking, then
+/// pressed once to start and once to stop.
 private struct WelcomeDemo: View {
-    private static let sentence = "Running ten minutes late – start without me."
-    private var words: [Substring] { Self.sentence.split(separator: " ") }
+    private static let sentences = ["Running ten minutes late – start without me.", "Joining now, see you there."]
+    private var sentence: String { Self.sentences[holdRound ? 0 : 1] }
+    private var words: [Substring] { sentence.split(separator: " ") }
+    @State private var holdRound = true
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var scheme
@@ -280,7 +284,9 @@ private struct WelcomeDemo: View {
 
     private var hud: some View {
         HStack(spacing: 8) {
-            Text("Press").font(.system(size: 11)).foregroundStyle(.white.opacity(0.72))
+            Text(holdRound ? "Hold" : "Press").font(.system(size: 11)).foregroundStyle(.white.opacity(0.72))
+                .frame(minWidth: 30, alignment: .trailing)
+                .contentTransition(.opacity)
             HStack(spacing: 4) {
                 ForEach(Array(shortcutKeys(shortcutText(for: .inline)).enumerated()), id: \.offset) { index, key in
                     let lit = index < litKeys
@@ -371,12 +377,17 @@ private struct WelcomeDemo: View {
         return !Task.isCancelled
     }
 
-    private func press() async -> Bool {
+    /// The keys go down one after another; a press lets them up at once.
+    private func keysDown() async -> Bool {
         for n in 1 ... 3 {
             litKeys = n
             guard await sleep(0.07) else { return false }
         }
-        guard await sleep(0.26) else { return false }
+        return true
+    }
+
+    private func press() async -> Bool {
+        guard await keysDown(), await sleep(0.26) else { return false }
         litKeys = 0
         return true
     }
@@ -386,7 +397,8 @@ private struct WelcomeDemo: View {
             sent = nil
             typedWords = 0
             composerActive = true
-            guard await sleep(0.7), await press() else { return }
+            // Held: the keys stay down while the words come, and letting go stops it.
+            guard await sleep(0.7), await (holdRound ? keysDown() : press()) else { return }
             stripShown = true
             listening = true
             guard await sleep(0.45) else { return }
@@ -394,16 +406,22 @@ private struct WelcomeDemo: View {
                 withAnimation(.easeOut(duration: 0.18)) { typedWords = n }
                 guard await sleep(0.17 + Double.random(in: 0 ... 0.09)) else { return }
             }
-            guard await sleep(0.25), await press() else { return }
+            if holdRound {
+                guard await sleep(0.25) else { return }
+                litKeys = 0
+            } else {
+                guard await sleep(0.25), await press() else { return }
+            }
             listening = false
             stripShown = false
             guard await sleep(0.9) else { return }
             withAnimation(.easeOut(duration: 0.2)) {
-                sent = Self.sentence
+                sent = sentence
                 typedWords = 0
                 composerActive = false
             }
             guard await sleep(1.6) else { return }
+            withAnimation(.easeOut(duration: 0.2)) { holdRound.toggle() }
         }
     }
 }
@@ -1238,7 +1256,7 @@ private struct TryItScreen: View {
     /// One value for every state the step draws, so a change between them is animated
     /// as one cross-fade rather than popping in and out a frame at a time.
     private var stageKey: String {
-        "\(phase)|\(aiPhase)|\(aiStage)|\(aiOffered)|\(HeldShortcuts.shared.down.contains(.inline))|\(appState.holdTipFollowed)"
+        "\(phase)|\(aiPhase)|\(aiStage)|\(aiOffered)|\(HeldShortcuts.shared.down.contains(.inline))\(HeldShortcuts.shared.down.contains(.ai))|\(appState.holdTipFollowed)"
     }
 
     @ViewBuilder
@@ -1262,7 +1280,10 @@ private struct TryItScreen: View {
                 LiveShortcutKeycaps(action: .inline, size: 22).padding(.top, 10)
             } else {
                 title(Text("Listening…"))
-                body(Text(holdToTalk ? "Let go of \(qLetter) when you're done." : "Press \(q) again when you're done."))
+                // Press to toggle with the keys still down: the press already started it.
+                body(Text(holdToTalk ? "Let go of \(qLetter) when you're done."
+                          : HeldShortcuts.shared.down.contains(.inline) ? "You can let go of the keys now — speak."
+                          : "Press \(q) again when you're done."))
                 LiveShortcutKeycaps(action: .inline, size: 22, pulsing: true).padding(.top, 10)
             }
             example(Self.plainExample)
@@ -1334,7 +1355,9 @@ private struct TryItScreen: View {
             EmptyView()
         case .listening:
             title(Text("Listening…"))
-            body(Text(holdToTalk ? "Let go of \(aLetter) when you're done." : "Press \(a) again when you're done."))
+            body(Text(holdToTalk ? "Let go of \(aLetter) when you're done."
+                      : HeldShortcuts.shared.down.contains(.ai) ? "You can let go of the keys now — speak."
+                      : "Press \(a) again when you're done."))
             LiveShortcutKeycaps(action: .ai, size: 22, pulsing: true, ai: true).padding(.top, 10)
             example(Self.aiExample, ai: true)
         case .polishing:
