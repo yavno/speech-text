@@ -809,6 +809,7 @@ struct SkinPreview: View {
         ZStack {
             LinearGradient(colors: [Color(hex: 0xE4ECF2), Color(hex: 0xC6D3DE)],
                            startPoint: .topLeading, endPoint: .bottomTrailing)
+            if skin == .minimal { glassBackdrop }
             strip
                 .scaleEffect(scale)
                 .frame(width: skin.overlayStripSize.width * scale,
@@ -824,6 +825,30 @@ struct SkinPreview: View {
         .environment(\.technoPalette, palette)
         .animation(.easeInOut(duration: 0.25), value: accentHex)
         .animation(.easeInOut(duration: 0.25), value: technoRaw)
+    }
+
+    /// Something for the minimal glass to be seen over — a dark window with lines of text
+    /// and a spot of colour, half under the strip — so the Transparency row's stops look
+    /// different here too; on the bare patch every stop read as the same pale glass.
+    private var glassBackdrop: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color(hex: 0x24313D))
+                .overlay(alignment: .topLeading) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        ForEach([46, 34, 52, 28, 40], id: \.self) { width in
+                            Capsule().fill(Color.white.opacity(0.85)).frame(width: CGFloat(width), height: 3)
+                        }
+                    }
+                    .padding(8)
+                }
+                .frame(width: 84, height: 54)
+                .offset(x: -34, y: 2)
+            Circle()
+                .fill(Color(hex: 0xFF9F0A))
+                .frame(width: 30, height: 30)
+                .offset(x: 50, y: -14)
+        }
     }
 
     @ViewBuilder
@@ -858,7 +883,6 @@ struct SkinPreview: View {
         .padding(.horizontal, 12)
         .frame(width: size.width, height: size.height)
         .minimalGlass(in: Capsule())
-        .background(Color.white.opacity(0.35))
         .clipShape(Capsule())
         .shadow(color: .black.opacity(0.18), radius: 6, y: 2)
     }

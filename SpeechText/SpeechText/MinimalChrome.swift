@@ -27,18 +27,25 @@ private struct MinimalGlass<S: Shape>: ViewModifier {
 
     private var transparency: GlassTransparency { GlassTransparency(stored: transparencyRaw) }
 
+    /// A background, not `glassEffect` on the content: like `.background(.ultraThinMaterial)`
+    /// before it, it reaches under a titled window's title bar, where the content does not.
     func body(content: Content) -> some View {
-        if !isEnabled {
+        if isEnabled {
+            content.background { surface.ignoresSafeArea() }
+        } else {
             content
-        } else if #available(macOS 26, *) {
-            content.glassEffect(glass, in: shape)
+        }
+    }
+
+    @ViewBuilder
+    private var surface: some View {
+        if #available(macOS 26, *) {
+            Color.clear.glassEffect(glass, in: shape)
         } else {
             let fill = transparency.material(reduceTransparency: reduceTransparency)
-            content.background {
-                ZStack {
-                    shape.fill(.ultraThinMaterial.opacity(fill.materialOpacity))
-                    shape.fill(Color(nsColor: .windowBackgroundColor).opacity(fill.backgroundOpacity))
-                }
+            ZStack {
+                shape.fill(.ultraThinMaterial.opacity(fill.materialOpacity))
+                shape.fill(Color(nsColor: .windowBackgroundColor).opacity(fill.backgroundOpacity))
             }
         }
     }
