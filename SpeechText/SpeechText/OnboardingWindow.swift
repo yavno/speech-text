@@ -3,6 +3,7 @@
 
 import SwiftUI
 import AppKit
+import SpeechTextCore
 
 // MARK: - The setup window
 
