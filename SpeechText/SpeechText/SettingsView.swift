@@ -42,6 +42,8 @@ struct SettingsView: View {
     @AppStorage(SettingsKeys.appSkin) private var skinRaw = AppSkin.default.rawValue
     @AppStorage(SettingsKeys.accentColor) private var accentHex = AccentColor.neutral
     @AppStorage(SettingsKeys.technoPhosphor) private var technoRaw = TechnoPhosphor.green.rawValue
+    @AppStorage(SettingsKeys.glassTransparency) private var transparencyRaw = GlassTransparency.default.rawValue
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AppStorage(SettingsKeys.dockIconMode) private var dockIconRaw = DockIconMode.default.rawValue
     @AppStorage(SettingsKeys.homeIntroHidden) private var homeIntroHidden = false
     @AppStorage(SettingsKeys.promptsIntroHidden) private var promptsIntroHidden = false
@@ -402,6 +404,8 @@ struct SettingsView: View {
                         .help("Any colour")
                     }
                 }
+                SettingsDivider()
+                transparencyRow
             } else {
                 SettingsRow(title: "Display", detail: technoColorDetail) {
                     HStack(spacing: 8) {
@@ -443,6 +447,43 @@ struct SettingsView: View {
     private var selectedPhosphor: TechnoPhosphor? {
         if let preset = TechnoPhosphor(rawValue: technoRaw) { return preset }
         return TechnoPhosphor.customHex(technoRaw) == nil ? .green : nil
+    }
+
+    /// The minimal skin's glass: a scale of stops, as History's retention is, since only a
+    /// few points of it look the same on every macOS the app runs on.
+    private var transparencyRow: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Transparency")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(SetupColor.label)
+                Text(transparencyDetail)
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(SetupColor.label2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            SettingsStepSlider(values: GlassTransparency.allCases,
+                               selection: reduceTransparency ? .default : GlassTransparency(stored: transparencyRaw),
+                               title: \.title, label: "Transparency") { transparencyRaw = $0.rawValue }
+                .allowsHitTesting(!reduceTransparency)
+                .opacity(reduceTransparency ? 0.45 : 1)
+        }
+        .padding(.vertical, 14)
+    }
+
+    private var transparencyDetail: String {
+        if reduceTransparency {
+            return "Reduce transparency is on in System Settings, so the glass is solid — there is nothing to adjust."
+        }
+        let isDefault = GlassTransparency(stored: transparencyRaw) == .default
+        if #available(macOS 26, *) {
+            return isDefault
+                ? "Default — the glass follows Liquid Glass in System Settings › Appearance."
+                : "How much of what is behind the overlay and the Record Window shows through. Liquid Glass in System Settings no longer changes it."
+        }
+        return isDefault
+            ? "Default — the system's thinnest material."
+            : "How much of what is behind the overlay and the Record Window shows through."
     }
 
     private var technoColorDetail: String {

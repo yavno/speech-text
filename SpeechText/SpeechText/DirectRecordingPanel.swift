@@ -572,7 +572,7 @@ struct DirectRecordingPanelView: View {
             .padding(.top, 8)
             .offset(y: 4) // the button overlaps the text area's edge
         }
-        .background(.ultraThinMaterial)
+        .minimalGlass(in: Rectangle())
     }
 
     /// Collapsed it is a record button; recording or working, it stretches into the

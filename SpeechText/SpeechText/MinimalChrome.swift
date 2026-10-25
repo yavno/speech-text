@@ -3,6 +3,59 @@
 
 import SwiftUI
 import AppKit
+import SpeechTextCore
+
+// MARK: - Glass
+
+extension View {
+    /// The minimal skin's surface behind this view, clipped to `shape`: Liquid Glass on
+    /// macOS 26 and later, the material before it, either at the stop of Settings ›
+    /// Appearance › Transparency (`GlassTransparency`). The one place that asks which
+    /// macOS this is, so a surface cannot be glass in one place and material in another.
+    /// `isEnabled` false leaves the view as it is: a surface that has a techno look too.
+    func minimalGlass(in shape: some Shape, isEnabled: Bool = true) -> some View {
+        modifier(MinimalGlass(shape: shape, isEnabled: isEnabled))
+    }
+}
+
+private struct MinimalGlass<S: Shape>: ViewModifier {
+    let shape: S
+    let isEnabled: Bool
+
+    @AppStorage(SettingsKeys.glassTransparency) private var transparencyRaw = GlassTransparency.default.rawValue
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    private var transparency: GlassTransparency { GlassTransparency(stored: transparencyRaw) }
+
+    func body(content: Content) -> some View {
+        if !isEnabled {
+            content
+        } else if #available(macOS 26, *) {
+            content.glassEffect(glass, in: shape)
+        } else {
+            let fill = transparency.material(reduceTransparency: reduceTransparency)
+            content.background {
+                ZStack {
+                    shape.fill(.ultraThinMaterial.opacity(fill.materialOpacity))
+                    shape.fill(Color(nsColor: .windowBackgroundColor).opacity(fill.backgroundOpacity))
+                }
+            }
+        }
+    }
+
+    /// The tint is a SwiftUI colour from the window's background, which follows light and
+    /// dark by itself — `NSGlassEffectView.tintColor` resolved such a colour once and kept
+    /// the light one in dark mode (measured).
+    @available(macOS 26, *)
+    private var glass: Glass {
+        switch transparency.glass(reduceTransparency: reduceTransparency) {
+        case .regular:
+            return .regular
+        case .clear(let tint):
+            return tint > 0 ? .clear.tint(Color(nsColor: .windowBackgroundColor).opacity(tint)) : .clear
+        }
+    }
+}
 
 // MARK: - Waveform
 

@@ -96,6 +96,8 @@ public enum SettingsKeys {
     public static let accentColor = "accentColor"
     /// The techno display's colour: a `TechnoPhosphor.rawValue`, or any colour as `#RRGGBB`.
     public static let technoPhosphor = "technoPhosphor"
+    /// `GlassTransparency.rawValue` — how much the minimal skin's glass lets through.
+    public static let glassTransparency = "glassTransparency"
     /// `DockIconMode.rawValue`: never, while a window is open, or always.
     public static let dockIconMode = "dockIconMode"
     /// Where the user dragged the inline overlay: its bottom-left corner as `"x,y"` in
@@ -190,7 +192,7 @@ public enum SettingsKeys {
         holdToTalk, escapeCancelsDictation,
         llmProvider,
         promptPresets, defaultPresetID, aiModeInRecordWindow,
-        appSkin, accentColor, technoPhosphor, dockIconMode,
+        appSkin, accentColor, technoPhosphor, glassTransparency, dockIconMode,
         hotkeyLayoutVersion,
     ] + Provider.allCases.flatMap { provider in
         [provider.descriptor.speechModel, provider.descriptor.chatModel].compactMap { $0?.settingsKey }

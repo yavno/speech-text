@@ -329,7 +329,7 @@ final class StoredProviderNameTests: XCTestCase {
             "holdToTalk", "escapeCancelsDictation",
             "llmProvider", "groqLLMModel", "anthropicModel", "openAIModel", "localLLMModel",
             "promptPresets", "defaultPresetID", "aiModeInRecordWindow",
-            "appSkin", "accentColor", "technoPhosphor", "dockIconMode",
+            "appSkin", "accentColor", "technoPhosphor", "glassTransparency", "dockIconMode",
             "hotkeyLayoutVersion",
         ])
         XCTAssertEqual(SettingsKeys.portable.count, Set(SettingsKeys.portable).count, "listed twice")

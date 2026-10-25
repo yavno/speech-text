@@ -857,7 +857,7 @@ struct SkinPreview: View {
         }
         .padding(.horizontal, 12)
         .frame(width: size.width, height: size.height)
-        .background(.ultraThinMaterial)
+        .minimalGlass(in: Capsule())
         .background(Color.white.opacity(0.35))
         .clipShape(Capsule())
         .shadow(color: .black.opacity(0.18), radius: 6, y: 2)

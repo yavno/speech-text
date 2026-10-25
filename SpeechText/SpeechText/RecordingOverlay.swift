@@ -184,11 +184,11 @@ struct RecordingOverlayView: View {
             }
             if !growsDown { minimalStrip }
         }
-        .background(.ultraThinMaterial)
         .background {
             // An edit fills the glass: the outline alone is AI dictation's.
             if isEditMode { Semantic.ai.opacity(0.26) }
         }
+        .minimalGlass(in: minimalShape)
         .clipShape(minimalShape)
         .overlay {
             // Only the AI modes get an outline; a plain dictation is meant to be a quiet
@@ -441,11 +441,9 @@ struct StatusOverlayView: View {
         .padding(.horizontal, 16)
         .frame(height: 60)
         .background {
-            switch skin {
-            case .minimal: Rectangle().fill(.ultraThinMaterial)
-            case .techno: shape.fill(techno.screen)
-            }
+            if skin == .techno { shape.fill(techno.screen) }
         }
+        .minimalGlass(in: shape, isEnabled: skin == .minimal)
         .overlay(shape.strokeBorder(borderColor, lineWidth: 1))
         .clipShape(shape)
         .contentShape(Rectangle())
@@ -797,11 +795,9 @@ struct HoldTipView: View {
         .padding(.horizontal, 16)
         .frame(height: 60)
         .background {
-            switch skin {
-            case .minimal: Rectangle().fill(.ultraThinMaterial)
-            case .techno: shape.fill(TechnoSkin.screen)
-            }
+            if skin == .techno { shape.fill(TechnoSkin.screen) }
         }
+        .minimalGlass(in: shape, isEnabled: skin == .minimal)
         .overlay(shape.strokeBorder(skin == .techno ? TechnoSkin.phosphor.opacity(0.14) : .primary.opacity(0.10), lineWidth: 1))
         .clipShape(shape)
         .animation(.easeOut(duration: 0.2), value: followed)

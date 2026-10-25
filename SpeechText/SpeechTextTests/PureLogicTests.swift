@@ -488,6 +488,62 @@ final class OverlayPlacementTests: XCTestCase {
     }
 }
 
+// MARK: - The minimal skin's transparency (GlassTransparency)
+
+final class GlassTransparencyTests: XCTestCase {
+    /// Nobody who never moved the slider sees their overlay change: the default is the
+    /// material exactly as it was on macOS 14 and 15, and untinted `.regular` — the glass
+    /// nearest it, measured — on 26.
+    func testTheDefaultLooksAsTheSkinDidBefore() {
+        XCTAssertEqual(GlassTransparency.default, .standard)
+        XCTAssertEqual(GlassTransparency(stored: nil), .standard)
+        XCTAssertEqual(GlassTransparency(stored: ""), .standard)
+        XCTAssertEqual(GlassTransparency(stored: "opaque"), .standard)
+        XCTAssertEqual(GlassTransparency(stored: "least"), .least)
+        XCTAssertEqual(GlassTransparency.standard.glass, .regular)
+        XCTAssertEqual(GlassTransparency.standard.material, MaterialFill(materialOpacity: 1, backgroundOpacity: 0))
+    }
+
+    /// The slider runs from most to least transparent, and each stop lets through less
+    /// than the one before. On 26 that is the tint on `.clear`, with untinted `.regular`
+    /// between 0.2 and 0.5 — where it measured in a window that is not key (backdrop kept
+    /// 0.14, 0.11, 0.10, 0.07, 0.02 of its detail).
+    func testEachStopLetsThroughLessThanTheOneBefore() {
+        XCTAssertEqual(GlassTransparency.allCases, [.most, .more, .standard, .less, .least])
+        let tints = GlassTransparency.allCases.map { stop -> Double? in
+            if case .clear(let tint) = stop.glass { return tint }
+            return nil
+        }
+        XCTAssertEqual(tints, [0, 0.2, nil, 0.5, 0.8])
+
+        let fills = GlassTransparency.allCases.map(\.material)
+        for (thinner, thicker) in zip(fills, fills.dropFirst()) {
+            XCTAssertLessThanOrEqual(thinner.materialOpacity, thicker.materialOpacity)
+            XCTAssertLessThanOrEqual(thinner.backgroundOpacity, thicker.backgroundOpacity)
+            XCTAssertNotEqual(thinner, thicker)
+        }
+        for fill in fills {
+            XCTAssert((0...1).contains(fill.materialOpacity) && (0...1).contains(fill.backgroundOpacity))
+        }
+    }
+
+    /// With Reduce transparency every stop draws the same solid surface: `.clear` turns a
+    /// dark grey under it even in light mode, and a thinned material lets the desktop in.
+    func testReduceTransparencyLeavesNothingToAdjust() {
+        for stop in GlassTransparency.allCases {
+            XCTAssertEqual(stop.glass(reduceTransparency: true), .regular)
+            XCTAssertEqual(stop.material(reduceTransparency: true), GlassTransparency.standard.material)
+            XCTAssertEqual(stop.glass(reduceTransparency: false), stop.glass)
+            XCTAssertEqual(stop.material(reduceTransparency: false), stop.material)
+        }
+    }
+
+    func testEveryStopHasItsOwnName() {
+        let titles = GlassTransparency.allCases.map(\.title)
+        XCTAssertEqual(titles, ["Most", "More", "Default", "Less", "Least"])
+    }
+}
+
 // MARK: - Shortcut conflicts
 
 final class ShortcutConflictTests: XCTestCase {
