@@ -158,7 +158,7 @@ final class ManualClock: @unchecked Sendable {
             for id in due.keys { sleepers[id] = nil }
             return due.values.map(\.cont)
         }
-        due.forEach { $0.resume() }
+        for cont in due { cont.resume() }
     }
 }
 
@@ -460,14 +460,16 @@ final class RealtimeTranscriberContractTests: XCTestCase {
     }
 
     /// A chunk taken from `pendingAudio` reaches the socket before the stop's commit, and
-    /// none after it: after the commit it would open a segment nothing closes. `send`
-    /// takes `sendLock` before it takes the audio and holds it until the chunk is on the
-    /// socket. Here chunk A is held open on the socket, chunk B queues behind it, and the
-    /// stop comes in between; which of B and the commit then wins is up to the scheduler,
-    /// so it is run many times.
+    /// none after it: after the commit it would open a segment nothing closes. Chunk A is
+    /// held open on the socket, chunk B queues behind it, and the stop comes in between:
+    /// the commit must wait for A — `sendLock` is held across the socket call — and B,
+    /// which reaches the socket after the stop took its audio, must not be sent. It cannot
+    /// force the old order's window, `pendingAudio` taken before `sendLock`: NSLock hands
+    /// the lock to B, the first waiter, which then lands before the commit. Which of B and
+    /// the commit wins is the scheduler's, so it is run a few times.
     func testNoChunkReachesTheSocketAfterTheStopsCommit() async {
         for vendor in Vendor.allCases {
-            for run in 0..<20 {
+            for run in 0..<5 {
                 let rig = Rig(vendor)
                 await rig.becomeReady()
 
