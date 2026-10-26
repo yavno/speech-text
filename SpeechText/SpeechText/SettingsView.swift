@@ -384,10 +384,9 @@ struct SettingsView: View {
 
         SettingsGroup(title: "Colour") {
             if skin.supportsAccent {
-                SettingsRow(title: "Accent",
-                            detail: AccentColor.isNeutral(accentHex)
-                                ? "Default — ink on glass, with a red record button."
-                                : "Tints the level meter and the record button.") {
+                // No caption, here or under Display: the swatches say it, and a caption of
+                // another length moved them when the skin changed.
+                SettingsRow(title: "Accent") {
                     HStack(spacing: 8) {
                         ForEach(AccentColor.presets, id: \.hex) { preset in
                             swatch(preset)
@@ -407,7 +406,7 @@ struct SettingsView: View {
                 SettingsDivider()
                 transparencyRow
             } else {
-                SettingsRow(title: "Display", detail: technoColorDetail) {
+                SettingsRow(title: "Display", detail: technoColorWarning) {
                     HStack(spacing: 8) {
                         ForEach(TechnoPhosphor.allCases) { option in
                             phosphorSwatch(option, selected: option == selectedPhosphor)
@@ -473,29 +472,23 @@ struct SettingsView: View {
 
     private var transparencyDetail: String {
         if reduceTransparency {
-            return "Reduce transparency is on in System Settings, so the glass is solid — there is nothing to adjust."
+            return "Reduce transparency is on in System Settings — nothing to adjust."
         }
         let isDefault = GlassTransparency(stored: transparencyRaw) == .default
         if #available(macOS 26, *) {
             return isDefault
-                ? "Default — the glass follows Liquid Glass in System Settings › Appearance."
-                : "How much of what is behind the overlay and the Record Window shows through. Liquid Glass in System Settings no longer changes it."
+                ? "Default — follows Liquid Glass in System Settings › Appearance."
+                : "Set here — Liquid Glass in System Settings no longer changes it."
         }
         return isDefault
             ? "Default — the system's thinnest material."
-            : "How much of what is behind the overlay and the Record Window shows through."
+            : "How much of what is behind the panels shows through."
     }
 
-    private var technoColorDetail: String {
-        if let hex = TechnoPhosphor.customHex(technoRaw) {
-            return TechnoPalette.isCloseToAI(hex)
-                ? "Close to AI mode's violet — a plain dictation will be hard to tell from an AI one."
-                : "Your colour, on glass of the same hue. AI mode stays violet."
-        }
-        switch selectedPhosphor {
-        case .green, nil: return "Default — the green of the design."
-        case let preset?: return "\(preset.displayName) dots and text on matching glass. AI mode stays violet."
-        }
+    /// Said only when it matters: a colour of the user's own close to AI mode's violet.
+    private var technoColorWarning: String? {
+        guard let hex = TechnoPhosphor.customHex(technoRaw), TechnoPalette.isCloseToAI(hex) else { return nil }
+        return "Close to AI mode's violet — a plain dictation will be hard to tell from an AI one."
     }
 
     /// A display colour as the glass would show it: a lit dot on its own screen.
