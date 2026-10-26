@@ -235,9 +235,15 @@ final class ListPriceTests: XCTestCase {
         "anthropic/claude-sonnet-5": (2, 0.20, 10),
         "anthropic/claude-opus-5": (5, 0.50, 25),
         "anthropic/claude-haiku-4-5": (1, 0.10, 5),
+        "anthropic/claude-sonnet-5-5": (2, 0.10, 10),
+        "anthropic/claude-opus-5-5": (4, 0.20, 20),
+        "anthropic/claude-haiku-5-5": (0.10, 0.01, 0.50),
         "openai/gpt-5.6-luna": (0.20, 0.02, 1.20),
         "openai/gpt-5.6-terra": (2, 0.20, 12),
         "openai/gpt-5.6-sol": (4, 0.40, 20),
+        "openai/gpt-6-luna": (0.10, 0.01, 0.50),
+        "openai/gpt-6-sol": (2, 0.20, 10),
+        "openai/gpt-6.1-sol": (2, 0.10, 10),
     ]
 
     func testEverySpeechModelIsPricedFreeOrSaysItIsNot() {
@@ -294,7 +300,7 @@ final class ListPriceTests: XCTestCase {
     }
 
     func testTheTableSaysWhenItWasChecked() {
-        XCTAssertEqual(UsagePrices.checkedText, "14 October 2026")
+        XCTAssertEqual(UsagePrices.checkedText, "26 October 2026")
         XCTAssertEqual(UsagePrices.disclaimer, "estimated from known prices")
     }
 }

@@ -102,9 +102,15 @@ public func chatModelLine(_ model: ChatModelDescriptor) -> String {
     case "claude-sonnet-5": "Fast, and writes well."
     case "claude-opus-5": "Writes best. Slower, and costs more."
     case "claude-haiku-4-5": "The fastest."
+    case "claude-sonnet-5-5": "The newer Sonnet, at the same price."
+    case "claude-opus-5-5": "The newer Opus. Costs less than Opus 5."
+    case "claude-haiku-5-5": "The newer Haiku, at a tenth of the price."
     case "gpt-5.6-luna": "The fastest."
     case "gpt-5.6-terra": "Balanced."
     case "gpt-5.6-sol": "The flagship. Slower, and costs more."
+    case "gpt-6-luna": "The newer Luna, at half the price."
+    case "gpt-6-sol": "The newer generation's flagship."
+    case "gpt-6.1-sol": "GPT-6 Sol, updated. Cheaper on repeated prompts."
     default: ""
     }
 }

@@ -98,7 +98,7 @@ public func homeWordCount(_ text: String) -> Int {
 /// vendor's bill. A model with no price is named, not guessed; one on the Mac is free.
 public enum UsagePrices {
     /// When the table was last checked against every vendor's page.
-    public static let checked = DateComponents(calendar: Calendar(identifier: .gregorian), year: 2026, month: 10, day: 14)
+    public static let checked = DateComponents(calendar: Calendar(identifier: .gregorian), year: 2026, month: 10, day: 26)
     /// When every vendor's deprecations page was last read against both catalogues'
     /// `lifecycle` (docs/prices.md › Deprecations). Its own date: a price check and a
     /// deprecation check are separate passes.

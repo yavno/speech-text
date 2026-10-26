@@ -32,7 +32,8 @@ final class LLMRequestPayloadTests: XCTestCase {
 
     func testEveryCatalogueReasoningModelGetsTheEffort() {
         for model in knownChatModels(of: .openai) {
-            XCTAssertEqual(model.reasoningEffort, "none", model.id)
+            // 6.1 Sol rejects `none` (checked 2026-10-26).
+            XCTAssertEqual(model.reasoningEffort, model.id == "gpt-6.1-sol" ? "low" : "none", model.id)
         }
     }
 
@@ -124,11 +125,14 @@ final class ChatModelCatalogTests: XCTestCase {
                                                    "qwen/qwen3.8-27b"])
         XCTAssertEqual(offeredChatModels(of: .groq).map(\.displayName), ["GPT-OSS 120B", "GPT-OSS 20B (fastest)",
                                                      "Qwen3.8 27B (preview)"])
-        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
-        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5 (fastest)"])
-        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
+        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5",
+                                                        "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"])
+        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5 (fastest)",
+                                                                "Claude Sonnet 5.5", "Claude Opus 5.5", "Claude Haiku 5.5"])
+        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol",
+                                                     "gpt-6-luna", "gpt-6-sol", "gpt-6.1-sol"])
         XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-5.6 Luna — fastest", "GPT-5.6 Terra — balanced",
-                                                       "GPT-5.6 Sol — flagship"])
+                                                       "GPT-5.6 Sol — flagship", "GPT-6 Luna", "GPT-6 Sol", "GPT-6.1 Sol"])
     }
 
     func testAnUnlistedIDIsNamedByItselfAndListedNowhere() {
@@ -177,10 +181,12 @@ final class ChatRequestBodyTests: XCTestCase {
     }
 
     func testOpenAIModels() {
-        for model in ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"] {
+        for model in ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-6-luna", "gpt-6-sol"] {
             assertBody(openAI(model), ["model": model, "messages": turns, "max_completion_tokens": 8192,
                                        "reasoning_effort": "none"], model)
         }
+        assertBody(openAI("gpt-6.1-sol"), ["model": "gpt-6.1-sol", "messages": turns, "max_completion_tokens": 8192,
+                                           "reasoning_effort": "low"], "gpt-6.1-sol")
     }
 
     func testAnthropicModels() {
@@ -201,6 +207,21 @@ final class ChatRequestBodyTests: XCTestCase {
         assertBody(haiku.payload(system: "S", user: "U"),
                    ["model": "claude-haiku-4-5", "max_tokens": 16000, "system": "S", "messages": userTurn], "haiku")
         XCTAssertNil(haiku.betaHeader)
+
+        for id in ["claude-sonnet-5-5", "claude-opus-5-5"] {
+            let client = AnthropicChatClient(apiKey: "k", model: chatModel(provider: .anthropic, id: id))
+            assertBody(client.payload(system: "S", user: "U"),
+                       ["model": id, "max_tokens": 16000, "system": "S", "messages": userTurn,
+                        "output_config": ["effort": "low"], "fallbacks": "default"], id)
+            XCTAssertEqual(client.betaHeader, "server-side-fallback-2026-07-01")
+        }
+
+        // Haiku 5.5 takes the effort, unlike 4.5, but has no server-side fallback.
+        let haiku55 = AnthropicChatClient(apiKey: "k", model: chatModel(provider: .anthropic, id: "claude-haiku-5-5"))
+        assertBody(haiku55.payload(system: "S", user: "U"),
+                   ["model": "claude-haiku-5-5", "max_tokens": 16000, "system": "S", "messages": userTurn,
+                    "output_config": ["effort": "low"]], "haiku 5.5")
+        XCTAssertNil(haiku55.betaHeader)
     }
 }
 

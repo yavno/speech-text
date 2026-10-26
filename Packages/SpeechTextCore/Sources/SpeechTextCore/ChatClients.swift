@@ -113,7 +113,11 @@ public struct ChatRates: Hashable, Sendable {
 /// is marked `.deprecated` with its replacement, never dropped (docs/adding-a-provider.md
 /// › Retiring a model). `output_config.effort` is rejected by pre-4.6-era models such as
 /// Haiku 4.5; elsewhere `low` keeps latency down while leaving adaptive thinking
-/// on (disabling it can leak `<thinking>` tags).
+/// on (disabling it can leak `<thinking>` tags). The 5.5 family (#41) took
+/// `output_config.effort: low` and, Sonnet and Opus, `fallbacks: "default"` in one live
+/// call each on 2026-10-26; Haiku 5.5 has no server-side fallback. Added beside the
+/// models they follow, not in their place: neither is the default nor marked superseded,
+/// and nothing about their rewriting has been measured on the corpus yet.
 ///
 /// OpenAI: GPT-6 Astra is left out: it is built for long agentic work, and a dictation
 /// clean-up would only pay for its latency. `reasoning_effort: none` — measured
@@ -122,6 +126,9 @@ public struct ChatRates: Hashable, Sendable {
 /// accepted values are `none / low / medium / high / xhigh`; `minimal` is rejected. Only
 /// the 5.6 family was measured, so a model added here without a measurement is sent
 /// nothing: an unsupported value costs the whole rewrite, a default effort only time.
+/// The GPT-6 family (#42) was checked in one live call each on 2026-10-26: Luna and Sol
+/// take `none`, 6.1 Sol only `low` and up, and all three reject `max_tokens` as the 5.6
+/// models do (the `reasoning` dialect). Not measured on the corpus, and not the default.
 ///
 /// Prices are pay-as-you-go list prices per million tokens as of `UsagePrices.checked`
 /// (docs/prices.md): Groq's models page (cached input for gpt-oss at the 50 % discount its
@@ -158,6 +165,16 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .anthropic, id: "claude-haiku-4-5", displayName: "Claude Haiku 4.5 (fastest)",
                         reasoningEffort: nil, reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 1, cachedInput: 0.10, output: 5))),
+    ChatModelDescriptor(provider: .anthropic, id: "claude-sonnet-5-5", displayName: "Claude Sonnet 5.5",
+                        reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: true,
+                        price: .listed(.perMillion(input: 2, cachedInput: 0.10, output: 10))),
+    ChatModelDescriptor(provider: .anthropic, id: "claude-opus-5-5", displayName: "Claude Opus 5.5",
+                        reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: true,
+                        price: .listed(.perMillion(input: 4, cachedInput: 0.20, output: 20))),
+    // The price for prompts up to 100k tokens; a rewrite's prompt is far below it.
+    ChatModelDescriptor(provider: .anthropic, id: "claude-haiku-5-5", displayName: "Claude Haiku 5.5",
+                        reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
+                        price: .listed(.perMillion(input: 0.10, cachedInput: 0.01, output: 0.50))),
 
     ChatModelDescriptor(provider: .openai, id: "gpt-5.6-luna", displayName: "GPT-5.6 Luna — fastest",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
@@ -168,6 +185,16 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .openai, id: "gpt-5.6-sol", displayName: "GPT-5.6 Sol — flagship",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 4, cachedInput: 0.40, output: 20))),
+    ChatModelDescriptor(provider: .openai, id: "gpt-6-luna", displayName: "GPT-6 Luna",
+                        reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
+                        price: .listed(.perMillion(input: 0.10, cachedInput: 0.01, output: 0.50))),
+    ChatModelDescriptor(provider: .openai, id: "gpt-6-sol", displayName: "GPT-6 Sol",
+                        reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
+                        price: .listed(.perMillion(input: 2, cachedInput: 0.20, output: 10))),
+    // Rejects `none` ("Supported values are: 'low', 'medium', 'high', and 'xhigh'").
+    ChatModelDescriptor(provider: .openai, id: "gpt-6.1-sol", displayName: "GPT-6.1 Sol",
+                        reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
+                        price: .listed(.perMillion(input: 2, cachedInput: 0.10, output: 10))),
 ] + localChatModels.map { local in
     // No switches: reasoning is the template's business (`ChatTemplates`), not a request's.
     ChatModelDescriptor(provider: .local, id: local.id, displayName: local.displayName,
