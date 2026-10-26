@@ -63,6 +63,35 @@ public func makeStreamingTranscriber(configuration: RecordingConfiguration) -> S
     }
 }
 
+// MARK: - The socket
+
+/// The WebSocket a realtime transcriber talks through — `URLSessionWebSocketTask`'s own
+/// shape, so the app hands it one unchanged, and the contract tests
+/// (RealtimeTranscriberContractTests.swift) a fake that records what is sent, completes a
+/// send inside the call when asked to, and delivers scripted messages when the test says.
+protocol RealtimeWebSocket: AnyObject, Sendable {
+    func resume()
+    func send(_ message: URLSessionWebSocketTask.Message,
+              completionHandler: @escaping @Sendable ((any Error)?) -> Void)
+    func receive() async throws -> URLSessionWebSocketTask.Message
+    func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?)
+}
+
+extension URLSessionWebSocketTask: RealtimeWebSocket {}
+
+/// Opens the socket for a request; the app's default opens a `URLSessionWebSocketTask`.
+typealias RealtimeSocketOpener = @Sendable (URLRequest) -> any RealtimeWebSocket
+
+/// Every wait a realtime transcriber times — the finish timeout, the commit grace, the
+/// hold's deadline, the ready wait. Must return early when its task is cancelled, as
+/// `Task.sleep` does: `finish()` cancels the timer it no longer needs and waits for it.
+/// The contract tests pass a clock they advance by hand.
+typealias RealtimeSleep = @Sendable (TimeInterval) async -> Void
+
+let realtimeTaskSleep: RealtimeSleep = { seconds in
+    try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+}
+
 // MARK: - ElevenLabs Scribe v2 Realtime
 
 /// WebSocket client for `wss://api.elevenlabs.io/v1/speech-to-text/realtime`.
@@ -110,7 +139,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
     /// URLSession runs synchronously re-enters `fail` → `close`, which take `lock`.
     /// Always acquired before `lock`, never while holding it.
     private let sendLock = NSLock()
-    private var task: URLSessionWebSocketTask?
+    private var task: (any RealtimeWebSocket)?
     private var receiveLoop: Task<Void, Never>?
     private var pendingAudio = Data()
     /// Chunks ready to send but held until `session_started`, already encoded as the
@@ -157,10 +186,16 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
         return URLSession(configuration: config)
     }()
 
-    init(apiKey: String, model: String, keyterms: [String] = []) {
+    private let openSocket: RealtimeSocketOpener
+    private let sleep: RealtimeSleep
+
+    init(apiKey: String, model: String, keyterms: [String] = [],
+         openSocket: RealtimeSocketOpener? = nil, sleep: @escaping RealtimeSleep = realtimeTaskSleep) {
         self.apiKey = apiKey
         self.model = model
         self.keyterms = keyterms
+        self.openSocket = openSocket ?? { Self.session.webSocketTask(with: $0) }
+        self.sleep = sleep
         var continuation: AsyncStream<StreamingSTTEvent>.Continuation!
         events = AsyncStream { continuation = $0 }
         self.continuation = continuation
@@ -172,7 +207,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
 
         // The count only: terms are often people's names, and the log is public.
         dlog("ElevenLabs", "realtime: connecting, model=\(model), language=\(languages.count == 1 ? languages[0] : "auto"), keyterms=\(keyterms.count)")
-        let task = Self.session.webSocketTask(with: request)
+        let task = openSocket(request)
         lock.lock()
         self.task = task
         lock.unlock()
@@ -311,7 +346,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
                 }
             }
             group.addTask { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(STTTuning.streamFinishTimeoutSeconds * 1_000_000_000))
+                await self?.sleep(STTTuning.streamFinishTimeoutSeconds)
                 guard !Task.isCancelled else { return }
                 dlog("ElevenLabs", "realtime: no commit reply within \(STTTuning.streamFinishTimeoutSeconds)s — using what we have", level: .notice)
                 self?.endFinishWait()
@@ -339,7 +374,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
     /// Returns the messages still held for `session_started` (they go out ahead of the
     /// commit; if the session never started, the commit fails and the batch path takes
     /// over), the audio to commit, and the socket.
-    private func takePendingForFinish() -> ([String], Data, URLSessionWebSocketTask)? {
+    private func takePendingForFinish() -> ([String], Data, any RealtimeWebSocket)? {
         lock.lock()
         defer { lock.unlock() }
         guard !isClosed, let task else { return nil }
@@ -376,7 +411,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
     }
 
     /// Puts the whole batch on the socket with nothing of another thread's in between.
-    private func sendMessages(_ messages: [String], over task: URLSessionWebSocketTask) {
+    private func sendMessages(_ messages: [String], over task: any RealtimeWebSocket) {
         sendLock.lock()
         defer { sendLock.unlock() }
         for message in messages {
@@ -386,7 +421,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
 
     /// The raw send. Callers hold `sendLock`; `task.send` only enqueues, so the hold is
     /// short even for a flush of the whole pre-session buffer.
-    private func enqueue(_ text: String, over task: URLSessionWebSocketTask) {
+    private func enqueue(_ text: String, over task: any RealtimeWebSocket) {
         task.send(.string(text)) { [weak self] error in
             if let error {
                 self?.fail(error)
@@ -394,7 +429,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
         }
     }
 
-    private func runReceiveLoop(_ task: URLSessionWebSocketTask) async {
+    private func runReceiveLoop(_ task: any RealtimeWebSocket) async {
         while !Task.isCancelled {
             let message: URLSessionWebSocketTask.Message
             do {
@@ -512,7 +547,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
         }
         commitGrace?.cancel()
         commitGrace = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(STTTuning.streamCommitGraceSeconds * 1_000_000_000))
+            await self?.sleep(STTTuning.streamCommitGraceSeconds)
             guard !Task.isCancelled else { return }
             self?.endFinishWait()
         }
@@ -540,7 +575,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
         commitGrace = nil
         if holdDeadline == nil {
             holdDeadline = Task { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(STTTuning.streamCommitAfterPartialSeconds * 1_000_000_000))
+                await self?.sleep(STTTuning.streamCommitAfterPartialSeconds)
                 guard !Task.isCancelled else { return }
                 self?.endFinishWait()
             }
@@ -668,7 +703,7 @@ final class ElevenLabsRealtimeTranscriber: StreamingTranscriber, @unchecked Send
 /// What a close takes out from under a realtime transcriber's `lock`, to be cancelled
 /// once it is released.
 private struct ClosedSocket {
-    let task: URLSessionWebSocketTask?
+    let task: (any RealtimeWebSocket)?
     let receiveLoop: Task<Void, Never>?
 }
 
@@ -790,7 +825,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
     /// it, because a send completion URLSession runs synchronously re-enters `fail` →
     /// `close`, which take `lock`.
     private let sendLock = NSLock()
-    private var task: URLSessionWebSocketTask?
+    private var task: (any RealtimeWebSocket)?
     private var receiveLoop: Task<Void, Never>?
     private var pendingAudio = Data()
     /// Chunks encoded on the audio thread and held until `session.updated`.
@@ -834,10 +869,16 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
         return URLSession(configuration: config)
     }()
 
-    init(apiKey: String, model: String, keywords: [String] = []) {
+    private let openSocket: RealtimeSocketOpener
+    private let sleep: RealtimeSleep
+
+    init(apiKey: String, model: String, keywords: [String] = [],
+         openSocket: RealtimeSocketOpener? = nil, sleep: @escaping RealtimeSleep = realtimeTaskSleep) {
         self.apiKey = apiKey
         self.model = model
         self.keywords = keywords
+        self.openSocket = openSocket ?? { Self.session.webSocketTask(with: $0) }
+        self.sleep = sleep
         var continuation: AsyncStream<StreamingSTTEvent>.Continuation!
         events = AsyncStream { continuation = $0 }
         self.continuation = continuation
@@ -849,7 +890,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
 
         // The count only: terms are often people's names, and the log is public.
         dlog("OpenAI", "realtime: connecting, model=\(model), languages=\(languages.isEmpty ? "auto" : languages.joined(separator: ",")), keywords=\(keywords.count)")
-        let task = Self.session.webSocketTask(with: request)
+        let task = openSocket(request)
         lock.lock()
         self.task = task
         self.languages = languages
@@ -961,7 +1002,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
                 }
             }
             group.addTask { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(STTTuning.streamFinishTimeoutSeconds * 1_000_000_000))
+                await self?.sleep(STTTuning.streamFinishTimeoutSeconds)
                 guard !Task.isCancelled else { return }
                 dlog("OpenAI", "realtime: no transcript within \(STTTuning.streamFinishTimeoutSeconds)s — using what we have", level: .notice)
                 self?.resumeFinish()
@@ -983,7 +1024,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
 
     /// Locks can't be taken inside an async function, so `finish()` grabs its state here.
     /// Only called once the session is ready, so nothing is still held for it.
-    private func takePendingForFinish() -> (Data, URLSessionWebSocketTask)? {
+    private func takePendingForFinish() -> (Data, any RealtimeWebSocket)? {
         lock.lock()
         defer { lock.unlock() }
         guard !isClosed, sessionReady, let task else { return nil }
@@ -1006,7 +1047,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
                 }
             }
             group.addTask { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(STTTuning.streamSessionReadyTimeoutSeconds * 1_000_000_000))
+                await self?.sleep(STTTuning.streamSessionReadyTimeoutSeconds)
                 guard !Task.isCancelled else { return }
                 self?.expireReadyWait()
             }
@@ -1097,7 +1138,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
     }
 
     /// Puts the whole batch on the socket with nothing of another thread's in between.
-    private func sendMessages(_ messages: [String], over task: URLSessionWebSocketTask) {
+    private func sendMessages(_ messages: [String], over task: any RealtimeWebSocket) {
         sendLock.lock()
         defer { sendLock.unlock() }
         for message in messages {
@@ -1105,7 +1146,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
         }
     }
 
-    private func enqueue(_ text: String, over task: URLSessionWebSocketTask) {
+    private func enqueue(_ text: String, over task: any RealtimeWebSocket) {
         task.send(.string(text)) { [weak self] error in
             if let error {
                 self?.fail(error)
@@ -1113,7 +1154,7 @@ final class OpenAIRealtimeTranscriber: StreamingTranscriber, @unchecked Sendable
         }
     }
 
-    private func runReceiveLoop(_ task: URLSessionWebSocketTask) async {
+    private func runReceiveLoop(_ task: any RealtimeWebSocket) async {
         while !Task.isCancelled {
             let message: URLSessionWebSocketTask.Message
             do {

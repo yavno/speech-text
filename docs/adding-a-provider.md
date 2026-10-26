@@ -189,6 +189,11 @@ Read CLAUDE.md's streaming sections first. The rules:
 - Hold audio until the session is ready (bounded buffer); if it fills, emit `.failed`,
   never drop audio.
 - Keep the lock order: `sendLock` before `lock`, and never hold `lock` across `task.send`.
+- Open the socket through the injected `RealtimeSocketOpener` and time every wait with the
+  injected `RealtimeSleep` (both defaulted in `init`), never `URLSession` or `Task.sleep`
+  directly, and add the transcriber as a `Vendor` case in
+  `RealtimeTranscriberContractTests.swift`: the lock order, the pre-session buffer, the
+  padded commit, the bounded `finish()` and `no_session` are held there against a fake socket.
 - The protocol is `Sendable` (the audio thread, main and the stop all use one transcriber):
   declare the class `@unchecked Sendable` and keep every mutable field under `lock`.
 - Report a server that never started a session as `TranscriptionError.realtime(provider,
@@ -247,7 +252,7 @@ Read CLAUDE.md's streaming sections first. The rules:
   `Packages/SpeechTextCore/Sources/SpeechTextCore/`, which needs no `project.pbxproj`
   edit; the test bundle compiles no app file, so anything a test needs goes there too. Test
   request builders and parsers as pure functions; realtime vendors get a
-  `DictationReplay` script with a drop.
+  `DictationReplay` script with a drop and a `Vendor` case in the realtime contract tests.
 - Docs: README (engine table and **privacy list**), SECURITY.md, CLAUDE.md (component
   bullet, Settings Keys table), CHANGELOG. What only a person can check — a live socket
   from a microphone, a real key against the service — goes under *Needs a real-app run*

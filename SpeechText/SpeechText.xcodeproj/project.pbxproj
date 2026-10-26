@@ -76,6 +76,7 @@
 		FB0000000000000000000014 /* RefinementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000004 /* RefinementTests.swift */; };
 		FB0000000000000000000015 /* SpeechProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000005 /* SpeechProviderTests.swift */; };
 		FB0000000000000000000016 /* StreamingTranscriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000006 /* StreamingTranscriptTests.swift */; };
+		FB00000000000000000000A1 /* RealtimeTranscriberContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB00000000000000000000A0 /* RealtimeTranscriberContractTests.swift */; };
 		FB0000000000000000000017 /* ThirdPartyNoticesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000007 /* ThirdPartyNoticesTests.swift */; };
 		FB0000000000000000000018 /* TranscriptCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000008 /* TranscriptCleanupTests.swift */; };
 		FB0000000000000000000019 /* VocabularyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0000000000000000000009 /* VocabularyTests.swift */; };
@@ -173,6 +174,7 @@
 		FB0000000000000000000004 /* RefinementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefinementTests.swift; sourceTree = "<group>"; };
 		FB0000000000000000000005 /* SpeechProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechProviderTests.swift; sourceTree = "<group>"; };
 		FB0000000000000000000006 /* StreamingTranscriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingTranscriptTests.swift; sourceTree = "<group>"; };
+		FB00000000000000000000A0 /* RealtimeTranscriberContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeTranscriberContractTests.swift; sourceTree = "<group>"; };
 		FB0000000000000000000007 /* ThirdPartyNoticesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyNoticesTests.swift; sourceTree = "<group>"; };
 		FB0000000000000000000008 /* TranscriptCleanupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptCleanupTests.swift; sourceTree = "<group>"; };
 		FB0000000000000000000009 /* VocabularyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyTests.swift; sourceTree = "<group>"; };
@@ -367,6 +369,7 @@
 				FB0000000000000000000004 /* RefinementTests.swift */,
 				FB0000000000000000000005 /* SpeechProviderTests.swift */,
 				FB0000000000000000000006 /* StreamingTranscriptTests.swift */,
+				FB00000000000000000000A0 /* RealtimeTranscriberContractTests.swift */,
 				FB0000000000000000000007 /* ThirdPartyNoticesTests.swift */,
 				FB0000000000000000000008 /* TranscriptCleanupTests.swift */,
 				FB0000000000000000000009 /* VocabularyTests.swift */,
@@ -621,6 +624,7 @@
 				FB0000000000000000000014 /* RefinementTests.swift in Sources */,
 				FB0000000000000000000015 /* SpeechProviderTests.swift in Sources */,
 				FB0000000000000000000016 /* StreamingTranscriptTests.swift in Sources */,
+				FB00000000000000000000A1 /* RealtimeTranscriberContractTests.swift in Sources */,
 				FB0000000000000000000017 /* ThirdPartyNoticesTests.swift in Sources */,
 				FB0000000000000000000018 /* TranscriptCleanupTests.swift in Sources */,
 				FB0000000000000000000019 /* VocabularyTests.swift in Sources */,
