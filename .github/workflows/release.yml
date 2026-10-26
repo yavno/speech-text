@@ -209,8 +209,13 @@ jobs:
 
       # Everything the release job publishes is kept here, because it runs on a
       # different job (and so a different workspace) than the one that built it.
+      # A pull request's run only proves the packaging works: nobody downloads its
+      # unsigned image, and on a private repository every 30 MB kept for 14 days
+      # counts against the account's Actions storage, which a run of pull requests
+      # that touched project.pbxproj filled in October 2026 — the next upload, a
+      # tag's included, then failed. A tag and a manual run still keep theirs.
       - name: Keep the image
-        if: always()
+        if: ${{ always() && github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: SpeechText-${{ github.sha }}

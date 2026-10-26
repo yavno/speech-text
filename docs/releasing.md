@@ -254,7 +254,7 @@ gh run download <run-id> --dir build/ci        # SpeechText-<sha>/: the .dmg, .s
 It runs on the self-hosted Mac with the repository secrets, exactly as a tag does, up to
 and including the image. What a tag adds is skipped: the version check, the release
 notes, the appcast and the *Draft release* job. The image is kept as the run's artifact for
-14 days (for a tag the artifact also carries `appcast.xml` and `notes.md`, which the
+14 days — a manual run's and a tag's only: a pull request's packaging run keeps nothing (for a tag the artifact also carries `appcast.xml` and `notes.md`, which the
 *Draft release* job downloads). This is the way to try the pipeline, or to get a newer
 notarized build for an [update test](#checking-an-update-before-publishing), without a tag that would then have
 to be deleted.
