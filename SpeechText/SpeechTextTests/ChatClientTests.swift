@@ -121,9 +121,9 @@ final class ChatModelCatalogTests: XCTestCase {
     /// The pickers read the catalogue, in the order and with the names they had.
     func testPickersKeepTheirOrderAndNames() {
         XCTAssertEqual(offeredChatModels(of: .groq).map(\.id), ["openai/gpt-oss-120b", "openai/gpt-oss-20b",
-                                                   "qwen/qwen3.8-27b", "minimaxai/minimax-m2.7"])
+                                                   "qwen/qwen3.8-27b"])
         XCTAssertEqual(offeredChatModels(of: .groq).map(\.displayName), ["GPT-OSS 120B", "GPT-OSS 20B (fastest)",
-                                                     "Qwen3.8 27B (preview)", "MiniMax M2.7 (preview)"])
+                                                     "Qwen3.8 27B (preview)"])
         XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
         XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5 (fastest)"])
         XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])

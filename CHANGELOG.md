@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **MiniMax M2.7 is no longer offered for AI Rewrite.** Groq stopped serving it to ordinary accounts on 16 October 2026. If you had picked it, SpeechText switches to GPT-OSS 120B at launch and says so once.
+- **Qwen3.8 27B on Groq is estimated at its cached-input price** ($0.40 per million tokens, half its input price) where Groq reports cached tokens.
 - **No more macOS "would like to control this computer" alert.** Turning on Accessibility — from setup, Home, Settings or a notice — opens System Settings with SpeechText's helper beside it, and nothing else. A dictation that could not be pasted because Accessibility is off says so, with *Turn On…*, instead of raising the alert each time.
 - **Home says what is still missing.** While setup is unfinished, Home offers to continue it or skip it, with what it still lacks; afterwards it says when the microphone or Accessibility is off, with a way to turn it on.
 - **Setup's Try it step, continued.** With Press to toggle, it says the keys can be let go once the dictation has started. The Welcome picture shows holding the shortcut as well as pressing it, and the Permissions step notices a permission turned off in System Settings.

@@ -101,8 +101,9 @@ final class ModelLifecycleTests: XCTestCase {
                 XCTAssertLessThan(Date(), due, "\(id) is due for the archive (archivedSpeechModels / archivedChatModels)")
             }
             XCTAssertNotNil(deprecation.announced.date, id)
+            // The same day for a model withdrawn without notice (Groq's MiniMax M2.7, #39).
             if let announced = deprecation.announced.date, let shutdown = deprecation.shutdown.date {
-                XCTAssertLessThan(announced, shutdown, id)
+                XCTAssertLessThanOrEqual(announced, shutdown, id)
             }
         }
         XCTAssertEqual(ModelRetirement.termMonths, 6)
@@ -249,6 +250,22 @@ final class ModelLifecycleTests: XCTestCase {
         // The next launch has nothing left to move and records nothing more.
         normalizeStoredProviders(in: defaults, localModelOnDisk: { _ in false })
         XCTAssertEqual(storedModelMigrations(in: defaults).count, 1)
+    }
+
+    /// MiniMax M2.7 went Enterprise-only on Groq with no shutdown announced (#39): a stored
+    /// pick moves to Groq's default, and the model reads as retired, out of the picker.
+    func testMiniMaxMovesToGPTOSS() throws {
+        let defaults = suite()
+        defaults.set("groq", forKey: SettingsKeys.llmProvider)
+        defaults.set("minimaxai/minimax-m2.7", forKey: SettingsKeys.groqLLMModel)
+
+        normalizeStoredProviders(in: defaults, localModelOnDisk: { _ in false })
+
+        XCTAssertEqual(defaults.string(forKey: SettingsKeys.groqLLMModel), "openai/gpt-oss-120b")
+        XCTAssertEqual(storedModelMigrations(in: defaults).last?.reason, .deprecated)
+        let model = chatModel(provider: .groq, id: "minimaxai/minimax-m2.7")
+        XCTAssertEqual(model.lifecycle.status(on: Date()), "Retired")
+        XCTAssertFalse(offeredChatModels(of: .groq).contains { $0.id == model.id })
     }
 
     /// An ID that leads nowhere — a model deleted before lifecycles existed — is cleared,

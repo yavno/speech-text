@@ -31,8 +31,9 @@ The pay-as-you-go, standard-tier price, in US dollars:
 
 - **Groq:** the models page, console.groq.com/docs/models (speech by the hour, chat per
   million tokens). Cached input: the prompt-caching page lists the models it covers and
-  the discount (50 % on gpt-oss as of 14 October 2026). Every other model's cached price
-  is its input price.
+  the discount (50 % on gpt-oss as of 14 October 2026). Qwen3.8 27B's cached price
+  ($0.40) is stated only by `/v1/models`, which the vendor watch reads. Every other
+  model's cached price is its input price.
 - **ElevenLabs:** elevenlabs.io/pricing/api. Scribe v2 and Scribe v2 Realtime by the hour,
   and *keyterm prompting* as a separate line per model. Use the pricing page's figure,
   not the API reference's percentage.

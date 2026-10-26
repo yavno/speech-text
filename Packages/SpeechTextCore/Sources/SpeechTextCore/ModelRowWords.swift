@@ -98,7 +98,7 @@ public func chatModelLine(_ model: ChatModelDescriptor) -> String {
     switch model.id {
     case "openai/gpt-oss-120b": "Clean text in about a second."
     case "openai/gpt-oss-20b": "The fastest, a little less careful."
-    case "qwen/qwen3.8-27b", "minimaxai/minimax-m2.7": "A preview — Groq may withdraw it."
+    case "qwen/qwen3.8-27b": "A preview — Groq may withdraw it."
     case "claude-sonnet-5": "Fast, and writes well."
     case "claude-opus-5": "Writes best. Slower, and costs more."
     case "claude-haiku-4-5": "The fastest."

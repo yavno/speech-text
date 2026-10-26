@@ -104,7 +104,8 @@ public struct ChatRates: Hashable, Sendable {
 /// such: Groq may withdraw a preview without notice. Groq's reasoning models take
 /// different switches, and the wrong one is an HTTP 400 rather than something ignored:
 /// gpt-oss rejects `reasoning_format` and has no `none` effort; Qwen defaults to `raw`.
-/// MiniMax M2.7 documents no switch, so its reply goes through `strippingReasoning`.
+/// MiniMax M2.7 documents no switch, so its reply goes through `strippingReasoning`; it
+/// went Enterprise-only on 2026-10-16 and is retired (#39).
 ///
 /// Anthropic: Fable 5.1 is left out on purpose: it is the slowest and most expensive
 /// model, and a dictation clean-up gains nothing from it. Haiku 4.5 is still active, its
@@ -123,8 +124,9 @@ public struct ChatRates: Hashable, Sendable {
 /// nothing: an unsupported value costs the whole rewrite, a default effort only time.
 ///
 /// Prices are pay-as-you-go list prices per million tokens as of `UsagePrices.checked`
-/// (docs/prices.md): Groq's models page (cached input only for gpt-oss, at the 50 %
-/// discount its prompt-caching page states), Anthropic's pricing page (cache hits as the
+/// (docs/prices.md): Groq's models page (cached input for gpt-oss at the 50 % discount its
+/// prompt-caching page states, and for Qwen3.8 27B from `/v1/models`, the one place it is
+/// published), Anthropic's pricing page (cache hits as the
 /// cached price), OpenAI's pricing page (standard tier). A model on this Mac is free.
 public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .groq, id: "openai/gpt-oss-120b", displayName: "GPT-OSS 120B",
@@ -135,11 +137,17 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
                         price: .listed(.perMillion(input: 0.075, cachedInput: 0.0375, output: 0.30))),
     ChatModelDescriptor(provider: .groq, id: "qwen/qwen3.8-27b", displayName: "Qwen3.8 27B (preview)",
                         reasoningEffort: "none", reasoningOutput: .hidden, refusalFallbacks: false,
-                        price: .listed(.perMillion(input: 0.80, output: 4.00))),
-    // Groq lists no price for it ("Contact sales").
+                        price: .listed(.perMillion(input: 0.80, cachedInput: 0.40, output: 4.00))),
+    // Groq lists no price for it ("Contact sales"). Gone from `/v1/models` for an ordinary
+    // key since 2026-10-16 with no deprecation published — "Contact sales" is how Groq marks
+    // an Enterprise-only model — so it is retired as of the day it was first seen missing.
     ChatModelDescriptor(provider: .groq, id: "minimaxai/minimax-m2.7", displayName: "MiniMax M2.7 (preview)",
                         reasoningEffort: nil, reasoningOutput: .unchanged, refusalFallbacks: false,
-                        price: .notPriced),
+                        price: .notPriced,
+                        lifecycle: .deprecated(Deprecation(
+                            announced: ModelRetirement.day(2026, 10, 16), shutdown: ModelRetirement.day(2026, 10, 16),
+                            replacement: "openai/gpt-oss-120b",
+                            source: URL(string: "https://github.com/yavno/speech-text/issues/39")!))),
 
     ChatModelDescriptor(provider: .anthropic, id: "claude-sonnet-5", displayName: "Claude Sonnet 5",
                         reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,

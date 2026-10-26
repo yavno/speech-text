@@ -230,7 +230,7 @@ final class ListPriceTests: XCTestCase {
     private let chat: [String: (Double, Double, Double)?] = [
         "groq/openai/gpt-oss-120b": (0.15, 0.075, 0.60),
         "groq/openai/gpt-oss-20b": (0.075, 0.0375, 0.30),
-        "groq/qwen/qwen3.8-27b": (0.80, 0.80, 4.00),
+        "groq/qwen/qwen3.8-27b": (0.80, 0.40, 4.00),
         "groq/minimaxai/minimax-m2.7": nil,
         "anthropic/claude-sonnet-5": (2, 0.20, 10),
         "anthropic/claude-opus-5": (5, 0.50, 25),
