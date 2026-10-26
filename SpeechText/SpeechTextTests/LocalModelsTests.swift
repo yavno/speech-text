@@ -109,7 +109,8 @@ final class LocalSTTRecommendationTests: XCTestCase {
     /// `engine` was left at the Whisper default would be handed to WhisperKit, which
     /// would fail on a model folder it cannot read.
     func testCatalogueCoversBothEngines() {
-        let parakeets = [parakeetV3ModelID, parakeetUltraModelID, "parakeet-redux", "phonon-2"]
+        let parakeets = [parakeetV3ModelID, parakeetUltraModelID, "parakeet-redux", "phonon-2",
+                         "bark-3.0", "bark-3.0-clean"]
         for id in parakeets {
             XCTAssertEqual(localSTTModel(id: id)?.engine, .parakeet, id)
         }
@@ -124,7 +125,8 @@ final class LocalSTTRecommendationTests: XCTestCase {
     func testEveryParakeetEntryNamesItsOwnBuild() {
         let versions = localSTTModels.filter { $0.engine == .parakeet }.map(\.parakeetVersion)
         XCTAssertFalse(versions.contains(nil))
-        XCTAssertEqual(Set(versions.compactMap { $0 }), [.v3, .ultra, .redux, .phonon2])
+        XCTAssertEqual(Set(versions.compactMap { $0 }), [.v3, .ultra, .redux, .phonon2, .bark3, .bark3Clean])
+        XCTAssertEqual(versions.count, Set(versions.compactMap { $0 }).count)
         for model in localSTTModels where model.engine == .whisperKit {
             XCTAssertNil(model.parakeetVersion, model.id)
         }
@@ -142,6 +144,24 @@ final class LocalSTTRecommendationTests: XCTestCase {
             }
         }
         XCTAssertTrue(localSTTModel(id: "phonon-2").map(speechModelSubtitle)?.hasSuffix(" · English only") ?? false)
+    }
+
+    /// Bark 3.0 and Bark 3.0 Clean are candidates (#43): offered, but picked for nobody —
+    /// not even for English alone, where they would have to beat Phonon-2 — until they are
+    /// measured on our recordings.
+    func testTheBarkCandidatesArePickedForNobody() {
+        let bark = ["bark-3.0", "bark-3.0-clean"]
+        for ram: UInt64 in [8, 16, 32, 64, 128, 512] {
+            for languages in [[], ["en"], ["uk"], ["uk", "en"]] {
+                let caps = mac(ram: ram)
+                XCTAssertFalse(bark.contains(recommendedLocalSTTModel(for: caps, languages: languages)?.id ?? ""), "\(ram) GB, \(languages)")
+                XCTAssertFalse(bark.contains(bestQualityLocalSTTModel(for: caps, languages: languages)?.id ?? ""), "\(ram) GB, \(languages)")
+            }
+        }
+        for id in bark {
+            XCTAssertTrue(offeredLocalSTTModels(for: mac(ram: 16)).contains { $0.id == id }, id)
+            XCTAssertTrue(localSTTModel(id: id).map(speechModelSubtitle)?.hasSuffix(" · English only") ?? false, id)
+        }
     }
 
 }
@@ -296,10 +316,10 @@ final class LocalModelInstalledTests: XCTestCase {
     }
 
     /// Ultra, Redux and Phonon-2 install the same four bundles as v3 (seen in real installs
-    /// on 2026-10-16 — Phonon-2's alternative encoders are not fetched), so each is held
-    /// to all four too, in its own folder.
+    /// on 2026-10-16 — Phonon-2's alternative encoders are not fetched), and so do Bark 3.0
+    /// and Bark 3.0 Clean (their repo's tree), so each is held to all four too, in its own folder.
     func testEveryParakeetBuildNeedsItsFourBundles() throws {
-        for id in [parakeetUltraModelID, "parakeet-redux", "phonon-2"] {
+        for id in [parakeetUltraModelID, "parakeet-redux", "phonon-2", "bark-3.0", "bark-3.0-clean"] {
             try put(["Preprocessor.mlmodelc", "Encoder.mlmodelc", "Decoder.mlmodelc"], under: id)
             XCTAssertFalse(isLocalModelInstalled(id, in: root), id)
             try put(["JointDecisionv3.mlmodelc"], under: id)
@@ -312,13 +332,14 @@ final class LocalModelInstalledTests: XCTestCase {
 
 // MARK: - Minimum system version
 
-/// Parakeet Redux and Phonon-2 compress their encoders with Core ML ops macOS 14 lacks,
-/// and FluidAudio refuses them there; macOS 14 is the app's own minimum.
+/// Parakeet Redux, Phonon-2 and Bark compress their encoders with Core ML ops macOS 14
+/// lacks, and FluidAudio refuses them there (Bark only once it is loaded as itself —
+/// FluidInference/FluidAudio#1054); macOS 14 is the app's own minimum.
 final class LocalModelSystemVersionTests: XCTestCase {
 
-    func testOnlyReduxAndPhononNeedMacOS15() {
+    func testOnlyTheCompressedEncodersNeedMacOS15() {
         let newer = localSTTModels.filter { $0.minimumSystemVersion > 14 }.map(\.id)
-        XCTAssertEqual(Set(newer), ["parakeet-redux", "phonon-2"])
+        XCTAssertEqual(Set(newer), ["parakeet-redux", "phonon-2", "bark-3.0", "bark-3.0-clean"])
         XCTAssertTrue(localSTTModels.allSatisfy { $0.minimumSystemVersion >= 14 })
     }
 
@@ -326,6 +347,8 @@ final class LocalModelSystemVersionTests: XCTestCase {
         let sonoma = offeredLocalSTTModels(for: mac(ram: 32, macOS: 14)).map(\.id)
         XCTAssertFalse(sonoma.contains("parakeet-redux"))
         XCTAssertFalse(sonoma.contains("phonon-2"))
+        XCTAssertFalse(sonoma.contains("bark-3.0"))
+        XCTAssertFalse(sonoma.contains("bark-3.0-clean"))
         XCTAssertTrue(sonoma.contains(parakeetUltraModelID))
         XCTAssertTrue(sonoma.contains(parakeetV3ModelID))
     }
@@ -503,6 +526,11 @@ final class LocalModelLanguageTests: XCTestCase {
         }
         guard case .listed(let phonon) = localSTTModel(id: "phonon-2")?.languages else { return XCTFail("Phonon-2 lists its language") }
         XCTAssertEqual(phonon.codes, ["en"])
+        for id in ["bark-3.0", "bark-3.0-clean"] {
+            guard case .listed(let bark) = localSTTModel(id: id)?.languages else { XCTFail(id); continue }
+            XCTAssertEqual(bark.codes, ["en"], id)
+            XCTAssertEqual(bark.source.absoluteString, "https://huggingface.co/FluidInference/bark-3.0-coreml", id)
+        }
         for model in localSTTModels where model.engine == .whisperKit {
             XCTAssertTrue([whisperLanguages, whisperV3Languages].contains(model.languages), model.id)
             // Recommendations read these lists through `knows`, which compares exact codes:

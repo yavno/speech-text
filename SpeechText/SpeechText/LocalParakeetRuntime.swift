@@ -23,7 +23,7 @@ import SpeechTextCore
 /// framework exists. That is what keeps the standalone test bundle building, and it
 /// means a third engine later is one more conforming type.
 ///
-/// One runtime runs the whole v3 family (`ParakeetVersion`): v3 and its three
+/// One runtime runs the whole v3 family (`ParakeetVersion`): v3 and its five
 /// re-trainings share the tokenizer, the 15 s window and the decoder contract, and differ
 /// only in their weights and which repo they come from.
 ///
@@ -31,7 +31,9 @@ import SpeechTextCore
 /// - v3: `FluidInference/parakeet-tdt-0.6b-v3-coreml`, from `nvidia/parakeet-tdt-0.6b-v3`;
 /// - Ultra: `FluidInference/parakeet-ultra-coreml`, from `moondream/parakeet-ultra`;
 /// - Redux: `FluidInference/parakeet-redux-coreml`, from `moondream/parakeet-redux`;
-/// - Phonon-2: `FluidInference/phonon-2-coreml`, from `FermionResearch/Phonon-2`.
+/// - Phonon-2: `FluidInference/phonon-2-coreml`, from `FermionResearch/Phonon-2`;
+/// - Bark 3.0 and Bark 3.0 Clean: the two folders of `FluidInference/bark-3.0-coreml`, from
+///   `ConwayResearch/Underdog-Bark-3.0` and `-Clean` (credited in ThirdPartyNotices too).
 struct ParakeetRuntime: LocalSTTRuntime {
     /// FluidAudio writes into `<parent of the directory you pass>/<its own folder name>`
     /// and hands back the path you gave it, so passing a folder named anything else
@@ -41,6 +43,22 @@ struct ParakeetRuntime: LocalSTTRuntime {
     /// which here are the same string, but the store's move is what guarantees it.
     func download(variant: String, into base: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> URL {
         let build = try ParakeetBuild(modelID: variant)
+        let folder: URL
+        switch build.source {
+        case .hub(let repo):
+            folder = try await Self.downloadFromHub(repo, variant: build.downloadVariant, into: base, progress: progress)
+        case .pinned(let fetch):
+            folder = try await fetch.run(into: base, progress: progress)
+        }
+        // Nothing to move on to unless every bundle the loader opens arrived.
+        guard isParakeetFolderComplete(folder) else {
+            throw LocalModelError.downloadFailed("the download of \(variant) is incomplete")
+        }
+        return folder
+    }
+
+    private static func downloadFromHub(_ repo: Repo, variant: String?, into base: URL,
+                                        progress: @escaping @Sendable (Double) -> Void) async throws -> URL {
         // `ModelHub.download`, not `AsrModels.download`: the latter also *loads* every
         // bundle on the Neural Engine as it fetches it, whatever compute units the model
         // will run on — for Redux on an M1 Pro that was a 12-minute compile that failed
@@ -48,14 +66,9 @@ struct ParakeetRuntime: LocalSTTRuntime {
         // where the store shows it as "optimizing" and it uses the build's own units.
         // The fetch reports 0…0.5 (FluidAudio keeps the other half for a compile it does
         // not do here), hence the doubling.
-        try await ModelHub.download(build.repo, to: base, variant: build.downloadVariant,
+        try await ModelHub.download(repo, to: base, variant: variant,
                                     progressHandler: { progress(min($0.fractionCompleted * 2, 1)) })
-        let folder = base.appendingPathComponent(build.repo.folderName, isDirectory: true)
-        // Nothing to move on to unless every bundle the loader opens arrived.
-        guard isParakeetFolderComplete(folder) else {
-            throw LocalModelError.downloadFailed("the download of \(variant) is incomplete")
-        }
-        return folder
+        return base.appendingPathComponent(repo.folderName, isDirectory: true)
     }
 
     func transcribe(audioFileURL: URL, modelFolder: URL, language: String?) async throws -> String {
@@ -80,8 +93,8 @@ struct ParakeetRuntime: LocalSTTRuntime {
     /// a missing-file error. `.int8` is FluidAudio's default and is what was measured;
     /// `.int8V2` is a 577 MB rebuild that avoids a token-corruption bug
     /// (FluidInference/FluidAudio#760) we have not seen, and `.int4` a 298 MB one we have
-    /// not tested. It names a file for v3 only: Ultra, Redux and Phonon-2 each ship one encoder, which FluidAudio
-    /// fetches and opens whatever this says.
+    /// not tested. It names a file for v3 only: Ultra, Redux, Phonon-2 and Bark each ship one
+    /// encoder the loader opens (`Encoder.mlmodelc`), whatever this says.
     fileprivate static let encoderPrecision: ParakeetEncoderPrecision = .int8
 
     /// Turns our stored language into Parakeet's hint, which on v3 filters the decoder's
@@ -99,15 +112,24 @@ struct ParakeetRuntime: LocalSTTRuntime {
 }
 
 /// What FluidAudio needs to know about one of our Parakeet models: its `AsrModelVersion`,
-/// the repo it comes from (whose folder name `AsrModels.download(to:)` writes into — the
-/// version's own `repo` is not public, so it is named here) and where its encoder runs.
-/// Built from the catalogue entry; an ID that is not a Parakeet one throws rather than
-/// quietly loading v3 from a folder that holds something else.
+/// where its files come from (for most, the repo whose folder name `ModelHub.download(to:)`
+/// writes into — the version's own `repo` is not public, so it is named here) and where its
+/// encoder runs. Built from the catalogue entry; an ID that is not a Parakeet one throws
+/// rather than quietly loading v3 from a folder that holds something else.
 struct ParakeetBuild {
+    /// FluidAudio's own download, for a repo its `Repo` names; or a pinned folder fetched
+    /// file by file, for one the pinned FluidAudio does not know.
+    enum Source {
+        case hub(Repo)
+        case pinned(PinnedFolderFetch)
+    }
+
     let version: AsrModelVersion
-    let repo: Repo
+    let source: Source
     /// nil keeps FluidAudio's default, the Neural Engine. See `init`.
     let encoderComputeUnits: MLComputeUnits?
+    /// Whether the transcript has `<unk>` taken out of it. See `init`.
+    var dropsUnknownToken = false
 
     /// The repo variant FluidAudio picks files by: v3's encoder precision, nothing for the
     /// builds that ship a single encoder.
@@ -121,9 +143,9 @@ struct ParakeetBuild {
         }
         switch parakeet {
         case .v3:
-            (version, repo, encoderComputeUnits) = (.v3, .parakeetV3, nil)
+            (version, source, encoderComputeUnits) = (.v3, .hub(.parakeetV3), nil)
         case .ultra:
-            (version, repo, encoderComputeUnits) = (.ultra, .parakeetUltra, nil)
+            (version, source, encoderComputeUnits) = (.ultra, .hub(.parakeetUltra), nil)
         case .redux:
             // The GPU, measured on 2026-10-16 (M1 Pro, macOS 26): on the Neural Engine its
             // 2-bit encoder failed to compile (`ANECCompile() FAILED`) after 652 s — on
@@ -132,12 +154,131 @@ struct ParakeetBuild {
             // corpus it answered in 0.97 s at the median (p90 2.0 s) against v3's 0.25 s on
             // the Neural Engine. A Mac whose ANE does compile it (FluidAudio measured
             // 45–52 ms a window there, M-series) might do better — not measured here.
-            (version, repo, encoderComputeUnits) = (.redux, .parakeetRedux, .cpuAndGPU)
+            (version, source, encoderComputeUnits) = (.redux, .hub(.parakeetRedux), .cpuAndGPU)
         case .phonon2:
             // The Neural Engine, never the GPU: there Phonon-2's sparse encoder is expanded
             // on every load (~150 s of CPU, FluidAudio measured), and Core ML never caches it.
-            (version, repo, encoderComputeUnits) = (.phonon2, .phonon2, nil)
+            (version, source, encoderComputeUnits) = (.phonon2, .hub(.phonon2), nil)
+        case .bark3, .bark3Clean:
+            // FluidAudio 0.17.7 has no `AsrModelVersion` for Bark: `.bark3` / `.bark3Clean`
+            // come with FluidInference/FluidAudio#1054, open and in no release on 2026-10-26.
+            // They have v3's contract (tokenizer, blank ID, window, JointDecisionv3) and
+            // Ultra's single `Encoder.mlmodelc`, so `.ultra` loads them — the repo's own README
+            // says to on a FluidAudio without #1054, and both loaded and transcribed English
+            // that way on an M1 Pro (2026-10-26). `.ultra` is never platform-gated, where
+            // #1054 gates Bark to macOS 15 for its iOS 18 palette ops: the catalogue's
+            // `minimumSystemVersion` is the only guard. Once a release with #1054 is pinned,
+            // this becomes `.hub(.bark3)` and the pinned fetch goes.
+            //
+            // The Neural Engine, never the GPU: like Phonon-2's, its sparse encoder is rebuilt
+            // on every GPU load (the repo's README), and the GPU's `Encoder_lut3` is not fetched.
+            // And `<unk>` is dropped: Bark emits it where its training text had a quotation
+            // mark, which #1054 drops inside FluidAudio and 0.17.7 leaves in the text.
+            let folder = parakeet == .bark3 ? "bark-3.0" : "bark-3.0-clean"
+            (version, encoderComputeUnits) = (.ultra, nil)
+            source = .pinned(PinnedFolderFetch(repository: "FluidInference/bark-3.0-coreml",
+                                               revision: "73b0c0da665d29ea0332e9f0d32da8e26a4cdb38",
+                                               folder: folder, leaving: ["Encoder_lut3.mlmodelc", "NOTICE"]))
+            dropsUnknownToken = true
         }
+    }
+
+    /// The transcript as it is pasted: without the `<unk>` a Bark build writes for a
+    /// quotation mark, and without the doubled space that would leave behind.
+    func cleaned(_ text: String) -> String {
+        guard dropsUnknownToken else { return text }
+        return text.replacingOccurrences(of: "<unk>", with: "")
+            .replacingOccurrences(of: " {2,}", with: " ", options: .regularExpression)
+    }
+}
+
+/// One folder of a HuggingFace repository at a pinned commit, fetched file by file into
+/// `<base>/<folder>` — for a build the pinned FluidAudio's `ModelHub` cannot name, since its
+/// downloads take only a case of its own `Repo`. Lists the folder through the tree API,
+/// skips what `leaving` names (a path under the folder, or a bundle and everything in it),
+/// keeps a file already there at its listed size, and checks every size after the fetch.
+/// Cancelled with the task that runs it: URLSession's async download stops with it.
+struct PinnedFolderFetch: Sendable {
+    let repository: String
+    let revision: String
+    let folder: String
+    let leaving: [String]
+
+    private struct Entry: Decodable {
+        let type: String
+        let path: String
+        let size: Int64
+    }
+
+    func run(into base: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> URL {
+        let listURL = URL(string: "https://huggingface.co/api/models/\(repository)/tree/\(revision)/\(folder)?recursive=1")!
+        let (listing, response) = try await URLSession.shared.data(from: listURL)
+        try Self.check(response, for: listURL)
+        let files = try JSONDecoder().decode([Entry].self, from: listing).filter { entry in
+            entry.type == "file" && !leaving.contains { skip in
+                let skipped = "\(folder)/\(skip)"
+                return entry.path == skipped || entry.path.hasPrefix(skipped + "/")
+            }
+        }
+        guard !files.isEmpty else { throw LocalModelError.downloadFailed("\(repository)/\(folder) lists no files") }
+
+        let total = max(files.reduce(0) { $0 + $1.size }, 1)
+        var done: Int64 = 0
+        for file in files {
+            try Task.checkCancellation()
+            let destination = base.appendingPathComponent(file.path)
+            if Self.size(of: destination) != file.size {
+                let url = URL(string: "https://huggingface.co/\(repository)/resolve/\(revision)/\(file.path)")!
+                let before = done
+                let watcher = FetchProgress { received in progress(Double(before + received) / Double(total)) }
+                let (location, response) = try await URLSession.shared.download(from: url, delegate: watcher)
+                try Self.check(response, for: url)
+                try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(),
+                                                        withIntermediateDirectories: true)
+                try? FileManager.default.removeItem(at: destination)
+                try FileManager.default.moveItem(at: location, to: destination)
+                guard Self.size(of: destination) == file.size else {
+                    throw LocalModelError.downloadFailed("\(file.path) arrived at the wrong size")
+                }
+            }
+            done += file.size
+            progress(Double(done) / Double(total))
+        }
+        return base.appendingPathComponent(folder, isDirectory: true)
+    }
+
+    private static func check(_ response: URLResponse, for url: URL) throws {
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard (200..<300).contains(status) else {
+            throw LocalModelError.downloadFailed("HTTP \(status) from \(url.host() ?? "huggingface.co")")
+        }
+    }
+
+    private static func size(of file: URL) -> Int64? {
+        (try? FileManager.default.attributesOfItem(atPath: file.path))?[.size] as? Int64
+    }
+}
+
+/// Reports one download's bytes as they arrive. The async `download(from:delegate:)` hands
+/// its task to the delegate when it creates it, and the task's own `Progress` is watched —
+/// the download delegate's `didWriteData` is not sent for an async download.
+/// `@unchecked Sendable`: URLSession calls it on its own queue, and the one thing it keeps,
+/// the observation, is held under `lock`.
+private final class FetchProgress: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let report: @Sendable (Int64) -> Void
+    private let lock = NSLock()
+    private var observation: NSKeyValueObservation?
+
+    init(report: @escaping @Sendable (Int64) -> Void) {
+        self.report = report
+    }
+
+    func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+        let report = report
+        let observation = task.progress.observe(\.completedUnitCount) { progress, _ in
+            report(progress.completedUnitCount)
+        }
+        lock.withLock { self.observation = observation }
     }
 }
 
@@ -182,10 +323,10 @@ actor ParakeetPipelineCache {
             // network's state forward, which is what a *continuing* stream wants; a
             // segment here is a finished recording, and seeding it with the tail of the
             // previous one would let a stale dictation colour the next one's first words.
-            var state = try TdtDecoderState(decoderLayers: try ParakeetBuild(modelID: modelFolder.lastPathComponent)
-                .version.decoderLayers)
+            let build = try ParakeetBuild(modelID: modelFolder.lastPathComponent)
+            var state = try TdtDecoderState(decoderLayers: build.version.decoderLayers)
             let result = try await manager.transcribe(audioFileURL, decoderState: &state, language: language)
-            return result.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            return build.cleaned(result.text).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 

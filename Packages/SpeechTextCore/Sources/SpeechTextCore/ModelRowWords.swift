@@ -19,6 +19,8 @@ private func speechModelWords(_ model: LocalSTTModel) -> String {
     case parakeetV3ModelID: "The quickest to answer."
     case "parakeet-redux": "Less than half the download of v3, and slower to answer."
     case "phonon-2": "Parakeet v3 compressed for a single language, as accurate on it."
+    case "bark-3.0": "Parakeet v3 trained further, writing every word as said. Not yet tested here."
+    case "bark-3.0-clean": "Bark 3.0 without the fillers and repeats. Not yet tested here."
     case "openai_whisper-large-v3-v20240930_turbo_632MB": "Slower to answer than Parakeet."
     case "openai_whisper-small_216MB": "Small and fast."
     case "openai_whisper-base": "Smaller still, and less accurate."
