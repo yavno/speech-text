@@ -511,7 +511,7 @@ private struct PromptEditorCard: View {
                 }
             }
 
-            section("When to use", hint: "The situation AI Rewrite recognises from what you said — distinct from every other prompt's.") {
+            section("When to use", hint: "The situation AI Rewrite recognizes from what you said — distinct from every other prompt's.") {
                 MainTextEditor(text: $preset.whenToUse, minHeight: 64, tint: MainColor.ink2, fill: MainColor.card)
             }
             section("Instructions", hint: "What it does to the text once this prompt is picked.") {

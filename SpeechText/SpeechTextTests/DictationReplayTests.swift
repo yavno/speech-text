@@ -967,7 +967,7 @@ final class DictationHotkeyGestureTests: XCTestCase {
     func testTheNoticeSaysWhatBecameOfTheDictation() {
         let reasons: [DictationCancelReason] = [.shortcut, .tap, .releasedEarly, .escape, .closeButton, .menu]
         for reason in reasons {
-            XCTAssertEqual(reason.notice(savedInHistory: false).title, "Dictation cancelled")
+            XCTAssertEqual(reason.notice(savedInHistory: false).title, "Dictation canceled")
         }
         XCTAssertTrue(DictationCancelReason.shortcut.notice(savedInHistory: true).detail.contains("History"))
         XCTAssertFalse(DictationCancelReason.shortcut.notice(savedInHistory: false).detail.contains("History"))
@@ -1324,7 +1324,7 @@ final class SelectionEditTests: XCTestCase {
         for reason in reasons {
             for putBack in [false, true] {
                 let notice = reason.notice(textPutBack: putBack)
-                XCTAssertEqual(notice.title, "Edit cancelled")
+                XCTAssertEqual(notice.title, "Edit canceled")
                 XCTAssertLessThanOrEqual(laidOutHeight(notice.detail), twoLines, notice.detail)
             }
         }

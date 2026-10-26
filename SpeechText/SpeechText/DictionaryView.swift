@@ -518,7 +518,7 @@ private struct DictionaryReplacements: View {
 
     private func message(for problem: TextReplacements.EntryProblem) -> String {
         switch problem {
-        case .emptyReplace: "Type what is recognised now."
+        case .emptyReplace: "Type what is recognized now."
         case .emptyWith: "Type how it should be written."
         case .noWord: "Replace needs at least one letter or digit."
         case .duplicate: "That already has a replacement."
@@ -594,7 +594,7 @@ private struct DictionaryEffects: View {
                     "Turned off. Wrong spellings are still replaced, and AI Rewrite still keeps them as written.", false)
         }
         if let limits = model.vocabulary.limits {
-            let title = provider == .apple ? "Apple's recogniser listens for them" : "\(vendor) is given them"
+            let title = provider == .apple ? "Apple's recognizer listens for them" : "\(vendor) is given them"
             var detail = Self.count(sent: CustomVocabulary.selected(terms, limits: limits).count,
                                     of: terms.count, model: model.displayName)
             if let surcharge = model.price.listed?.keytermSurchargePerMinute, surcharge > 0 {

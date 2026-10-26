@@ -249,7 +249,7 @@ struct SettingsView: View {
             // The licences the bundled third-party code requires to travel with every copy
             // (scripts/third-party-notices.sh); opened in the system's text viewer.
             SettingsRow(title: "Acknowledgements",
-                        detail: "The open-source code SpeechText is built on, and its licences.") {
+                        detail: "The open-source code SpeechText is built on, and its licenses.") {
                 if let notices = Bundle.main.url(forResource: "ThirdPartyNotices", withExtension: "txt") {
                     Button("Show") { NSWorkspace.shared.open(notices) }
                         .buttonStyle(SetupButtonStyle(kind: .secondary, height: 28))
@@ -382,7 +382,7 @@ struct SettingsView: View {
             }
         }
 
-        SettingsGroup(title: "Colour") {
+        SettingsGroup(title: "Color") {
             if skin.supportsAccent {
                 // No caption, here or under Display: the swatches say it, and a caption of
                 // another length moved them when the skin changed.
@@ -392,7 +392,7 @@ struct SettingsView: View {
                             swatch(preset)
                         }
                         ColorPicker(
-                            "Colour",
+                            "Color",
                             selection: Binding(
                                 get: { AccentColor.meter(accentHex) },
                                 set: { accentHex = AccentColor.hex(from: $0) }
@@ -400,7 +400,7 @@ struct SettingsView: View {
                             supportsOpacity: false
                         )
                         .labelsHidden()
-                        .help("Any colour")
+                        .help("Any color")
                     }
                 }
                 SettingsDivider()
@@ -412,7 +412,7 @@ struct SettingsView: View {
                             phosphorSwatch(option, selected: option == selectedPhosphor)
                         }
                         ColorPicker(
-                            "Colour",
+                            "Color",
                             selection: Binding(
                                 get: { TechnoPalette(stored: technoRaw).phosphor },
                                 set: { technoRaw = AccentColor.hex(from: $0) }
@@ -420,7 +420,7 @@ struct SettingsView: View {
                             supportsOpacity: false
                         )
                         .labelsHidden()
-                        .help("Any colour — the glass and the shell follow its hue")
+                        .help("Any color — the glass and the shell follow its hue")
                     }
                 }
             }

@@ -39,7 +39,7 @@ enum AppSkin: String, CaseIterable, Identifiable {
     var detail: String {
         switch self {
         case .minimal: return "Native macOS panels on glass. Tint them if you want to."
-        case .techno: return "A moulded handset with a dot-matrix LCD."
+        case .techno: return "A molded handset with a dot-matrix LCD."
         }
     }
 

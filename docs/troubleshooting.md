@@ -26,7 +26,7 @@ Click into a text field before stopping the dictation. The text goes to the app 
 
 ## A dictation is cancelled as soon as I start it
 
-With **Hold to talk** chosen (Settings › Dictation › Recording), a dictation records only while you hold the shortcut, and a short tap cancels it. Hold the shortcut and talk, or double-tap it to keep recording hands-free until the next press. A “Dictation cancelled” notice says what cancelled it.
+With **Hold to talk** chosen (Settings › Dictation › Recording), a dictation records only while you hold the shortcut, and a short tap cancels it. Hold the shortcut and talk, or double-tap it to keep recording hands-free until the next press. A “Dictation canceled” notice says what cancelled it.
 
 ## Microphone and Bluetooth headphones
 

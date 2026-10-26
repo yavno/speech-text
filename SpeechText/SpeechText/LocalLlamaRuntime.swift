@@ -62,7 +62,7 @@ enum LlamaError: LocalizedError, Equatable {
         // Read by the user as it stands: the service sends this text back as the error.
         case .promptTooLong: "The text is too long for the model on this Mac."
         case .decodeFailed(let code): "The local model stopped with an error (\(code))."
-        case .cancelled: "The local rewrite was cancelled."
+        case .cancelled: "The local rewrite was canceled."
         }
     }
 }

@@ -50,11 +50,11 @@ public enum DictationCancelReason: Equatable, Sendable {
     public func notice(savedInHistory: Bool) -> (title: String, detail: String) {
         switch self {
         case .tap:
-            return ("Dictation cancelled", "A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free.")
+            return ("Dictation canceled", "A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free.")
         case .releasedEarly:
-            return ("Dictation cancelled", "The shortcut was let go before the microphone opened. Hold it until the overlay listens.")
+            return ("Dictation canceled", "The shortcut was let go before the microphone opened. Hold it until the overlay listens.")
         case .shortcut, .escape, .closeButton, .menu:
-            return ("Dictation cancelled", savedInHistory
+            return ("Dictation canceled", savedInHistory
                     ? "Nothing was pasted. The dictation is saved in History."
                     : "Nothing was pasted.")
         }

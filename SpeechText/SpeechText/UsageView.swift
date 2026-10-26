@@ -190,7 +190,7 @@ private struct UsageTypingSpeedEditor: View {
         "Old maps were confident about coastlines and vague about interiors, which is roughly how most of us describe our own plans.",
         "A good explanation feels obvious afterwards, as if the idea had been waiting patiently for someone to say it out loud.",
         "Weather, traffic and the price of coffee: three things everyone discusses, few understand, and nobody can change before Tuesday.",
-        "The quietest rooms are seldom silent; listen carefully and there's a refrigerator humming, a clock ticking, a neighbour's piano.",
+        "The quietest rooms are seldom silent; listen carefully and there's a refrigerator humming, a clock ticking, a neighbor's piano.",
     ]
 
     @State private var sentence = Self.sentences.randomElement() ?? Self.sentences[0]
@@ -793,7 +793,7 @@ private struct UsageEngines: View {
         switch engine.step {
         case .speech:
             switch STTProviderType(rawValue: engine.key) {
-            case .apple: "On-device recogniser"
+            case .apple: "On-device recognizer"
             case .local: "Model on this Mac"
             case .some(let type) where engine.provider != nil: type.vendor.displayName
             // Written before History kept the model, so only the engine is known.
