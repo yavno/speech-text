@@ -146,6 +146,15 @@ final class LocalSTTRecommendationTests: XCTestCase {
         XCTAssertTrue(localSTTModel(id: "phonon-2").map(speechModelSubtitle)?.hasSuffix(" · English only") ?? false)
     }
 
+    /// Bark writes `<unk>` where its training text had a quotation mark; it is never pasted,
+    /// nor the doubled space it leaves.
+    func testBarksUnknownTokenIsDropped() {
+        XCTAssertEqual(droppingUnknownTokens("He said <unk>ship it<unk> and left."), "He said ship it and left.")
+        XCTAssertEqual(droppingUnknownTokens("She wrote <unk> done <unk>."), "She wrote done .")
+        XCTAssertEqual(droppingUnknownTokens("<unk>Hello,<unk> she said."), "Hello, she said.")
+        XCTAssertEqual(droppingUnknownTokens("No token here."), "No token here.")
+    }
+
     /// Bark 3.0 and Bark 3.0 Clean are candidates (#43): offered, but picked for nobody —
     /// not even for English alone, where they would have to beat Phonon-2 — until they are
     /// measured on our recordings.

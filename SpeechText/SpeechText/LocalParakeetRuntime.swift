@@ -186,9 +186,7 @@ struct ParakeetBuild {
     /// The transcript as it is pasted: without the `<unk>` a Bark build writes for a
     /// quotation mark, and without the doubled space that would leave behind.
     func cleaned(_ text: String) -> String {
-        guard dropsUnknownToken else { return text }
-        return text.replacingOccurrences(of: "<unk>", with: "")
-            .replacingOccurrences(of: " {2,}", with: " ", options: .regularExpression)
+        dropsUnknownToken ? droppingUnknownTokens(text) : text
     }
 }
 
@@ -230,8 +228,16 @@ struct PinnedFolderFetch: Sendable {
             if Self.size(of: destination) != file.size {
                 let url = URL(string: "https://huggingface.co/\(repository)/resolve/\(revision)/\(file.path)")!
                 let before = done
-                let watcher = FetchProgress { received in progress(Double(before + received) / Double(total)) }
+                let watcher = FetchProgress()
+                let polling = Task {
+                    while !Task.isCancelled {
+                        progress(Double(before + watcher.received) / Double(total))
+                        try? await Task.sleep(for: .milliseconds(200))
+                    }
+                }
+                defer { polling.cancel() }
                 let (location, response) = try await URLSession.shared.download(from: url, delegate: watcher)
+                polling.cancel()
                 try Self.check(response, for: url)
                 try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(),
                                                         withIntermediateDirectories: true)
@@ -259,26 +265,22 @@ struct PinnedFolderFetch: Sendable {
     }
 }
 
-/// Reports one download's bytes as they arrive. The async `download(from:delegate:)` hands
-/// its task to the delegate when it creates it, and the task's own `Progress` is watched —
-/// the download delegate's `didWriteData` is not sent for an async download.
-/// `@unchecked Sendable`: URLSession calls it on its own queue, and the one thing it keeps,
-/// the observation, is held under `lock`.
+/// How many bytes one download has received, read by polling. The async
+/// `download(from:delegate:)` hands its task to the delegate when it creates it; neither the
+/// download delegate's `didWriteData` nor the task's own `Progress` moves before the file is
+/// done for an async download (seen 2026-10-26: one jump from 0 to 90 % over Bark's
+/// encoder), while `countOfBytesReceived` does. `@unchecked Sendable`: URLSession calls it on
+/// its own queue, and the task it keeps is held under `lock`.
 private final class FetchProgress: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-    private let report: @Sendable (Int64) -> Void
     private let lock = NSLock()
-    private var observation: NSKeyValueObservation?
+    private var task: URLSessionTask?
 
-    init(report: @escaping @Sendable (Int64) -> Void) {
-        self.report = report
+    var received: Int64 {
+        lock.withLock { task?.countOfBytesReceived ?? 0 }
     }
 
     func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
-        let report = report
-        let observation = task.progress.observe(\.completedUnitCount) { progress, _ in
-            report(progress.completedUnitCount)
-        }
-        lock.withLock { self.observation = observation }
+        lock.withLock { self.task = task }
     }
 }
 

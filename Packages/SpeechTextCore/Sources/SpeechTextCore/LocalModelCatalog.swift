@@ -184,9 +184,10 @@ public let localSTTModels: [LocalSTTModel] = [
         parakeetVersion: .v3
     ),
     // Underdog Bark 3.0 and Bark 3.0 Clean are candidates (#43): offered in Settings on
-    // macOS 15+, but in no tier's picks until they are measured on our own recordings —
-    // and for the one person they could be picked for, who speaks English alone, they
-    // have to beat Phonon-2, not only v3. Their IDs are the folders FluidAudio's own
+    // macOS 15+, but in no tier's picks. For the one person they could be picked for, who
+    // speaks English alone, they have to beat Phonon-2, not only v3 — and on the corpus
+    // (2026-10-26, M1 Pro, three English clips) all four tied, at WER 0.06 on en-plain,
+    // with a first load of about 103 s, Phonon-2's. Their IDs are the folders FluidAudio's own
     // `AsrModelVersion.bark3` / `.bark3Clean` cache them in (FluidInference/FluidAudio#1054),
     // so an install made now is where a FluidAudio that knows them would look.
     LocalSTTModel(
@@ -196,11 +197,12 @@ public let localSTTModels: [LocalSTTModel] = [
         // From the HuggingFace tree at the pinned commit: the four bundles and the vocabulary.
         downloadBytes: 447_420_083,
         memoryFloorBytes: 8 * gigabyte,
-        summary: "Underdog's Bark 3.0, trained to leave out fillers, false starts and repeated words. Not yet tested on our recordings.",
+        summary: "Underdog's Bark 3.0, trained to leave out fillers, false starts and repeated words. As accurate as v3 on our recordings, and it drops a sentence's opening \"So\" with them.",
         // English only, as the model card says (`language: [en]`).
         languages: parakeetLanguages(repository: "FluidInference/bark-3.0-coreml", codes: ["en"],
                                      checked: ModelRetirement.day(2026, 10, 26)),
-        languageNotes: [:],
+        languageNotes: ["en": LanguageNote(text: "Once wrote \"Yeah.\" for a cough.",
+                                           measured: "audio corpus, 2026-10-26, M1 Pro: noise-breath-cough on the MacBook microphone, every pass")],
         parakeetVersion: .bark3Clean,
         minimumSystemVersion: 15
     ),
@@ -211,7 +213,7 @@ public let localSTTModels: [LocalSTTModel] = [
         // From the HuggingFace tree at the pinned commit: the four bundles and the vocabulary.
         downloadBytes: 436_436_886,
         memoryFloorBytes: 8 * gigabyte,
-        summary: "Underdog's Bark 3.0, a Parakeet v3 trained further, writing down every word as said. Not yet tested on our recordings.",
+        summary: "Underdog's Bark 3.0, a Parakeet v3 trained further, writing down every word as said. As accurate as v3 and Phonon-2 on our recordings, on a small sample.",
         languages: parakeetLanguages(repository: "FluidInference/bark-3.0-coreml", codes: ["en"],
                                      checked: ModelRetirement.day(2026, 10, 26)),
         languageNotes: [:],
@@ -568,6 +570,15 @@ public let parakeetRequiredBundles = [
 public func isParakeetFolderComplete(_ folder: URL) -> Bool {
     let contents = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
     return (parakeetRequiredBundles + ["parakeet_vocab.json"]).allSatisfy(contents.contains)
+}
+
+/// A Bark transcript as it is pasted: without the SentencePiece `<unk>` Bark writes where
+/// its training text had a quotation mark, and without the doubled space that leaves
+/// behind. FluidAudio drops it itself from FluidInference/FluidAudio#1054 on; 0.17.7 leaves
+/// it in the text, as the model's README says (not yet seen in a dictation here).
+public func droppingUnknownTokens(_ text: String) -> String {
+    text.replacingOccurrences(of: "<unk>", with: "")
+        .replacingOccurrences(of: " {2,}", with: " ", options: .regularExpression)
 }
 
 /// Whether a model is ready to transcribe with.
