@@ -53,6 +53,12 @@ final class CatalogueExportTests: XCTestCase {
                                  ("phonon-2", "FluidInference/phonon-2-coreml")] {
             XCTAssertEqual(export.speech.first { $0.id == id }?.source?.huggingFace, repository, id)
         }
+        // Bark's two builds are folders of one repository, their bundles inside the folder.
+        for id in ["bark-3.0", "bark-3.0-clean"] {
+            XCTAssertEqual(export.speech.first { $0.id == id }?.source,
+                           .init(huggingFace: "FluidInference/bark-3.0-coreml", path: id,
+                                 requiredFiles: parakeetRequiredBundles), id)
+        }
         // Every local model has a source, or the script cannot check it.
         XCTAssertTrue(export.speech.filter { $0.vendor == "local" }.allSatisfy { $0.source != nil })
         XCTAssertTrue(export.chat.filter { $0.vendor == "local" }.allSatisfy { $0.source != nil })

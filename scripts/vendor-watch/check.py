@@ -273,8 +273,12 @@ def huggingface_sources(models):
         if name not in repos:
             try:
                 info = get_json("https://huggingface.co/api/models/" + name)
+                files = [s["rfilename"] for s in info.get("siblings", [])]
+                # Every folder a file sits in, at any depth: a required bundle may be inside
+                # the source's own folder (Bark's two builds share one repository).
                 repos[name] = {"lastModified": info.get("lastModified", "")[:10],
-                               "top": {s["rfilename"].split("/")[0] for s in info.get("siblings", [])}}
+                               "folders": {"/".join(f.split("/")[:n]) for f in files
+                                           for n in range(1, f.count("/") + 2)}}
             except NotChecked as error:
                 repos[name] = {"error": str(error)}
         repo = repos[name]
@@ -283,8 +287,9 @@ def huggingface_sources(models):
             result["error"] = repo["error"]
         else:
             result["lastModified"] = repo["lastModified"]
-            wanted = ([source["path"]] if source.get("path") else []) + source.get("requiredFiles", [])
-            missing = [w for w in wanted if w not in repo["top"]]
+            path = source.get("path")
+            wanted = ([path] if path else []) + [path + "/" + f if path else f for f in source.get("requiredFiles", [])]
+            missing = [w for w in wanted if w not in repo["folders"]]
             if missing:
                 result["missing"] = missing
         results.append(result)

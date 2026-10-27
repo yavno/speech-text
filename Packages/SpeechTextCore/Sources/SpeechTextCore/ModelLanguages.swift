@@ -166,10 +166,12 @@ let parakeetV3LanguageCodes = [
 
 /// A Parakeet build's languages, read from the `language` list of the model card of the
 /// FluidInference repository the app downloads it from — machine-readable, so
-/// `scripts/check-vendor-models.sh` compares it every week. Read 2026-10-17 for all four.
-func parakeetLanguages(repository: String, codes: [String] = parakeetV3LanguageCodes) -> LanguageCoverage {
+/// `scripts/check-vendor-models.sh` compares it every week. Read 2026-10-17 for the first four,
+/// 2026-10-26 for Bark 3.0 and Bark 3.0 Clean.
+func parakeetLanguages(repository: String, codes: [String] = parakeetV3LanguageCodes,
+                       checked: DateComponents = ModelRetirement.day(2026, 10, 17)) -> LanguageCoverage {
     .listed(PublishedLanguages(codes: codes, source: URL(string: "https://huggingface.co/\(repository)")!,
-                               checked: ModelRetirement.day(2026, 10, 17)))
+                               checked: checked))
 }
 
 let parakeetV3Languages = parakeetLanguages(repository: "FluidInference/parakeet-tdt-0.6b-v3-coreml")

@@ -187,17 +187,22 @@ extension CatalogueExport {
             Source(huggingFace: "argmaxinc/whisperkit-coreml", path: id, requiredFiles: [])
         case .parakeet:
             parakeetRepository(localSTTModel(id: id)?.parakeetVersion).map {
-                Source(huggingFace: $0, path: nil, requiredFiles: parakeetRequiredBundles)
+                Source(huggingFace: $0.repository, path: $0.folder, requiredFiles: parakeetRequiredBundles)
             }
         }
     }
 
-    static func parakeetRepository(_ version: ParakeetVersion?) -> String? {
+    /// The repository, and for a build that shares one with another, its folder in it —
+    /// Bark 3.0 and Bark 3.0 Clean are the two folders of one repository, whose required
+    /// bundles are then inside that folder.
+    static func parakeetRepository(_ version: ParakeetVersion?) -> (repository: String, folder: String?)? {
         switch version {
-        case .v3: "FluidInference/parakeet-tdt-0.6b-v3-coreml"
-        case .ultra: "FluidInference/parakeet-ultra-coreml"
-        case .redux: "FluidInference/parakeet-redux-coreml"
-        case .phonon2: "FluidInference/phonon-2-coreml"
+        case .v3: ("FluidInference/parakeet-tdt-0.6b-v3-coreml", nil)
+        case .ultra: ("FluidInference/parakeet-ultra-coreml", nil)
+        case .redux: ("FluidInference/parakeet-redux-coreml", nil)
+        case .phonon2: ("FluidInference/phonon-2-coreml", nil)
+        case .bark3: ("FluidInference/bark-3.0-coreml", "bark-3.0")
+        case .bark3Clean: ("FluidInference/bark-3.0-coreml", "bark-3.0-clean")
         case nil: nil
         }
     }

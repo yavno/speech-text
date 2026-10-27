@@ -1687,6 +1687,34 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 
+Underdog Bark 3.0 and Bark 3.0 Clean — local speech models, downloaded when chosen
+==================================================================================
+
+Speech recognition weights downloaded from Settings when the user chooses them, not
+shipped in the app: Underdog Bark 3.0 (https://huggingface.co/ConwayResearch/Underdog-Bark-3.0)
+and Underdog Bark 3.0 Clean (https://huggingface.co/ConwayResearch/Underdog-Bark-3.0-Clean)
+by Conway Research, converted to Core ML by Fluid Inference
+(https://huggingface.co/FluidInference/bark-3.0-coreml, revision
+73b0c0da665d29ea0332e9f0d32da8e26a4cdb38). Published under the Creative Commons
+Attribution 4.0 International licence (CC-BY-4.0),
+https://creativecommons.org/licenses/by/4.0/.
+
+Both models derive from:
+
+  nvidia/parakeet-tdt-0.6b-v3, (c) NVIDIA Corporation, CC-BY-4.0
+    https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+  moondream/parakeet-ultra, (c) Moondream, CC-BY-4.0
+    https://huggingface.co/moondream/parakeet-ultra
+
+Changes, as the upstream NOTICE states them: post-trained and compressed by Conway
+Research. The FastConformer encoder architecture, TDT decoder, tokenizer and
+feature-extractor configuration derive from the models above and remain under
+CC-BY-4.0. Fluid Inference's Core ML conversion re-encodes the encoder's linear layers
+as Core ML palettes, bit-exact to the upstream weights; the other tensors are the
+upstream values at fp16. SpeechText runs the files unmodified, and removes the "<unk>"
+token Bark writes for a quotation mark from the transcript.
+
+
 llama.cpp — llama.framework (build b11696)
 ==========================================
 
