@@ -21,7 +21,7 @@ public struct AudioInputDevice: Equatable, Identifiable, Sendable {
     public let transport: Transport
     /// False for a MacBook's own microphone with the lid closed: it stays in the list,
     /// but the hardware is disconnected and records silence.
-    var canHear = true
+    public var canHear = true
 
     public init(uid: String, name: String, transport: Transport, canHear: Bool = true) {
         self.uid = uid

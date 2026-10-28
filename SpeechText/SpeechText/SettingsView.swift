@@ -816,6 +816,7 @@ private struct MicrophoneField: View {
     @AppStorage(SettingsKeys.microphone) private var stored = ""
     @AppStorage(SettingsKeys.microphoneName) private var storedName = ""
     @State private var monitor = AudioInputMonitor()
+    @State private var microphoneAllowed = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
 
     private var choice: MicrophoneChoice { MicrophoneChoice(stored: stored) }
 
@@ -836,7 +837,7 @@ private struct MicrophoneField: View {
                 Text("Microphone")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(SetupColor.label)
-                InUseMicrophone(device: inUse)
+                InUseMicrophone(device: inUse, problem: problem)
                 Text(caption)
                     .font(.system(size: 11.5))
                     .foregroundStyle(SetupColor.label2)
@@ -847,6 +848,23 @@ private struct MicrophoneField: View {
             picker
         }
         .padding(.vertical, 11)
+        // Neither the grant nor the lid raises a Core Audio notification the monitor
+        // hears, and both change while the user is in System Settings or away.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            microphoneAllowed = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
+            monitor.refresh()
+        }
+    }
+
+    /// Why the device in use will record nothing, from what is known without opening it.
+    /// Whether a connected device is actually sending sound is not checked: that would
+    /// open the microphone — and turn Bluetooth headphones to call quality — for a look
+    /// at Settings.
+    private var problem: String? {
+        guard let inUse else { return nil }
+        if !microphoneAllowed { return "SpeechText isn't allowed to use the microphone." }
+        if !inUse.canHear { return "The lid is closed, so this microphone hears nothing." }
+        return nil
     }
 
     private var picker: some View {
@@ -879,6 +897,7 @@ private struct MicrophoneField: View {
     /// Why the device above is the one in use; the device itself is drawn apart from it,
     /// so it can be found at a glance rather than read out of a sentence.
     private var caption: String {
+        if let problem { return problem }
         switch choice {
         case .automatic:
             if let avoided = resolution.avoided {
@@ -902,16 +921,19 @@ private struct MicrophoneField: View {
     }
 }
 
-/// The microphone a dictation records from right now: a lit dot, the kind of device and
-/// its name, on a pill of its own — or a warning when there is none.
+/// The microphone a dictation records from right now: a dot, the kind of device and its
+/// name, on a pill of its own — or a warning when there is none. The dot is lit while
+/// nothing known stops the device from recording, and turns to a warning when something
+/// does (`problem`); it does not listen for sound.
 private struct InUseMicrophone: View {
     let device: AudioInputDevice?
+    let problem: String?
 
     var body: some View {
         if let device {
             HStack(spacing: 6) {
                 Circle()
-                    .fill(SetupColor.ok)
+                    .fill(problem == nil ? SetupColor.ok : SetupColor.warn)
                     .frame(width: 6, height: 6)
                 Image(systemName: symbol(for: device.transport))
                     .font(.system(size: 11, weight: .semibold))
@@ -928,6 +950,7 @@ private struct InUseMicrophone: View {
             .overlay(Capsule().strokeBorder(SetupColor.panelBorder))
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("In use: \(device.name)")
+            .accessibilityValue(problem ?? "")
         } else {
             SettingsStatus(text: "No microphone is connected", ok: false)
         }
