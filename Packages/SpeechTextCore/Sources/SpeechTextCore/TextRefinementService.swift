@@ -219,10 +219,14 @@ public enum TextRefinementService {
     }
 
     /// How to read the `<vocabulary>` block, in both prompts: the user's own spellings,
-    /// kept where the words occur, never a list of words to work in.
+    /// kept where the words occur, never a list of words to work in — nor a hint at what
+    /// the dictation is about. With "T3 Code" in the Dictionary and T3 Code's prompt in
+    /// `<context>`, GPT-5.6 Luna opened a dictation about a web page with "Update the T3
+    /// Code interface…" in 15 of 30 runs; this wording, 1 of 30, and near-misses are still
+    /// spelled right (2026-10-28). Rewording the context rule instead changed nothing.
     private static let vocabularyRule = """
-        <vocabulary> lists the user's names and terms: spell them exactly so where they \
-        occur, near-misses too; never add one otherwise.
+        <vocabulary> lists the user's names and terms, never the subject: spell one \
+        exactly so where the transcript says it, near-misses too; never add one otherwise.
         """
 
     /// The transcript, preceded by where it is going when that is known and by the

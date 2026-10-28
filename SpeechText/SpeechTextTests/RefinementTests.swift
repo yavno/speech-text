@@ -382,6 +382,8 @@ final class FocusContextTests: XCTestCase {
                        TextRefinementService.buildEditSystemPrompt(presets: [])] {
             XCTAssertTrue(prompt.contains("<vocabulary>"))
             XCTAssertTrue(prompt.contains("never add one otherwise"))
+            // A word in the Dictionary is not a hint at what the dictation is about.
+            XCTAssertTrue(prompt.contains("never the subject"))
         }
         let block = Vocabulary.promptBlock([VocabularyEntry(term: "SpeechText")])
         let message = TextRefinementService.editUserMessage(selection: "t", instruction: "i", context: nil,
