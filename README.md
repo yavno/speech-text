@@ -71,14 +71,14 @@ Local speech models are third-party weights, downloaded when you choose one: Whi
 
 ### Download it
 
-1. Download `SpeechText-<version>.dmg` from the [latest release](https://github.com/yavno/speech-text/releases/latest).
+1. Download [SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg), the latest version — or `SpeechText-<version>.dmg`, the same image, from the [latest release](https://github.com/yavno/speech-text/releases/latest).
 2. Open the image and drag **SpeechText** into your **Applications** folder. (If you open it straight from the image instead, it offers to move itself there.)
 3. Open it from Applications. Because it came from the Internet, macOS checks it before the first launch and asks *"SpeechText is an app downloaded from the Internet. Are you sure you want to open it?"*, naming the developer — click **Open**. One question, and the app opens: that is what signing and notarization are for. Every release is signed with an Apple Developer ID certificate and notarized by Apple before it is published, and until the project's Apple account becomes an organization, the developer macOS names is Alona Sheiko, whose Apple Developer account signs the releases. If your Mac says something stronger than that — an unidentified developer, or a trip through System Settings › Privacy & Security to open it at all — then that download did not pass the check, and we would like to know: please [open an issue](https://github.com/yavno/speech-text/issues).
 4. SpeechText lives in the menu bar — look for its ST mark at the top right; *Open SpeechText* there opens its main window. A setup window opens on the first run and walks through the rest: which speech engine to use, an optional AI provider, the keys those need, the permissions below, and a dictation to try before you rely on it.
 
 After that, SpeechText keeps itself up to date: it checks once a day, shows you what changed, and installs the update when you agree. *Check for Updates…* in the menu asks straight away.
 
-If you want to verify the download, each release carries a `.sha256` file beside the image:
+If you want to verify the download, each release carries a `.sha256` file beside the versioned image (it names `SpeechText-<version>.dmg`, so check that file):
 
 ```bash
 shasum -a 256 -c SpeechText-<version>.dmg.sha256

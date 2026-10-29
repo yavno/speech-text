@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A download link that is always the latest version**: [SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg). Every release now carries the disk image under that name too, beside `SpeechText-X.Y.Z.dmg` — the same signed and notarized file.
+
 ## [0.10.0] - 2026-10-29
 
 The first public release.

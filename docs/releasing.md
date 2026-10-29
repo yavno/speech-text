@@ -223,8 +223,9 @@ to the descriptors.
 4. The **Release** workflow checks the tag against the project version, signs,
    notarizes (a few minutes) and writes the appcast and the release notes in its
    *Package* job; a separate *Draft release* job, the only one that may write to the
-   repository, then opens a **draft** release with `SpeechText-X.Y.Z.dmg`, its `.sha256`
-   and `appcast.xml`.
+   repository, then opens a **draft** release with `SpeechText-X.Y.Z.dmg`, its `.sha256`,
+   `SpeechText.dmg` — the same image under a name without the version, so still signed
+   and notarized — and `appcast.xml`.
 5. Download the image and install it on a Mac — or a fresh user account — that has
    never run SpeechText: it should open without any Gatekeeper dialog, show the drag
    window (the app, the arrow, Applications), and on first launch from Applications open
@@ -398,6 +399,11 @@ Every release carries `appcast.xml`, and the app reads it at
 whatever release is currently the latest *published* one. So a draft release is invisible
 to installed copies, and publishing the draft is the moment the update goes out. Sparkle
 checks once a day; the menu item checks now.
+
+`SpeechText.dmg` works the same way for people: it is an identical copy of
+`SpeechText-X.Y.Z.dmg`, so `…/releases/latest/download/SpeechText.dmg` always serves the
+latest published image — one stable link for a Download button. The versioned file stays:
+the appcast's enclosure URL and the `.sha256` name it.
 
 The feed holds one item: the release being cut. Sparkle installs the best item it finds,
 so one is enough, and it means a release depends on nothing from the release before it —
