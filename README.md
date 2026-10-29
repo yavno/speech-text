@@ -45,7 +45,7 @@ Pick per your priorities — all configurable in Settings:
 | **OpenAI** | pay-as-you-go | Upload or realtime streaming, needs an API key; the newest engine, and the least exercised |
 | **Local model** | free | Parakeet or Whisper, downloaded to your Mac in one click; no key, works offline |
 
-For local models, Settings reads your Mac's chip, memory and free disk, places it in a memory class from 8 GB to 256 GB and up, and marks two models for it: a **recommended** one (the fastest of good quality) and a **best quality** one. Heavier models stay available, labelled. On Apple Silicon both are **Parakeet v3** — NVIDIA's multilingual model, 25 European languages, 483 MB, and in our tests it matched the best cloud engine in under a second. Intel Macs have no Neural Engine and are pointed at the small Whisper models instead.
+For local models, Settings reads your Mac's chip, memory and free disk, places it in a memory class from 8 GB to 256 GB and up, and marks two models for it: a **recommended** one (the fastest of good quality) and a **best quality** one. Heavier models stay available, labelled. The picks also follow the languages you speak and your macOS: on Apple Silicon both are usually **Parakeet v3** — NVIDIA's multilingual model, 25 European languages, 483 MB, and in our tests it matched the best cloud engine in under a second. If you speak English alone it recommends the smaller English-only Phonon-2 (macOS 15 or later), and for a language Parakeet does not know, Whisper Large v3 Turbo. Each model's row says how many languages it knows and warns about one of yours it lacks. Intel Macs have no Neural Engine and are pointed at the small Whisper models instead.
 
 For the AI pass you can use **Groq**, **Anthropic** or **OpenAI** with your own key — or run it on your Mac with nothing else installed: AI Rewrite is built on [llama.cpp](https://github.com/ggml-org/llama.cpp), and Settings offers Qwen3.8 27B, gpt-oss 20B, Gemma 4 12B, Qwen3.5 9B and Qwen3.5 4B, from 2.7 GB to 19 GB, recommends a pair for your Mac, and downloads them in one click. A model that is in use is read once and kept ready, so a local rewrite takes a second or two.
 
@@ -72,7 +72,7 @@ Local speech models are third-party weights, downloaded when you choose one: Whi
 ### Download it
 
 1. Download `SpeechText-<version>.dmg` from the [latest release](https://github.com/yavno/speech-text/releases/latest).
-2. Open the image and drag **SpeechText** into your **Applications** folder.
+2. Open the image and drag **SpeechText** into your **Applications** folder. (If you open it straight from the image instead, it offers to move itself there.)
 3. Open it from Applications. Because it came from the Internet, macOS checks it before the first launch and asks *"SpeechText is an app downloaded from the Internet. Are you sure you want to open it?"*, naming the developer — click **Open**. One question, and the app opens: that is what signing and notarization are for. Every release is signed with an Apple Developer ID certificate and notarized by Apple before it is published, and until the project's Apple account becomes an organization, the developer macOS names is Vladyslav Husakov, the author. If your Mac says something stronger than that — an unidentified developer, or a trip through System Settings › Privacy & Security to open it at all — then that download did not pass the check, and we would like to know: please [open an issue](https://github.com/yavno/speech-text/issues).
 4. SpeechText lives in the menu bar — look for its ST mark at the top right; *Open SpeechText* there opens its main window. A setup window opens on the first run and walks through the rest: which speech engine to use, an optional AI provider, the keys those need, the permissions below, and a dictation to try before you rely on it.
 
@@ -93,7 +93,7 @@ The setup window explains each of these as it asks for it, and Settings shows wh
 **Required**
 
 - **Microphone** — to hear you. Nothing works without it.
-- **Accessibility** — to paste at the cursor in another app, which is how the text gets where you want it. Without it a dictation opens the Record Window instead, so you can copy the text out by hand. macOS ties this permission to the app's signature, so an update or an OS upgrade can quietly drop it; SpeechText asks again whenever it is missing, rather than once ever, because a paste that silently does nothing is worse than a prompt.
+- **Accessibility** — to paste at the cursor in another app, which is how the text gets where you want it. Without it a dictation opens the Record Window instead, so you can copy the text out by hand. macOS ties this permission to the app's signature, so an update or an OS upgrade can quietly drop it; SpeechText tells you whenever it is missing — on Home, and on any dictation it could not paste, with a button that opens the right System Settings pane — rather than once ever, because a paste that silently does nothing is worse than a reminder.
 
 **Asked only if you use the feature**
 
