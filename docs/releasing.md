@@ -246,6 +246,15 @@ to the descriptors.
 A tag pushed before the secrets exist fails the workflow instead of releasing an
 unsigned image.
 
+7. Move the Homebrew cask to the release. It lives in
+   [yavno/homebrew-tap](https://github.com/yavno/homebrew-tap) (`Casks/speechtext.rb`):
+   set `version` and `sha256` — the hash in the release's `.sha256` file — in a pull
+   request there, whose *Audit* check downloads the image and compares. Or let Homebrew
+   write it: `brew bump-cask-pr --version X.Y.Z yavno/tap/speechtext`. The cask's
+   `livecheck` reads the appcast, so `brew livecheck --cask yavno/tap/speechtext` says
+   when it is behind. Users are not blocked by a cask left behind — the app updates
+   itself — but a new install from it starts on the older version.
+
 ## A signed build without a tag
 
 The Release workflow can also be started by hand, which signs and notarizes a build of

@@ -84,7 +84,13 @@ If you want to verify the download, each release carries a `.sha256` file beside
 shasum -a 256 -c SpeechText-<version>.dmg.sha256
 ```
 
-A Homebrew cask is not available yet — it needs a published release to point at. It is tracked in [issue #1](https://github.com/yavno/speech-text/issues/1).
+### Or with Homebrew
+
+```bash
+brew install --cask yavno/tap/speechtext
+```
+
+The cask lives in our own tap, [yavno/homebrew-tap](https://github.com/yavno/homebrew-tap), and installs the same signed image. SpeechText still updates itself, so `brew upgrade` leaves it alone unless you pass `--greedy`. `brew uninstall --zap speechtext` also removes its settings, History and downloaded models — but not your API keys, which live in the keychain: delete them in Settings › API Keys first.
 
 ### Permissions
 
