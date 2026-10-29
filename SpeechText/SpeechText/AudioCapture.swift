@@ -44,9 +44,20 @@ protocol AudioCapture: AnyObject, Sendable {
 // MARK: - The system's input
 
 final class EngineCapture: AudioCapture, @unchecked Sendable {
-    private let engine = AVAudioEngine()
+    /// Optional only so `deinit` can hand it on; set for the capture's whole life.
+    private var held: AVAudioEngine? = AVAudioEngine()
+    private var engine: AVAudioEngine { held! }
     private var observer: NSObjectProtocol?
     var onConfigurationChange: (@MainActor () -> Void)?
+
+    /// Where a dropped `AVAudioEngine` is deallocated. Its dealloc waits, with
+    /// `dispatch_sync`, for its I/O unit's own queue, and that queue can be held for
+    /// good by the unit's property listener re-reading a device the HAL no longer
+    /// knows (`_GetHWFormat` answered `!obj`, seen 2026-10-29). Released on
+    /// `engineQueue`, as it was, that wait blocked every later start behind it: each
+    /// dictation sat in "starting" forever. Here it costs one stuck thread and leaks
+    /// the engine, and the next capture is unaffected.
+    private static let releaseQueue = DispatchQueue(label: "SpeechText.EngineCapture.release", qos: .utility)
 
     init() {
         // Device plugged or unplugged, AirPods switching: AVAudioEngine stops itself and
@@ -60,6 +71,14 @@ final class EngineCapture: AudioCapture, @unchecked Sendable {
 
     deinit {
         if let observer { NotificationCenter.default.removeObserver(observer) }
+        // The retain is taken and the property cleared before the block is queued, so
+        // the block's release is the engine's last, whichever thread got here first.
+        // No local binding: one would hold the engine to the end of this scope, after
+        // the block may already have run.
+        guard held != nil else { return }
+        let retained = Unmanaged.passRetained(held!)
+        held = nil
+        Self.releaseQueue.async { retained.release() }
     }
 
     var format: AVAudioFormat { engine.inputNode.outputFormat(forBus: 0) }

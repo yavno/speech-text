@@ -122,7 +122,16 @@ final class SpeechEngine {
     /// `prepare()`/`start()` run here, and so does the `stop()` of an engine that may
     /// still be starting: `AVAudioEngine` is not thread-safe, and a cancel that stopped
     /// it on main while the start was mid-flight raced two mutations of one graph.
-    private let engineQueue = DispatchQueue(label: "SpeechEngine.audio", qos: .userInitiated)
+    /// Replaced, not shared, once a start overruns `startDeadline`: whatever held the old
+    /// one still holds it, and every later start would wait behind it.
+    private var engineQueue = SpeechEngine.makeEngineQueue()
+    private static func makeEngineQueue() -> DispatchQueue {
+        DispatchQueue(label: "SpeechEngine.audio", qos: .userInitiated)
+    }
+    /// How long a start may take before it is given up as a start failure. A Bluetooth
+    /// headset's microphone takes about a second; past this the audio system is stuck,
+    /// and an overlay saying "starting" until the next press helps no one.
+    private static let startDeadline: TimeInterval = 8
     /// True once a pause has started `finish()` on the current segment — or, for Apple,
     /// written its History row — so a subsequent stop knows not to send the same audio a
     /// second time, nor to write the same segment twice.
@@ -585,6 +594,22 @@ final class SpeechEngine {
                     dlog("Engine", "microphone live: \(timing)")
                 }
             }
+        }
+
+        guard timer != nil else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.startDeadline) { [weak self] in
+            guard let self, self.engineStartToken == token, self.phase == .starting else { return }
+            dlog("Engine", "⚠ the microphone did not start in \(Int(Self.startDeadline)) s — a start failure, on a fresh audio queue", level: .error)
+            seLog.error("startAudioEngine: no start in \(Int(Self.startDeadline), privacy: .public) s")
+            let message = "The microphone didn't start. Try again, or quit and reopen SpeechText."
+            self.errorMessage = message
+            self.onStartFailure?(message)
+            self.phase = .idle
+            // The capture's stop goes onto the old queue, behind its own start, so one
+            // engine is still never touched from two threads; the next start gets a
+            // queue nothing is stuck on.
+            self.cleanup()
+            self.engineQueue = Self.makeEngineQueue()
         }
     }
 
