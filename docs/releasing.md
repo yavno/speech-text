@@ -294,7 +294,7 @@ a copy installed from a release image should read `Notarized`.
 
 ## Checking an update before publishing
 
-While the repository is private, or before the draft is published, the real feed
+Before the draft is published, the real feed
 (`…/releases/latest/download/appcast.xml`) answers 404, so an installed copy cannot see
 the new version there. Sparkle reads `SUFeedURL` from the app's defaults before its
 `Info.plist`, which lets one installed copy be pointed at a feed served from this Mac.
