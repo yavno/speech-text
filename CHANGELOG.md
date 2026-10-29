@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-29
+
+The first public release.
+
 ### Added
 
 - **Claude Sonnet 5.5, Opus 5.5 and Haiku 5.5, and GPT-6 Luna, GPT-6 Sol and GPT-6.1 Sol for AI Rewrite**, in Settings › AI Rewrite beside the models they follow. Nothing you picked changes: the model a new install starts on is the same as before.
@@ -22,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A main window**, opened from the menu's *Open SpeechText* or a click on the Dock icon. *Home* shows the shortcut to learn, your engines, the last 7 days and recent dictations. *History* replaces the History window, with days, search (⌘F), filters for AI Rewrite, edits and failures, and Retry, Copy and Delete on each row. *Usage* shows how much you dictated, the time it saved, what it cost and which engines and models did the work. *Prompts* replaces the presets window and says how often each prompt was used.
 - **Dictionary**, a page of the new main window, for the names and terms you want spelled your way. Add a word, and optionally how it tends to come out wrong: those spellings are replaced in everything you dictate and in what AI Rewrite and Edit write back, and AI Rewrite and Edit are told to keep the word as written. A Replacements table on the same page writes anything your way — "кома" as "," — whole words, in any capitals. The words also go to the speech engine wherever it takes a list of them — OpenAI's GPT Transcribe and GPT Live Transcribe, ElevenLabs Scribe and Apple's recogniser — and to Groq's Whisper as a hint. An engine that takes fewer words than you have gets the ones you use most, and anything added this week first; the page says how many the engine in use gets, and one switch there stops sending them to any engine. ElevenLabs charges a little more for a transcription that carries them ($0.05 an hour on Scribe v2, $0.08 on Scribe v2 Realtime).
 - **Music in Bluetooth headphones keeps playing at full quality while you dictate.** A headset's own microphone drops it to call quality — mono and muffled — and takes about a second to start, so by default SpeechText now records with your Mac's microphone instead. Settings › Dictation › Microphone shows which microphone is in use and why, and lets you pick System Default or any connected microphone, AirPods included. With the lid closed, the headphones' microphone is used, since the Mac's own is switched off.
+- **Liquid Glass for the minimal skin** on macOS 26 and later, with a **Transparency** slider in Settings › Appearance that the skin's preview follows as you move it. On macOS 14 and 15 the slider thins or thickens the material the overlay already had; with Reduce transparency on, the surface is solid and the slider has nothing to adjust.
+- **Setup asks which languages you speak** on its first step, so the Speech step can show at once which models take them and recommend one. It is optional, and the same list is in Settings › Dictation.
+- **Install instead of Retry** when a dictation failed because the local speech model you picked is not on this Mac: in the failure notice, History and Home it starts the download and opens Settings › Speech to text, and turns back into Retry once the model is ready.
+- **Settings › Dictation › Microphone says when the microphone can't hear you**: when SpeechText isn't allowed to use it, or when the lid is closed and the Mac's own microphone is the one selected.
+- Links to the website and the GitHub repository in Settings › General.
 
 ### Changed
 
@@ -52,6 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Usage counts every request that was paid for.** Each dictation now keeps a list of the requests it made: a live stream and the upload that replaced it, a retry from History, an AI rewrite. Each one records the audio sent and what the vendor said it billed — Groq's ten-second minimum per request included — so a dictation that fell back, or was retried, is counted for every request instead of once. A rewrite that a later retry replaced is still counted. Dictations made before this update are counted as before.
 - **Usage counts what AI Rewrite was billed.** Each rewrite and edit now keeps the tokens the provider reported, and Usage and Home price those instead of estimating from the words. Rewrites made before this update are still estimated, and *How this is counted* says how many.
 - **Live text survives a short outage.** When the connection drops mid-dictation, the live engines (ElevenLabs and OpenAI) reconnect and the overlay keeps showing your words. The text pasted at the stop still comes from the upload, which heard what was said while the connection was down.
+- **The recording modes in Settings are described in words**, and the gesture demos under them press your own shortcut's keys one by one.
+- Everything SpeechText says on screen is spelled in American English ("color", "canceled"), as macOS's own windows beside it are.
+- Clicking *Any language* in setup or Settings opens the list of languages, as *+ Add* does.
+- Setup and Settings use less processor time while they are open, and pause their animations while hidden.
 
 ### Fixed
 
@@ -82,12 +95,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **No more invented sign-offs.** A shortcut pressed with nothing said could paste text nobody spoke: "Thank you for watching", "Дякую за перегляд", "Evet.". A short recording whose whole result is one of these known phrases now pastes nothing, and it no longer flashes on the overlay. Such a recording stays in History, where it can be retried. The live engines (ElevenLabs and OpenAI) now also ignore silent recordings and ones too short to be speech, as the upload engines already did.
 - **Long dictations with ElevenLabs Scribe Realtime no longer pick up invented text.** Read without a long pause, Scribe Realtime keeps one stretch open, and past about half a minute it began writing sentences nobody said, or one phrase over and over, which were then pasted. When any stretch runs past 30 seconds, the text pasted at the stop now comes from the uploaded recording (Scribe v2), so the paste takes a few seconds longer and that audio is paid for twice. The overlay still shows the live text while you speak.
 - A word cut in two by a pause in ElevenLabs Scribe Realtime is pasted whole even when the stream ended the first half with "..." and started the second with a capital: "перфоратор", not "перфо Ратор".
+- **A dictation whose microphone never starts says so** after 8 seconds — "The microphone didn't start." — instead of leaving the overlay waiting, and the next dictation starts normally. A stuck audio device used to leave every later dictation "starting" until SpeechText was quit.
+- **Nothing is pasted while a Control Center menu is open.** With Control Center, Sound, Wi-Fi or Bluetooth open, the paste went nowhere and the notice still said it had landed; the text now goes to the Record Window and the notice says why.
+- **Update alerts no longer hide behind other windows.** An error or "You're up to date" alert from Check for Updates could open behind another app and leave the whole menu bar menu disabled until it was found; it now stays in front until closed.
+- **AI Rewrite no longer writes a Dictionary word into a dictation that never said it.** A word both in the Dictionary and in the window you were typing in was sometimes taken for the subject of the text.
+- **Edit selection keeps a selection that ends in a new line as you made it.** Narrowed to its words, it could make Slack select other text and cut that instead.
 
 ### Security
 
 - **API keys are kept in the macOS keychain**, in a part of it that only SpeechText can open, instead of the preferences file any app running as you could read. Keys you entered before are moved there on first launch and deleted from the preferences, including those left behind by earlier names of the app. Old Time Machine backups still hold the preferences file, so replacing your keys with the provider once is worth doing. The keys are tied to this Mac: on a new Mac, enter them again.
 
 ## [0.9.1] - 2026-09-24
+
+Packaged as a draft and never published; it first reached anyone in 0.10.0.
 
 ### Added
 
@@ -159,6 +179,5 @@ First tagged as 1.0.0, renumbered on 2026-09-18: SpeechText is still in a closed
 - Webhook delivery: POST the transcribed text to a URL of your own, with optional Bearer token auth.
 - Automatic language detection that follows the active macOS keyboard layout.
 
-[Unreleased]: https://github.com/yavno/speech-text/compare/v0.9.1...HEAD
-[0.9.1]: https://github.com/yavno/speech-text/compare/v0.9.0...v0.9.1
-[0.9.0]: https://github.com/yavno/speech-text/releases/tag/v0.9.0
+[Unreleased]: https://github.com/yavno/speech-text/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/yavno/speech-text/releases/tag/v0.10.0

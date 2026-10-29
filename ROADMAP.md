@@ -6,7 +6,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-- **Distribution** — the signed, notarized `.dmg` and the in-app updater are in place, and 0.9.1 is packaged as a draft release; what is left is making the repository public, publishing that release, and a Homebrew cask. Until then the only way for anyone else to run SpeechText is to build it, which excludes almost everyone.
+- **Distribution** — the signed, notarized `.dmg` and the in-app updater are in place, and the repository is public; what is left is publishing the first release, 0.10.0, and a Homebrew cask. Until then the only way for anyone else to run SpeechText is to build it, which excludes almost everyone.
 
 ## Next
 

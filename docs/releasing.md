@@ -213,7 +213,13 @@ to the descriptors.
    that section becomes the release notes.
 2. `scripts/rebuild.sh --tag X.Y.Z` sets the version, dates the
    CHANGELOG section, commits and tags `vX.Y.Z`. Nothing is pushed.
-3. `git push && git push origin vX.Y.Z`.
+3. `git push && git push origin vX.Y.Z`. `main` takes changes only as squash-merged pull
+   requests, though, and a squash writes a new commit, so a tag made on a branch would
+   name a commit `main` never gets. Through a pull request instead: run step 2 on a
+   branch, delete the tag it made (`git tag -d vX.Y.Z`), open the pull request, and once
+   it is merged tag its squash commit, by hash, and push only the tag —
+   `git fetch origin && git tag -a vX.Y.Z -m "SpeechText X.Y.Z" "$(gh pr view N --json mergeCommit -q .mergeCommit.oid)" && git push origin vX.Y.Z`.
+   Re-date the CHANGELOG section in the pull request if it is merged on a later day.
 4. The **Release** workflow checks the tag against the project version, signs,
    notarizes (a few minutes) and writes the appcast and the release notes in its
    *Package* job; a separate *Draft release* job, the only one that may write to the

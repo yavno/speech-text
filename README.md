@@ -67,7 +67,7 @@ Local speech models are third-party weights, downloaded when you choose one: Whi
 
 ## Install
 
-**SpeechText is a beta.** It does what this page describes and is used daily by its author, but it has not been through a public release yet: some settings will move, some rough edges are known, and you may be the first person to hit a given one. It updates itself, so a fix reaches you without a second download. If something breaks, [open an issue](https://github.com/yavno/speech-text/issues) — that is what the beta is for.
+**SpeechText is a beta.** It does what this page describes and is used daily by its author, and 0.10.0 is its first public release: some settings will move, some rough edges are known, and you may be the first person to hit a given one. It updates itself, so a fix reaches you without a second download. If something breaks, [open an issue](https://github.com/yavno/speech-text/issues) — that is what the beta is for.
 
 ### Download it
 
