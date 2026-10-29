@@ -49,6 +49,10 @@ on:
 permissions:
   contents: read
 
+# The Xcode a hosted Mac selects — see ci.yml.
+env:
+  XCODE_VERSION: "27.1"
+
 concurrency:
   group: release-${{ github.ref }}
   # A newer push to a pull request's branch makes its older unsigned build moot,
@@ -63,7 +67,7 @@ jobs:
     # someone who can push a tag can start it. A pull request on a public
     # repository is something a stranger can trigger, so it goes to a machine
     # that can be thrown away.
-    runs-on: ${{ github.event_name == 'pull_request' && github.repository_visibility != 'private' && 'macos-latest' || 'self-hosted' }}
+    runs-on: ${{ github.event_name == 'pull_request' && github.repository_visibility != 'private' && 'xcode-27' || 'self-hosted' }}
     # Unsigned it takes ~3 minutes; signed, `notarytool --wait` waits on Apple with
     # no bound of its own. The default six hours would hold the one runner. A
     # timeout cancels the job, and the `always()` cleanup below still runs; a
@@ -86,14 +90,11 @@ jobs:
           fetch-depth: 0
 
       # Hosted images carry several Xcodes; the self-hosted Mac uses the one it has,
-      # and must not be asked for a sudo password.
-      - name: Select the newest Xcode
+      # and must not be asked for a sudo password. ci.yml says why it is named
+      # (XCODE_VERSION) and why the image is `xcode-27`.
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         if: runner.environment == 'github-hosted'
-        run: |
-          set -euo pipefail
-          latest=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
-          if [ -n "$latest" ]; then sudo xcode-select -s "$latest"; fi
-          xcodebuild -version
+        run: scripts/ci-select-xcode.sh "$XCODE_VERSION"
 
       - name: The tag matches the project version
         if: startsWith(github.ref, 'refs/tags/')

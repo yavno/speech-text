@@ -26,6 +26,12 @@ name: CI
 # hosted runner, so the failure is a job that does not start rather than a
 # stranger's code on someone's Mac.
 #
+# The hosted Mac is `xcode-27`, not `macos-latest`: the project takes Xcode 27.1
+# (Swift 6.4 tools), and `macos-latest` — macOS 26 — carries Xcode 26.6 at most,
+# whose Swift 6.3 refuses the package's manifest. `xcode-27` is GitHub's image
+# with macOS 27 and Xcode 27.1, still marked preview (actions/runner-images#14404);
+# once `macos-latest` carries Xcode 27 it can go back.
+#
 # Actions minutes are free for a public repository on the standard runners, so
 # what was once a cost saving costs nothing to give up. The self-hosted Mac then
 # keeps only the tag-triggered packaging in release.yml, which no pull request
@@ -39,6 +45,13 @@ on:
 permissions:
   contents: read
 
+# The Xcode a hosted Mac selects: the project's floor, named rather than the
+# newest one found, because the image also carries release candidates — on
+# `xcode-27` the newest is `Xcode_27.2_Release_Candidate.app`, linked as
+# `Xcode_27.2.app` too, so no file name tells a release from a candidate.
+env:
+  XCODE_VERSION: "27.1"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   # A newer push to a pull request's branch makes the older run moot. On main the
@@ -51,7 +64,7 @@ jobs:
     name: Tests
     # The one job that needs a Mac, and the one that runs a pull request's own
     # code. Public: it gets a disposable Mac.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'macos-latest' }}
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'xcode-27' }}
     # GitHub's default is six hours, and while private there is one runner: a hung
     # xcodebuild would hold every queued run behind it. A warm run takes ~3 minutes;
     # a hosted one builds three packages from nothing.
@@ -61,18 +74,10 @@ jobs:
 
       # Hosted images carry several Xcodes; the self-hosted Mac uses the one it
       # has and must not be asked for a sudo password. The job runs in both
-      # places, so the step is written for both.
-      - name: Select the newest Xcode
+      # places, so the step is written for both. Which one: XCODE_VERSION, above.
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         if: runner.environment == 'github-hosted'
-        run: |
-          set -euo pipefail
-          latest=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
-          if [ -z "$latest" ]; then
-            echo "No /Applications/Xcode_*.app found; using the runner default."
-          else
-            sudo xcode-select -s "$latest"
-          fi
-          xcodebuild -version
+        run: scripts/ci-select-xcode.sh "$XCODE_VERSION"
 
       # A hosted runner starts empty, so WhisperKit, FluidAudio and Sparkle are
       # cloned from scratch on every run unless they are kept. Package.resolved
@@ -156,7 +161,7 @@ jobs:
     # commas) are dropped by rule tag; what is kept are the rules that name a
     # construct to avoid. scripts/lint-swift.sh holds the list and .swift-format the
     # configuration — an old finding elsewhere in a touched file is left alone.
-    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'macos-latest' }}
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'xcode-27' }}
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
     steps:
@@ -166,16 +171,9 @@ jobs:
 
       # See the Tests job: hosted images carry several Xcodes, the self-hosted Mac
       # uses the one it has.
-      - name: Select the newest Xcode
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         if: runner.environment == 'github-hosted'
-        run: |
-          set -euo pipefail
-          latest=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
-          if [ -z "$latest" ]; then
-            echo "No /Applications/Xcode_*.app found; using the runner default."
-          else
-            sudo xcode-select -s "$latest"
-          fi
+        run: scripts/ci-select-xcode.sh "$XCODE_VERSION"
 
       - name: swift-format finds nothing in the changed files
         env:

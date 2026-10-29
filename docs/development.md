@@ -210,9 +210,19 @@ moves the work:
 
 | Job | While private | Once public | What it does |
 |---|---|---|---|
-| Tests | `self-hosted` | `macos-latest` | `xcodebuild test` and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
-| Swift lint | `self-hosted` | `macos-latest` | `scripts/lint-swift.sh` — swift-format's semantic rules (not layout) on the lines a pull request adds or changes; needs Xcode's `swift-format` |
+| Tests | `self-hosted` | `xcode-27` | `xcodebuild test` and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
+| Swift lint | `self-hosted` | `xcode-27` | `scripts/lint-swift.sh` — swift-format's semantic rules (not layout) on the lines a pull request adds or changes; needs Xcode's `swift-format` |
 | Checks | `self-hosted` | `ubuntu-latest` | the seven checks below, one step each |
+
+The hosted Mac is GitHub's `xcode-27` image (macOS 27, Xcode 27.1 by default;
+still a preview, actions/runner-images#14404), not `macos-latest`: on 2026-10-29
+`macos-latest` was macOS 26 with Xcode 26.6 at most, and its Swift 6.3.3 refused
+the package's `swift-tools-version:6.4` before building anything. Once
+`macos-latest` carries Xcode 27 the label can go back. The Xcode is named, not
+found: `scripts/ci-select-xcode.sh` selects `Xcode_$XCODE_VERSION.app` (27.1, the
+project's floor) and fails when it is missing, because the image also carries a
+release candidate linked as `Xcode_27.2.app`, which a "newest installed" rule
+took.
 
 | *Checks* step | What it checks |
 |---|---|
@@ -356,19 +366,19 @@ gone to the self-hosted Mac. One part of it has been tried by hand: on
 2026-10-21 the Checks job's steps (all but Base branch, which needs the API) ran
 in an `ubuntu:24.04` container under both mawk, the image's `awk`, and gawk — and
 each failed as it should on a tree with a violation of its own planted in it.
-Tests, Swift lint and `release.yml`'s pull-request Package have never run on
-`macos-latest`. So the first pull request after the flip is a test of CI itself,
+Tests, Swift lint and `release.yml`'s pull-request Package had never run on a
+hosted Mac. So the first pull request after the flip is a test of CI itself,
 and is watched rather than trusted:
 
 1. Every job's log names a GitHub-hosted runner, never `Vlad-DO-Laptop`, and
    Package's first step (the self-hosted refusal) is skipped, not run.
-2. Tests: *Select the newest Xcode* prints a version, *Cache the resolved
+2. Tests: *Select Xcode 27.1* prints that version, *Cache the resolved
    packages* misses and its post step saves; the next run restores it. Put both
    runs' times under *Run time on a hosted runner* above.
 3. Swift lint: `xcrun swift-format` exists in the Xcode that was selected.
 4. Checks runs on Ubuntu and *Base branch* reads the labels.
 5. A pull request that touches the packaging (`release.yml`'s `paths:`) gets an
-   unsigned image from Package on `macos-latest` — the `dmgbuild` venv included.
+   unsigned image from Package on `xcode-27` — the `dmgbuild` venv included.
 6. Then the ruleset on `main` (*No check blocks a merge* above).
 
 The self-hosted Mac keeps the tag-triggered packaging in
@@ -376,7 +386,7 @@ The self-hosted Mac keeps the tag-triggered packaging in
 signing certificate lives and only someone who can push a tag can start it. That
 workflow's pull-request trigger — the one that checks the packaging script still
 works — is keyed on the event *and* the visibility, so on a public repository it
-lands on `macos-latest` and never signs; the job's first step refuses outright
+lands on `xcode-27` and never signs; the job's first step refuses outright
 should a public repository's pull request reach the self-hosted runner anyway.
 
 
