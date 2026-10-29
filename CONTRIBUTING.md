@@ -40,7 +40,7 @@ Every feature goes the same way, in the open, so you can see where anything stan
 
 👍 on a feature issue is a vote. Votes tell us what matters to you; they are weighed with measurements and with ROADMAP.md, and do not decide alone.
 
-**Where to help:** sub-issues and issues labelled `good first issue` or `help wanted` (code), `verification` (trying a build by hand), and `translation`. Comment on the issue before you start, so two people don't build the same thing.
+**Where to help:** sub-issues and issues labelled `good first issue` or `help wanted` (code), and `verification` (trying a build by hand). Comment on the issue before you start, so two people don't build the same thing.
 
 ## Your first pull request
 

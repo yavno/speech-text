@@ -7,7 +7,6 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 ## Now
 
 - **Distribution** — the signed, notarized `.dmg` and the in-app updater are in place, and 0.9.1 is packaged as a draft release; what is left is making the repository public, publishing that release, and a Homebrew cask. Until then the only way for anyone else to run SpeechText is to build it, which excludes almost everyone.
-- **Accuracy for technical speech** — library names, identifiers and mixed-language dictation are where every engine struggles. The Dictionary now sends its words to every engine that takes a list, replaces wrong spellings, and tells the LLM to keep them; what is still open is the verdict on Groq's Whisper prompt, which is on trial. The engine × clip corpus exists and has been run — it picked the local models' defaults — and measures each clip with and without the Dictionary's words; that comparison for Groq's prompt is still to be made and acted on.
 
 ## Next
 
@@ -17,7 +16,6 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Later
 
-- **Sync** — prompts and history across Macs.
 - **Automation** — URL scheme, Shortcuts, a CLI, and an MCP server, so other tools can start a dictation or read a transcript.
 
 ## Done
