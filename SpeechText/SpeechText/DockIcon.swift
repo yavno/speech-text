@@ -8,14 +8,15 @@ import SpeechTextCore
 ///
 /// The app is an `LSUIElement` agent, and an agent's windows have nowhere to be found
 /// once another app covers them: no Dock icon, no ⌘Tab entry, no Window menu. The
-/// default therefore gives the app a Dock icon for exactly as long as one of its
-/// ordinary windows (the main window, Settings, Debug Log) is open.
+/// default therefore keeps the app in the Dock all the time, as an ordinary app is;
+/// `whileWindowOpen` gives it an icon only while one of its ordinary windows (the main
+/// window, Settings, Debug Log) is open.
 enum DockIconMode: String, CaseIterable, Identifiable {
     case never
     case whileWindowOpen
     case always
 
-    static let `default` = DockIconMode.whileWindowOpen
+    static let `default` = DockIconMode.always
 
     var id: String { rawValue }
 

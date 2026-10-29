@@ -106,7 +106,7 @@ The setup window explains each of these as it asks for it, and Settings shows wh
 - **Speech Recognition** — only for the Apple on-device engine, and only the first time it transcribes something. Pick a cloud engine or a downloaded model and macOS never asks.
 - **Automation** — only when returning to the app you dictated into needs an AppleScript nudge, because the ordinary way of bringing it back failed. macOS asks once per app.
 
-SpeechText runs as a menu bar agent. It shows a Dock icon while one of its own windows is open, so Settings can be found again once something covers it; Settings › General can make that never or always.
+SpeechText runs as a menu bar agent with a Dock icon, so its windows can be found again once something covers them; Settings › General can show the icon only while one of its windows is open, or never.
 
 ### Build it yourself
 

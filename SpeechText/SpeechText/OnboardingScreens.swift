@@ -1729,7 +1729,7 @@ private struct DoneScreen: View {
                 Text("You're all set").setupTitle(32).padding(.bottom, 10)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SpeechText lives in your menu bar").font(.system(size: 14, weight: .semibold)).foregroundStyle(SetupColor.label)
-                    Text("Its window opens next. Once you close it there's no Dock icon — click the icon at the top of your screen to open SpeechText again.")
+                    Text("Its window opens next. Once you close it, click SpeechText in the Dock or the icon at the top of your screen to open it again.")
                         .font(.system(size: 13)).foregroundStyle(SetupColor.label2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
