@@ -24,4 +24,6 @@ Kept short, because a roadmap that never records an arrival stops being believed
 
 ## Want to help?
 
+The roadmap, with votes and progress: https://speech-text.app/roadmap
+
 Start with [`good first issue`](../../labels/good%20first%20issue). For anything on this roadmap, comment on the relevant issue first so two people don't build the same thing.

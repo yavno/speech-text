@@ -137,7 +137,7 @@ Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Start with issues labelled [`good first issue`](https://github.com/yavno/speech-text/labels/good%20first%20issue). For anything larger, open an issue first so we can agree on the approach before you write code.
 
-[docs/architecture.md](docs/architecture.md) is a map of the code and [docs/troubleshooting.md](docs/troubleshooting.md) covers what to do when a dictation misbehaves. [ROADMAP.md](ROADMAP.md) describes where the project is heading, [CHANGELOG.md](CHANGELOG.md) what has already shipped, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) how we treat each other here.
+[docs/architecture.md](docs/architecture.md) is a map of the code and [docs/troubleshooting.md](docs/troubleshooting.md) covers what to do when a dictation misbehaves. [ROADMAP.md](ROADMAP.md) describes where the project is heading (with votes and progress on [speech-text.app/roadmap](https://speech-text.app/roadmap)), [CHANGELOG.md](CHANGELOG.md) what has already shipped, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) how we treat each other here.
 
 ---
 
