@@ -90,6 +90,50 @@ final class ProviderKeyTests: XCTestCase {
     }
 }
 
+final class DiskImageLaunchTests: XCTestCase {
+    private func copy(_ path: String, _ build: String, signed: Bool = true) -> InstalledCopy {
+        InstalledCopy(path: path, build: build, isSameSigner: signed)
+    }
+
+    /// Dragged, then double-clicked in the image: the installed copy opens, nothing is asked.
+    func testTheSameBuildInApplicationsIsOpened() {
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52", copies: [copy("/Applications/SpeechText.app", "52")]),
+                       .openInstalled("/Applications/SpeechText.app"))
+    }
+
+    func testANewerInstalledBuildIsOpenedAndComparedAsANumber() {
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "9", copies: [copy("/Applications/SpeechText.app", "10")]),
+                       .openInstalled("/Applications/SpeechText.app"))
+    }
+
+    /// An older copy is what the move replaces.
+    func testAnOlderInstalledBuildIsMovedOver() {
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52", copies: [copy("/Applications/SpeechText.app", "47")]),
+                       .offerMove)
+    }
+
+    func testNoInstalledCopyOffersTheMove() {
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52", copies: []), .offerMove)
+    }
+
+    /// A bundle at that path signed by anyone else is never opened past Gatekeeper.
+    func testACopySignedByAnotherTeamIsNotOpened() {
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52",
+                                              copies: [copy("/Applications/SpeechText.app", "60", signed: false)]),
+                       .offerMove)
+    }
+
+    /// An account that cannot write /Applications installs into its own; the shared one
+    /// is preferred when both hold a usable copy.
+    func testTheSharedApplicationsFolderComesFirst() {
+        let shared = copy("/Applications/SpeechText.app", "52")
+        let own = copy("/Users/me/Applications/SpeechText.app", "52")
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52", copies: [shared, own]), .openInstalled(shared.path))
+        XCTAssertEqual(DiskImageLaunch.decide(runningBuild: "52", copies: [copy(shared.path, "40"), own]),
+                       .openInstalled(own.path))
+    }
+}
+
 final class InstallLocationTests: XCTestCase {
     private let image = MountedDiskImage(imagePath: "/Users/me/Downloads/SpeechText-0.9.0.dmg",
                                          mountPoint: "/Volumes/SpeechText 0.9.0")

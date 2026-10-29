@@ -225,6 +225,45 @@ public enum InstallLocation: Equatable, Sendable {
     }
 }
 
+/// A copy of the app already in an Applications folder, as the copy opened from the disk
+/// image finds it.
+public struct InstalledCopy: Equatable, Sendable {
+    public let path: String
+    /// Its `CFBundleVersion`.
+    public let build: String
+    /// Signed so that it satisfies the running copy's designated requirement: the same app
+    /// from the same team. Anything else at that path is not ours to open past Gatekeeper.
+    public let isSameSigner: Bool
+
+    public init(path: String, build: String, isSameSigner: Bool) {
+        self.path = path
+        self.build = build
+        self.isSameSigner = isSameSigner
+    }
+}
+
+/// What a copy opened from the disk image does.
+///
+/// The image's window says: drag SpeechText to Applications, then double-click it in this
+/// window. The drag is a Finder copy that starts nothing, so the double-click is what opens
+/// the app — the copy in the image hands over to the one in Applications without asking.
+/// With no such copy (or an older one) the double-click is the whole install, and the
+/// image's copy offers to move itself.
+public enum DiskImageLaunch: Equatable, Sendable {
+    /// Open the copy at this path, and quit.
+    case openInstalled(String)
+    case offerMove
+
+    /// `copies` in the order to prefer them: `/Applications`, then `~/Applications`. The
+    /// build is compared numerically ("10" after "9"), and an older one is replaced by the move.
+    public static func decide(runningBuild: String, copies: [InstalledCopy]) -> DiskImageLaunch {
+        let usable = copies.first {
+            $0.isSameSigner && $0.build.compare(runningBuild, options: .numeric) != .orderedAscending
+        }
+        return usable.map { .openInstalled($0.path) } ?? .offerMove
+    }
+}
+
 // MARK: - A key, shown
 
 /// How a stored API key is shown: enough of each end to tell two keys apart, never the

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import AppKit
+import Security
 import SpeechTextCore
 
-/// The disk image's half of installing: moving an app that was opened straight from the
-/// image into Applications. The decision is `InstallLocation` (SetupServices.swift); this
+/// The disk image's half of installing: opening the copy a drag put in Applications, or
+/// moving an app that was opened straight from the image into Applications. The decision is `InstallLocation` (SetupServices.swift); this
 /// is the I/O around it. The image itself is the user's to eject and throw away.
 enum AppInstaller {
     /// Where the running copy is. Asks `hdiutil` which images are mounted — a few tens of
@@ -50,8 +51,18 @@ enum AppInstaller {
         let path = Bundle.main.bundleURL.resolvingSymlinksInPath().path
         guard path.hasPrefix("/Volumes/") || path.contains("/AppTranslocation/") else { return false }
         guard case .inDiskImage(let image) = currentLocation() else { return false }
-        dlog("Install", "running from the disk image \(image?.imagePath ?? "(translocated)") — offering the move")
         isLeaving = true
+
+        // Dragged to Applications, then double-clicked in the image, as its window says:
+        // open that copy and go.
+        if case .openInstalled(let path) = DiskImageLaunch.decide(runningBuild: build(of: Bundle.main.bundleURL),
+                                                                  copies: installedCopies()) {
+            dlog("Install", "running from the disk image — opening the copy at \(path)")
+            openInstalled(URL(fileURLWithPath: path))
+            return true
+        }
+
+        dlog("Install", "running from the disk image \(image?.imagePath ?? "(translocated)") — offering the move")
 
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
@@ -83,6 +94,72 @@ enum AppInstaller {
         return true
     }
 
+    // MARK: Dragged to Applications
+
+    /// The copies a drag may have put in Applications, the shared folder first.
+    private static func installedCopies() -> [InstalledCopy] {
+        let name = Bundle.main.bundleURL.lastPathComponent
+        let folders = [URL(fileURLWithPath: "/Applications", isDirectory: true),
+                       FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications", isDirectory: true)]
+        return folders.map { $0.appendingPathComponent(name) }
+            .filter { FileManager.default.fileExists(atPath: $0.path) }
+            .map { InstalledCopy(path: $0.path, build: build(of: $0), isSameSigner: isSignedLikeThisCopy($0)) }
+    }
+
+    private static func build(of bundle: URL) -> String {
+        let info = NSDictionary(contentsOf: bundle.appendingPathComponent("Contents/Info.plist"))
+        return info?["CFBundleVersion"] as? String ?? "0"
+    }
+
+    /// Whether the bundle at `url` is valid and satisfies this copy's designated
+    /// requirement — the same app, signed by the same team.
+    private static func isSignedLikeThisCopy(_ url: URL) -> Bool {
+        var running: SecCode?
+        var runningStatic: SecStaticCode?
+        var requirement: SecRequirement?
+        var other: SecStaticCode?
+        guard SecCodeCopySelf([], &running) == errSecSuccess, let running,
+              SecCodeCopyStaticCode(running, [], &runningStatic) == errSecSuccess, let runningStatic,
+              SecCodeCopyDesignatedRequirement(runningStatic, [], &requirement) == errSecSuccess, let requirement,
+              SecStaticCodeCreateWithPath(url as CFURL, [], &other) == errSecSuccess, let other
+        else { return false }
+        let status = SecStaticCodeCheckValidity(other, [], requirement)
+        if status != errSecSuccess { dlog("Install", "\(url.path) is not signed like this copy (\(status))") }
+        return status == errSecSuccess
+    }
+
+    /// Opens the installed copy — or, when it is already running, brings it forward, where
+    /// the reopen opens its main window — and quits this one.
+    @MainActor
+    private static func openInstalled(_ url: URL) {
+        let isRunning = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+            .contains { $0.bundleURL?.standardizedFileURL == url.standardizedFileURL }
+        if !isRunning {
+            // A Finder copy keeps the quarantine flag the user has just answered for this
+            // copy; the signature check above is what makes it ours to clear, so macOS
+            // does not ask "downloaded from the Internet — open it?" a second time.
+            clearQuarantine(url)
+        }
+        let configuration = NSWorkspace.OpenConfiguration()
+        // Only for a launch: with it, a copy already running would get a second instance.
+        configuration.createsNewApplicationInstance = !isRunning
+        NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
+            if let error { dlog("Install", "opening \(url.path) failed: \(error.localizedDescription)", level: .error) }
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
+    }
+
+    private static func clearQuarantine(_ url: URL) {
+        let xattr = Process()
+        xattr.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
+        xattr.arguments = ["-d", "-r", "com.apple.quarantine", url.path]
+        xattr.standardError = FileHandle.nullDevice
+        try? xattr.run()
+        xattr.waitUntilExit()
+    }
+
+    // MARK: Moving into Applications
+
     /// Copies the running bundle into Applications — the user's own `~/Applications` when
     /// the shared folder is not writable (an account that is not an administrator) —
     /// replacing an older copy, which goes to the Trash rather than being deleted.
@@ -105,12 +182,7 @@ enum AppInstaller {
 
         // The user already opened this copy past Gatekeeper; without this the installed
         // copy would ask "downloaded from the Internet — open it?" a second time.
-        let xattr = Process()
-        xattr.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
-        xattr.arguments = ["-d", "-r", "com.apple.quarantine", destination.path]
-        xattr.standardError = FileHandle.nullDevice
-        try? xattr.run()
-        xattr.waitUntilExit()
+        clearQuarantine(destination)
 
         dlog("Install", "installed at \(destination.path)")
         return destination

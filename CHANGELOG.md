@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The disk image says what to do after the drag.** Its window now reads *Drag, then open*: drag SpeechText onto Applications, then double-click it in the same window. That double-click opens the copy you just dragged, with no second question from macOS — before, a drag ended with nothing opening and the window still up.
+
 ## [0.10.0] - 2026-10-29
 
 The first public release.
