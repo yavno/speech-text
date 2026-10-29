@@ -223,8 +223,9 @@ to the descriptors.
 4. The **Release** workflow checks the tag against the project version, signs,
    notarizes (a few minutes) and writes the appcast and the release notes in its
    *Package* job; a separate *Draft release* job, the only one that may write to the
-   repository, then opens a **draft** release with `SpeechText-X.Y.Z.dmg`, its `.sha256`
-   and `appcast.xml`.
+   repository, then opens a **draft** release with `SpeechText-X.Y.Z.dmg`, its `.sha256`,
+   `SpeechText.dmg` — the same image under a name without the version, so still signed
+   and notarized — and `appcast.xml`.
 5. Download the image and install it on a Mac — or a fresh user account — that has
    never run SpeechText: it should open without any Gatekeeper dialog, show the drag
    window (the app, the arrow, Applications), and on first launch from Applications open
@@ -245,6 +246,15 @@ to the descriptors.
 
 A tag pushed before the secrets exist fails the workflow instead of releasing an
 unsigned image.
+
+7. Move the Homebrew cask to the release. It lives in
+   [yavno/homebrew-tap](https://github.com/yavno/homebrew-tap) (`Casks/speechtext.rb`):
+   set `version` and `sha256` — the hash in the release's `.sha256` file — in a pull
+   request there, whose *Audit* check downloads the image and compares. Or let Homebrew
+   write it: `brew bump-cask-pr --version X.Y.Z yavno/tap/speechtext`. The cask's
+   `livecheck` reads the appcast, so `brew livecheck --cask yavno/tap/speechtext` says
+   when it is behind. Users are not blocked by a cask left behind — the app updates
+   itself — but a new install from it starts on the older version.
 
 ## A signed build without a tag
 
@@ -294,7 +304,7 @@ a copy installed from a release image should read `Notarized`.
 
 ## Checking an update before publishing
 
-While the repository is private, or before the draft is published, the real feed
+Before the draft is published, the real feed
 (`…/releases/latest/download/appcast.xml`) answers 404, so an installed copy cannot see
 the new version there. Sparkle reads `SUFeedURL` from the app's defaults before its
 `Info.plist`, which lets one installed copy be pointed at a feed served from this Mac.
@@ -398,6 +408,11 @@ Every release carries `appcast.xml`, and the app reads it at
 whatever release is currently the latest *published* one. So a draft release is invisible
 to installed copies, and publishing the draft is the moment the update goes out. Sparkle
 checks once a day; the menu item checks now.
+
+`SpeechText.dmg` works the same way for people: it is an identical copy of
+`SpeechText-X.Y.Z.dmg`, so `…/releases/latest/download/SpeechText.dmg` always serves the
+latest published image — one stable link for a Download button. The versioned file stays:
+the appcast's enclosure URL and the `.sha256` name it.
 
 The feed holds one item: the release being cut. Sparkle installs the best item it finds,
 so one is enough, and it means a release depends on nothing from the release before it —

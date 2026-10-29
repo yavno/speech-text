@@ -98,7 +98,7 @@ Everything else is checked for you. CI runs the test suite (which compiles the a
 
 [`.github/CODEOWNERS`](.github/CODEOWNERS) names who reviews; for now that is the maintainer, who looks at every pull request. Expect a first response within a few days — this is one person's project, so it is not an SLA, and a nudge on the pull request after a week is welcome.
 
-- CI must be green before a merge. While the repository is private GitHub lets a red pull request through — no check is required there — so any red check, *DCO sign-off* included, is "do not merge" by agreement.
+- CI must be green before a merge. GitHub refuses a merge while Tests, Swift lint or Checks is red; any other red check, *DCO sign-off* included, is "do not merge" by agreement.
 - A pull request that lists something under *Needs a real-app run* is not blocked on you: the maintainer checks those items in a real build, with a real microphone and the apps the e2e run cannot read back. Say as precisely as you can what to check.
 - Review comments are about the change, not you. If the answer to a comment is "that was on purpose", say so and why; the code is full of decisions that look like oversights.
 

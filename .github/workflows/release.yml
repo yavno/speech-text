@@ -270,9 +270,16 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           # appcast.xml is what installed copies of the app read: publishing the draft is
           # what makes this version the answer at .../releases/latest/download/appcast.xml.
+          # SpeechText.dmg is the same image under a name without the version, so
+          # .../releases/latest/download/SpeechText.dmg is one link that always downloads
+          # the latest. A copy, not gh's `path#label`: a label changes the text on the
+          # release page, never the file name in the URL. The appcast's enclosure and the
+          # .sha256 name the versioned file, which stays.
+          cp "$RUNNER_TEMP/release/SpeechText-$version.dmg" "$RUNNER_TEMP/release/SpeechText.dmg"
           gh release create "$GITHUB_REF_NAME" \
             "$RUNNER_TEMP/release/SpeechText-$version.dmg" \
             "$RUNNER_TEMP/release/SpeechText-$version.dmg.sha256" \
+            "$RUNNER_TEMP/release/SpeechText.dmg" \
             "$RUNNER_TEMP/release/appcast.xml" \
             --draft --verify-tag \
             --title "SpeechText $version" \

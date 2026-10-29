@@ -119,12 +119,9 @@ settings take care of the rest:
 
 The *DCO sign-off* check fails a pull request with an unsigned commit; the one exemption is
 Dependabot's own commits (`.github/dependabot.yml`), and only in a pull request that
-Dependabot itself opened. On this private
-repository, though, that failure does not block anything — and neither does any
-other: branch protection and required checks need GitHub Pro or a public
-repository (the API answers 403 for both, checked 2026-10-21), so a red Tests run
-can be merged as easily as a red sign-off. Every red check therefore means "do not
-merge", and pushing straight to `main` skips them altogether.
+Dependabot itself opened. That failure does not block a merge by itself: the
+`main` ruleset requires Tests, Swift lint and Checks (see *CI* below), not the
+sign-off, so a red *DCO sign-off* means "do not merge" by agreement.
 
 ### Known unsigned history
 
@@ -240,20 +237,20 @@ failing grep could report last. As steps of one job each still runs whatever the
 one before it did (`if: !cancelled()`), so a run shows every check that fails,
 under its own name; re-running the job re-runs all seven.
 
-While the repository is private only collaborators can open a pull request, so
-the self-hosted Mac is the arrangement it has always been. The moment visibility
-changes, every job moves by itself — nobody has to remember a second pull
-request, and there is no window in which the arrangement is wrong. The polarity
+On a private repository only collaborators can open a pull request, so every job
+ran on the self-hosted Mac until the repository went public on 2026-10-29; then
+every job moved by itself — nobody had to remember a second pull request, and
+there was no window in which the arrangement was wrong. The polarity
 is deliberate: an unrecognised visibility falls through to the hosted runner, so
 the failure is a job that does not start rather than a stranger's code on
 someone's Mac.
 
-**No check blocks a merge while the repository is private.** Branch protection,
-rulesets and required checks need GitHub Pro or a public repository, so every job
-here is a signal for whoever merges, not a gate: a red run is "do not merge" by
-agreement only, and a push straight to `main` is checked after the fact. Going
-public makes the gate possible; it still has to be set up — a ruleset on `main`
-requiring Tests, Swift lint and Checks.
+**The ruleset on `main` is the gate.** *Safe merge* takes changes only as
+squash-merged pull requests, with one approving review, and refuses a merge while
+Tests, Swift lint or Checks is red; it also refuses force-pushes and deleting the
+branch. Organization admins can bypass it, which is how the maintainer merges his
+own pull requests. Any other red check — *DCO sign-off*, a Package run — is "do
+not merge" by agreement.
 
 Actions minutes are free for a public repository on the standard runners. The
 Checks job then runs on Linux, where it is faster and costs a tenth as
@@ -348,27 +345,18 @@ here.
   compiler does not check.
 
 <!-- ci-timings -->
-**Run time on a hosted runner: not yet measured.** As of 2026-09-22 this account
-cannot start a GitHub-hosted runner at all — every such job fails in three
-seconds with *"the job was not started because recent account payments have
-failed or your spending limit needs to be increased"* — so the figure cannot be
-taken while the repository is private. It becomes measurable the moment the
-repository is public, since standard runners are then free, and the first
-pull-request run after the flip belongs here. Do not anchor on the self-hosted
-Mac's number: that build is warm and incremental (16 s on 2026-09-22), whereas a
-hosted run resolves and builds all three Swift packages from nothing, which is
-exactly what the cache above exists for.
+**Run time on a hosted runner:** Tests took 6–14 minutes on `xcode-27` across the
+first eight runs after the repository went public (2026-10-29, the package cache
+restored), about 10 at the median; Checks and Swift lint take seconds. Do not
+anchor on the self-hosted Mac's number: that build is warm and incremental (16 s
+on 2026-09-22).
 
 ### The first run after going public
 
-The hosted half of every `runs-on` has never run: since 2026-09-22 everything has
-gone to the self-hosted Mac. One part of it has been tried by hand: on
-2026-10-21 the Checks job's steps (all but Base branch, which needs the API) ran
-in an `ubuntu:24.04` container under both mawk, the image's `awk`, and gawk — and
-each failed as it should on a tree with a violation of its own planted in it.
-Tests, Swift lint and `release.yml`'s pull-request Package had never run on a
-hosted Mac. So the first pull request after the flip is a test of CI itself,
-and is watched rather than trusted:
+The repository went public on 2026-10-29, and the first pull requests after it
+were watched rather than trusted. `macos-latest` turned out to carry no Xcode 27,
+which is why the Mac jobs run on `xcode-27`. The list, kept for a repository that
+moves the same way:
 
 1. Every job's log names a GitHub-hosted runner, never `Vlad-DO-Laptop`, and
    Package's first step (the self-hosted refusal) is skipped, not run.
@@ -379,7 +367,7 @@ and is watched rather than trusted:
 4. Checks runs on Ubuntu and *Base branch* reads the labels.
 5. A pull request that touches the packaging (`release.yml`'s `paths:`) gets an
    unsigned image from Package on `xcode-27` — the `dmgbuild` venv included.
-6. Then the ruleset on `main` (*No check blocks a merge* above).
+6. Then the ruleset on `main` (*The ruleset on `main` is the gate* above).
 
 The self-hosted Mac keeps the tag-triggered packaging in
 [`release.yml`](../.github/workflows/release.yml), because that is where the
