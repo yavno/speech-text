@@ -1,0 +1,50 @@
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time.
+
+        Search [Ideas](https://github.com/yavno/speech-text/discussions/categories/ideas) and the [roadmap](https://github.com/yavno/speech-text/blob/main/ROADMAP.md) first. If your idea is already there, upvote it (the arrow at the top left of the discussion) instead of opening a new one.
+
+        One idea per discussion. Describe the situation, not the solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: What do you dictate, where, and what gets in the way?
+      placeholder: "I dictate replies in Slack all day, and…"
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: How do you get around it today?
+      description: Optional. A workaround, another tool, or nothing at all.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What did you have in mind?
+      description: Optional. A rough idea is fine.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of SpeechText?
+      description: Optional.
+      options:
+        - "Inline recording"
+        - "AI recording"
+        - "Record Window"
+        - "Edit Selection with AI"
+        - "Speech engines / models"
+        - "Main window (Home, History, Usage, Prompts, Dictionary)"
+        - "Settings / setup"
+        - "Something new"
+        - "Other"
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you like to help?
+      options:
+        - label: I'd be willing to open a pull request for this
+        - label: I'd be willing to test it before it ships

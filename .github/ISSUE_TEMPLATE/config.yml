@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Question or idea
-    url: https://github.com/yavno/speech-text/discussions
-    about: For anything that isn't a bug report or a concrete feature request.
+  - name: Suggest a feature
+    url: https://github.com/yavno/speech-text/discussions/new?category=ideas
+    about: Ideas start as a discussion, where others can upvote them. An issue is opened once one is accepted.
+  - name: Question
+    url: https://github.com/yavno/speech-text/discussions/new?category=q-a
+    about: How something works, or whether it should.
   - name: Security vulnerability
     url: https://github.com/yavno/speech-text/security/advisories/new
     about: Please report security issues privately, not as a public issue.

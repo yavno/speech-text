@@ -27,6 +27,21 @@ Issues labelled [`good first issue`](../../labels/good%20first%20issue) and [`he
 - Features that expand the product's scope without a prior discussion
 - Anything that sends user data somewhere new
 
+## How features are planned
+
+Every feature goes the same way, in the open, so you can see where anything stands and where your help fits.
+
+1. **An idea starts in [Ideas](../../discussions/categories/ideas).** One idea per discussion; upvote the ones you want. Each new idea gets an answer within a week, and one of three labels: `under review`, `accepted` or `declined` (with the reason).
+2. **An accepted idea becomes an issue** of type *Feature* with the `roadmap` label and a horizon: `horizon: now`, `horizon: next` or `horizon: later` — the same three sections as [ROADMAP.md](ROADMAP.md). The issue links back to its idea with a line `Idea: #<number>`.
+3. **Its stages are sub-issues**, one each, labelled `stage: spec`, `stage: design`, `stage: build`, `stage: test` and `stage: ship`. A closed sub-issue is a stage done. A feature only has the stages it needs.
+4. **When a feature is blocked**, it gets `state: waiting`, and the first line of the issue says what on: `Waiting: <reason>`.
+5. **It ships in a milestone** named after the version, as its tag without the `v` (`0.10.0`, `0.11.0`, …). The feature issue is closed when the release is out.
+6. **A feature we decide against** is closed as *not planned*, with a comment starting `Dropped: <reason>`.
+
+👍 on a feature issue is a vote. Votes tell us what matters to you; they are weighed with measurements and with ROADMAP.md, and do not decide alone.
+
+**Where to help:** sub-issues and issues labelled `good first issue` or `help wanted` (code), `verification` (trying a build by hand), and `translation`. Comment on the issue before you start, so two people don't build the same thing.
+
 ## Your first pull request
 
 1. Clone the repository and turn on the hooks: `git config core.hooksPath .githooks` (see [Hooks](#hooks)).
