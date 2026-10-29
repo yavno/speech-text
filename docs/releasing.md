@@ -433,8 +433,8 @@ build](#checking-a-signed-build) has the commands that verify the result.
 
 What a user sees on opening the image — the app on the left, a dotted arrow, the
 Applications folder on the right, on a white card in the setup window's green glass rim,
-under the title "One drag and you're set" and above a line saying setup starts once SpeechText is
-opened from Applications — is a background drawn by `scripts/dmg/background.swift` and a Finder layout
+under the title "Double-click SpeechText to install" and above two lines — the app moves itself
+to Applications and opens setup; dragged instead, open it from Applications — is a background drawn by `scripts/dmg/background.swift` and a Finder layout
 (`.DS_Store`) written by [dmgbuild](https://github.com/dmgbuild/dmgbuild) from
 `scripts/dmg/dmgbuild-settings.py`. dmgbuild writes the layout itself rather than
 scripting Finder, which would need an Automation grant and someone at the screen — a tag

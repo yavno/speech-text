@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Draws the disk image window's background in the setup window's frame: a white card
-// inside a rim of glass over the green aura, a title in the setup's type, a dotted arrow
-// from the app to Applications, and a line saying what comes after. The two icons and
+// inside a rim of glass over the green aura, a title in the setup's type saying to
+// double-click the app, a dotted arrow from the app to Applications for those who drag,
+// and two lines saying what comes after each. The two icons and
 // their names are Finder's.
 //
 //   swift background.swift OUT_DIR
@@ -141,6 +142,25 @@ struct Arrow: View {
     }
 }
 
+/// A step's number in a green dot, and what to do.
+struct StepLabel: View {
+    let number: Int
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Text("\(number)")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 20, height: 20)
+                .background(Circle().fill(brand))
+            Text(text)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(brandDeep)
+        }
+    }
+}
+
 struct Background: View {
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -159,19 +179,27 @@ struct Background: View {
                 .frame(width: WIDTH - 2 * RIM, height: CARD_AREA - 2 * RIM)
                 .offset(x: RIM, y: RIM)
             Arrow()
+            // Step 1 over the arrow: the drag.
+            StepLabel(number: 1, text: "Drag")
+                .position(x: (APP_CENTER.x + APPS_CENTER.x) / 2, y: APP_CENTER.y - 52)
             VStack(spacing: 0) {
                 // setupTitle: semibold, tracked in by 3 %, the setup's label colour.
-                Text("One drag and you're set")
+                Text("Drag, then open")
                     .font(.system(size: 28, weight: .semibold))
                     .tracking(-28 * 0.03)
                     .foregroundStyle(.black.opacity(0.88))
                     .padding(.top, 34)
                 Spacer()
-                // setupLead's colour, at the size of a caption.
-                Text("Setup starts when you open SpeechText from Applications.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.black.opacity(0.56))
-                    .padding(.bottom, CARD_AREA - LABEL_BAND.top - LABEL_BAND.height - 50)
+                // Step 2 — the one a drag leaves out: a Finder copy starts nothing, and
+                // the window would otherwise sit there with nothing opening. The icon in
+                // this window opens the copy in Applications (AppInstaller).
+                VStack(spacing: 5) {
+                    StepLabel(number: 2, text: "Then double-click SpeechText in this window")
+                    Text("It opens the copy in Applications, and setup begins.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.black.opacity(0.62))
+                }
+                .padding(.bottom, CARD_AREA - LABEL_BAND.top - LABEL_BAND.height - 62)
             }
             .frame(width: WIDTH, height: CARD_AREA)
         }
