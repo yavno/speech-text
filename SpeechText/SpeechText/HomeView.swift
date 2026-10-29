@@ -121,7 +121,7 @@ struct HomeAttention: View {
                 }
                 if !ax {
                     problem("SpeechText can't type for you", "Accessibility is off, so your text opens in the Record Window instead.") {
-                        AccessibilityGuide.shared.start { _ in }
+                        SystemSettingsGuide.accessibility.start { _ in }
                     }
                 }
             }

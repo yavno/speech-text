@@ -211,7 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             // dictation that could not be pasted offers the way to turn it on. Listed
             // quietly, so the switch is there to find.
             if !PasteService.isAccessibilityGranted {
-                AccessibilityGuide.registerQuietly()
+                SystemSettingsGuide.registerQuietly()
             }
         }
 
@@ -2435,7 +2435,7 @@ final class AppState {
     /// `historyPlace`: what a click on the notice narrows History to, as History's row names it.
     /// A notice's way to Accessibility: the pane and the helper, never macOS's alert.
     static let allowAccessibilityAction = StatusOverlayAction(title: "Turn On…") {
-        AccessibilityGuide.shared.start { _ in }
+        SystemSettingsGuide.accessibility.start { _ in }
     }
 
     func showStatus(icon: String, title: String, detail: String?, tint: Color, duration: TimeInterval = 5,

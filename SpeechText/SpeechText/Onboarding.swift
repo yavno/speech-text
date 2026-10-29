@@ -239,7 +239,7 @@ final class OnboardingModel {
         observers = []
         permissionsPoll?.invalidate()
         permissionsPoll = nil
-        stopWatchingAccessibility()
+        stopSystemSettingsHelpers()
         checks.values.forEach { $0.cancel() }
         appState.dictationTest.isActive = false
         appState.dictationTest.isBlocked = false
@@ -554,9 +554,10 @@ final class OnboardingModel {
         return (value as? Bool) ?? false
     }
 
-    /// System Settings › Keyboard, where Dictation is turned on.
+    /// System Settings › Keyboard, where Dictation is turned on — at the foot of the pane,
+    /// so the helper floats beside it saying where. Back to setup once it is on, or on Done.
     static func openKeyboardSettings() {
-        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
+        SystemSettingsGuide.dictation.start { _ in NSApp.activate(ignoringOtherApps: true) }
     }
 
     private func flash(_ row: String) {
@@ -577,10 +578,10 @@ final class OnboardingModel {
     }
 
     /// Accessibility has no system dialog of its own to grant it: the user turns
-    /// SpeechText on in System Settings, with `AccessibilityGuide`'s helper beside it.
+    /// SpeechText on in System Settings, with `SystemSettingsGuide`'s helper beside it.
     func openAccessibilitySettings() {
         accessibilityChoice = .waiting
-        AccessibilityGuide.shared.start { [weak self] granted in
+        SystemSettingsGuide.accessibility.start { [weak self] granted in
             guard let self else { return }
             self.accessibilityChoice = .idle
             self.refreshPermissions()
@@ -589,8 +590,9 @@ final class OnboardingModel {
         }
     }
 
-    private func stopWatchingAccessibility() {
-        AccessibilityGuide.shared.stop()
+    private func stopSystemSettingsHelpers() {
+        SystemSettingsGuide.accessibility.stop()
+        SystemSettingsGuide.dictation.stop()
     }
 
     /// Registered or unregistered on change, not on Continue.
