@@ -6,7 +6,7 @@ Press a shortcut, say what you want to write, and the text appears at your curso
 
 https://github.com/user-attachments/assets/VIDEO-ID
 
-**[Download for macOS](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg)** · free and open source · macOS 14 or later
+**[Download for macOS](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg)** · [speech-text.app](https://speech-text.app) · free and open source · macOS 14 or later
 
 ---
 
@@ -62,7 +62,7 @@ SpeechText updates itself. It's in beta, so if something breaks, [let us know](h
 
 ![CI](https://github.com/yavno/speech-text/actions/workflows/ci.yml/badge.svg)
 
-Open `SpeechText/SpeechText.xcodeproj` in Xcode 27.1 or later and press ⌘R. See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/architecture.md](docs/architecture.md), [docs/third-party.md](docs/third-party.md) the [roadmap](ROADMAP.md) and the [changelog](CHANGELOG.md).
+Open `SpeechText/SpeechText.xcodeproj` in Xcode 27.1 or later and press ⌘R. See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/architecture.md](docs/architecture.md), [docs/third-party.md](docs/third-party.md) the [roadmap](ROADMAP.md) (vote on it at [speech-text.app/roadmap](https://speech-text.app/roadmap)) and the [changelog](CHANGELOG.md).
 
 ## License
 
