@@ -368,13 +368,15 @@ moves the same way:
    unsigned image from Package on `xcode-27` — the `dmgbuild` venv included.
 6. Then the ruleset on `main` (*The ruleset on `main` is the gate* above).
 
-The self-hosted Mac keeps the tag-triggered packaging in
-[`release.yml`](../.github/workflows/release.yml), because that is where the
-signing certificate lives and only someone who can push a tag can start it. That
-workflow's pull-request trigger — the one that checks the packaging script still
-works — is keyed on the event *and* the visibility, so on a public repository it
-lands on `xcode-27` and never signs; the job's first step refuses outright
-should a public repository's pull request reach the self-hosted runner anyway.
+[`release.yml`](../.github/workflows/release.yml) followed on 2026-10-30. Its
+tag-triggered packaging used to stay on the self-hosted Mac, on the reasoning that
+the signing certificate lived there; it does not — every credential a release needs
+is a repository secret — and a tag that waited for one person's laptop to be
+switched on was the last thing tying a release to it. On a public repository
+Package now runs on `xcode-27` whatever started it, signing only for a tag or a
+manual run, and *Draft release* on `ubuntu-latest`; a private repository still
+sends both to the self-hosted Mac. The job's first step refuses outright should a
+public repository's run reach a self-hosted runner anyway.
 
 
 ## Project layout

@@ -6,19 +6,22 @@ name: Release
 # A pull request that touches the packaging runs the same script unsigned, so a
 # broken release pipeline is found in review rather than on release day.
 #
-# A tag runs on the organisation's self-hosted Mac, because that is where the
-# signing certificate is. That machine is someone's own Mac, not a throwaway VM,
-# so the job leaves nothing behind: no sudo, the signing keychain taken back out
-# of the user's search list, and the notary key deleted — whether the job
-# succeeds, fails or is cancelled. Only someone who can push a tag can start it.
+# On a public repository every run is on a GitHub-hosted machine: Package on an
+# `xcode-27` Mac, the draft on Linux. The signing certificate, the notary key, the
+# provisioning profile and the update-signing key all come from the repository's
+# secrets, so nothing ties a release to anyone's own Mac, and a tag is released
+# whether or not that Mac is switched on. A pull request runs the same Package job
+# and never signs; only someone who can push a tag (or start a manual run) gets a
+# signed build. The secrets are gated on the event, and GitHub withholds them from
+# a fork regardless.
 #
-# On a public repository a pull request runs the same job on a GitHub-hosted Mac
-# instead, and never signs. Anyone may open a pull request there, and a pull
-# request is code: run on the self-hosted Mac it would be a stranger's code
-# against someone's own keychain and SSH keys. `runs-on` is therefore chosen by
-# the event *and* the repository's visibility, and the job's first step refuses
-# outright if the three ever disagree. The secrets were already gated on the
-# event, and GitHub withholds them from a fork regardless.
+# On a private repository hosted Mac minutes are billed, so there it runs on the
+# organisation's self-hosted Mac, as every tag did until 2026-10-30. That machine is
+# someone's own Mac, not a throwaway VM, so the job leaves nothing behind: no sudo,
+# the signing keychain taken back out of the user's search list, and the notary key
+# deleted — whether the job succeeds, fails or is cancelled. `runs-on` is chosen by
+# the repository's visibility, as in ci.yml, and the job's first step refuses
+# outright if a public repository's run ever lands on a self-hosted runner.
 #
 # Secrets (docs/releasing.md explains where each comes from):
 #   DEVELOPER_ID_P12_BASE64, DEVELOPER_ID_P12_PASSWORD   the signing certificate
@@ -55,33 +58,32 @@ env:
 
 concurrency:
   group: release-${{ github.ref }}
-  # A newer push to a pull request's branch makes its older unsigned build moot,
-  # and on the one runner it would only hold up the next. A tag or a manual run
-  # signs and notarizes, and is never cut short for another.
+  # A newer push to a pull request's branch makes its older unsigned build moot.
+  # A tag or a manual run signs and notarizes, and is never cut short for another.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   package:
     name: Package
-    # A tag needs the certificate, so it goes to the Mac that holds it, and only
-    # someone who can push a tag can start it. A pull request on a public
-    # repository is something a stranger can trigger, so it goes to a machine
-    # that can be thrown away.
-    runs-on: ${{ github.event_name == 'pull_request' && github.repository_visibility != 'private' && 'xcode-27' || 'self-hosted' }}
-    # Unsigned it takes ~3 minutes; signed, `notarytool --wait` waits on Apple with
-    # no bound of its own. The default six hours would hold the one runner. A
-    # timeout cancels the job, and the `always()` cleanup below still runs; a
-    # notarization that slow is re-run, not waited out.
-    timeout-minutes: 45
+    # A machine that is thrown away after the job, whatever started it. An
+    # unrecognised visibility falls through to the hosted Mac too, so a mistake is a
+    # job that waits for a runner rather than a stranger's code on someone's Mac.
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'xcode-27' }}
+    # The hosted Mac resolves the packages from nothing and builds clean; signed,
+    # `notarytool --wait` then waits on Apple with no bound of its own. The default
+    # six hours would only burn minutes. A timeout cancels the job, and the
+    # `always()` cleanup below still runs; a notarization that slow is re-run, not
+    # waited out.
+    timeout-minutes: 60
     steps:
       # The expression above is the guard; this is the assertion that it held.
-      # A pull request that reached the self-hosted Mac must stop before it runs
-      # any of the repository's own code, so this is the first step and it does
-      # not even check the tree out.
-      - name: A public repository's pull request never runs on the self-hosted Mac
-        if: github.event_name == 'pull_request' && github.repository_visibility != 'private' && runner.environment != 'github-hosted'
+      # A public repository's run that reached a self-hosted machine must stop
+      # before it runs any of the repository's own code, so this is the first step
+      # and it does not even check the tree out.
+      - name: A public repository never runs on the self-hosted Mac
+        if: github.repository_visibility != 'private' && runner.environment != 'github-hosted'
         run: |
-          echo "::error::This pull request landed on a self-hosted runner. Refusing to build it."
+          echo "::error::This run landed on a self-hosted runner. Refusing to build it."
           exit 1
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -244,12 +246,10 @@ jobs:
     name: Draft release
     # Only the draft's creation needs to write to the repository, so only this job
     # may. It checks nothing out and runs none of the repository's code: it takes
-    # what `package` built and hands it to `gh`. Tags are pushed by people who may
-    # push to the repository, so this is always the self-hosted Mac, as the signing
-    # is.
+    # what `package` built and hands it to `gh`, which needs no Mac.
     needs: package
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: self-hosted
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 10
     permissions:
       contents: write
