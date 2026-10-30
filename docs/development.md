@@ -119,9 +119,8 @@ settings take care of the rest:
 
 The *DCO sign-off* check fails a pull request with an unsigned commit; the one exemption is
 Dependabot's own commits (`.github/dependabot.yml`), and only in a pull request that
-Dependabot itself opened. That failure does not block a merge by itself: the
-`main` ruleset requires Tests, Swift lint and Checks (see *CI* below), not the
-sign-off, so a red *DCO sign-off* means "do not merge" by agreement.
+Dependabot itself opened. It is a step of the *Checks* job, which the `main`
+ruleset requires (see *CI* below), so an unsigned commit blocks the merge.
 
 ### Known unsigned history
 
@@ -246,11 +245,11 @@ the failure is a job that does not start rather than a stranger's code on
 someone's Mac.
 
 **The ruleset on `main` is the gate.** *Safe merge* takes changes only as
-squash-merged pull requests, with one approving review, and refuses a merge while
+squash-merged pull requests, with no approving review required, and refuses a merge while
 Tests, Swift lint or Checks is red; it also refuses force-pushes and deleting the
 branch. Organization admins can bypass it, which is how the maintainer merges his
-own pull requests. Any other red check — *DCO sign-off*, a Package run — is "do
-not merge" by agreement.
+own pull requests. *DCO sign-off* and *Base branch* are steps of Checks, so they
+block a merge too; a red Package run is "do not merge" by agreement.
 
 Actions minutes are free for a public repository on the standard runners. The
 Checks job then runs on Linux, where it is faster and costs a tenth as
