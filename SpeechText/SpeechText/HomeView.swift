@@ -488,14 +488,14 @@ struct HomeIntroCard: View {
     }
 }
 
-/// "Ready": only when it is true — the microphone and Accessibility are both allowed.
+/// "Ready to use": only when it is true — the microphone and Accessibility are both allowed.
 struct HomeReadyChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Circle().fill(Color(hex: 0x5FE39A))
                 .frame(width: 6, height: 6)
                 .shadow(color: Color(hex: 0x5FE39A), radius: 3)
-            Text("Ready")
+            Text("Ready to use")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(.white)
         }
