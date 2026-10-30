@@ -47,7 +47,7 @@ public struct VocabularyEntry: Identifiable, Codable, Hashable, Sendable {
 
     /// A word whose capitals are the point — "iPhone", "SpeechText", "JSON", "macOS" — is
     /// put back the way it is written when it comes out in other capitals, even with no
-    /// wrong spelling listed. A plain word or a name ("Olena", "Apple") is not: lower case
+    /// wrong spelling listed. A plain word or a name ("Sarah", "Apple") is not: lower case
     /// may be another word, and a capital may only be the start of a sentence.
     public var fixesCapitals: Bool {
         let letters = trimmedTerm.filter(\.isLetter)
@@ -141,7 +141,7 @@ public enum Vocabulary {
 
     /// Words from the user's own dictations that look like names or terms — capitals
     /// inside a word ("iPhone", "SpeechText", "JSON"), or a capital that does not start a
-    /// sentence or a line ("Olena", "Figma") and is never written in lower case — used at
+    /// sentence or a line ("Sarah", "Figma") and is never written in lower case — used at
     /// least `minimumCount` times and not taught yet, most used first.
     static func suggestions(from texts: [String], excluding entries: [VocabularyEntry],
                             minimumCount: Int = 2, limit: Int = 8) -> [(term: String, count: Int)] {

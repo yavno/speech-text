@@ -487,9 +487,9 @@ public struct HomeTalk: Equatable, Sendable {
         preset: nil)
 
     static let ai = Script(
-        app: "Mail", place: "To: Olena",
-        said: "uh email to Olena running late start without me sorry".split(separator: " ").map(String.init),
-        output: "Hi Olena, I'm running a few minutes late — please start without me. Sorry!",
+        app: "Mail", place: "To: Sarah",
+        said: "uh email to Sarah running late start without me sorry".split(separator: " ").map(String.init),
+        output: "Hi Sarah, I'm running a few minutes late — please start without me. Sorry!",
         preset: "Email / Message")
 
     static let edit = Script(

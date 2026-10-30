@@ -289,7 +289,7 @@ private struct PromptsBanner: View {
 
     /// Keyed by the built-in prompts' fixed ids' last two digits.
     private static let examples: [Example] = [
-        Example(builtIn: "03", said: "uh email to Olena running late start without me"),
+        Example(builtIn: "03", said: "uh email to Sarah running late start without me"),
         Example(builtIn: "05", said: "list for the trip passport charger the blue jacket"),
         Example(builtIn: "04", said: "translate to English дякую що прийшли"),
         Example(builtIn: "06", said: "fix the bug where the token expires too early"),
@@ -749,7 +749,7 @@ private struct PromptsWordsPicture: View {
     let words: [String]
 
     var body: some View {
-        let shown = words.isEmpty ? ["SpeechText", "Olena", "JSON"] : Array(words.prefix(3))
+        let shown = words.isEmpty ? ["SpeechText", "Sarah", "JSON"] : Array(words.prefix(3))
         VStack(spacing: 6) {
             ForEach(Array(shown.enumerated()), id: \.offset) { index, word in
                 HStack(spacing: 5) {
