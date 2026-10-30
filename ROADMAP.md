@@ -6,7 +6,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-- **Distribution** — the first public release, 0.10.0, is out: a signed, notarized `.dmg` that updates itself. What is left is a Homebrew cask.
+Nothing is in progress right now; the next piece of work comes from **Next**.
 
 ## Next
 
@@ -20,7 +20,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Done
 
-Kept short, because a roadmap that never records an arrival stops being believed: continuous integration on every pull request; live transcription shown on the overlay while you speak and pasted once at the stop; local speech and chat models with a hardware-based recommendation; first-run setup; signed, notarized releases that update themselves; OpenAI as a speech engine; API keys in the keychain; dictations made offline saved and retried once the network is back; a main window with History, Usage and Prompts; a Dictionary whose words reach the engine, a replacement table and the AI prompt; AI Rewrite built into the app on llama.cpp, with nothing else to install; a voice activity detector that keeps typing and room noise from being sent; the languages each model knows, shown before you download it; a lifecycle for models, so one a vendor retires is moved to its replacement; a weekly check of the catalogues against the vendors.
+Kept short, because a roadmap that never records an arrival stops being believed: continuous integration on every pull request; live transcription shown on the overlay while you speak and pasted once at the stop; local speech and chat models with a hardware-based recommendation; first-run setup; signed, notarized releases that update themselves, the first of them public as 0.10.0 and installable with Homebrew; OpenAI as a speech engine; API keys in the keychain; dictations made offline saved and retried once the network is back; a main window with History, Usage and Prompts; a Dictionary whose words reach the engine, a replacement table and the AI prompt; AI Rewrite built into the app on llama.cpp, with nothing else to install; a voice activity detector that keeps typing and room noise from being sent; the languages each model knows, shown before you download it; a lifecycle for models, so one a vendor retires is moved to its replacement; a weekly check of the catalogues against the vendors.
 
 ## Want to help?
 
