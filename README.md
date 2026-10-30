@@ -4,7 +4,7 @@
 
 Press a shortcut, say what you want to write, and the text appears at your cursor: in Slack, Mail, Notion, your code editor, anywhere.
 
-https://github.com/user-attachments/assets/VIDEO-ID
+https://github.com/user-attachments/assets/2cf9b269-2961-4f5b-97ae-a36af71dabbd
 
 **[Download for macOS](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg)** · [speech-text.app](https://speech-text.app) · free and open source · macOS 14 or later
 
