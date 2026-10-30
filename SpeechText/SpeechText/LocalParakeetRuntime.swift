@@ -27,7 +27,7 @@ import SpeechTextCore
 /// re-trainings share the tokenizer, the 15 s window and the decoder contract, and differ
 /// only in their weights and which repo they come from.
 ///
-/// Weights, each CC-BY-4.0 and credited in README:
+/// Weights, each CC-BY-4.0 and credited in docs/third-party.md:
 /// - v3: `FluidInference/parakeet-tdt-0.6b-v3-coreml`, from `nvidia/parakeet-tdt-0.6b-v3`;
 /// - Ultra: `FluidInference/parakeet-ultra-coreml`, from `moondream/parakeet-ultra`;
 /// - Redux: `FluidInference/parakeet-redux-coreml`, from `moondream/parakeet-redux`;

@@ -253,7 +253,7 @@ Read CLAUDE.md's streaming sections first. The rules:
   edit; the test bundle compiles no app file, so anything a test needs goes there too. Test
   request builders and parsers as pure functions; realtime vendors get a
   `DictationReplay` script with a drop and a `Vendor` case in the realtime contract tests.
-- Docs: README (engine table and **privacy list**), SECURITY.md, CLAUDE.md (component
+- Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md, CLAUDE.md (component
   bullet, Settings Keys table), CHANGELOG. What only a person can check — a live socket
   from a microphone, a real key against the service — goes under *Needs a real-app run*
   in the pull request.
@@ -309,7 +309,7 @@ key      | Packages/SpeechTextCore/Sources/SpeechTextCore/Settings.swift        
 key      | Packages/SpeechTextCore/Sources/SpeechTextCore/ProviderRegistry.swift      | var descriptor: ProviderDescriptor     | compiler    | the Provider case and its ProviderDescriptor: name, roles, and the APIKeyDescriptor (key page, create note, prefix, sample, verification)
 key      | Packages/SpeechTextCore/Sources/SpeechTextCore/SetupServices.swift         | enum SetupCards                        | review      | a setup card on the Speech and AI steps, if the maintainer wants one; SetupCardsTests checks what it saves
 key      | docs/development.md                                                        | ## API keys                            | manual      | the list of keys
-docs     | README.md                                                                  | ## Privacy: where your audio goes      | manual      | the privacy list (and the engine table or AI sentence above it)
+docs     | docs/privacy.md                                                            | # Where your audio goes                | manual      | the privacy list, the engine table and the AI Rewrite paragraph
 docs     | SECURITY.md                                                                | The privacy practices of               | manual:file | add the vendor
 docs     | CLAUDE.md                                                                  | ## Settings Keys Reference             | manual      | the new keys, and the provider file's Architecture bullet
 docs     | CHANGELOG.md                                                               | ## [Unreleased]                        | manual:file | an Added entry

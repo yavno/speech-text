@@ -1,162 +1,69 @@
 # SpeechText
 
-**Voice-to-text for macOS. Press a hotkey, speak, and the text appears where your cursor is.**
+**Talk instead of typing, anywhere on your Mac.**
 
-![CI](https://github.com/yavno/speech-text/actions/workflows/ci.yml/badge.svg)
+Press a shortcut, say what you want to write, and the text appears at your cursor: in Slack, Mail, Notion, your code editor, anywhere.
 
-Open source, bring your own API keys. A month of heavy dictation costs cents instead of a $15 subscription.
+https://github.com/user-attachments/assets/VIDEO-ID
 
-![SpeechText](speech-text.png)
-
----
-
-## What it does
-
-Press a global hotkey, talk, press it again — or, with Hold to talk on, hold it while you speak and let go. SpeechText transcribes what you said and pastes it at the cursor in whatever app you were just using — your editor, a chat box, an email, anywhere.
-
-**Four ways to use it:**
-
-| Mode | Hotkey | What happens |
-|---|---|---|
-| **Inline** | `Ctrl+Shift+Q` | Speak → text is pasted at your cursor |
-| **AI Rewrite** | `Ctrl+Shift+A` | Speak → an LLM cleans it up → pasted at your cursor |
-| **Record Window** | `Ctrl+Shift+W` | A floating panel for longer dictation you want to edit first |
-| **Edit with AI** | `Ctrl+Shift+E` | Select text, optionally say what to change → the rewrite replaces the selection |
-
-All hotkeys are configurable.
-
-### The dictation *is* the prompt
-
-AI Rewrite has no mode picker. You just talk, and the model figures out what you wanted from how you said it — clean up this text, write it as an email, translate it, turn it into a commit message. You define these as prompts on the main window's Prompts page, each with a plain-language "when to use this" description, and the model routes your dictation to the right one.
-
-If the LLM fails or refuses, you still get your raw transcript. A dictation is never lost.
+**[Download for macOS](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg)** · free and open source · macOS 14 or later
 
 ---
 
-## Speech engines
+## Press. Speak. It types.
 
-Pick per your priorities — all configurable in Settings:
+1. Hold `⌃⇧Q` and speak.
+2. Let go.
+3. Your words appear where your cursor is.
 
-| Engine | Cost | Notes |
-|---|---|---|
-| **Apple** (on-device) | free | Recognition stays on your Mac; a History retry of a saved recording goes to Groq if you have a Groq key |
-| **Groq** (Whisper) | ~$0.04/hour | Fast, accurate, needs an API key |
-| **ElevenLabs** (Scribe v2) | pay-as-you-go | Upload, or realtime streaming with live partial text; needs an API key |
-| **OpenAI** | pay-as-you-go | Upload or realtime streaming, needs an API key; the newest engine, and the least exercised |
-| **Local model** | free | Parakeet or Whisper, downloaded to your Mac in one click; no key, works offline |
+No window to switch to, no copy and paste.
 
-For local models, Settings reads your Mac's chip, memory and free disk, places it in a memory class from 8 GB to 256 GB and up, and marks two models for it: a **recommended** one (the fastest of good quality) and a **best quality** one. Heavier models stay available, labelled. The picks also follow the languages you speak and your macOS: on Apple Silicon both are usually **Parakeet v3** — NVIDIA's multilingual model, 25 European languages, 483 MB, and in our tests it matched the best cloud engine in under a second. If you speak English alone it recommends the smaller English-only Phonon-2 (macOS 15 or later), and for a language Parakeet does not know, Whisper Large v3 Turbo. Each model's row says how many languages it knows and warns about one of yours it lacks. Intel Macs have no Neural Engine and are pointed at the small Whisper models instead.
+## Knows where it's going
 
-For the AI pass you can use **Groq**, **Anthropic** or **OpenAI** with your own key — or run it on your Mac with nothing else installed: AI Rewrite is built on [llama.cpp](https://github.com/ggml-org/llama.cpp), and Settings offers Qwen3.8 27B, gpt-oss 20B, Gemma 4 12B, Qwen3.5 9B and Qwen3.5 4B, from 2.7 GB to 19 GB, recommends a pair for your Mac, and downloads them in one click. A model that is in use is read once and kept ready, so a local rewrite takes a second or two.
+Hold `⌃⇧A` instead, and AI turns what you said into what you meant. *"So um… tell Anna the demo moved to Friday"* becomes a short message in WhatsApp and a proper email in Gmail. Ask for it in English, as a list, or shorter, and it does that too. There are no modes to pick: just talk.
 
----
+## Edit by voice
 
-## Requirements
+Select some text, hold `⌃⇧E`, and say *"make it shorter"* or *"more friendly"*. The rewrite replaces the selection.
 
-- macOS 14 (Sonoma) or later
-- Xcode 27.1+ (Swift 6.4, on macOS 26.6 or later) — only if you build from source
-- Optional: API keys for the cloud engines you want to use
+## And more
 
-Four third-party dependencies. Three Swift packages, resolved by Xcode on the first build: [WhisperKit](https://github.com/argmaxinc/argmax-oss-swift) and [FluidAudio](https://github.com/FluidInference/FluidAudio) for the two local speech engines and the voice activity detector, and [Sparkle](https://sparkle-project.org) for updates. And [llama.cpp](https://github.com/ggml-org/llama.cpp), for AI Rewrite on your Mac, as ggml-org's prebuilt framework in a local package (`Packages/LlamaBinary/`), linked only by the `SpeechTextLLM` helper service the app talks to — so a model that runs out of memory ends the service, not your dictation. Each is imported by one file per use — FluidAudio by two, the Parakeet engine and the detector. Everything else is Apple frameworks. Their licences ship inside the app (Settings › General › Acknowledgements), generated by `scripts/third-party-notices.sh`.
+- **Every dictation, kept.** History has everything you said and what AI made of it, so you can search it, copy it, or retry it.
+- **Your words.** Teach it names, product terms and code identifiers, and it spells them right every time.
+- **Style your window.** Choose a skin and a color.
 
-The voice activity detector is [Silero VAD](https://github.com/snakers4/silero-vad) v6.2.1 (MIT), in [FluidInference's Core ML conversion](https://huggingface.co/FluidInference/silero-vad-coreml) (MIT), shipped inside the app; its notice is in the same file, from `scripts/notices/silero-vad.txt`.
+## Free on your Mac, or pennies in the cloud
 
-Local speech models are third-party weights, downloaded when you choose one: Whisper is MIT, and the Parakeet models are each under CC-BY-4.0, run through FluidAudio's Core ML conversions — Parakeet v3 is [NVIDIA's `parakeet-tdt-0.6b-v3`](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3), Parakeet Ultra and Parakeet Redux are moondream's [`parakeet-ultra`](https://huggingface.co/moondream/parakeet-ultra) and [`parakeet-redux`](https://huggingface.co/moondream/parakeet-redux), and Phonon-2 is Fermion Research's [`Phonon-2`](https://huggingface.co/FermionResearch/Phonon-2).
+- **On your Mac:** download a speech model in one click. It's free and private, works offline, and handles English, Ukrainian and dozens of other languages. AI rewriting can run on your Mac too.
+- **In the cloud:** use your own Groq, OpenAI, ElevenLabs or Anthropic key. A month of heavy dictation costs cents, not a monthly subscription.
 
----
+SpeechText recommends the right model for your Mac and the languages you speak.
+
+## Private by design
+
+- No account, no telemetry, no server of ours.
+- With a model on your Mac, nothing leaves your computer.
+- With a cloud provider, your audio goes straight to them, using your key.
+- History stays on your Mac, and you decide how long it's kept.
+
+[What is sent where →](docs/privacy.md)
 
 ## Install
 
-**SpeechText is a beta.** It does what this page describes and is used daily by its author, and 0.10.0 is its first public release: some settings will move, some rough edges are known, and you may be the first person to hit a given one. It updates itself, so a fix reaches you without a second download. If something breaks, [open an issue](https://github.com/yavno/speech-text/issues) — that is what the beta is for.
-
-### Download it
-
-1. Download [SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg), the latest version — or `SpeechText-<version>.dmg`, the same image, from the [latest release](https://github.com/yavno/speech-text/releases/latest).
-2. Open the image, drag **SpeechText** onto **Applications**, then double-click **SpeechText** in the same window: it opens the copy you just dragged. (Double-clicking it without the drag works too — it offers to move itself to Applications.)
-3. Because it came from the Internet, macOS checks it before the first launch and asks *"SpeechText is an app downloaded from the Internet. Are you sure you want to open it?"*, naming the developer — click **Open**. One question, and the app opens: that is what signing and notarization are for. Every release is signed with an Apple Developer ID certificate and notarized by Apple before it is published, and until the project's Apple account becomes an organization, the developer macOS names is Alona Sheiko, whose Apple Developer account signs the releases. If your Mac says something stronger than that — an unidentified developer, or a trip through System Settings › Privacy & Security to open it at all — then that download did not pass the check, and we would like to know: please [open an issue](https://github.com/yavno/speech-text/issues).
-4. SpeechText lives in the menu bar — look for its ST mark at the top right; *Open SpeechText* there opens its main window. A setup window opens on the first run and walks through the rest: which speech engine to use, an optional AI provider, the keys those need, the permissions below, and a dictation to try before you rely on it.
-
-After that, SpeechText keeps itself up to date: it checks once a day, shows you what changed, and installs the update when you agree. *Check for Updates…* in the menu asks straight away.
-
-If you want to verify the download, each release carries a `.sha256` file beside the versioned image (it names `SpeechText-<version>.dmg`, so check that file):
-
-```bash
-shasum -a 256 -c SpeechText-<version>.dmg.sha256
-```
-
-### Or with Homebrew
+[Download SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg), drag it to Applications and open it. A short setup takes care of the rest. Or use Homebrew:
 
 ```bash
 brew install --cask yavno/tap/speechtext
 ```
 
-The cask lives in our own tap, [yavno/homebrew-tap](https://github.com/yavno/homebrew-tap), and installs the same signed image. SpeechText still updates itself, so `brew upgrade` leaves it alone unless you pass `--greedy`. `brew uninstall --zap speechtext` also removes its settings, History and downloaded models — but not your API keys, which live in the keychain: delete them in Settings › API Keys first.
+SpeechText updates itself. It's in beta, so if something breaks, [let us know](https://github.com/yavno/speech-text/issues). More details are in [docs/install.md](docs/install.md), and [docs/troubleshooting.md](docs/troubleshooting.md) helps when a dictation misbehaves.
 
-### Permissions
+## For developers
 
-The setup window explains each of these as it asks for it, and Settings shows what is still missing.
+![CI](https://github.com/yavno/speech-text/actions/workflows/ci.yml/badge.svg)
 
-**Required**
-
-- **Microphone** — to hear you. Nothing works without it.
-- **Accessibility** — to paste at the cursor in another app, which is how the text gets where you want it. Without it a dictation opens the Record Window instead, so you can copy the text out by hand. macOS ties this permission to the app's signature, so an update or an OS upgrade can quietly drop it; SpeechText tells you whenever it is missing — on Home, and on any dictation it could not paste, with a button that opens the right System Settings pane — rather than once ever, because a paste that silently does nothing is worse than a reminder.
-
-**Asked only if you use the feature**
-
-- **Speech Recognition** — only for the Apple on-device engine, and only the first time it transcribes something. Pick a cloud engine or a downloaded model and macOS never asks.
-- **Automation** — only when returning to the app you dictated into needs an AppleScript nudge, because the ordinary way of bringing it back failed. macOS asks once per app.
-
-SpeechText runs as a menu bar agent with a Dock icon, so its windows can be found again once something covers them; Settings › General can show the icon only while one of its windows is open, or never.
-
-### Build it yourself
-
-You need Xcode 27.1 or later, which runs on macOS 26.6 or later: the project builds in the Swift 6 language mode with Swift 6.4 tools. The app it builds runs on macOS 14 or later.
-
-```bash
-git clone https://github.com/yavno/speech-text.git
-cd speech-text
-open SpeechText/SpeechText.xcodeproj
-```
-
-Then press `Cmd+R` in Xcode. A build from Xcode has no updater and is not signed for distribution — see [docs/development.md](docs/development.md), and [docs/releasing.md](docs/releasing.md) for how a release is signed, notarized and published.
-
----
-
-## Privacy: where your audio goes
-
-This matters, so it is stated plainly:
-
-- **Apple engine** — audio never leaves your Mac while you dictate. The one exception: Apple's recogniser cannot read a saved recording, so a retry from History is uploaded to Groq, and only if you have stored a Groq key. Settings › Privacy & Data says when that applies.
-- **Local model** (Parakeet or Whisper) — audio never leaves your Mac either; the model runs on it, and no key is involved. The same goes for AI Rewrite on a built-in model: the text stays on your Mac too.
-- **Groq / ElevenLabs / OpenAI** — audio is uploaded to that provider, using *your* API key, under *their* privacy policy. SpeechText has no server and never sees your audio or your keys.
-- **AI Rewrite and Edit with AI** — text, never the audio, is sent to the LLM provider you selected, with your key: the transcript (or the selected text and your instruction), your Dictionary's words, and the app, window title and field the text is for. Nothing is read from a password manager, and only the app's name from a password field.
-- **History** — transcripts are stored locally in `~/Library/Application Support/SpeechText/`. How long History keeps dictations is your choice (Settings › Privacy & Data: forever by default, or this session only, 7 or 30 days, 3 or 6 months, a year). A failed recording keeps its audio so you can retry — 7 days by default, on the same scale and never longer than its record — then it is deleted.
-- **API keys** — a release keeps them in the macOS keychain, where no other app can read them; a build you make yourself keeps them in its preferences file (see [SECURITY.md](SECURITY.md)). Never transmitted anywhere except to the provider they belong to.
-
-There is no telemetry, no analytics, and no account.
-
----
-
-## Contributing
-
-Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Start with issues labelled [`good first issue`](https://github.com/yavno/speech-text/labels/good%20first%20issue). For anything larger, open an issue first so we can agree on the approach before you write code.
-
-[docs/architecture.md](docs/architecture.md) is a map of the code and [docs/troubleshooting.md](docs/troubleshooting.md) covers what to do when a dictation misbehaves. [ROADMAP.md](ROADMAP.md) describes where the project is heading (with votes and progress on [speech-text.app/roadmap](https://speech-text.app/roadmap)), [CHANGELOG.md](CHANGELOG.md) what has already shipped, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) how we treat each other here.
-
----
+Open `SpeechText/SpeechText.xcodeproj` in Xcode 27.1 or later and press ⌘R. See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/architecture.md](docs/architecture.md), [docs/third-party.md](docs/third-party.md) the [roadmap](ROADMAP.md) and the [changelog](CHANGELOG.md).
 
 ## License
 
-Copyright (C) 2026 Vladyslav Husakov
-
-SpeechText is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either **version 3 of the License, or (at your option) any later version** — see [LICENSE](LICENSE).
-
-In short: you can use, study, modify and redistribute SpeechText freely. If you distribute a modified version, you must publish your source under the same license.
-
-Every source file carries an [SPDX](https://spdx.dev) header (`GPL-3.0-or-later`), so a file stays identifiable if it is ever copied out of the repository.
-
-The name SpeechText and its icon are not covered by the GPL: a modified version you distribute needs a name of its own — see [TRADEMARKS.md](TRADEMARKS.md). SpeechText is not affiliated with SpeechText.AI.
-
-SpeechText will stay open source. There is no CLA, contributors keep the copyright to their work, and no future version will be relicensed under closed terms.
+[GPL-3.0-or-later](LICENSE): free to use, change and share. The name and icon are covered separately ([TRADEMARKS.md](TRADEMARKS.md)), and third-party code and models are credited in [docs/third-party.md](docs/third-party.md).
