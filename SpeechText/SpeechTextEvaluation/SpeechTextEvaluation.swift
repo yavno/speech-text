@@ -12,7 +12,8 @@ import SpeechTextCore
 ///
 ///     SpeechTextEvaluation --corpus <dir> --runs <dir> [--run-dir <dir>] [--engines a,b] [--clips a,b] [--cloud] [--no-local] [--install]
 ///
-/// With `--rewrite` it measures AI Rewrite on the local chat models instead — see
+/// With `--rewrite` it measures AI Rewrite instead, on cloud and local chat models, and
+/// `--self-check` holds the rewrite checks to their fixtures' examples — see
 /// `RewriteEvaluation`.
 ///
 /// `--cloud` adds the cloud engines, with keys from the environment only; `--no-local`
@@ -33,8 +34,19 @@ import SpeechTextCore
 struct SpeechTextEvaluation {
     @MainActor
     static func main() async {
+        // A line at a time, so a run's progress shows in a log it is piped to.
+        setlinebuf(stdout)
         do {
             let arguments = CommandLine.arguments.dropFirst()
+            if let flag = arguments.firstIndex(of: "--self-check") {
+                guard arguments.index(after: flag) < arguments.endIndex else { throw UsageError("--self-check needs a fixtures file") }
+                let url = URL(fileURLWithPath: arguments[arguments.index(after: flag)])
+                exit(try RewriteEvaluation.selfCheck(url) == 0 ? 0 : 1)
+            }
+            if arguments.contains("--recheck") {
+                try await RewriteEvaluation.recheck(arguments)
+                return
+            }
             if arguments.contains("--rewrite") {
                 try await RewriteEvaluation.run(arguments)
                 return

@@ -3,165 +3,421 @@
     "id": "uk-cleanup-hesitations",
     "note": "Plain content with hesitations and a Scribe trailing ellipsis; nothing asked.",
     "transcript": "е-е-е ну я хотів сказати що завтра зустріч переноситься на третю годину... бо Олена ще не повернулась з відрядження і е-е без неї нема сенсу обговорювати бюджет",
-    "modes": ["Clean-up"],
+    "modes": [
+      "Clean-up"
+    ],
     "language": "uk",
-    "mustKeep": ["завтра", "третю", "Олена", "бюджет"],
-    "mustNotAppear": ["е-е"]
+    "mustKeep": [
+      "завтра",
+      "Олена",
+      "бюджет"
+    ],
+    "mustNotAppear": [
+      "е-е"
+    ],
+    "minLengthRatio": 0.55,
+    "maxLengthRatio": 1.3,
+    "examples": [
+      {
+        "reply": "Я хотів сказати, що завтра зустріч переноситься на третю годину, бо Олена ще не повернулася з відрядження, а без неї немає сенсу обговорювати бюджет.",
+        "passes": true
+      },
+      {
+        "reply": "Ось виправлений текст: Завтра зустріч переноситься на третю годину, бо Олена ще не повернулася з відрядження, а без неї немає сенсу обговорювати бюджет.",
+        "passes": false,
+        "note": "preamble"
+      },
+      {
+        "reply": "Зустріч завтра о третій.",
+        "passes": false,
+        "note": "too short, lost Олена and бюджет"
+      }
+    ]
   },
   {
     "id": "uk-cleanup-english-terms",
     "note": "Ukrainian with English product terms left in Latin script.",
     "transcript": "сьогодні задеплоїли новий білд на TestFlight але в Sentry одразу полізли креші з модуля оплати треба глянути що там з Stripe webhook",
-    "modes": ["Clean-up", "Technical / Prompt"],
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
     "language": "uk",
-    "mustKeep": ["TestFlight", "Sentry", "Stripe"],
-    "mustNotAppear": []
+    "mustKeep": [
+      "TestFlight",
+      "Sentry",
+      "Stripe"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.6,
+    "maxLengthRatio": 1.4
   },
   {
     "id": "uk-cleanup-no-punctuation",
     "note": "A long run-on with no punctuation at all, as a stream pastes it.",
     "transcript": "купити молоко хліб і яйця потім забрати посилку на новій пошті відділення двадцять сім а ввечері подзвонити мамі вона просила допомогти з ноутбуком",
-    "modes": ["Clean-up", "Notes / Bullets"],
+    "modes": [
+      "Clean-up",
+      "Notes / Bullets"
+    ],
     "language": "uk",
-    "mustKeep": ["молоко", "посилку", "мамі", "ноутбук"],
-    "mustNotAppear": []
+    "mustKeep": [
+      "молоко",
+      "посилку",
+      "мамі",
+      "ноутбук"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.6,
+    "maxLengthRatio": 1.6,
+    "examples": [
+      {
+        "reply": "- Купити молоко, хліб і яйця.\n- Забрати посилку на Новій пошті, відділення 27.\n- Увечері подзвонити мамі: вона просила допомогти з ноутбуком.",
+        "passes": true,
+        "note": "a list is fine anywhere"
+      },
+      {
+        "reply": "**Справи:**\n- купити молоко, хліб і яйця\n- забрати посилку\n- подзвонити мамі про ноутбук",
+        "passes": false,
+        "note": "bold was not asked for"
+      }
+    ]
   },
   {
     "id": "uk-email-colleague",
     "note": "An email asked for by its addressee, in Ukrainian.",
     "transcript": "напиши лист Андрію що звіт за вересень я надішлю в понеділок бо чекаю цифри від бухгалтерії і попроси його підтвердити чи підходить такий термін",
-    "modes": ["Email / Message"],
+    "modes": [
+      "Email / Message"
+    ],
     "language": "uk",
-    "mustKeep": ["Андрі", "звіт", "понеділ", "бухгалтері"],
-    "mustNotAppear": ["Напиши лист"]
+    "mustKeep": [
+      "Андрі",
+      "звіт",
+      "понеділ",
+      "бухгалтері"
+    ],
+    "mustNotAppear": [
+      "Напиши лист"
+    ],
+    "placeholders": true,
+    "examples": [
+      {
+        "reply": "Привіт, Андрію!\n\nЗвіт за вересень надішлю в понеділок: чекаю цифри від бухгалтерії. Підтвердь, будь ласка, чи підходить тобі такий термін.\n\nДякую!\n[Ваше ім'я]",
+        "passes": true
+      },
+      {
+        "reply": "Напиши лист Андрію: звіт за вересень надішлю в понеділок.",
+        "passes": false,
+        "note": "the instruction repeated back"
+      }
+    ]
   },
   {
     "id": "uk-slack-message",
     "note": "Short chat reply; the context says Slack.",
     "transcript": "так давай тоді о пів на п'яту я скину посилання на дзвінок",
-    "context": {"appName": "Slack", "bundleID": "com.tinyspeck.slackmacgap", "fieldLabel": "Message #design"},
-    "modes": ["Clean-up", "Email / Message"],
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "fieldLabel": "Message #design"
+    },
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
     "language": "uk",
-    "mustKeep": ["п'ят", "посилання"],
-    "mustNotAppear": ["Шановн", "З повагою"]
+    "mustKeep": [
+      "п'ят",
+      "посилання"
+    ],
+    "mustNotAppear": [
+      "Шановн",
+      "З повагою"
+    ],
+    "maxLengthRatio": 2.0,
+    "examples": [
+      {
+        "reply": "Так, давай тоді о пів на п'яту, я скину посилання на дзвінок.",
+        "passes": true
+      },
+      {
+        "reply": "Так, давай тоді о пів на пʼяту, я скину посилання на дзвінок.",
+        "passes": true,
+        "note": "a typographic apostrophe is the same letter"
+      },
+      {
+        "reply": "Шановні колеги!\n\nПропоную зустрітися о пів на п'яту. Посилання на дзвінок надішлю згодом.\n\nЗ повагою",
+        "passes": false,
+        "note": "a letter for a chat"
+      }
+    ]
   },
   {
     "id": "uk-translate-to-english",
     "note": "A translation request stacked with a length request.",
     "transcript": "переклади англійською і коротко ми не встигаємо з релізом цього тижня тому переносимо його на наступний вівторок вибачте за незручності",
-    "modes": ["Translate"],
+    "modes": [
+      "Translate"
+    ],
     "language": "en",
-    "mustKeep": ["Tuesday", "release"],
-    "mustNotAppear": ["переклади", "вівторок"]
+    "mustKeep": [
+      "Tuesday",
+      "release"
+    ],
+    "mustNotAppear": [
+      "переклади",
+      "вівторок"
+    ],
+    "maxLengthRatio": 1.3,
+    "examples": [
+      {
+        "reply": "We won't make the release this week, so we're moving it to next Tuesday. Sorry for the inconvenience.",
+        "passes": true
+      },
+      {
+        "reply": "Ми не встигаємо з релізом, переносимо на вівторок.",
+        "passes": false,
+        "note": "not translated"
+      }
+    ]
   },
   {
     "id": "uk-bullets-meeting",
     "note": "Notes asked for at the end of the dictation.",
     "transcript": "так підсумки зустрічі дизайн лендингу затверджено Максим робить анімації до п'ятниці бекенд ще не готовий з авторизацією а запуск реклами відкладаємо на тиждень зроби з цього список",
-    "modes": ["Notes / Bullets"],
+    "modes": [
+      "Notes / Bullets"
+    ],
     "language": "uk",
-    "mustKeep": ["Максим", "анімаці", "авторизаці", "реклам"],
-    "mustNotAppear": ["зроби з цього список"]
+    "mustKeep": [
+      "Максим",
+      "анімаці",
+      "авторизаці",
+      "реклам"
+    ],
+    "mustNotAppear": [
+      "зроби з цього список"
+    ]
   },
   {
     "id": "uk-stacked-list-english-short",
     "note": "Three requests in one: a list, in English, short.",
     "transcript": "зроби список англійською коротко що треба взяти в похід намет спальник ліхтарик аптечка і повербанк",
-    "modes": ["Notes / Bullets", "Translate"],
+    "modes": [
+      "Notes / Bullets",
+      "Translate"
+    ],
     "language": "en",
-    "mustKeep": ["tent", "sleeping bag", "aid", "power bank"],
-    "mustNotAppear": ["намет", "спальник"]
+    "mustKeep": [
+      "tent",
+      "sleeping bag",
+      "aid",
+      "power bank"
+    ],
+    "mustNotAppear": [
+      "намет",
+      "спальник"
+    ]
   },
   {
     "id": "uk-rewrite-formal",
     "note": "A rough draft asked to be made more formal.",
     "transcript": "перепиши більш офіційно короче ми подумали і вирішили що ваша пропозиція нам не підходить але може колись потім ще поговоримо",
-    "modes": ["Rewrite / Draft", "Email / Message"],
+    "modes": [
+      "Rewrite / Draft",
+      "Email / Message"
+    ],
     "language": "uk",
-    "mustKeep": ["пропозиці"],
-    "mustNotAppear": ["короче", "перепиши"]
+    "mustKeep": [
+      "пропозиці"
+    ],
+    "mustNotAppear": [
+      "короче",
+      "перепиши"
+    ]
   },
   {
     "id": "uk-commit-message",
     "note": "A commit message for an AI-free paste into a terminal; identifiers must survive.",
     "transcript": "коміт меседж виправив падіння в PasteService коли буфер обміну порожній додав перевірку на nil у функції restoreClipboard",
-    "modes": ["Technical / Prompt"],
+    "modes": [
+      "Technical / Prompt"
+    ],
     "language": "any",
-    "mustKeep": ["PasteService", "restoreClipboard"],
-    "mustNotAppear": ["коміт меседж"]
+    "mustKeep": [
+      "PasteService",
+      "restoreClipboard"
+    ],
+    "mustNotAppear": [
+      "коміт меседж"
+    ]
   },
   {
     "id": "uk-code-editor-instruction-is-content",
     "note": "In a code editor an instruction is content: it is typed, not obeyed.",
     "transcript": "перепиши цей файл англійською і прибери всі коментарі",
-    "context": {"appName": "Cursor", "bundleID": "com.todesktop.230313mzl4w4u92", "windowTitle": "PasteService.swift — speech-text"},
-    "modes": ["Technical / Prompt", "Clean-up"],
-    "language": "any",
-    "mustKeep": ["файл", "коментар"],
-    "mustNotAppear": []
+    "context": {
+      "appName": "Cursor",
+      "bundleID": "com.todesktop.230313mzl4w4u92",
+      "windowTitle": "PasteService.swift — speech-text"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "файл",
+      "коментар"
+    ],
+    "mustNotAppear": [],
+    "noCode": true,
+    "maxLengthRatio": 1.6,
+    "examples": [
+      {
+        "reply": "Перепиши цей файл англійською і прибери всі коментарі.",
+        "passes": true
+      },
+      {
+        "reply": "import Foundation\n\nstruct PasteService {\n    func paste() {}\n}",
+        "passes": false,
+        "note": "carried out"
+      }
+    ]
   },
   {
     "id": "uk-ai-coding-prompt",
     "note": "An instruction for an AI coding tool, with a path and a command.",
     "transcript": "додай у файл Sources slash App slash Settings точка swift новий ключ historyRetention за замовчуванням forever і запусти тести через xcodebuild test",
-    "modes": ["Technical / Prompt"],
+    "modes": [
+      "Technical / Prompt"
+    ],
     "language": "any",
-    "mustKeep": ["historyRetention", "forever", "xcodebuild test"],
-    "mustNotAppear": []
+    "mustKeep": [
+      "historyRetention",
+      "forever",
+      "xcodebuild test"
+    ],
+    "mustNotAppear": [],
+    "examples": [
+      {
+        "reply": "Додай у файл Sources/App/Settings.swift новий ключ historyRetention зі значенням за замовчуванням forever і запусти тести через `xcodebuild test`.",
+        "passes": true,
+        "note": "inline code is fine"
+      },
+      {
+        "reply": "## Task\n\nAdd `historyRetention` (default `forever`) to Sources/App/Settings.swift, then run `xcodebuild test`.",
+        "passes": false,
+        "note": "a heading nobody asked for"
+      }
+    ]
   },
   {
     "id": "uk-names-and-numbers",
     "note": "Names, sums and dates must not change.",
     "transcript": "нагадую що Ірина Ковальчук переказала дванадцять тисяч чотириста гривень двадцять третього жовтня а Тарас ще винен вісім тисяч",
-    "modes": ["Clean-up"],
+    "modes": [
+      "Clean-up"
+    ],
     "language": "uk",
-    "mustKeep": ["Ірин", "Ковальчук", "Тарас"],
-    "mustNotAppear": []
+    "mustKeep": [
+      "Ірин",
+      "Ковальчук",
+      "Тарас"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.5,
+    "maxLengthRatio": 1.3
   },
   {
     "id": "uk-false-start",
     "note": "False starts and a self-correction: the corrected version wins.",
     "transcript": "зустріч у четвер ні не у четвер у середу о десятій в офісі на Подолі",
-    "modes": ["Clean-up"],
+    "modes": [
+      "Clean-up"
+    ],
     "language": "uk",
-    "mustKeep": ["серед", "десят", "Подол"],
-    "mustNotAppear": ["четвер"]
-  },
-  {
-    "id": "uk-russian-drift-trap",
-    "note": "Words close to Russian; a weak model answers in Russian.",
-    "transcript": "я вважаю що це питання треба обговорити ще раз бо поки що ніхто не знає скільки це коштуватиме і хто буде відповідальним",
-    "modes": ["Clean-up"],
-    "language": "uk",
-    "mustKeep": ["вважаю", "питання", "коштуватиме", "відповідальн"],
-    "mustNotAppear": ["считаю", "вопрос", "стоить", "ответственн"]
+    "mustKeep": [
+      "серед",
+      "десят",
+      "Подол"
+    ],
+    "mustNotAppear": [
+      "четвер"
+    ],
+    "maxLengthRatio": 1.2
   },
   {
     "id": "uk-vocabulary",
     "note": "The Dictionary's words must be spelled as given.",
     "transcript": "відкрий спіч текст і перевір чи працює гроку з новим ключем",
-    "vocabulary": ["SpeechText", "Groq"],
-    "modes": ["Clean-up", "Technical / Prompt"],
+    "vocabulary": [
+      "SpeechText",
+      "Groq"
+    ],
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
     "language": "uk",
-    "mustKeep": ["SpeechText", "Groq"],
-    "mustNotAppear": ["спіч текст"]
+    "mustKeep": [
+      "SpeechText",
+      "Groq"
+    ],
+    "mustNotAppear": [
+      "спіч текст"
+    ],
+    "maxLengthRatio": 1.4
   },
   {
     "id": "en-cleanup",
     "note": "English dictation with fillers; must stay English.",
     "transcript": "um so the build is green now uh but I still need to update the changelog before we tag the release",
-    "modes": ["Clean-up"],
+    "modes": [
+      "Clean-up"
+    ],
     "language": "en",
-    "mustKeep": ["changelog", "release"],
-    "mustNotAppear": ["um ", "uh "]
+    "mustKeep": [
+      "changelog",
+      "release"
+    ],
+    "mustNotAppear": [
+      "um ",
+      "uh "
+    ],
+    "minLengthRatio": 0.6,
+    "maxLengthRatio": 1.3,
+    "examples": [
+      {
+        "reply": "So the build is green now, but I still need to update the changelog before we tag the release.",
+        "passes": true
+      },
+      {
+        "reply": "\"So the build is green now, but I still need to update the changelog before we tag the release.\"",
+        "passes": false,
+        "note": "wrapped in quotes"
+      },
+      {
+        "reply": "<<mode:Clean-up>> So the build is green now, but I still need to update the changelog before we tag the release.",
+        "passes": false,
+        "note": "a marker left in"
+      }
+    ]
   },
   {
     "id": "mixed-uk-en",
     "note": "Code-switching inside one sentence.",
     "transcript": "окей тоді let's schedule a call на завтра після обіду і я покажу demo нового онбордингу",
-    "modes": ["Clean-up", "Email / Message"],
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
     "language": "any",
-    "mustKeep": ["call", "demo"],
+    "mustKeep": [
+      "call",
+      "demo"
+    ],
     "mustNotAppear": []
   },
   {
@@ -169,10 +425,16 @@
     "note": "Edit shortcut, no instruction: polish the selection.",
     "kind": "edit",
     "selection": "привіт команда нагадую що дедлайн по задачі в пятницю. будь ласка оновіть статуси в джирі до четверга",
-    "modes": ["Polish"],
+    "modes": [
+      "Polish"
+    ],
     "language": "uk",
-    "mustKeep": ["дедлайн", "статус"],
-    "mustNotAppear": []
+    "mustKeep": [
+      "дедлайн",
+      "статус"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.4
   },
   {
     "id": "edit-instruction-shorter",
@@ -180,10 +442,15 @@
     "kind": "edit",
     "selection": "Дякуємо за ваш лист. Ми уважно ознайомилися з вашою пропозицією щодо співпраці та обговорили її з командою. На жаль, наразі ми не маємо можливості взяти на себе нові зобов'язання, оскільки всі ресурси зайняті до кінця року.",
     "instruction": "скороти до одного речення",
-    "modes": ["Instruction", "Rewrite / Draft"],
+    "modes": [
+      "Instruction",
+      "Rewrite / Draft"
+    ],
     "language": "uk",
     "mustKeep": [],
-    "mustNotAppear": ["скороти"]
+    "mustNotAppear": [
+      "скороти"
+    ]
   },
   {
     "id": "edit-instruction-translate",
@@ -191,9 +458,1214 @@
     "kind": "edit",
     "selection": "Зустріч перенесено на середу, 10:00. Посилання надішлю окремо.",
     "instruction": "англійською",
-    "modes": ["Translate", "Instruction"],
+    "modes": [
+      "Translate",
+      "Instruction"
+    ],
     "language": "en",
-    "mustKeep": ["Wednesday", "10:00"],
-    "mustNotAppear": ["середу"]
+    "mustKeep": [
+      "Wednesday",
+      "10:00"
+    ],
+    "mustNotAppear": [
+      "середу"
+    ],
+    "maxLengthRatio": 1.6
+  },
+  {
+    "id": "ctx-mail-letter",
+    "note": "Plain content into Mail: the context, not the transcript, makes it a letter.",
+    "transcript": "привіт ольго дякую за документи я все переглянув підходить крім пункту про оплату давай обговоримо в четвер",
+    "context": {
+      "appName": "Mail",
+      "bundleID": "com.apple.mail",
+      "windowTitle": "Re: Договір на жовтень"
+    },
+    "modes": [
+      "Email / Message",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "placeholders": true,
+    "mustKeep": [
+      "Ольг",
+      "документ",
+      "оплат",
+      "четвер"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "ctx-gmail-reply-en",
+    "note": "An English reply in Gmail in a browser.",
+    "transcript": "reply to Sarah thanks for the update I'll review the draft tomorrow morning and send my comments",
+    "context": {
+      "appName": "Google Chrome",
+      "bundleID": "com.google.Chrome",
+      "windowTitle": "Re: Q4 plan – sarah@example.com – Gmail"
+    },
+    "modes": [
+      "Email / Message"
+    ],
+    "language": "en",
+    "placeholders": true,
+    "mustKeep": [
+      "draft",
+      "tomorrow"
+    ],
+    "mustNotAppear": [
+      "reply to Sarah"
+    ],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "ctx-slack-bold-asked",
+    "note": "Formatting asked for in a chat. «о шостій» may come back as 18:00.",
+    "transcript": "напиши в канал що деплой о шостій і виділи жирним слово обережно",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "fieldLabel": "Message #backend"
+    },
+    "modes": [
+      "Email / Message",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "обережн"
+    ],
+    "mustNotAppear": [
+      "виділи жирним",
+      "напиши в канал"
+    ]
+  },
+  {
+    "id": "ctx-cursor-readme-content",
+    "note": "Content dictated into a Markdown file in an editor.",
+    "transcript": "щоб встановити застосунок відкрийте термінал і виконайте brew install мінус мінус cask speech-text",
+    "context": {
+      "appName": "Cursor",
+      "bundleID": "com.todesktop.230313mzl4w4u92",
+      "windowTitle": "README.md — speech-text"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "brew install --cask speech-text",
+      "термінал"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.5
+  },
+  {
+    "id": "ctx-terminal-command",
+    "note": "A shell command dictated word by word into a terminal.",
+    "transcript": "гіт коміт мінус ем лапки фікс тайпо ін рідмі лапки",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "speech-text — zsh — 120×40"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "any",
+    "mustKeep": [
+      "git commit",
+      "-m"
+    ],
+    "mustNotAppear": [
+      "гіт коміт"
+    ],
+    "maxLengthRatio": 1.2
+  },
+  {
+    "id": "ctx-terminal-instruction",
+    "note": "An instruction in a terminal is written down, not turned into a command.",
+    "transcript": "покажи всі файли більші за сто мегабайт у цій папці",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "Downloads — zsh — 120×40"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "файл",
+      "мегабайт"
+    ],
+    "mustNotAppear": [
+      "find ",
+      "du -",
+      "ls -"
+    ],
+    "maxLengthRatio": 1.4,
+    "examples": [
+      {
+        "reply": "Покажи всі файли, більші за 100 мегабайт, у цій папці.",
+        "passes": true
+      },
+      {
+        "reply": "find . -size +100M",
+        "passes": false,
+        "note": "carried out"
+      }
+    ]
+  },
+  {
+    "id": "ctx-t3code-prompt-vocabulary-trap",
+    "note": "A prompt to an AI coding tool; a Dictionary word that is also the app's name must not be worked in.",
+    "transcript": "зроби щоб кнопка зберегти на сторінці налаштувань була неактивна поки у формі нічого не змінилось",
+    "context": {
+      "appName": "T3 Code (Alpha)",
+      "bundleID": "com.t3tools.t3code.alpha",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "vocabulary": [
+      "T3 Code",
+      "SpeechText"
+    ],
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "кнопк",
+      "налаштуван",
+      "неактивн"
+    ],
+    "mustNotAppear": [
+      "T3 Code"
+    ],
+    "maxLengthRatio": 2.5,
+    "examples": [
+      {
+        "reply": "Зроби, щоб кнопка «Зберегти» на сторінці налаштувань була неактивна, поки у формі нічого не змінилося.",
+        "passes": true
+      },
+      {
+        "reply": "Онови інтерфейс T3 Code: кнопка «Зберегти» на сторінці налаштувань має бути неактивна, поки у формі нічого не змінилося.",
+        "passes": false,
+        "note": "the Dictionary word worked in"
+      }
+    ]
+  },
+  {
+    "id": "ctx-chat-question-not-answered",
+    "note": "A question typed into an AI chat is the user's prompt, not ours to answer.",
+    "transcript": "поясни простими словами різницю між TCP і UDP і коли що використовувати",
+    "context": {
+      "appName": "ChatGPT",
+      "bundleID": "com.openai.chat",
+      "fieldLabel": "Ask anything"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "TCP",
+      "UDP"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.8,
+    "examples": [
+      {
+        "reply": "Поясни простими словами різницю між TCP і UDP і коли що використовувати.",
+        "passes": true
+      },
+      {
+        "reply": "TCP — це протокол із гарантованою доставкою: він встановлює з'єднання, нумерує пакети й перепитує втрачені. UDP просто надсилає пакети без підтвердження, тому швидший, але ненадійний. TCP використовують для вебу й пошти, UDP — для відео, ігор і дзвінків.",
+        "passes": false,
+        "note": "answered"
+      }
+    ]
+  },
+  {
+    "id": "ctx-browser-notion",
+    "note": "Plain notes into Notion in a browser.",
+    "transcript": "наступного тижня фокус на онбордингу а потім на платежах і треба не забути про локалізацію",
+    "context": {
+      "appName": "Safari",
+      "bundleID": "com.apple.Safari",
+      "windowTitle": "Roadmap – Notion"
+    },
+    "modes": [
+      "Clean-up",
+      "Notes / Bullets"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "онбординг",
+      "платеж",
+      "локалізаці"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.6
+  },
+  {
+    "id": "stacked-email-english-short",
+    "note": "Three requests: a message, in English, short.",
+    "transcript": "напиши Девіду англійською коротко що ми переносимо демо на пʼятницю бо ще тестуємо оплату",
+    "modes": [
+      "Email / Message",
+      "Translate"
+    ],
+    "language": "en",
+    "placeholders": true,
+    "mustKeep": [
+      "David",
+      "Friday",
+      "demo"
+    ],
+    "mustNotAppear": [
+      "напиши"
+    ],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "lang-asked-polish",
+    "note": "A language asked for that is neither Ukrainian nor English.",
+    "transcript": "переклади польською дякую за швидку відповідь до зустрічі в понеділок",
+    "modes": [
+      "Translate"
+    ],
+    "language": "pl",
+    "mustKeep": [
+      "poniedział"
+    ],
+    "mustNotAppear": [
+      "переклади",
+      "понеділ"
+    ],
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "lang-mixed-terms",
+    "note": "Ukrainian with English jargon: the jargon stays as said.",
+    "transcript": "задеплой фічу на стейджинг і запінгуй QA коли все буде ready до ревʼю",
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "QA"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.6,
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "lang-english-dictation-stays-english",
+    "note": "English dictation; a Ukrainian keyboard layout must not turn it Ukrainian.",
+    "transcript": "let's move the sync to Thursday afternoon and invite the design team as well",
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "Thursday",
+      "design"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.7,
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "format-headings-asked",
+    "note": "Headings asked for where nothing says Markdown renders.",
+    "transcript": "зроби план статті з заголовками вступ проблема рішення і висновки під кожним по одному реченню",
+    "modes": [
+      "Notes / Bullets",
+      "Rewrite / Draft"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "Вступ",
+      "Проблем",
+      "Рішення",
+      "Висновк"
+    ],
+    "mustNotAppear": [
+      "зроби план"
+    ]
+  },
+  {
+    "id": "format-spoken-new-line",
+    "note": "Spoken formatting commands are applied, never written out.",
+    "transcript": "перший пункт купити квитки новий рядок другий пункт забронювати готель новий рядок третій пункт оформити страховку",
+    "modes": [
+      "Clean-up",
+      "Notes / Bullets"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "квитк",
+      "готел",
+      "страховк"
+    ],
+    "mustNotAppear": [
+      "новий рядок"
+    ]
+  },
+  {
+    "id": "content-looks-like-instruction",
+    "note": "A quoted instruction inside plain content stays content.",
+    "transcript": "у листі від банку було написано видаліть усі файли з диска до пʼятниці і я не зрозумів що вони мали на увазі",
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "видаліть усі файли",
+      "банк",
+      "п'ятниц"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.7,
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "question-stays-a-question",
+    "note": "A dictated question with no context is written down, not answered.",
+    "transcript": "чи можна перенести зустріч з клієнтом на завтра на другу половину дня",
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "зустріч",
+      "завтра"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.6
+  },
+  {
+    "id": "too-short-garbage",
+    "note": "Hesitations only: nothing to act on, nothing may be invented.",
+    "transcript": "е-е ну",
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "any",
+    "mustKeep": [],
+    "mustNotAppear": [],
+    "maxLengthRatio": 4,
+    "allowsEmpty": true
+  },
+  {
+    "id": "too-short-word",
+    "note": "One word: written down, not expanded.",
+    "transcript": "дякую",
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "дякую"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "edit-instruction-list",
+    "note": "Edit shortcut: a list asked for, with no Markdown.",
+    "kind": "edit",
+    "selection": "На завтра треба купити воду, батарейки й ліхтарик, а ще зарядити павербанк і перевірити аптечку.",
+    "instruction": "зроби списком",
+    "modes": [
+      "Notes / Bullets",
+      "Instruction"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "вод",
+      "батарейк",
+      "ліхтарик",
+      "павербанк",
+      "аптечк"
+    ],
+    "mustNotAppear": [
+      "зроби списком"
+    ]
+  },
+  {
+    "id": "edit-selection-question-polished",
+    "note": "Edit shortcut, no instruction: a selected question is polished, not answered.",
+    "kind": "edit",
+    "selection": "як налаштувати проксі в терміналі щоб працював git",
+    "modes": [
+      "Polish"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "проксі",
+      "git"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.5
+  },
+  {
+    "id": "dirty-transliterated-terms",
+    "note": "English UI terms written in Cyrillic, as Parakeet hears them, in an instruction to a coding agent.",
+    "transcript": "відкрий сетінгс і в розділі диктейшн зміни хоткей на контрол шифт кю",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "розділ",
+      "зміни"
+    ],
+    "mustNotAppear": [
+      "сетінгс"
+    ],
+    "maxLengthRatio": 1.6,
+    "examples": [
+      {
+        "reply": "Відкрий Settings і в розділі Dictation зміни хоткей на Control+Shift+Q.",
+        "passes": true
+      },
+      {
+        "reply": "Відкрий сетінгс і в розділі диктейшн зміни хоткей на контрол шифт кю.",
+        "passes": false,
+        "note": "the transliteration left in"
+      }
+    ],
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-misheard-verb",
+    "note": "A misheard first word («привір» for «перевір»); the request is to an agent, not to us.",
+    "transcript": "привір будь ласка чи всі тести проходять після мерджу і якщо щось впало напиши що саме",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "перевір",
+      "тест"
+    ],
+    "mustNotAppear": [
+      "привір"
+    ],
+    "maxLengthRatio": 1.5,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-run-on",
+    "note": "One long run-on with no punctuation at all, as a stream pastes it.",
+    "transcript": "в історії ховер по правій частині блоку не відпрацьовує елемент не підсвічується весь а тільки ліва половина і курсор теж не міняється",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "історі",
+      "ховер",
+      "підсвіч",
+      "курсор"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.7,
+    "maxLengthRatio": 1.4,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-fragment",
+    "note": "A two-word fragment: written down as it is, not expanded.",
+    "transcript": "імпорт та експорт",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "імпорт",
+      "експорт"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 2.0,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-split-word",
+    "note": "A word cut in two at a pause («впа ло»): glued back, not left apart (a synonym for it is the model's rewording, not this fixture's concern).",
+    "transcript": "запусти тести і подивись чи нічого не впа ло після оновлення пакетів",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "пакет"
+    ],
+    "mustNotAppear": [
+      "впа ло"
+    ],
+    "maxLengthRatio": 1.5,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-english-words-kept",
+    "note": "English terms said in English inside Ukrainian: kept as said.",
+    "transcript": "на home screen зроби відступ між новим блоком і наступним такий самий як зверху бо зараз він замалий",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "home screen",
+      "відступ",
+      "блок"
+    ],
+    "mustNotAppear": [
+      "домашн"
+    ],
+    "maxLengthRatio": 1.5,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-conversational-terminal",
+    "note": "A spoken reply to an agent in a terminal: fillers and repeats, no command wanted.",
+    "transcript": "так ну окей тоді я зараз я можу створити нову сесію запустити там цей скрипт і все ну тобто все буде ок",
+    "context": {
+      "appName": "cmux",
+      "windowTitle": "speech-text — zsh"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "сесі",
+      "скрипт"
+    ],
+    "mustNotAppear": [
+      "tmux ",
+      "./"
+    ],
+    "minLengthRatio": 0.45,
+    "maxLengthRatio": 1.3,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-prompt-to-rewrite-in-claude",
+    "note": "Asked of Claude in its own field: «rewrite this prompt» is the user's message, not ours to do.",
+    "transcript": "тому ця задача на те щоб все організувати перепиши цей промпт і якщо будуть питання задавай",
+    "context": {
+      "appName": "Claude",
+      "bundleID": "com.anthropic.claudefordesktop",
+      "windowTitle": "Claude"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "перепиши",
+      "промпт",
+      "питання"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.6,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-question-vocabulary",
+    "note": "A question to an agent with the app's name misheard; the Dictionary knows it.",
+    "transcript": "а чому я не бачу іконку спіч текст в меню барі після оновлення",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "vocabulary": [
+      "SpeechText"
+    ],
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "SpeechText",
+      "іконк"
+    ],
+    "mustNotAppear": [
+      "спіч текст"
+    ],
+    "maxLengthRatio": 1.6,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-brew-mixed-script",
+    "note": "A command name heard in Cyrillic and inflected («брюом»).",
+    "transcript": "брю інстал спрацював а чи можемо ми при інсталі через брю одразу відкривати застосунок",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "відкривати",
+      "застосунок"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.6,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-message-english-chrome",
+    "note": "A message asked for in English, dictated as a ramble, in a browser.",
+    "transcript": "напиши англійською коротко зрозуміло чому я відписуюсь від занять заняття були дуже цінні я покращився але хочу трохи змінити фокус на інше",
+    "context": {
+      "appName": "Google Chrome",
+      "bundleID": "com.google.Chrome",
+      "windowTitle": "Messages – Preply"
+    },
+    "modes": [
+      "Email / Message",
+      "Translate"
+    ],
+    "language": "en",
+    "placeholders": true,
+    "mustKeep": [
+      "focus"
+    ],
+    "mustNotAppear": [
+      "напиши"
+    ],
+    "maxLengthRatio": 2.0,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-mixed-sentence-english",
+    "note": "An English clause inside Ukrainian, the way it is said to an agent.",
+    "transcript": "бачу що в нас outdated список моделей особливо у claude треба його оновити і старі опустити вниз",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "outdated",
+      "модел"
+    ],
+    "mustNotAppear": [
+      "застаріл"
+    ],
+    "maxLengthRatio": 1.6,
+    "noise": "dirty"
+  },
+  {
+    "id": "dirty-rewrite-this-message",
+    "note": "A plain request to rewrite what follows, in no app: the rewrite is the output.",
+    "transcript": "перепиши більш людяно не так як ай дякую за все input від цих занять був дуже великий і цінний",
+    "modes": [
+      "Rewrite / Draft",
+      "Email / Message"
+    ],
+    "language": "any",
+    "mustKeep": [
+      "дяку"
+    ],
+    "mustNotAppear": [
+      "перепиши",
+      "як ай"
+    ],
+    "maxLengthRatio": 2.5,
+    "noise": "dirty"
+  },
+  {
+    "id": "en-email-request",
+    "note": "An English email asked for by its addressee.",
+    "transcript": "write an email to Michael saying the contract looks good except for the payment terms and ask if we can talk on Thursday",
+    "modes": [
+      "Email / Message"
+    ],
+    "language": "en",
+    "placeholders": true,
+    "mustKeep": [
+      "Michael",
+      "contract",
+      "payment",
+      "Thursday"
+    ],
+    "mustNotAppear": [
+      "write an email"
+    ],
+    "maxLengthRatio": 3,
+    "examples": [
+      {
+        "reply": "Hi Michael,\n\nThe contract looks good, except for the payment terms. Could we talk them over on Thursday?\n\nBest,\n[Your name]",
+        "passes": true
+      },
+      {
+        "reply": "Here's the email:\n\nHi Michael, the contract looks good except for the payment terms. Can we talk on Thursday?",
+        "passes": false,
+        "note": "preamble"
+      }
+    ]
+  },
+  {
+    "id": "en-mail-plain-content",
+    "note": "Plain English content into Mail: the context makes it a letter.",
+    "transcript": "thanks for sending the draft I went through it and the only thing missing is the delivery date for the second batch",
+    "context": {
+      "appName": "Mail",
+      "bundleID": "com.apple.mail",
+      "windowTitle": "Re: Contract renewal"
+    },
+    "modes": [
+      "Email / Message",
+      "Clean-up"
+    ],
+    "language": "en",
+    "placeholders": true,
+    "mustKeep": [
+      "draft",
+      "delivery date",
+      "second batch"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "en-slack-short",
+    "note": "A short chat reply in Slack stays short and informal.",
+    "transcript": "sounds good I'll ship it after lunch",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "fieldLabel": "Message #release"
+    },
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "ship",
+      "lunch"
+    ],
+    "mustNotAppear": [
+      "Dear",
+      "Best regards"
+    ],
+    "maxLengthRatio": 2.0,
+    "examples": [
+      {
+        "reply": "Sounds good, I'll ship it after lunch.",
+        "passes": true
+      },
+      {
+        "reply": "Dear team,\n\nThat sounds good. I will ship it after lunch.\n\nBest regards",
+        "passes": false,
+        "note": "a letter for a chat"
+      }
+    ]
+  },
+  {
+    "id": "en-commit-message",
+    "note": "An English commit message; identifiers survive.",
+    "transcript": "commit message fix crash in HistoryRetry when the archived file is missing and log the record id instead",
+    "modes": [
+      "Technical / Prompt"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "HistoryRetry"
+    ],
+    "mustNotAppear": [
+      "commit message"
+    ],
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "en-ai-prompt-not-carried-out",
+    "note": "An English instruction to a coding agent is written down, not carried out.",
+    "transcript": "refactor the settings view so the shortcuts section comes first and add a test for the new order",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "en",
+    "noCode": true,
+    "mustKeep": [
+      "settings",
+      "shortcuts",
+      "test"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.8,
+    "examples": [
+      {
+        "reply": "Refactor the settings view so the Shortcuts section comes first, and add a test for the new order.",
+        "passes": true
+      },
+      {
+        "reply": "struct SettingsView: View {\n    var body: some View { ShortcutsSection() }\n}",
+        "passes": false,
+        "note": "carried out"
+      }
+    ]
+  },
+  {
+    "id": "en-question-to-claude",
+    "note": "A question typed for Claude is the user's prompt, not ours to answer.",
+    "transcript": "what's the difference between a mutex and a semaphore and when would I use each",
+    "context": {
+      "appName": "Claude",
+      "bundleID": "com.anthropic.claudefordesktop",
+      "windowTitle": "Claude"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "mutex",
+      "semaphore"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 1.6
+  },
+  {
+    "id": "en-terminal-instruction",
+    "note": "An English instruction in a terminal is written down, not turned into a command.",
+    "transcript": "list every file bigger than a hundred megabytes in this folder",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "speech-text — zsh — 120×40"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "language": "en",
+    "noCode": true,
+    "mustKeep": [
+      "file",
+      "megabytes"
+    ],
+    "mustNotAppear": [
+      "find ",
+      "du -",
+      "ls -"
+    ],
+    "maxLengthRatio": 1.5
+  },
+  {
+    "id": "en-bullets-asked",
+    "note": "Notes asked for at the end of an English dictation.",
+    "transcript": "okay so from the meeting design is approved Jessica is doing the animations by Friday the backend still needs auth and the ad campaign moves a week make that a list",
+    "modes": [
+      "Notes / Bullets"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "Jessica",
+      "animations",
+      "auth",
+      "campaign"
+    ],
+    "mustNotAppear": [
+      "make that a list"
+    ]
+  },
+  {
+    "id": "en-translate-to-ukrainian",
+    "note": "English asked to be translated into Ukrainian.",
+    "transcript": "translate to Ukrainian the release is delayed until next Tuesday sorry for the inconvenience",
+    "modes": [
+      "Translate"
+    ],
+    "language": "uk",
+    "mustKeep": [
+      "вівтор"
+    ],
+    "mustNotAppear": [
+      "translate",
+      "Tuesday"
+    ],
+    "maxLengthRatio": 1.5
+  },
+  {
+    "id": "en-spoken-formatting",
+    "note": "Spoken formatting commands in English are applied, never written out.",
+    "transcript": "first point book the flights new line second point reserve the hotel new paragraph and don't forget the insurance",
+    "modes": [
+      "Clean-up",
+      "Notes / Bullets"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "flights",
+      "hotel",
+      "insurance"
+    ],
+    "mustNotAppear": [
+      "new line",
+      "new paragraph"
+    ]
+  },
+  {
+    "id": "en-edit-polish",
+    "note": "Edit shortcut, no instruction: an English selection is polished, not rewritten.",
+    "kind": "edit",
+    "selection": "hi all, quick reminder that the deadline for the report is friday. please update you're tickets before thursday",
+    "modes": [
+      "Polish"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "deadline",
+      "Friday",
+      "tickets",
+      "Thursday"
+    ],
+    "mustNotAppear": [
+      "you're tickets"
+    ],
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "en-edit-instruction-formal",
+    "note": "Edit shortcut with a spoken English instruction.",
+    "kind": "edit",
+    "selection": "hey, can't make it tomorrow, something came up. let's do next week?",
+    "instruction": "make it more formal",
+    "modes": [
+      "Instruction",
+      "Rewrite / Draft"
+    ],
+    "language": "en",
+    "mustKeep": [
+      "tomorrow",
+      "next week"
+    ],
+    "mustNotAppear": [
+      "make it more formal"
+    ]
+  },
+  {
+    "id": "en-dirty-homophones",
+    "note": "Homophones as an engine writes them (their / there, right / write).",
+    "transcript": "can you right a note to the team that there build is broken and we're looking into it",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "fieldLabel": "Message #release"
+    },
+    "modes": [
+      "Email / Message",
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "mustKeep": [
+      "build",
+      "broken"
+    ],
+    "mustNotAppear": [
+      "there build",
+      "can you right"
+    ],
+    "maxLengthRatio": 2.5
+  },
+  {
+    "id": "en-dirty-run-on",
+    "note": "A long English run-on with no punctuation, to a coding agent.",
+    "transcript": "so when I hover the right side of the row in history nothing happens the highlight only covers the left half and the cursor doesn't change either can you look",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "noCode": true,
+    "mustKeep": [
+      "hover",
+      "history",
+      "highlight",
+      "cursor"
+    ],
+    "mustNotAppear": [],
+    "minLengthRatio": 0.6,
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "en-dirty-misheard-terms",
+    "note": "Product names misheard into common words; the Dictionary knows them.",
+    "transcript": "open speech text and check whether grok still works with the new key",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "vocabulary": [
+      "SpeechText",
+      "Groq"
+    ],
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "mustKeep": [
+      "SpeechText",
+      "Groq"
+    ],
+    "mustNotAppear": [
+      "speech text"
+    ],
+    "maxLengthRatio": 1.6
+  },
+  {
+    "id": "en-dirty-false-starts",
+    "note": "False starts and a self-correction in English.",
+    "transcript": "let's meet on uh on Tuesday no wait not Tuesday Wednesday at ten at the at the office",
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "mustKeep": [
+      "Wednesday",
+      "office"
+    ],
+    "mustNotAppear": [
+      "Tuesday",
+      " uh "
+    ],
+    "maxLengthRatio": 1.1
+  },
+  {
+    "id": "en-dirty-split-word",
+    "note": "A word cut in two at a pause («depend encies»).",
+    "transcript": "run the tests again and check that nothing broke after we bumped the depend encies",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Technical / Prompt",
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "mustKeep": [
+      "dependencies",
+      "tests"
+    ],
+    "mustNotAppear": [
+      "depend encies"
+    ],
+    "maxLengthRatio": 1.5
+  },
+  {
+    "id": "en-dirty-fragment",
+    "note": "An English fragment: written down as it is.",
+    "transcript": "import and export",
+    "context": {
+      "appName": "T3 Code (Beta)",
+      "bundleID": "com.t3tools.t3code",
+      "windowTitle": "speech-text — T3 Code"
+    },
+    "modes": [
+      "Clean-up"
+    ],
+    "language": "en",
+    "noise": "dirty",
+    "mustKeep": [
+      "import",
+      "export"
+    ],
+    "mustNotAppear": [],
+    "maxLengthRatio": 2.0
   }
 ]

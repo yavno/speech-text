@@ -25,6 +25,7 @@
 		F90000000000000000000010 /* LocalChatXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9000000000000000000000F /* LocalChatXPC.swift */; };
 		F9000000000000000000000E /* LocalChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9000000000000000000000D /* LocalChatTests.swift */; };
 		F9000000000000000000000C /* RewriteEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9000000000000000000000B /* RewriteEvaluation.swift */; };
+		F900000000000000000000D1 /* RewriteChecks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F900000000000000000000D0 /* RewriteChecks.swift */; };
 		F9000000000000000000000A /* LocalLlamaRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90000000000000000000009 /* LocalLlamaRuntime.swift */; };
 		D8000004000000000000A003 /* LlamaBinary in Frameworks */ = {isa = PBXBuildFile; productRef = D8000005000000000000A003 /* LlamaBinary */; };
 		F7A002000000000000000002 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A001000000000000000002 /* MainWindow.swift */; };
@@ -124,6 +125,7 @@
 		F9000000000000000000000F /* LocalChatXPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalChatXPC.swift; sourceTree = "<group>"; };
 		F9000000000000000000000D /* LocalChatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalChatTests.swift; sourceTree = "<group>"; };
 		F9000000000000000000000B /* RewriteEvaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriteEvaluation.swift; sourceTree = "<group>"; };
+		F900000000000000000000D0 /* RewriteChecks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriteChecks.swift; sourceTree = "<group>"; };
 		F90000000000000000000009 /* LocalLlamaRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalLlamaRuntime.swift; sourceTree = "<group>"; };
 		F7A001000000000000000002 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		F7A001000000000000000003 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				D8000001000000000000A010 /* SpeechTextEvaluation.swift */,
+				F900000000000000000000D0 /* RewriteChecks.swift */,
 				F9000000000000000000000B /* RewriteEvaluation.swift */,
 			);
 			path = SpeechTextEvaluation;
@@ -653,6 +656,7 @@
 				D8000003000000000000002C /* LocalParakeetRuntime.swift in Sources */,
 				D8000003000000000000002D /* SpeechTextEvaluation.swift in Sources */,
 				F9000000000000000000000A /* LocalLlamaRuntime.swift in Sources */,
+				F900000000000000000000D1 /* RewriteChecks.swift in Sources */,
 				F9000000000000000000000C /* RewriteEvaluation.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
