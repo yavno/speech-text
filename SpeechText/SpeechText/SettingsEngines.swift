@@ -348,6 +348,20 @@ struct SpeechEngineSettings: View {
         }
     }
 
+    private func speechModelRow(_ model: STTModelDescriptor, card: SpeechServiceCard, keyed: Bool) -> some View {
+        let selected = storedModel(card.service) == model.id
+        return SetupRow(title: onlineSpeechModelName(model), subtitle: languageCountLabel(model.languages),
+                        badge: lifecycleBadge(model.lifecycle, selected: selected)
+                            ?? (model.id == card.service.defaultSpeechModel
+                                ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
+                        languageBadge: languageBadge(model.languages, spoken: spoken),
+                        detail: onlineSpeechModelLine(model, spoken: spoken),
+                        isSelected: selected, compact: true) {
+            setStoredModel(model.id, for: card.service)
+            if keyed { sttProvider = card.engine.rawValue }
+        }
+    }
+
     @ViewBuilder
     private func serviceRow(_ card: SpeechServiceCard) -> some View {
         let selected = engine == card.engine
@@ -359,16 +373,13 @@ struct SpeechEngineSettings: View {
         }
         if selected || opened == card.service {
             NestedUnderRow {
-                ForEach(pickerSTTModels(of: card.service, selected: storedModel(card.service))) { model in
-                    SetupRow(title: onlineSpeechModelName(model), subtitle: languageCountLabel(model.languages),
-                             badge: lifecycleBadge(model.lifecycle)
-                                ?? (model.id == card.service.defaultSpeechModel
-                                    ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
-                             languageBadge: languageBadge(model.languages, spoken: spoken),
-                             detail: onlineSpeechModelLine(model, spoken: spoken),
-                             isSelected: storedModel(card.service) == model.id, compact: true) {
-                        setStoredModel(model.id, for: card.service)
-                        if keyed { sttProvider = card.engine.rawValue }
+                let runs = modelPickerRuns(pickerSTTModels(of: card.service, selected: storedModel(card.service)),
+                                           lifecycle: \.lifecycle)
+                ForEach(runs.current) { model in speechModelRow(model, card: card, keyed: keyed) }
+                if !runs.legacy.isEmpty {
+                    LegacyModels(count: runs.legacy.count,
+                                 holdsSelection: runs.legacy.contains { $0.id == storedModel(card.service) }) {
+                        ForEach(runs.legacy) { model in speechModelRow(model, card: card, keyed: keyed) }
                     }
                 }
                 ModelChoiceNote(stored: storedModel(card.service),
@@ -628,6 +639,19 @@ struct AIEngineSettings: View {
         }
     }
 
+    private func chatModelRow(_ model: ChatModelDescriptor, card: AIServiceCard, keyed: Bool) -> some View {
+        let selected = storedModel(card.pick) == model.id
+        return SetupRow(title: chatModelName(model),
+                        badge: lifecycleBadge(model.lifecycle, selected: selected)
+                            ?? (model.id == card.service.defaultChatModel
+                                ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
+                        detail: chatModelLine(model).isEmpty ? nil : chatModelLine(model),
+                        isSelected: selected, compact: true) {
+            setStoredModel(model.id, for: card.pick)
+            if keyed { llmProvider = card.pick.rawValue }
+        }
+    }
+
     @ViewBuilder
     private func serviceRow(_ card: AIServiceCard) -> some View {
         let selected = pick == card.pick
@@ -639,15 +663,13 @@ struct AIEngineSettings: View {
         }
         if selected || opened == card.service {
             NestedUnderRow {
-                ForEach(pickerChatModels(of: card.pick, selected: storedModel(card.pick)), id: \.id) { model in
-                    SetupRow(title: chatModelName(model),
-                             badge: lifecycleBadge(model.lifecycle)
-                                ?? (model.id == card.service.defaultChatModel
-                                    ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
-                             detail: chatModelLine(model).isEmpty ? nil : chatModelLine(model),
-                             isSelected: storedModel(card.pick) == model.id, compact: true) {
-                        setStoredModel(model.id, for: card.pick)
-                        if keyed { llmProvider = card.pick.rawValue }
+                let runs = modelPickerRuns(pickerChatModels(of: card.pick, selected: storedModel(card.pick)),
+                                           lifecycle: \.lifecycle)
+                ForEach(runs.current, id: \.id) { model in chatModelRow(model, card: card, keyed: keyed) }
+                if !runs.legacy.isEmpty {
+                    LegacyModels(count: runs.legacy.count,
+                                 holdsSelection: runs.legacy.contains { $0.id == storedModel(card.pick) }) {
+                        ForEach(runs.legacy, id: \.id) { model in chatModelRow(model, card: card, keyed: keyed) }
                     }
                 }
                 ModelChoiceNote(stored: storedModel(card.pick),
@@ -673,10 +695,55 @@ struct AIEngineSettings: View {
 }
 
 /// A model the vendor is retiring says so, with the date, in place of any other badge. It
-/// is listed only while it is still the one selected (`pickerSTTModels`).
-private func lifecycleBadge(_ lifecycle: ModelLifecycle) -> SetupBadge? {
-    if case .superseded = lifecycle { return SetupBadge(text: "Newer model available", kind: .quality) }
+/// is listed only while it is still the one selected (`pickerSTTModels`). A superseded
+/// model sits under Legacy models, which says what it is; only the selected one carries
+/// "Newer model available", beside the Switch under the list.
+private func lifecycleBadge(_ lifecycle: ModelLifecycle, selected: Bool) -> SetupBadge? {
+    if case .superseded = lifecycle {
+        return selected ? SetupBadge(text: "Newer model available", kind: .quality) : nil
+    }
     return lifecycle.status(on: Date()).map { SetupBadge(text: $0, kind: .warn) }
+}
+
+/// Under a service's current models, its legacy ones, folded away behind one row unless
+/// the model in use is one of them (`modelPickerRuns`).
+private struct LegacyModels<Rows: View>: View {
+    let count: Int
+    let holdsSelection: Bool
+    @ViewBuilder let rows: Rows
+    @State private var opened: Bool?
+
+    var body: some View {
+        let isOpen = opened ?? holdsSelection
+        Button {
+            withAnimation(.easeOut(duration: 0.15)) { opened = !isOpen }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9, weight: .semibold))
+                    .rotationEffect(.degrees(isOpen ? 90 : 0))
+                Text("Legacy models")
+                    .font(.system(size: 12, weight: .medium))
+                Text("\(count)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(SetupColor.label2)
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(SetupColor.label)
+            .padding(.horizontal, 10)
+            .padding(.top, 6)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Legacy models")
+        .accessibilityValue(isOpen ? "Shown, \(count)" : "Hidden, \(count)")
+        if isOpen {
+            Text("Earlier versions. They still work, but the models above replace them.")
+                .rowNote()
+                .padding(.horizontal, 10)
+            rows
+        }
+    }
 }
 
 /// The offered model a superseded one points to, or nil.

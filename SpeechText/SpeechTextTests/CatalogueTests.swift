@@ -363,8 +363,8 @@ final class StoredProviderNameTests: XCTestCase {
         XCTAssertEqual(Provider.openAI.defaultSpeechModel, "gpt-transcribe")
         XCTAssertEqual(Provider.local.defaultSpeechModel, "parakeet-tdt-0.6b-v3")
         XCTAssertEqual(Provider.groq.defaultChatModel, "openai/gpt-oss-120b")
-        XCTAssertEqual(Provider.anthropic.defaultChatModel, "claude-sonnet-5")
-        XCTAssertEqual(Provider.openAI.defaultChatModel, "gpt-5.6-luna")
+        XCTAssertEqual(Provider.anthropic.defaultChatModel, "claude-sonnet-5-5")
+        XCTAssertEqual(Provider.openAI.defaultChatModel, "gpt-6-luna")
         XCTAssertEqual(Provider.local.defaultChatModel, "gemma-4-12b-it-qat-q4_0")
         XCTAssertEqual(Provider.ollama.defaultChatModel, "")
     }

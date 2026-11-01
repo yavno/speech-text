@@ -82,7 +82,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                                               header: .named("x-api-key"),
                                               extraHeaders: ["anthropic-version": "2023-06-01"])),
                 speechModel: nil,
-                chatModel: ModelSetting(settingsKey: SettingsKeys.anthropicModel, defaultID: "claude-sonnet-5"),
+                chatModel: ModelSetting(settingsKey: SettingsKeys.anthropicModel, defaultID: "claude-sonnet-5-5"),
                 speechUpload: nil)
         case .openAI:
             ProviderDescriptor(displayName: "OpenAI", roles: [.speech, .chat], apiKey: APIKeyDescriptor(
@@ -94,7 +94,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                 verification: KeyVerification(url: URL(string: "https://api.openai.com/v1/models")!,
                                               header: .bearer)),
                 speechModel: ModelSetting(settingsKey: SettingsKeys.openAISTTModel, defaultID: "gpt-transcribe"),
-                chatModel: ModelSetting(settingsKey: SettingsKeys.openAIModel, defaultID: "gpt-5.6-luna"),
+                chatModel: ModelSetting(settingsKey: SettingsKeys.openAIModel, defaultID: "gpt-6-luna"),
                 // Uploads stay FLAC. OpenAI's documented format list omits it, but the
                 // endpoint accepts it — verified with a real request on 2026-09-21 against
                 // `gpt-transcribe` and `whisper-1`. Do not "fix" this to WAV on the strength
