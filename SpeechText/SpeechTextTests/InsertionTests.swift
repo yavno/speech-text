@@ -141,3 +141,32 @@ final class DeliveryTierTests: XCTestCase {
         XCTAssertEqual(DeliveryTier.resolve(isOwnSurface: false, probe: probe), .b)
     }
 }
+
+/// The keystroke a simulated ⌘V / ⌘C / ⌘X is posted as. Chrome 156 pastes nothing for a
+/// V whose flags alone say ⌘ (measured 2026-11-01), so ⌘ itself has to go down first and
+/// come up last.
+final class CommandKeystrokeTests: XCTestCase {
+    private let command: UInt16 = 0x37
+    private let v: UInt16 = 0x09
+
+    func testCommandIsPressedAroundTheLetter() {
+        XCTAssertEqual(CommandKeystroke.steps(letterKeyCode: v), [
+            .init(keyCode: command, isDown: true, commandHeld: true),
+            .init(keyCode: v, isDown: true, commandHeld: true),
+            .init(keyCode: v, isDown: false, commandHeld: true),
+            .init(keyCode: command, isDown: false, commandHeld: false),
+        ])
+    }
+
+    func testTheLetterIsTheOneTheLayoutNames() {
+        // Dvorak's ⌘V is not the ANSI position; whatever key the layout gives is posted.
+        let dvorakV: UInt16 = 0x2F
+        let letters = CommandKeystroke.steps(letterKeyCode: dvorakV).filter { $0.keyCode != command }
+        XCTAssertEqual(letters.map(\.keyCode), [dvorakV, dvorakV])
+        XCTAssertEqual(letters.map(\.isDown), [true, false])
+    }
+
+    func testTheStepsKeepTheMeasuredSpacing() {
+        XCTAssertEqual(CommandKeystroke.stepMicroseconds, 20_000)
+    }
+}
