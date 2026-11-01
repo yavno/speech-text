@@ -1026,31 +1026,41 @@ private struct HistoryDetail: View {
             let edit = refinement.isSelectionEdit
             // Saved for want of a network: a retry rewrote it, but nothing reached the app.
             let notPasted = record.undelivered != nil
+            let result: HistoryTextPane = refinement.succeeded
+                ? HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
+                                  text: refinement.outputText, ai: true,
+                                  note: edit ? "Replaced the selection" : notPasted ? "Not pasted" : "Pasted",
+                                  model: modelName(refinement))
+                : HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
+                                  text: "", ai: true, model: modelName(refinement),
+                                  failure: (edit ? "Didn't work — the selection was left as it was."
+                                             : notPasted ? "Didn't work — the dictated text was kept instead."
+                                             : "Didn't work — the dictated text was pasted instead.")
+                                      + (refinement.errorMessage.map { "\n\($0)" } ?? ""))
             if edit {
-                (Text("Instruction  ").foregroundStyle(MainColor.ink3)
-                 + Text(record.text.isEmpty ? "None — polished" : record.text).foregroundStyle(MainColor.ink))
-                    .font(.system(size: 13))
-                    .textSelection(.enabled)
+                // An edit has three texts: the selection and the instruction said about it side
+                // by side, and the rewrite under both, across the whole width.
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
+                        HistoryTextPane(title: "Selected text", symbol: "text.cursor",
+                                        text: refinement.inputText, ai: false)
+                        HistoryTextPane(title: "Instruction", symbol: "waveform",
+                                        text: record.text, ai: false,
+                                        placeholder: "None — polished",
+                                        model: record.text.isEmpty || engine.isEmpty ? nil : engine)
+                    }
                     .fixedSize(horizontal: false, vertical: true)
-            }
-            HStack(alignment: .top, spacing: 10) {
-                HistoryTextPane(title: edit ? "Selected text" : "Dictated", symbol: edit ? "text.cursor" : "waveform",
-                                text: refinement.inputText, ai: false, model: edit ? nil : engine)
-                if refinement.succeeded {
-                    HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
-                                    text: refinement.outputText, ai: true,
-                                    note: edit ? "Replaced the selection" : notPasted ? "Not pasted" : "Pasted",
-                                    model: modelName(refinement))
-                } else {
-                    HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
-                                    text: "", ai: true, model: modelName(refinement),
-                                    failure: (edit ? "Didn't work — the selection was left as it was."
-                                               : notPasted ? "Didn't work — the dictated text was kept instead."
-                                               : "Didn't work — the dictated text was pasted instead.")
-                                        + (refinement.errorMessage.map { "\n\($0)" } ?? ""))
+                    result
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+            } else {
+                HStack(alignment: .top, spacing: 10) {
+                    HistoryTextPane(title: "Dictated", symbol: "waveform",
+                                    text: refinement.inputText, ai: false, model: engine)
+                    result
+                }
+                .fixedSize(horizontal: false, vertical: true)
             }
-            .fixedSize(horizontal: false, vertical: true)
         }
         // A plain dictation has no pane: the open row above already shows its whole text,
         // and its engine is named in the facts below.
@@ -1100,8 +1110,7 @@ private struct HistoryDetail: View {
         var parts: [String] = [HistoryFormat.full(record.date)]
         if let length = HistoryFormat.length(record.duration) { parts.append(length) }
         // A rewrite names its engine under what it heard; anything else names it here.
-        if record.status != .success || record.refinement == nil || record.refinement?.isSelectionEdit == true,
-           !engine.isEmpty {
+        if record.status != .success || record.refinement == nil, !engine.isEmpty {
             parts.append(engine)
         }
         if let origin = record.originApp, let destination = record.destinationApp, origin != destination {
@@ -1156,6 +1165,8 @@ private struct HistoryTextPane: View {
     let text: String
     let ai: Bool
     var note: String?
+    /// What an empty text reads as.
+    var placeholder = "No text"
     var model: String?
     var failure: String?
 
@@ -1184,7 +1195,7 @@ private struct HistoryTextPane: View {
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text(text.isEmpty ? "No text" : text)
+                Text(text.isEmpty ? placeholder : text)
                     .font(.system(size: 13.5))
                     .foregroundStyle(text.isEmpty ? MainColor.ink3 : MainColor.ink)
                     .lineSpacing(3.5)
