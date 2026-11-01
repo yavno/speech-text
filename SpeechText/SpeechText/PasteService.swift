@@ -673,10 +673,18 @@ struct PasteService {
         simulateCommandKey("v", name: "⌘V")
     }
 
-    /// Posts ⌘ + `keyCode`. The flags are set outright, so a shortcut's ⌃⇧ still held
-    /// down does not turn ⌘C into ⌘⌃⇧C.
+    /// Posts ⌘ + the letter as `CommandKeystroke` spells it — ⌘ pressed as a key of its
+    /// own around the letter, which Chrome needs to paste (see there).
     private static func simulateCommandKey(_ letter: Character, name: String) {
-        simulateKey(commandKeyCode(for: letter), flags: .maskCommand, name: name)
+        let source = CGEventSource(stateID: .combinedSessionState)
+        let steps = CommandKeystroke.steps(letterKeyCode: commandKeyCode(for: letter))
+        for (index, step) in steps.enumerated() {
+            if index > 0 { usleep(CommandKeystroke.stepMicroseconds) }
+            let event = CGEvent(keyboardEventSource: source, virtualKey: step.keyCode, keyDown: step.isDown)
+            event?.flags = step.commandHeld ? .maskCommand : []
+            event?.post(tap: .cgSessionEventTap)
+        }
+        dlog("Paste", "CGEvent \(name) posted", level: .debug)
     }
 
     /// The key that types `letter` while ⌘ is down in the keyboard layout in use. A
@@ -717,21 +725,5 @@ struct PasteService {
             dlog("Paste", "⌘\(wanted.uppercased()) is key \(found) in this layout", level: .debug)
         }
         return found ?? fallback
-    }
-
-    /// Posts `keyCode` with exactly `flags` — none at all for a plain ⌫, whatever is
-    /// physically held.
-    private static func simulateKey(_ keyCode: CGKeyCode, flags: CGEventFlags, name: String) {
-        let source = CGEventSource(stateID: .combinedSessionState)
-
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
-        keyDown?.flags = flags
-
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
-        keyUp?.flags = flags
-
-        keyDown?.post(tap: .cgSessionEventTap)
-        keyUp?.post(tap: .cgSessionEventTap)
-        dlog("Paste", "CGEvent \(name) posted", level: .debug)
     }
 }

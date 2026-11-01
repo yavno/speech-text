@@ -149,3 +149,32 @@ public enum ShortcutConflict: Equatable, Sendable {
         return system.contains(candidate) ? .system : nil
     }
 }
+
+/// The key events a simulated ⌘-shortcut (the paste's ⌘V, the Edit shortcut's ⌘C and ⌘X)
+/// is posted as: ⌘ down, the letter down and up, ⌘ up — a person's keystroke, not one
+/// letter whose flags merely say ⌘. Chrome 156 (measured 2026-11-01) reads the pasteboard
+/// for the latter and then inserts nothing, so every dictation and edit into a web page
+/// was reported pasted and left the field empty; with ⌘ pressed around the letter it
+/// pastes. `PasteService.simulateCommandKey` posts these, `stepMicroseconds` apart — the
+/// spacing that was measured.
+public enum CommandKeystroke {
+    public struct Step: Equatable, Sendable {
+        public let keyCode: UInt16
+        public let isDown: Bool
+        /// Set outright on the event, so a shortcut's ⌃⇧ still held down does not turn
+        /// ⌘C into ⌘⌃⇧C.
+        public let commandHeld: Bool
+    }
+
+    public static let stepMicroseconds: UInt32 = 20_000
+
+    public static func steps(letterKeyCode: UInt16) -> [Step] {
+        let command = UInt16(kVK_Command)
+        return [
+            Step(keyCode: command, isDown: true, commandHeld: true),
+            Step(keyCode: letterKeyCode, isDown: true, commandHeld: true),
+            Step(keyCode: letterKeyCode, isDown: false, commandHeld: true),
+            Step(keyCode: command, isDown: false, commandHeld: false),
+        ]
+    }
+}
