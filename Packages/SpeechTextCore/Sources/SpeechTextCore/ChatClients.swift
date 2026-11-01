@@ -73,6 +73,14 @@ public struct ChatModelDescriptor: Equatable, Sendable {
     /// Where the model is in its vendor's life (`ModelLifecycle`). A model on this Mac is
     /// current while the catalogue lists it.
     public var lifecycle: ModelLifecycle = .current
+
+    /// This model with another `reasoning_effort` (nil sends none) — for the rewrite
+    /// evaluation, which measures a setting before the catalogue is given it.
+    public func withReasoningEffort(_ effort: String?) -> ChatModelDescriptor {
+        ChatModelDescriptor(provider: provider, id: id, displayName: displayName, reasoningEffort: effort,
+                            reasoningOutput: reasoningOutput, refusalFallbacks: refusalFallbacks,
+                            price: price, lifecycle: lifecycle)
+    }
 }
 
 /// What a vendor charges for a chat model's tokens.
@@ -306,8 +314,8 @@ public struct ChatReply: Equatable, Sendable {
 public struct ChatUsage: Codable, Equatable, Sendable {
     public var inputTokens: Int
     public var outputTokens: Int
-    var cachedInputTokens: Int? = nil
-    var reasoningTokens: Int? = nil
+    public var cachedInputTokens: Int? = nil
+    public var reasoningTokens: Int? = nil
 
     public init(inputTokens: Int, outputTokens: Int, cachedInputTokens: Int? = nil, reasoningTokens: Int? = nil) {
         self.inputTokens = inputTokens
@@ -679,9 +687,14 @@ public enum LLMConfiguration {
         guard !key.isEmpty else { throw LLMError.missingAPIKey(type) }
         let id = model(for: type)
         guard id != clearedModelChoice else { throw LLMError.noModelChosen(type) }
-        let model = chatModel(provider: type, id: id)
+        return makeChatClient(model: chatModel(provider: type, id: id), apiKey: key)
+    }
 
-        switch type {
+    /// The cloud client for `model`, with `apiKey` — the one place a provider's endpoint and
+    /// dialect are named, so the rewrite evaluation builds exactly the client the app does.
+    /// Pure: nothing is read from the settings. A model on this Mac has no cloud client.
+    public static func makeChatClient(model: ChatModelDescriptor, apiKey key: String) -> ChatClient {
+        switch model.provider {
         case .groq:
             return OpenAICompatibleChatClient(
                 label: "Groq",
@@ -697,7 +710,7 @@ public enum LLMConfiguration {
         case .anthropic:
             return AnthropicChatClient(apiKey: key, model: model)
         case .local:
-            preconditionFailure("handled above — a model on this Mac has no key to check")
+            preconditionFailure("a model on this Mac goes through LocalChat.clientFactory")
         }
     }
 }

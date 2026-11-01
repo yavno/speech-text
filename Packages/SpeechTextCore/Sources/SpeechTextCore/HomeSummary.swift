@@ -201,7 +201,7 @@ extension ChatRates {
     /// output token at theirs. Anthropic's cache writes are in `inputTokens` at the base
     /// price, though billed at 1.25× — harmless only because no request sets
     /// `cache_control`, so there are none.
-    func cost(_ usage: ChatUsage) -> Double {
+    public func cost(_ usage: ChatUsage) -> Double {
         let cached = min(usage.cachedInputTokens ?? 0, usage.inputTokens)
         return Double(usage.inputTokens - cached) * inputPerToken + Double(cached) * cachedInputPerToken
             + Double(usage.outputTokens) * outputPerToken
