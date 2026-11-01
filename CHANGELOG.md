@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The disk image says what to do after the drag.** Its window now reads *Drag, then open*: drag SpeechText onto Applications, then double-click it in the same window. That double-click opens the copy you just dragged, with no second question from macOS — before, a drag ended with nothing opening and the window still up.
 - **SpeechText is in the Dock and ⌘Tab all the time** by default. Settings › General › Show in Dock still offers *While a window is open* or *Never*; a choice you made there is kept.
 
+### Fixed
+
+- **History no longer says "Pasted" for a dictation saved offline.** When a dictation made with no connection was rewritten by AI Rewrite once the network was back, its AI output read *Pasted* though nothing had been pasted; it now reads *Not pasted*, and a rewrite that failed says the dictated text was kept rather than pasted.
+
 ## [0.10.0] - 2026-10-29
 
 The first public release.
