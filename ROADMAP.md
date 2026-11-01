@@ -6,17 +6,19 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-Nothing is in progress right now; the next piece of work comes from **Next**.
+- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, then a prompt without its contradictions and repeats: modes for the kind of text, modifiers for language, length, tone and format, and possibly two steps — a fast model picks the mode, the writing model gets only that mode.
 
 ## Next
 
 - **Notetaker** — record a conversation you are part of, then review a speaker-attributed transcript, summarise it, ask questions and export it. Microphone and system audio are captured as two separate tracks, so who-said-what is exact for a one-to-one conversation without any speaker model at all.
 - **More providers** — behind the provider registry (`ProviderDescriptor`, see `docs/adding-a-provider.md`). New providers are a good contribution.
 - **Localization** — the UI is English-only. Translations come in the order people ask for them.
+- **Playground** — try your own dictations from History through other models and prompts, side by side with what came out, how long it took and what it cost.
 
 ## Later
 
 - **Automation** — URL scheme, Shortcuts, a CLI, and an MCP server, so other tools can start a dictation or read a transcript.
+- **Rich text paste** — formatting AI Rewrite was asked for, pasted as real rich text where the app does not render Markdown.
 
 ## Done
 
