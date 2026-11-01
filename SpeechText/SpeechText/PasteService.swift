@@ -673,10 +673,31 @@ struct PasteService {
         simulateCommandKey("v", name: "⌘V")
     }
 
-    /// Posts ⌘ + `keyCode`. The flags are set outright, so a shortcut's ⌃⇧ still held
-    /// down does not turn ⌘C into ⌘⌃⇧C.
+    /// Posts ⌘ + the letter as a person types it: ⌘ down, the letter down and up, ⌘ up.
+    /// The flags are set outright, so a shortcut's ⌃⇧ still held down does not turn ⌘C
+    /// into ⌘⌃⇧C.
+    ///
+    /// The ⌘ key is pressed as a key of its own, not only named in the letter's flags:
+    /// Chrome 156 (measured 2026-11-01) reads the pasteboard for a ⌘V whose flags alone
+    /// say ⌘ and then inserts nothing — every dictation and edit into a web page was
+    /// reported pasted and left the field empty — while the same ⌘V with ⌘ pressed
+    /// around it, or posted at the HID tap, pastes. The 20 ms steps are the ones measured.
     private static func simulateCommandKey(_ letter: Character, name: String) {
-        simulateKey(commandKeyCode(for: letter), flags: .maskCommand, name: name)
+        let source = CGEventSource(stateID: .combinedSessionState)
+        let letterKey = commandKeyCode(for: letter)
+        let steps: [(CGKeyCode, Bool, CGEventFlags)] = [
+            (CGKeyCode(kVK_Command), true, .maskCommand),
+            (letterKey, true, .maskCommand),
+            (letterKey, false, .maskCommand),
+            (CGKeyCode(kVK_Command), false, []),
+        ]
+        for (index, (keyCode, isDown, flags)) in steps.enumerated() {
+            if index > 0 { usleep(20_000) }
+            let event = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: isDown)
+            event?.flags = flags
+            event?.post(tap: .cgSessionEventTap)
+        }
+        dlog("Paste", "CGEvent \(name) posted", level: .debug)
     }
 
     /// The key that types `letter` while ⌘ is down in the keyboard layout in use. A
@@ -717,21 +738,5 @@ struct PasteService {
             dlog("Paste", "⌘\(wanted.uppercased()) is key \(found) in this layout", level: .debug)
         }
         return found ?? fallback
-    }
-
-    /// Posts `keyCode` with exactly `flags` — none at all for a plain ⌫, whatever is
-    /// physically held.
-    private static func simulateKey(_ keyCode: CGKeyCode, flags: CGEventFlags, name: String) {
-        let source = CGEventSource(stateID: .combinedSessionState)
-
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
-        keyDown?.flags = flags
-
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
-        keyUp?.flags = flags
-
-        keyDown?.post(tap: .cgSessionEventTap)
-        keyUp?.post(tap: .cgSessionEventTap)
-        dlog("Paste", "CGEvent \(name) posted", level: .debug)
     }
 }
