@@ -33,10 +33,22 @@ Every feature goes the same way, in the open, so you can see where anything stan
 
 1. **An idea starts in [Ideas](../../discussions/categories/ideas).** One idea per discussion; upvote the ones you want. Each new idea gets an answer within a week, and one of three labels: `under review`, `accepted` or `declined` (with the reason).
 2. **An accepted idea becomes an issue** of type *Feature* with the `roadmap` label and a horizon: `horizon: now`, `horizon: next` or `horizon: later` — the same three sections as [ROADMAP.md](ROADMAP.md). The issue links back to its idea with a line `Idea: #<number>`.
-3. **Its stages are sub-issues**, one each, labelled `stage: spec`, `stage: design`, `stage: build`, `stage: test` and `stage: ship`. A closed sub-issue is a stage done. A feature only has the stages it needs.
-4. **When a feature is blocked**, it gets `state: waiting`, and the first line of the issue says what on: `Waiting: <reason>`.
-5. **It ships in a milestone** named after the version, as its tag without the `v` (`0.10.0`, `0.11.0`, …). The feature issue is closed when the release is out.
-6. **A feature we decide against** is closed as *not planned*, with a comment starting `Dropped: <reason>`.
+3. **The issue's title is the feature's bold name in ROADMAP.md, word for word, and the issue ends with the card on speech-text.app/roadmap** — a last section in this format:
+
+   ```md
+   ### On the website
+
+   - Pitch: one line, at most 60 characters, plain text (no backticks or HTML)
+   - Icon: one of: apple github slack mail messages gmail docs notion chatgpt claude t3code terminal whatsapp discord linear play pause sparkles insert copy pointer rotate drop check keyboard mic mic-fill bolt sun moon slash sparkles-slash history retry key lock laptop cloud chip chevron logo-arrow speaker speaker-slash expand collapse x
+   - AI: yes or no (yes gives the card the violet AI accent)
+   - Why: at most three sentences; **bold**, _italic_ and links only, no code, HTML or headings
+   ```
+
+   The card's title is the issue's title, its column the `horizon:` label, and its order the feature's place in ROADMAP.md.
+4. **Its stages are sub-issues**, one each, labelled `stage: spec`, `stage: design`, `stage: build`, `stage: test` and `stage: ship`. A closed sub-issue is a stage done. A feature only has the stages it needs.
+5. **When a feature is blocked**, it gets `state: waiting`, and the first line of the issue says what on: `Waiting: <reason>`.
+6. **It ships in a milestone** named after the version, as its tag without the `v` (`0.10.0`, `0.11.0`, …). The feature issue is closed when the release is out.
+7. **A feature we decide against** is closed as *not planned*, with a comment starting `Dropped: <reason>`.
 
 👍 on a feature issue is a vote. Votes tell us what matters to you; they are weighed with measurements and with ROADMAP.md, and do not decide alone.
 
