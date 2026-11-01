@@ -1024,6 +1024,8 @@ private struct HistoryDetail: View {
     private var texts: some View {
         if let refinement = record.refinement {
             let edit = refinement.isSelectionEdit
+            // Saved for want of a network: a retry rewrote it, but nothing reached the app.
+            let notPasted = record.undelivered != nil
             if edit {
                 (Text("Instruction  ").foregroundStyle(MainColor.ink3)
                  + Text(record.text.isEmpty ? "None — polished" : record.text).foregroundStyle(MainColor.ink))
@@ -1037,12 +1039,14 @@ private struct HistoryDetail: View {
                 if refinement.succeeded {
                     HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
                                     text: refinement.outputText, ai: true,
-                                    note: edit ? "Replaced the selection" : "Pasted",
+                                    note: edit ? "Replaced the selection" : notPasted ? "Not pasted" : "Pasted",
                                     model: modelName(refinement))
                 } else {
                     HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
                                     text: "", ai: true, model: modelName(refinement),
-                                    failure: (edit ? "Didn't work — the selection was left as it was." : "Didn't work — the dictated text was pasted instead.")
+                                    failure: (edit ? "Didn't work — the selection was left as it was."
+                                               : notPasted ? "Didn't work — the dictated text was kept instead."
+                                               : "Didn't work — the dictated text was pasted instead.")
                                         + (refinement.errorMessage.map { "\n\($0)" } ?? ""))
                 }
             }
