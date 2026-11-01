@@ -243,6 +243,7 @@ final class ListPriceTests: XCTestCase {
         "openai/gpt-5.6-sol": (4, 0.40, 20),
         "openai/gpt-6-luna": (0.10, 0.01, 0.50),
         "openai/gpt-6-sol": (2, 0.20, 10),
+        "openai/gpt-6.1-terra": (1, 0.05, 5),
         "openai/gpt-6.1-sol": (2, 0.10, 10),
     ]
 

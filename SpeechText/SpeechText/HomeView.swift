@@ -1056,7 +1056,7 @@ struct HomeEngines: View {
     }
 
     /// A catalogue name without its picker note: "Scribe v2 Realtime — live text" and
-    /// "Claude Haiku 4.5 (fastest)" read here as the model's name alone.
+    /// "GPT-OSS 20B (fastest)" read here as the model's name alone.
     static func plainName(_ name: String) -> String { plainModelName(name) }
 }
 

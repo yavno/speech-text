@@ -125,14 +125,37 @@ final class ChatModelCatalogTests: XCTestCase {
                                                    "qwen/qwen3.8-27b"])
         XCTAssertEqual(offeredChatModels(of: .groq).map(\.displayName), ["GPT-OSS 120B", "GPT-OSS 20B (fastest)",
                                                      "Qwen3.8 27B (preview)"])
-        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5",
-                                                        "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"])
-        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5 (fastest)",
-                                                                "Claude Sonnet 5.5", "Claude Opus 5.5", "Claude Haiku 5.5"])
-        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol",
-                                                     "gpt-6-luna", "gpt-6-sol", "gpt-6.1-sol"])
-        XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-5.6 Luna — fastest", "GPT-5.6 Terra — balanced",
-                                                       "GPT-5.6 Sol — flagship", "GPT-6 Luna", "GPT-6 Sol", "GPT-6.1 Sol"])
+        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5",
+                                                        "claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
+        XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5.5", "Claude Opus 5.5", "Claude Haiku 5.5",
+                                                                "Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5"])
+        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol",
+                                                     "gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
+        XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-6 Luna", "GPT-6.1 Terra", "GPT-6.1 Sol",
+                                                       "GPT-6 Sol", "GPT-5.6 Luna", "GPT-5.6 Terra", "GPT-5.6 Sol"])
+    }
+
+    /// A picker leads with the models to pick now; what a newer model replaced, and a
+    /// selected model the vendor is retiring, go under Legacy models, each run in
+    /// catalogue order.
+    func testPickersPutLegacyModelsLast() {
+        let anthropic = modelPickerRuns(pickerChatModels(of: .anthropic, selected: "claude-sonnet-5"), lifecycle: \.lifecycle)
+        XCTAssertEqual(anthropic.current.map(\.id), ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"])
+        XCTAssertEqual(anthropic.legacy.map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
+
+        let openAI = modelPickerRuns(pickerChatModels(of: .openai, selected: "gpt-6-luna"), lifecycle: \.lifecycle)
+        XCTAssertEqual(openAI.current.map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol"])
+        XCTAssertEqual(openAI.legacy.map(\.id), ["gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
+
+        let groq = modelPickerRuns(pickerChatModels(of: .groq, selected: "minimaxai/minimax-m2.7"), lifecycle: \.lifecycle)
+        XCTAssertEqual(groq.current.map(\.id), ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"])
+        XCTAssertEqual(groq.legacy.map(\.id), ["minimaxai/minimax-m2.7"])
+
+        // Every provider's default leads, never under Legacy models.
+        for provider in [LLMProviderType.groq, .anthropic, .openai] {
+            let runs = modelPickerRuns(offeredChatModels(of: provider), lifecycle: \.lifecycle)
+            XCTAssertTrue(runs.current.contains { $0.id == provider.vendor.defaultChatModel }, "\(provider)")
+        }
     }
 
     func testAnUnlistedIDIsNamedByItselfAndListedNowhere() {
@@ -181,7 +204,7 @@ final class ChatRequestBodyTests: XCTestCase {
     }
 
     func testOpenAIModels() {
-        for model in ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-6-luna", "gpt-6-sol"] {
+        for model in ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-6-luna", "gpt-6-sol", "gpt-6.1-terra"] {
             assertBody(openAI(model), ["model": model, "messages": turns, "max_completion_tokens": 8192,
                                        "reasoning_effort": "none"], model)
         }

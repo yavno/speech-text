@@ -119,6 +119,28 @@ let archivedSpeechModels: [ArchivedModel<SpeechRates>] = []
 /// Chat models past their term.
 let archivedChatModels: [ArchivedModel<ChatRates>] = []
 
+// MARK: - A picker's two runs
+
+/// What a model picker lists, in two runs: the models to pick now, in catalogue order, and
+/// under them the legacy ones — superseded by a newer model of their vendor, or the
+/// selected one the vendor is retiring. A legacy model still works; the run only keeps
+/// the list from leading with what a newer model has replaced. "Legacy" is the vendors'
+/// own word for it (Anthropic's models page, OpenAI's).
+public struct ModelPickerRuns<Model> {
+    public let current: [Model]
+    public let legacy: [Model]
+}
+
+public func modelPickerRuns<Model>(_ models: [Model],
+                                   lifecycle: (Model) -> ModelLifecycle) -> ModelPickerRuns<Model> {
+    var current: [Model] = []
+    var legacy: [Model] = []
+    for model in models {
+        if case .current = lifecycle(model) { current.append(model) } else { legacy.append(model) }
+    }
+    return ModelPickerRuns(current: current, legacy: legacy)
+}
+
 // MARK: - Following a replacement
 
 /// One model as the chain sees it: whether it is offered and where it points.
