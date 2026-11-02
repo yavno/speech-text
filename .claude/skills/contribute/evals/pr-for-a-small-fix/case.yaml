@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: pr-for-a-small-fix
+expected_outcome: |
+  The exact commands, a signed-off commit, and a PR description in the template's shape.
+context:
+  scaffold_script: place-repo.sh
