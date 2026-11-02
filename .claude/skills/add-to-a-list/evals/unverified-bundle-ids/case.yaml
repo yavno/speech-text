@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: unverified-bundle-ids
+expected_outcome: |
+  Neither ID is guessed into the list; the agent explains the IDs must be read from a real install and says how.
+context:
+  scaffold_script: place-repo.sh
