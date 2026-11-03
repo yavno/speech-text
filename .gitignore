@@ -25,3 +25,5 @@ NOTE.md
 *.profraw
 *.profdata
 
+# claude plugin eval output
+.claude/skills/*/evals/results/
