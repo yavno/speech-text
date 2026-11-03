@@ -393,16 +393,18 @@ Packages/
   LlamaBinary/         llama.cpp's prebuilt xcframework, pinned
 docs/
   development.md       this file
+  architecture.md      the map of the code
+  decisions.md         the decisions behind the behaviour
   specs/               design documents for larger features
 scripts/               rebuild, packaging, keychain profile, appcast, trace import
 .githooks/             the sign-off and pre-commit hooks (see Hooks)
 .github/workflows/     CI and the tag-triggered release
-CLAUDE.md              full architecture reference
+AGENTS.md              the guide for AI coding agents (CLAUDE.md imports it)
 ```
 
 ## Architecture
 
-[`CLAUDE.md`](../CLAUDE.md) is the detailed architecture reference — every component, the recognition tiers, the recording phase machine, the settings keys. It is written for AI coding agents but it is the most complete description of the codebase and worth reading before any non-trivial change.
+[architecture.md](architecture.md) is the map of the code, [decisions.md](decisions.md) the decisions behind its behaviour, and [`AGENTS.md`](../AGENTS.md) the rules and the settings keys. Before any non-trivial change, read the decisions.md entries on what you touch.
 
 The short version:
 

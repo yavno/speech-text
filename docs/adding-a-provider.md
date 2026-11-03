@@ -178,7 +178,7 @@ no clipboard pick-up) · a free authenticated request for the key check (usually
 
 ## 5. Realtime speech engine
 
-Read CLAUDE.md's streaming sections first. The rules:
+Read the streaming entries in docs/decisions.md › Key patterns first. The rules:
 
 - **An upload twin is required**: `batchUpload: .model(id)` from the same vendor. A failed
   or dropped stream is finished by uploading the same audio.
@@ -253,8 +253,8 @@ Read CLAUDE.md's streaming sections first. The rules:
   edit; the test bundle compiles no app file, so anything a test needs goes there too. Test
   request builders and parsers as pure functions; realtime vendors get a
   `DictationReplay` script with a drop and a `Vendor` case in the realtime contract tests.
-- Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md, CLAUDE.md (component
-  bullet, Settings Keys table), CHANGELOG. What only a person can check — a live socket
+- Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md, AGENTS.md (Settings Keys
+  table), CHANGELOG. What only a person can check — a live socket
   from a microphone, a real key against the service — goes under *Needs a real-app run*
   in the pull request.
 
@@ -311,6 +311,6 @@ key      | Packages/SpeechTextCore/Sources/SpeechTextCore/SetupServices.swift   
 key      | docs/development.md                                                        | ## API keys                            | manual      | the list of keys
 docs     | docs/privacy.md                                                            | # Where your audio goes                | manual      | the privacy list, the engine table and the AI Rewrite paragraph
 docs     | SECURITY.md                                                                | The privacy practices of               | manual:file | add the vendor
-docs     | CLAUDE.md                                                                  | ## Settings Keys Reference             | manual      | the new keys, and the provider file's Architecture bullet
+docs     | AGENTS.md                                                                  | ## Settings Keys Reference             | manual      | the new keys
 docs     | CHANGELOG.md                                                               | ## [Unreleased]                        | manual:file | an Added entry
 ```

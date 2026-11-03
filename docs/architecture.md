@@ -1,6 +1,6 @@
 # Architecture
 
-A short map of the code for someone about to change it. [CLAUDE.md](../CLAUDE.md) is the full reference — every decision and the measurement behind it — and this page points into it rather than repeating it. Where the two disagree, the code wins, then CLAUDE.md.
+A short map of the code for someone about to change it. [decisions.md](decisions.md) has every decision and the measurement behind it, and this page points into it rather than repeating it. Where the two disagree, the code wins, then decisions.md.
 
 ## What the app is
 
@@ -119,13 +119,13 @@ These have no SwiftUI views, no `AppState`, no `SpeechEngine`. The package's man
 
 ## Invariants
 
-Each of these was learned the hard way. Break one only on purpose, and update CLAUDE.md with it.
+Each of these was learned the hard way. Break one only on purpose, and rewrite its entry in decisions.md.
 
-- **Nothing reaches another app before the stop.** Live text lives on the overlay only; text pasted into a foreign document cannot be taken back. — CLAUDE.md › Key Patterns › *Nothing reaches another app before the stop*
+- **Nothing reaches another app before the stop.** Live text lives on the overlay only; text pasted into a foreign document cannot be taken back. — decisions.md › Key patterns › *Nothing reaches another app before the stop*
 - **One write at the stop**, built from the whole recording (`spanLayer.text`), never from the last segment. — *One write at the stop*
 - **Streaming rides alongside the audio file, never instead of it.** The stream is for live text; the file is always written, and the upload answers whenever the stream cannot be trusted. — *Streaming rides alongside the audio file, never instead of it*
 - **Settings are snapshotted per session.** Provider, model and key are read once at start; History retry is the one place that reads fresh settings. — *Settings are snapshotted per session*
-- **SpeechTextCore stays closed.** No `TEST_HOST`; logic the tests need goes in `Packages/SpeechTextCore`, together with what it depends on, and needs no project edit; a package file never reaches into views, `AppState` or `SpeechEngine`. The manifest declares no dependency, so an engine's import there does not build, and CI's *Core imports* check refuses `import SwiftUI`. — CLAUDE.md › Tests, and [development.md](development.md#tests)
+- **SpeechTextCore stays closed.** No `TEST_HOST`; logic the tests need goes in `Packages/SpeechTextCore`, together with what it depends on, and needs no project edit; a package file never reaches into views, `AppState` or `SpeechEngine`. The manifest declares no dependency, so an engine's import there does not build, and CI's *Core imports* check refuses `import SwiftUI`. — AGENTS.md › Tests, and [development.md](development.md#tests)
 - **The local tier is reached through registration boxes.** `LocalSTT`, `LocalChat` and `VoiceActivity.detector` are filled at launch (`registerLocalSTT()`, `registerLocalChat()`, `registerVoiceActivity()`); unregistered, they fail or judge nothing rather than return empty text. — *Registration, not imports, for the local tier*
 - **API keys go through `APIKeyStore`.** Never read or write a key with `UserDefaults` directly: in a signed build they live in the keychain. — *API keys live in the keychain when the build can reach it*, and [development.md](development.md#api-keys)
 - **No telemetry or analytics of any kind.** — [ROADMAP.md](../ROADMAP.md)

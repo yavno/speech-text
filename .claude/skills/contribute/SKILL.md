@@ -5,7 +5,7 @@ description: The workflow for any change to SpeechText, from picking the work to
 
 # Contribute a change
 
-The rules are in `CONTRIBUTING.md` and `CLAUDE.md`. This is the order to apply them in.
+The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply them in.
 
 1. **Is it wanted?** A small fix needs nothing first. A feature, a refactor, a new
    setting, a UI change or anything in the recording pipeline needs an agreed issue;
@@ -13,8 +13,8 @@ The rules are in `CONTRIBUTING.md` and `CLAUDE.md`. This is the order to apply t
    place user data goes is unlikely to be accepted (`CONTRIBUTING.md`). Without an agreed
    issue, stop and ask.
 2. **Set up.** `git config core.hooksPath .githooks`, a branch from fresh `origin/main`.
-3. **Read before writing.** The part of `CLAUDE.md` on the files you touch. Many things
-   that look like oversights are decisions written down there; keep them or ask.
+3. **Read before writing.** The entries in `docs/decisions.md` on what you touch. Many
+   things that look like oversights are decisions written down there; keep them or ask.
 4. **Put code where it belongs.** Logic in `Packages/SpeechTextCore/Sources/SpeechTextCore/`
    (no `import SwiftUI`, no engine imports, `public` for what the app uses). Views,
    `AppState`, `SpeechEngine`, capture, hotkeys and stores in `SpeechText/SpeechText/`.
@@ -29,7 +29,7 @@ The rules are in `CONTRIBUTING.md` and `CLAUDE.md`. This is the order to apply t
    ```
    A new Swift file needs the SPDX header the others have.
 7. **Docs in the same change.** `CHANGELOG.md` under `[Unreleased]` if a user will notice
-   it, written for users. `CLAUDE.md` if a component, a pattern or a settings key changed.
+   it, written for users. `docs/decisions.md` if a decision changed, `AGENTS.md` if a rule or a settings key did.
    The guide in `docs/` the change makes untrue.
 8. **Commit.** `git commit -s` on every commit, a message that says what and why. English
    everywhere: code, comments, commits, the pull request.

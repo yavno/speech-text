@@ -130,7 +130,7 @@ Everything in the repository is written in English: code, comments, commit messa
 
 ## Setting up
 
-[docs/architecture.md](docs/architecture.md) is a short overview of how the app is put together — start there. [docs/development.md](docs/development.md) covers building, testing and the project layout. [`CLAUDE.md`](CLAUDE.md) is the exhaustive architecture reference — read the relevant section before changing the recording pipeline.
+[docs/architecture.md](docs/architecture.md) is a short overview of how the app is put together — start there. [docs/development.md](docs/development.md) covers building, testing and the project layout. [docs/decisions.md](docs/decisions.md) holds the decisions behind the app's behaviour, each with the bug or measurement behind it — read the entry before changing the recording pipeline. [`AGENTS.md`](AGENTS.md) is the guide for AI coding agents, and a quick read of the rules for anyone.
 
 ## License
 

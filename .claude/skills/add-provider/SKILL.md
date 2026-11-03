@@ -19,7 +19,7 @@ section of the guide when you reach it.
    there.
 5. **Write the code.** Follow the guide section for the shape, and copy the closest
    existing transcriber or chat client.
-6. **Tests and docs.** Guide §8. Run the tests (CLAUDE.md › Tests).
+6. **Tests and docs.** Guide §8. Run the tests (AGENTS.md › Tests).
 7. **Keep the guide true.** If you changed what adding a provider involves, update the
    guide in the same change, then run `scripts/check-provider-guide.sh`.
 
