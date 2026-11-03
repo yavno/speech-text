@@ -131,7 +131,9 @@ Code then turns an asked language that is the same as the dictated one into *non
 - The dictated language comes from `NLLanguageRecognizer`, limited to `spokenLanguages` plus English.
 - The `Core imports` check forbids only SwiftUI and the engines, so NaturalLanguage may be imported in SpeechTextCore.
 - Script alone is not enough: it does not tell English from Polish.
-- The rule only removes a request, and a request for the language already spoken changes nothing in the text. So where the recogniser is unsure, as on a dictation of two or three words, code leaves the model's answer alone. The confidence threshold is set on the fixtures.
+- The rule only removes a request, and a request for the language already spoken changes nothing in the text. So where the recogniser is unsure, code leaves the model's answer alone.
+  - Between languages written in different scripts, such as Ukrainian and English, the script decides: on every fixture, a single word included, the recogniser was at least 0.9999 sure (router v4, 2026-11-03). A threshold only matters between languages that share a script, such as English and Polish, and is set when a fixture needs one.
+  - A Ukrainian dictation that is mostly identifiers reads as English (`uk-ai-coding-prompt`). A request for Ukrainian on it is then kept, which is harmless; a request for English on it would be dropped.
 
 **D5 — The format: plain unless asked; Markdown only when named or rendered.**
 - Plain text is the default.
@@ -157,7 +159,7 @@ What meets the limit, as measured in the spike:
 | Jev (a provider of its own, any AI pick) | A hosted model built for decisions like these, asked all three questions in one request | 60/65 | 0.19 s |
 | Anthropic, OpenAI themselves | Nothing measured under 1 s. Haiku 5.5 took 1.24 s; GPT-6 Luna was not measured. | — | — |
 
-- **On this Mac,** "shared" reading (the state copied once per question) gave Qwen3.5 9B 60/65 at 1.04 s, just over the limit. Chained reading is the default. Shared is measured again after D3 and D4, since both take load off the model.
+- **On this Mac,** "shared" reading (the state copied once per question) gave Qwen3.5 9B 60/65 at 1.04 s, just over the limit. Chained reading is the default. The step-one prompt, with the user's own modes in it, is read when the model loads and again after a prompt is edited: read cold, it took 2.6–3.8 s, over the timeout, and 0.6–0.95 s once read (router v4). Shared is measured again after D3 and D4, since both take load off the model.
 - **Which step one runs,** by default, follows from what the user has:
   - with a Jev key, Jev, whatever the AI pick;
   - else, with AI Rewrite on this Mac, the local reading;
