@@ -46,10 +46,27 @@ struct RewriteFixture: Codable, Sendable {
     var instruction: String?
     var context: Context?
     var vocabulary: [String]?
+    /// A prompt of the user's own, as the Prompts page stores one.
+    struct Preset: Codable, Sendable {
+        var name: String
+        var whenToUse: String
+        var instructions: String
+    }
+
     /// The modes a right answer may report under today's prompt; the first is the expected one.
     var modes: [String]
-    /// The same for another prompt variant, by its name.
+    /// The same for another set of modes, by its name. `2026-11` is the three of
+    /// docs/specs/2026-11-03-rewrite-modes-and-router.md — Clean-up, Message, Document — and
+    /// the names of the fixture's own `presets`; every variant built on them looks there.
     var variantModes: [String: [String]]?
+    /// What the first step should find, for the variants that route (2026-11). The language
+    /// asked for, as an ISO 639-1 code; absent when none was, which is most dictations.
+    var askedLanguage: String?
+    /// The formats a right answer may pick: `plain`, `list` or `markdown`. Absent: plain.
+    var format: [String]?
+    /// Prompts of the user's own beside the built-ins, for a variant that sends them; `current`
+    /// sends the built-ins alone.
+    var presets: [Preset]?
     /// The reply's language: `uk`, `any`, or a language written in Latin script (`en`, `pl`, …).
     var language: String
     var mustKeep: [String]?
