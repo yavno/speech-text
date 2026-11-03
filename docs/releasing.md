@@ -197,8 +197,8 @@ Before the tag, run `scripts/check-vendor-models.sh` on the commit being tagged
   but `deprecated` or `retired`.** Such a model fails every dictation or rewrite that
   uses it. Mark it deprecated with its replacement, so that this release moves its users
   off it.
-- Every vendor must have been checked. Exit 3 means a key was missing or a vendor did not
-  answer, and that is not an all-clear.
+- Every vendor must have been checked. Exit 3 means a key was missing, a vendor did not
+  answer, or a vendor's deprecation page could not be read, and that is not an all-clear.
 - A shutdown the vendor's API announces for a `current` model does not block the tag. It
   is the warning to deprecate the model in this release or the next, before that date.
 - A `retired` model past its six months is removed in this release.

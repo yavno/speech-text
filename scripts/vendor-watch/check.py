@@ -8,10 +8,13 @@ here with urllib, so an API key never appears on a command line, and no error me
 ever carries a request header. docs/vendor-watch.md describes the report.
 
 Language lists are compared with their sources too, and never fail the release rule.
+Each vendor's deprecation page is read by its tables, and its changelog for the lines that
+are new since the stored copy (docs/vendor-watch.md › The vendors' pages).
 
 Exit status: 0 nothing to act on before a release, 1 the release rule fails (a catalogue
-model the vendor no longer serves that is not deprecated or retired), 3 some vendor could
-not be checked (no key, no network, an error), 64 bad usage. The shell script adds 2, a
+model the vendor no longer serves that is not deprecated or retired), 3 some vendor, or its
+deprecation page, could not be checked (no key, no network, an error, a page that changed
+shape), 64 bad usage. The shell script adds 2, a
 failed build.
 """
 
@@ -48,6 +51,9 @@ SPEECH_TASKS = {"automatic-speech-recognition", "voice-activity-detection", "aud
 # A published language list (docs/design/model-details/) is read again by hand when its
 # source has no reader below and it was checked longer ago than this.
 LANGUAGE_RECHECK_DAYS = 180
+# The prices other than Groq's are checked by hand (docs/prices.md); the report asks for it
+# again once the catalogue's date is older than this.
+PRICE_RECHECK_DAYS = 60
 # ISO 639-3 to 639-1, for the codes ElevenLabs writes; the catalogue keeps 639-1 where one
 # exists and the 639-3 code otherwise (ast, ceb, fil, kea, luo, nso, umb, yue), so a code
 # missing here is compared as it is, and a new one shows up as added.
@@ -235,6 +241,15 @@ def version_tuple(tag):
     return tuple(int(n) for n in re.findall(r"\d+", tag)[:3])
 
 
+def github_headers():
+    """A hosted runner shares its address with others, and GitHub allows an address 60
+    unauthenticated requests an hour: with GITHUB_TOKEN set, the requests are the token's."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
+    return headers
+
+
 def package_releases(resolved_path):
     pins = {p["identity"]: p for p in json.load(open(resolved_path))["pins"]}
     out = []
@@ -247,7 +262,7 @@ def package_releases(resolved_path):
         entry = {"package": owner_repo, "pinned": pinned, "newer": []}
         try:
             releases = get_json("https://api.github.com/repos/%s/releases?per_page=30" % owner_repo,
-                                {"Accept": "application/vnd.github+json"})
+                                github_headers())
             entry["newer"] = [{"tag": r["tag_name"], "date": (r.get("published_at") or "")[:10]}
                               for r in releases
                               if not r.get("draft") and not r.get("prerelease")
@@ -341,7 +356,7 @@ def language_reader(url):
 def language_lists(catalogue, today):
     """Each published language list the catalogue cites, read again from its source:
     languages the source has that the catalogue lacks, and the reverse. A source with no
-    reader is listed for the weekly agent to read, and flagged once it is old."""
+    reader is listed to read by hand, and flagged once it is old."""
     groups, unpublished = {}, []
     for model in catalogue["speech"]:
         languages = model.get("languages") or {}
@@ -535,35 +550,304 @@ def candidates(catalogue, served, previous):
     return new, absent
 
 
+# MARK: - Vendor pages
+
+# Each vendor's deprecation page, in its Markdown version: a table per announcement (and,
+# at Anthropic, one with every model's state). The API lists say what is served; these
+# pages say when a model goes and what replaces it. ElevenLabs publishes no such page.
+DEPRECATION_PAGES = {
+    "openAI": "https://developers.openai.com/api/docs/deprecations.md",
+    "groq": "https://console.groq.com/docs/deprecations.md",
+    "anthropic": "https://platform.claude.com/docs/en/about-claude/model-deprecations.md",
+}
+# Pages read for their new lines only: announcements, preview models withdrawn without a
+# deprecation entry, and whether OpenAI now publishes a language list for its speech
+# models. Never part of the release rule.
+TEXT_PAGES = [
+    ("openAI", "openai-changelog", "https://developers.openai.com/api/docs/changelog.md"),
+    ("openAI", "openai-speech-to-text", "https://developers.openai.com/api/docs/guides/speech-to-text.md"),
+    ("groq", "groq-changelog", "https://console.groq.com/docs/changelog.md"),
+    ("groq", "groq-models", "https://console.groq.com/docs/models.md"),
+    ("elevenLabs", "elevenlabs-changelog", "https://elevenlabs.io/docs/changelog.md"),
+    ("elevenLabs", "elevenlabs-models", "https://elevenlabs.io/docs/overview/models.md"),
+]
+# A new line on a text page is reported when it names a catalogue model or says one of these.
+PAGE_WORDS = re.compile(r"deprecat|shut ?down|retire|sunset|speech[- ]to[- ]text|transcri|\bscribe\b|whisper", re.I)
+# A new line that names a catalogue model and says one of these is a finding of its own,
+# filed against the model; any other line is only shown in the report.
+LIFECYCLE_WORDS = re.compile(r"deprecat|shut ?down|retire|sunset|discontinu|end of life|legacy", re.I)
+PAGE_LINES_SHOWN = 30
+DATE_FORMATS = ["%B %d, %Y", "%b %d, %Y", "%m/%d/%y", "%Y-%m-%d"]
+
+
+def read_page(url):
+    status, body = request(url)
+    if status != 200:
+        raise NotChecked("HTTP %d from %s" % (status, url))
+    return body.decode("utf-8", "replace")
+
+
+def table_cells(line):
+    """A Markdown table row's cells; `\\|` inside a cell is a literal bar."""
+    inner = line.strip()
+    inner = inner[1:] if inner.startswith("|") else inner
+    inner = inner[:-1] if inner.endswith("|") and not inner.endswith("\\|") else inner
+    return [cell.replace("\\|", "|").strip() for cell in re.split(r"(?<!\\)\|", inner)]
+
+
+def markdown_tables(text):
+    """(heading, header cells, rows) for every table, with the nearest heading above it."""
+    tables, heading, lines = [], "", text.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("#"):
+            heading = re.sub(r"\]\(#[^)]*\)", "]", line.lstrip("#").strip()).replace("[", "").replace("]", "")
+        if (line.lstrip().startswith("|") and i + 1 < len(lines)
+                and re.match(r"^\s*\|?\s*:?-{3,}", lines[i + 1])):
+            header, rows, i = table_cells(line), [], i + 2
+            while i < len(lines) and lines[i].lstrip().startswith("|"):
+                rows.append(table_cells(lines[i]))
+                i += 1
+            tables.append((heading, header, rows))
+            continue
+        i += 1
+    return tables
+
+
+def page_date(text):
+    """(date or None, whether it is only a "not sooner than" bound)."""
+    text = text.strip().rstrip(".")
+    bound = text.lower().startswith("not sooner than")
+    if bound:
+        text = text[len("not sooner than"):].strip()
+    for fmt in DATE_FORMATS:
+        try:
+            return datetime.datetime.strptime(text, fmt).date(), bound
+        except ValueError:
+            pass
+    return None, bound
+
+
+def cell_ids(cell):
+    """The model IDs a cell names: those in backticks if any, else its words split on "or"."""
+    quoted = re.findall(r"`([^`]+)`", cell)
+    if quoted:
+        return [q.strip() for q in quoted if not q.startswith("/") and not q.startswith("v1/")]
+    if cell.strip() in ("", "—", "-", "N/A"):
+        return []
+    return [p.strip() for p in re.split(r"\s+or\s+|\s+and\s+|,\s*", cell) if p.strip()]
+
+
+def column(header, *words, avoid=None):
+    for index, name in enumerate(header):
+        name = name.lower()
+        if all(w in name for w in words) and not (avoid and avoid in name):
+            return index
+    return None
+
+
+def deprecation_rows(vendor, text):
+    """Every row of every table this reader knows on a deprecation page: the IDs it names,
+    the date (shutdown, retirement, or Anthropic's "not sooner than" bound), the
+    replacement, and Anthropic's current state. No known table, or a known table with no
+    rows, means the page changed shape: the vendor is then not checked, never all-clear."""
+    rows = []
+    for heading, header, body in markdown_tables(text):
+        model = column(header, "model", avoid="replacement")
+        date = column(header, "shutdown date")
+        if date is None:
+            date = column(header, "retirement date")
+        if model is None or date is None:
+            continue
+        replacement = column(header, "replacement")
+        state = column(header, "current state")
+        if not body:
+            raise NotChecked("a deprecation table with no rows under \"%s\"" % heading)
+        for cells in body:
+            if len(cells) < len(header):
+                continue
+            day, bound = page_date(cells[date])
+            rows.append({"ids": cell_ids(cells[model]), "date": day, "bound": bound,
+                         "replacement": cell_ids(cells[replacement]) if replacement is not None else [],
+                         "state": cells[state] if state is not None else "Deprecated",
+                         "heading": heading})
+    if not rows:
+        raise NotChecked("no deprecation table this script can read")
+    return rows
+
+
+def page_entry(vendor, rows, model_id):
+    """What a deprecation page says about one catalogue ID, merged across its tables."""
+    found = {"listed": False, "date": None, "bound": None, "replacement": [], "state": None}
+    for row in rows:
+        ids = row["ids"]
+        if model_id not in ids and not (vendor == "anthropic"
+                                        and any(DATED.sub("", i) == model_id for i in ids)):
+            continue
+        if row["state"].lower() in ("deprecated", "retired"):
+            found["listed"] = True
+            if row["date"] and not row["bound"]:
+                found["date"] = row["date"]
+            found["replacement"] = found["replacement"] or row["replacement"]
+            found["state"] = found["state"] or row["state"]
+        elif row["state"].lower() == "active":
+            found["state"] = "Active"
+            if row["bound"]:
+                found["bound"] = row["date"]
+    return found
+
+
+def deprecation_pages(catalogue, gone, today, reader=read_page):
+    """Each catalogue model checked against its vendor's deprecation page. Returns the
+    findings, the URL that confirms each per-account "gone", and the pages not read."""
+    findings, confirmed, problems = [], {}, {}
+    entries = catalogue_entries(catalogue)
+    for vendor, url in sorted(DEPRECATION_PAGES.items()):
+        try:
+            rows = deprecation_rows(vendor, reader(url))
+        except NotChecked as error:
+            problems[vendor] = str(error)
+            continue
+        for v, model_id, kind, lifecycle, _ in entries:
+            if v != vendor:
+                continue
+            page = page_entry(vendor, rows, model_id)
+            state, shutdown = lifecycle.get("state", "current"), lifecycle.get("shutdownDate")
+            if page["listed"]:
+                if (vendor, model_id) in gone:
+                    confirmed[(vendor, model_id)] = url
+                if state not in ("deprecated", "retired"):
+                    findings.append({"vendor": vendor, "id": model_id, "kind": kind, "type": "deprecation_listed",
+                                     "date": page["date"], "replacement": page["replacement"],
+                                     "state": state, "url": url})
+                elif page["date"] and shutdown and page["date"].isoformat() != shutdown:
+                    findings.append({"vendor": vendor, "id": model_id, "kind": kind,
+                                     "type": "deprecation_date_changed", "date": page["date"],
+                                     "replacement": page["replacement"], "state": state,
+                                     "catalogue": shutdown, "url": url})
+            elif (page["state"] == "Active" and page["bound"] and page["bound"] <= today
+                  and state not in ("deprecated", "retired")):
+                findings.append({"vendor": vendor, "id": model_id, "kind": kind,
+                                 "type": "retirement_window_open", "date": page["bound"],
+                                 "replacement": [], "state": state, "url": url})
+    return findings, confirmed, problems
+
+
+def page_snapshot(folder, slug, today):
+    """The latest stored copy of a text page from before today, and where today's goes.
+    Two copies are kept per page."""
+    if not folder:
+        return None, None, None
+    pages = os.path.join(folder, "pages", slug)
+    os.makedirs(pages, exist_ok=True)
+    days = sorted(f[:-3] for f in os.listdir(pages) if re.match(r"\d{4}-\d{2}-\d{2}\.md$", f))
+    earlier = [d for d in days if d < today.isoformat()]
+    for old in earlier[:-1]:
+        os.remove(os.path.join(pages, old + ".md"))
+    previous = None
+    if earlier:
+        with open(os.path.join(pages, earlier[-1] + ".md"), encoding="utf-8") as f:
+            previous = f.read()
+    return previous, (earlier[-1] if earlier else None), os.path.join(pages, today.isoformat() + ".md")
+
+
+def new_page_lines(previous, current, model_ids):
+    """Lines of `current` that `previous` did not have, compared as sets so that moved
+    blocks are not new, kept when they name a catalogue model or say a watched word.
+    Each comes with the headings above it and the catalogue IDs it names. Headings and
+    code samples are context, never a line of their own."""
+    before = {line.strip() for line in previous.splitlines()}
+    fenced = False
+    patterns = [(i, re.compile(r"(?<![\w./-])%s(?![\w/-]|\.\w)" % re.escape(i))) for i in model_ids]
+    headings, out = {}, []
+    for line in current.splitlines():
+        text = line.strip()
+        if text.startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        if text.startswith("#"):
+            level = len(text) - len(text.lstrip("#"))
+            headings = {k: v for k, v in headings.items() if k < level}
+            headings[level] = re.sub(r"\]\(#[^)]*\)", "]", text.lstrip("#").strip()).replace("[", "").replace("]", "")
+            continue
+        if not text or text in before:
+            continue
+        named = [i for i, p in patterns if p.search(text)]
+        if named or PAGE_WORDS.search(text):
+            out.append({"line": text, "section": " › ".join(v for _, v in sorted(headings.items())),
+                        "models": named})
+    return out
+
+
+def text_pages(catalogue, snapshots, today, reader=read_page):
+    """The new lines of each text page since its stored copy."""
+    ids = {}
+    for vendor, model_id, _, _, _ in catalogue_entries(catalogue):
+        ids.setdefault(vendor, set()).add(model_id)
+    results = []
+    for vendor, slug, url in TEXT_PAGES:
+        result = {"vendor": vendor, "slug": slug, "url": url}
+        try:
+            current = reader(url)
+        except NotChecked as error:
+            result["error"] = str(error)
+            results.append(result)
+            continue
+        if not snapshots:
+            result["uncompared"] = True
+            results.append(result)
+            continue
+        previous, since, path = page_snapshot(snapshots, slug, today)
+        if path:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(current)
+        if previous is None:
+            result["baseline"] = True
+        else:
+            result["since"] = since
+            result["lines"] = new_page_lines(previous, current, sorted(ids.get(vendor, ())))
+        results.append(result)
+    return results
+
+
 # MARK: - Report
 
 def report(args, catalogue, served, problems, result, new, absent, packages, sources,
-           repos, repo_errors, previous_date, today, languages=([], [])):
+           repos, repo_errors, previous_date, today, languages=([], []), pages=None):
+    pages = pages or {"findings": [], "confirmed": {}, "problems": {}, "text": []}
     lines = ["# Vendor watch — %s" % today.isoformat(), "",
              "Catalogue: `%s`, prices checked %s. New IDs and repositories since %s."
              % (args.commit, catalogue["pricesChecked"], args.since), ""]
     gate = bool(result["gone"]) or any(s.get("missing") for s in sources)
     unchecked = sorted(problems)
+    unread = sorted(pages["problems"])
     if gate:
         lines.append("**Release rule fails**: the catalogue offers a model the vendor no longer serves.")
-    elif unchecked:
+    elif unchecked or unread:
         lines.append("**Not every vendor was checked** (%s): this is not an all-clear."
-                     % ", ".join(VENDOR_NAMES[v] for v in unchecked))
+                     % ", ".join(VENDOR_NAMES[v] for v in unchecked)
+                     + "".join("; %s's deprecation page" % VENDOR_NAMES[v] for v in unread))
     else:
         lines.append("Release rule passes: every vendor checked, nothing gone that is not already deprecated.")
     lines.append("")
 
     lines += ["## Not checked", ""]
-    if unchecked:
-        lines += ["- %s: %s" % (VENDOR_NAMES[v], problems[v]) for v in unchecked]
-    else:
-        lines.append("Every vendor answered.")
+    lines += ["- %s: %s" % (VENDOR_NAMES[v], problems[v]) for v in unchecked]
+    lines += ["- %s's deprecation page (%s): %s" % (VENDOR_NAMES[v], DEPRECATION_PAGES[v], pages["problems"][v])
+              for v in unread]
+    if not unchecked and not unread:
+        lines.append("Every vendor answered, and every deprecation page was read.")
     lines.append("")
 
     lines += ["## Gone: in the catalogue, not served by the vendor", "",
-              "The lists are per account: confirm on the vendor's deprecation page before acting.", ""]
+              "OpenAI's and Groq's lists are per account: a model that is not on the vendor's "
+              "deprecation page as well is unconfirmed.", ""]
     if result["gone"]:
-        lines += ["- **%s `%s`** (%s, %s)" % (VENDOR_NAMES[v], i, k, s) for v, i, k, s in result["gone"]]
+        lines += ["- **%s `%s`** (%s, %s)%s" % (VENDOR_NAMES[v], i, k, s, gone_note(v, i, pages["confirmed"]))
+                  for v, i, k, s in result["gone"]]
     else:
         lines.append("None.")
     if result["deprecatedGone"]:
@@ -577,6 +861,16 @@ def report(args, catalogue, served, problems, result, new, absent, packages, sou
                   for v, i, k, d, s in result["going"]]
     else:
         lines.append("None. (Only OpenAI's list carries a `shutdown_date`, and Groq's an `active` flag.)")
+    lines.append("")
+
+    lines += ["## On the vendor's deprecation page", "",
+              "Each catalogue model looked up in the tables of %s. Never part of the release rule: "
+              "the warning to deprecate the model before its date." % ", ".join(
+                  "[%s](%s)" % (VENDOR_NAMES[v], u) for v, u in sorted(DEPRECATION_PAGES.items())), ""]
+    if pages["findings"]:
+        lines += ["- " + page_finding_text(f) for f in pages["findings"]]
+    else:
+        lines.append("None.")
     lines.append("")
 
     lines += ["## Past their shutdown: retire, or remove in the next release", ""]
@@ -594,6 +888,16 @@ def report(args, catalogue, served, problems, result, new, absent, packages, sou
                   for v, i, ours, theirs in result["drift"]]
     else:
         lines.append("None.")
+    lines.append("")
+
+    checked = datetime.date.fromisoformat(catalogue["pricesChecked"])
+    age = (today - checked).days
+    lines += ["## Prices checked by hand", ""]
+    if age > PRICE_RECHECK_DAYS:
+        lines.append("**%d days ago (%s), more than %d: check them again** (docs/prices.md)."
+                     % (age, catalogue["pricesChecked"], PRICE_RECHECK_DAYS))
+    else:
+        lines.append("%d days ago (%s)." % (age, catalogue["pricesChecked"]))
     lines.append("")
 
     lists, unpublished = languages
@@ -618,8 +922,8 @@ def report(args, catalogue, served, problems, result, new, absent, packages, sou
     if not lists:
         lines.append("The export carries no language lists.")
     if unpublished:
-        lines += ["", "No published list (the weekly agent checks whether the vendor now publishes one): %s."
-                  % ", ".join(unpublished)]
+        lines += ["", "No published list (the speech-to-text guide's new lines below show whether the vendor "
+                  "now publishes one): %s." % ", ".join(unpublished)]
     lines.append("")
 
     lines += ["## New at the vendor", ""]
@@ -635,6 +939,16 @@ def report(args, catalogue, served, problems, result, new, absent, packages, sou
     lines += ["", "<details><summary>Every relevant vendor ID not in the catalogue</summary>", ""]
     lines += ["- %s: %s" % (VENDOR_NAMES[v], ", ".join("`%s`" % i for i in ids)) for v, ids in sorted(absent.items())]
     lines += ["", "</details>", ""]
+
+    lines += ["## New lines on the vendors' pages", "",
+              "Lines that were not on the page at its stored copy and that name a catalogue model "
+              "(in bold) or say deprecated, shutdown, retire, sunset, speech-to-text, transcription, "
+              "Scribe or Whisper. Read them: what they mean is not decided here.", ""]
+    for page in pages["text"]:
+        lines += text_page_lines(page)
+    if not pages["text"]:
+        lines.append("No page was read.")
+    lines.append("")
 
     lines += ["## Local models", "", "| Package | Pinned | Newer releases |", "|---|---|---|"]
     for p in packages:
@@ -664,7 +978,134 @@ def report(args, catalogue, served, problems, result, new, absent, packages, sou
         lines.append("- and %d more that do not: %s" % (len(others), ", ".join("`%s`" % o for o in others)))
     lines += ["- not checked: %s" % e for e in repo_errors]
     lines.append("")
-    return "\n".join(lines), gate, bool(unchecked)
+    return "\n".join(lines), gate, bool(unchecked or unread)
+
+
+def gone_note(vendor, model_id, confirmed):
+    if (vendor, model_id) in confirmed:
+        return ": on the [deprecation page](%s)" % confirmed[(vendor, model_id)]
+    if vendor in ("openAI", "groq"):
+        return ": not on the deprecation page, **unconfirmed** (the list is per account)"
+    return ""
+
+
+def page_finding_text(f):
+    name = "%s `%s` (%s, %s)" % (VENDOR_NAMES[f["vendor"]], f["id"], f["kind"], f["state"])
+    replacement = (", replacement %s" % " or ".join("`%s`" % r for r in f["replacement"])) if f["replacement"] else ""
+    if f["type"] == "deprecation_listed":
+        when = ("shuts down %s" % f["date"].isoformat()) if f["date"] else "deprecated, no date yet"
+        return "**%s**: %s%s" % (name, when, replacement)
+    if f["type"] == "deprecation_date_changed":
+        return "**%s**: the page says %s, the catalogue %s%s" % (name, f["date"].isoformat(), f["catalogue"],
+                                                                   replacement)
+    return "%s: still Active, but its earliest retirement date (%s) has passed" % (name, f["date"].isoformat())
+
+
+def text_page_lines(page):
+    title = "[%s](%s)" % (page["slug"], page["url"])
+    if "error" in page:
+        return ["- %s: not read: %s" % (title, page["error"])]
+    if page.get("uncompared"):
+        return ["- %s: read, but not compared: without SPEECHTEXT_VENDOR_WATCH no copy is kept" % title]
+    if page.get("baseline"):
+        return ["- %s: stored as the baseline; its new lines show from the next run" % title]
+    if not page["lines"]:
+        return ["- %s: nothing new since %s" % (title, page["since"])]
+    out = ["- %s, new since %s:" % (title, page["since"])]
+    for entry in page["lines"][:PAGE_LINES_SHOWN]:
+        text = entry["line"] if len(entry["line"]) <= 300 else entry["line"][:300] + "…"
+        names = ("**%s**: " % ", ".join("`%s`" % m for m in entry["models"])) if entry["models"] else ""
+        out.append("  - %s%s%s" % (names, ("%s: " % entry["section"]) if entry["section"] else "", text))
+    if len(page["lines"]) > PAGE_LINES_SHOWN:
+        out.append("  - … %d more" % (len(page["lines"]) - PAGE_LINES_SHOWN))
+    return out
+
+
+# MARK: - Findings
+
+PER_ACCOUNT = ("openAI", "groq")
+
+
+def finding(key, kind, details, vendor=None, model=None, gate=False, per_account=False, confirmed_by=None,
+            source=None):
+    return {"key": key, "kind": kind, "details": details, "vendor": vendor, "model": model, "gate": gate,
+            "per_account": per_account, "confirmed_by": confirmed_by, "source": source}
+
+
+def findings(catalogue, result, pages, new, packages, sources, repos, languages, today):
+    """What the report says needs acting on, one entry per model, package or source, for
+    filing issues. `key` names the thing, so a finding can be matched with the
+    issue it already has; `details` is a line of Markdown."""
+    out = []
+    for v, i, k, s in result["gone"]:
+        confirmed = pages["confirmed"].get((v, i))
+        out.append(finding("%s/%s" % (v, i), "gone",
+                           "%s no longer serves `%s` (%s, %s in the catalogue)." % (VENDOR_NAMES[v], i, k, s),
+                           v, i, gate=True, per_account=v in PER_ACCOUNT, confirmed_by=confirmed))
+    for v, i, k, d, s in result["going"]:
+        out.append(finding("%s/%s" % (v, i), "shutdown_announced",
+                           "%s's API announces a shutdown for `%s` (%s): %s; catalogue: %s."
+                           % (VENDOR_NAMES[v], i, k, d, s), v, i))
+    for v, i, k, d, r in result["expired"]:
+        out.append(finding("%s/%s" % (v, i), "past_shutdown", "`%s` (%s) shut down %s; %s." % (i, k, d, r), v, i))
+    for v, i, ours, theirs in result["drift"]:
+        out.append(finding("%s/%s" % (v, i), "price_drift",
+                           "%s `%s`: catalogue %s, API %s." % (VENDOR_NAMES[v], i, ours, theirs), v, i))
+    for f in pages["findings"]:
+        out.append(finding("%s/%s" % (f["vendor"], f["id"]), f["type"], page_finding_text(f) + ".",
+                           f["vendor"], f["id"], source=f["url"]))
+    for page in pages["text"]:
+        for entry in page.get("lines", []):
+            if not LIFECYCLE_WORDS.search(entry["line"]):
+                continue
+            for model_id in entry["models"]:
+                out.append(finding("%s/%s" % (page["vendor"], model_id), "page_mention",
+                                   "New on [%s](%s)%s: %s" % (page["slug"], page["url"],
+                                                              " (%s)" % entry["section"] if entry["section"] else "",
+                                                              entry["line"]),
+                                   page["vendor"], model_id, source=page["url"]))
+    for v, ids in sorted(new.items()):
+        for i in ids:
+            out.append(finding("%s/new/%s" % (v, i), "new_at_vendor",
+                               "%s serves `%s`, which is not in the catalogue and was not served at the "
+                               "previous run." % (VENDOR_NAMES[v], i), v, i))
+    lists, _ = languages
+    for entry in lists:
+        if entry.get("added") or entry.get("dropped"):
+            out.append(finding("languages/%s" % entry["source"], "language_list",
+                               "%s (%s): added %s; dropped %s." % (entry["source"], ", ".join(entry["models"]),
+                                                                   ", ".join(entry["added"]) or "none",
+                                                                   ", ".join(entry["dropped"]) or "none"),
+                               source=entry["source"]))
+        elif entry.get("manual") and entry.get("stale"):
+            out.append(finding("languages/%s" % entry["source"], "language_list",
+                               "%s (%s): read it again by hand, checked %s." % (entry["source"],
+                                                                               ", ".join(entry["models"]),
+                                                                               entry["checked"]),
+                               source=entry["source"]))
+    for s in sources:
+        if s.get("missing"):
+            out.append(finding("local/%s" % s["id"], "local_model",
+                               "`%s`: missing from %s: %s." % (s["id"], s["repo"], ", ".join(s["missing"])),
+                               "local", s["id"], gate=True, source="https://huggingface.co/" + s["repo"]))
+    for p in packages:
+        if p.get("newer"):
+            out.append(finding("package/%s" % p["package"], "package_release",
+                               "%s: pinned %s, newer %s." % (p["package"], p["pinned"],
+                                                             ", ".join(r["tag"] for r in p["newer"])),
+                               source="https://github.com/%s/releases" % p["package"]))
+    for r in repos:
+        if r["speech"]:
+            out.append(finding("huggingface/%s" % r["id"], "new_repository",
+                               "New repository `%s` (%s%s)." % (r["id"], r["created"],
+                                                                ", " + r["task"] if r["task"] else ""),
+                               source="https://huggingface.co/" + r["id"]))
+    age = (today - datetime.date.fromisoformat(catalogue["pricesChecked"])).days
+    if age > PRICE_RECHECK_DAYS:
+        out.append(finding("prices", "price_age",
+                           "The prices were checked by hand %d days ago (%s), more than %d (docs/prices.md)."
+                           % (age, catalogue["pricesChecked"], PRICE_RECHECK_DAYS)))
+    return out
 
 
 # MARK: - Main
@@ -702,6 +1143,7 @@ def main():
     parser.add_argument("--snapshots", help="folder of earlier runs' vendor lists, outside the repository")
     parser.add_argument("--since", help="yyyy-mm-dd; default: the previous snapshot, else a week ago")
     parser.add_argument("--out")
+    parser.add_argument("--json", help="also write the findings as JSON, for filing issues")
     args = parser.parse_args()
 
     today = datetime.date.today()
@@ -725,13 +1167,17 @@ def main():
             problems[vendor] = str(error)
 
     result = compare(catalogue, served, today)
+    gone = {(v, i) for v, i, _, _ in result["gone"]}
+    page_findings, confirmed, page_problems = deprecation_pages(catalogue, gone, today)
+    pages = {"findings": page_findings, "confirmed": confirmed, "problems": page_problems,
+             "text": text_pages(catalogue, args.snapshots, today)}
     new, absent = candidates(catalogue, served, (previous or {}).get("vendors"))
     packages = package_releases(args.resolved)
     sources = huggingface_sources(catalogue["speech"] + catalogue["chat"])
     repos, repo_errors = new_repositories(args.since)
     languages = language_lists(catalogue, today)
     text, gate, unchecked = report(args, catalogue, served, problems, result, new, absent, packages, sources,
-                                   repos, repo_errors, previous_date, today, languages)
+                                   repos, repo_errors, previous_date, today, languages, pages)
     if args.out:
         with open(args.out, "w") as out:
             out.write(text + "\n")
@@ -748,9 +1194,15 @@ def main():
         with open(os.path.join(args.snapshots, today.isoformat() + ".json"), "w") as out:
             json.dump(snapshot, out, indent=1, sort_keys=True)
 
-    if gate:
-        return 1
-    return 3 if unchecked else 0
+    status = 1 if gate else (3 if unchecked else 0)
+    if args.json:
+        with open(args.json, "w") as out:
+            json.dump({"date": today.isoformat(), "commit": args.commit, "exit": status,
+                       "unchecked": sorted(problems) + ["%s deprecation page" % v for v in sorted(page_problems)],
+                       "findings": findings(catalogue, result, pages, new, packages, sources, repos,
+                                            languages, today)},
+                      out, indent=1, sort_keys=True)
+    return status
 
 
 if __name__ == "__main__":
