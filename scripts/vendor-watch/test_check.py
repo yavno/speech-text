@@ -229,6 +229,15 @@ class Findings(unittest.TestCase):
                          ("openAI/gpt-6-luna", "gone", True, True, None))
         self.assertEqual((age["key"], age["kind"]), ("prices", "price_age"))
 
+    def test_the_price_age_finding_is_the_same_a_week_later(self):
+        cat = catalogue()
+        cat["pricesChecked"] = "2026-08-01"
+        empty = {"gone": [], "going": [], "expired": [], "drift": []}
+        pages = {"findings": [], "confirmed": {}, "problems": {}, "text": []}
+        week = [check.findings(cat, empty, pages, {}, [], [], [], ([], []), TODAY + datetime.timedelta(days=d))
+                for d in (0, 7)]
+        self.assertEqual(week[0], week[1])
+
 
 if __name__ == "__main__":
     unittest.main()

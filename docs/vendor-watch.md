@@ -39,7 +39,8 @@ SPEECHTEXT_VENDOR_WATCH=<folder outside the repository> scripts/check-vendor-mod
   `languages/<source>`, `prices`) to match it with an issue, its `kind`, whether it
   fails the release rule (`gate`), whether it comes from a per-account list and the page that
   confirms it (`per_account`, `confirmed_by`), and a line of Markdown.
-- **CI never runs it:** it needs keys and the network.
+- **CI never runs it:** it needs keys and the network. The vendor watch workflow does
+  (below).
 
 ### Where each list comes from
 
@@ -133,10 +134,36 @@ decided by the script: it shows the new lines (`TEXT_PAGES`), and a person reads
 | FluidAudio | https://github.com/FluidInference/FluidAudio/releases | releases API |
 | WhisperKit | https://github.com/argmaxinc/argmax-oss-swift/releases | releases API |
 
+## The workflow
+
+`.github/workflows/vendor-watch.yml` runs the script on GitHub's machines, started by hand
+from `main` (`gh workflow run vendor-watch.yml`) until a weekly schedule replaces the agent
+below.
+
+- **Check** (a hosted Mac) builds `SpeechTextEvaluation` and exports the catalogues on the
+  day, takes the newest `vendor-watch-snapshots` artifact any run on `main` left, runs the
+  script, and puts the report in the run's summary. It keeps the report, the findings and
+  the export (`vendor-watch-report`) and the snapshots for the next run, 90 days each. The
+  job is red when the script exits anything but 0.
+- **File issues** (Linux) files the findings with `scripts/vendor-watch/file_issues.py`:
+  one `model-lifecycle` issue per model, package or language source, found again by a
+  marker in its body. An open issue gets a comment only when its finding changed; a closed
+  one stays closed when the same finding comes back, and for good with the `wontfix` label
+  or a comment saying `vendor-watch:ignore`. A model gone from a per-account list and not
+  on the deprecation page is filed as *Unconfirmed*. New Hugging Face repositories are only
+  listed in the summary, and no run opens more than ten issues.
+- **Keys.** The secrets `VENDOR_WATCH_OPENAI_API_KEY`, `VENDOR_WATCH_GROQ_API_KEY`,
+  `VENDOR_WATCH_ANTHROPIC_API_KEY` and `VENDOR_WATCH_ELEVENLABS_API_KEY` belong to the
+  `vendor-watch` environment, which only `main` may use. The script only reads model lists;
+  each key is a separate one for this, restricted where the vendor allows it (OpenAI:
+  Models read; ElevenLabs: speech-to-text), under a spending limit. Only the Check job
+  sees them; File issues holds no key, and Check cannot write to the repository. Nothing
+  runs on a pull request or on a self-hosted machine.
+
 ## The weekly agent
 
-The agent runs once a week as a scheduled task on the maintainer's Mac, since GitHub-hosted
-runners are not available to this repository. Its prompt is below. `<repo>` is the main
+The agent runs once a week as a scheduled task on the maintainer's Mac, until the
+workflow above runs on a schedule. Its prompt is below. `<repo>` is the main
 checkout, and `<watch>` is the private folder that holds the reports and snapshots,
 outside the repository.
 
