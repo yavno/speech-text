@@ -1102,9 +1102,10 @@ def findings(catalogue, result, pages, new, packages, sources, repos, languages,
                                source="https://huggingface.co/" + r["id"]))
     age = (today - datetime.date.fromisoformat(catalogue["pricesChecked"])).days
     if age > PRICE_RECHECK_DAYS:
+        # The date, not the day count: the finding stays the same from one week to the next.
         out.append(finding("prices", "price_age",
-                           "The prices were checked by hand %d days ago (%s), more than %d (docs/prices.md)."
-                           % (age, catalogue["pricesChecked"], PRICE_RECHECK_DAYS)))
+                           "The prices were last checked by hand on %s, more than %d days ago (docs/prices.md)."
+                           % (catalogue["pricesChecked"], PRICE_RECHECK_DAYS)))
     return out
 
 
