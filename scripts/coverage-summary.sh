@@ -9,7 +9,7 @@
 #       RESULT_BUNDLE is the .xcresult `xcodebuild test -enableCodeCoverage YES
 #       -resultBundlePath …` wrote.
 #
-# The test bundle is standalone (CLAUDE.md › Tests): it links SpeechTextCore instead of
+# The test bundle is standalone (AGENTS.md › Tests): it links SpeechTextCore instead of
 # hosting the app, so the SpeechText.app row is only what a test happens to reach and
 # means little. What the suite covers is the package's sources, which the second table
 # counts apart from the test files themselves — whichever target the report files them

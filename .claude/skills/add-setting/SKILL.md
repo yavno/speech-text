@@ -1,6 +1,6 @@
 ---
 name: add-setting
-description: Add or change a user setting in SpeechText — a new UserDefaults key, its default, whether it survives a rename (SettingsKeys.portable), its control in Settings and its row in CLAUDE.md's Settings Keys Reference. Use it whenever a change adds a toggle, picker, option or preference, renames or retires a settings key, or changes a default, even if the user only says "make it configurable" or "add an option for…".
+description: Add or change a user setting in SpeechText — a new UserDefaults key, its default, whether it survives a rename (SettingsKeys.portable), its control in Settings and its row in AGENTS.md's Settings Keys Reference. Use it whenever a change adds a toggle, picker, option or preference, renames or retires a settings key, or changes a default, even if the user only says "make it configurable" or "add an option for…".
 ---
 
 # Add a setting
@@ -10,7 +10,7 @@ live in the same defaults domain the app reads. Follow the `contribute` skill fo
 workflow; a new setting needs an agreed issue first. Then:
 
 1. **Name.** Check whether macOS or the field already has a name for the thing
-   (`CLAUDE.md` › Naming). The key is camelCase and says what it holds.
+   (`AGENTS.md` › Naming). The key is camelCase and says what it holds.
 2. **Key.** A `public static let` in `SettingsKeys` (`Settings.swift`, SpeechTextCore),
    beside the keys it belongs with, with a doc comment saying what it holds when that
    is not obvious.
@@ -27,9 +27,9 @@ workflow; a new setting needs an agreed issue first. Then:
    that takes the value as a parameter, so a test can call it without `UserDefaults`.
 7. **Changing or retiring a key.** Never reuse a key for a different meaning. Move the
    old value once at launch (the `migrate…IfNeeded` functions are the pattern) and say
-   in `CLAUDE.md` when the old key is read and when it is deleted.
-8. **Docs.** A row in `CLAUDE.md` › Settings Keys Reference (key, purpose, default), the
-   component's bullet if its behaviour changed, `CHANGELOG.md` under `[Unreleased]`.
+   in its `AGENTS.md` row when the old key is read and when it is deleted.
+8. **Docs.** A row in `AGENTS.md` › Settings Keys Reference (key, purpose, default), its
+   entry in `docs/decisions.md` if a decision changed, `CHANGELOG.md` under `[Unreleased]`.
 
 Tests: the decision function's cases and the `portable` set. In *Needs a real-app run*,
 say what to check by hand: the control, and that the value survives a relaunch.
