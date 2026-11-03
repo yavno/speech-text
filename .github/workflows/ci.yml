@@ -256,6 +256,14 @@ jobs:
         if: ${{ !cancelled() }}
         run: scripts/check-core-imports.sh
 
+      # scripts/vendor-watch/check.py reads the vendors' deprecation tables and the
+      # new lines of their changelogs; its tests read short copies of those pages,
+      # with no network and no key, so a parser change is checked before a weekly
+      # run depends on it.
+      - name: Vendor watch script
+        if: ${{ !cancelled() }}
+        run: python3 -B -m unittest discover -s scripts/vendor-watch -p 'test_*.py'
+
       # Reads the pull request's commit messages. Pull requests only.
       - name: DCO sign-off
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}

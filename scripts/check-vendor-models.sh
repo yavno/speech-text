@@ -6,13 +6,16 @@
 # Markdown report: catalogue models a vendor no longer serves, shutdowns a vendor's API
 # announces, retired models whose retention is over, prices that differ from an API that
 # states them, language lists that changed at their source, new vendor models, newer
-# FluidAudio / WhisperKit releases and changed Hugging Face repositories. docs/vendor-watch.md describes it.
+# FluidAudio / WhisperKit releases and changed Hugging Face repositories, what each vendor's
+# deprecation page says about the catalogue's models, and the new lines on its changelog.
+# docs/vendor-watch.md describes it.
 #
-#   scripts/check-vendor-models.sh [--catalogue <file>] [--out <file>] [--since yyyy-mm-dd]
+#   scripts/check-vendor-models.sh [--catalogue <file>] [--out <file>] [--json <file>] [--since yyyy-mm-dd]
 #
 # --catalogue  a `SpeechTextEvaluation --export-catalogue` file; without it the tool is
 #              built (Release, in $SPEECHTEXT_DERIVED_DATA, default /tmp/st-dd-evaluation)
 #              and the catalogues of this checkout are exported.
+# --json       also write the findings as JSON, for filing issues.
 # --since      what counts as new; default: the previous snapshot's day, else a week ago.
 #
 # Keys come from ~/.config/speech-text/test-keys.env (OPENAI_API_KEY, GROQ_API_KEY,
@@ -21,10 +24,11 @@
 # key is "not checked", never an all-clear.
 #
 # SPEECHTEXT_VENDOR_WATCH=<dir> keeps each run's vendor lists in <dir>/snapshots/, so the
-# next run can tell which models are new. It must be outside the repository.
+# next run can tell which models are new, and a copy of each vendor page whose new lines it
+# reports. It must be outside the repository.
 #
 # Exit status: 0 nothing blocks a release, 1 the release rule fails (docs/releasing.md),
-# 2 the export could not be built, 3 some vendor was not checked. CI never runs it: it needs keys and the network.
+# 2 the export could not be built, 3 some vendor (or its deprecation page) was not checked.
 set -euo pipefail
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
@@ -33,13 +37,14 @@ resolved="$project/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 derived="${SPEECHTEXT_DERIVED_DATA:-/tmp/st-dd-evaluation}"
 keys="${SPEECHTEXT_KEYS:-$HOME/.config/speech-text/test-keys.env}"
 
-catalogue="" out="" since=""
+catalogue="" out="" json="" since=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --catalogue) catalogue="$2"; shift 2 ;;
     --out) out="$2"; shift 2 ;;
+    --json) json="$2"; shift 2 ;;
     --since) since="$2"; shift 2 ;;
-    -h|--help) sed -n '5,28p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '5,31p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown argument $1" >&2; exit 64 ;;
   esac
 done
@@ -70,6 +75,7 @@ fi
 
 args=(--catalogue "$catalogue" --resolved "$resolved" --keys "$keys" --commit "$commit")
 [ -n "$out" ] && args+=(--out "$out")
+[ -n "$json" ] && args+=(--json "$json")
 [ -n "$since" ] && args+=(--since "$since")
 # A python.org Python has no CA certificates of its own until its "Install Certificates"
 # step runs; the system's bundle serves every vendor here.
