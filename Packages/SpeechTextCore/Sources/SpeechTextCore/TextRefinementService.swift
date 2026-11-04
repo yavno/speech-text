@@ -224,7 +224,7 @@ public enum TextRefinementService {
     /// `<context>`, GPT-5.6 Luna opened a dictation about a web page with "Update the T3
     /// Code interface…" in 15 of 30 runs; this wording, 1 of 30, and near-misses are still
     /// spelled right (2026-10-28). Rewording the context rule instead changed nothing.
-    private static let vocabularyRule = """
+    static let vocabularyRule = """
         <vocabulary> lists the user's names and terms, never the subject: spell one \
         exactly so where the transcript says it, near-misses too; never add one otherwise.
         """

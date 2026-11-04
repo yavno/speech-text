@@ -12,7 +12,7 @@ import SpeechTextCore
 ///
 ///     SpeechTextEvaluation --rewrite <fixtures.json> --runs <dir>
 ///                          [--engines provider/model,…] [--fixtures id,…] [--repeat n]
-///                          [--variant current] [--reasoning-effort default|omit|<value>] [--concurrency n]
+///                          [--variant current|2026-11] [--reasoning-effort default|omit|<value>] [--concurrency n]
 ///                          [--judge provider/model,…] [--models <dir>] [--llama-server <path>] [--greedy]
 ///     SpeechTextEvaluation --self-check <fixtures.json>
 ///
@@ -112,6 +112,12 @@ enum RewriteEvaluation {
     enum Variant: String, Codable, CaseIterable, Sendable {
         /// What the app sends today: one request, the routing prompt with every preset.
         case current
+        /// One request on the three modes of docs/specs/2026-11-03-rewrite-modes-and-router.md
+        /// (#109, `RewriteModes`): the fixture's own `presets` offered beside them, and a field
+        /// for another program sent Clean-up alone, by code, unless the user has prompts of
+        /// their own. Its name is the key of the fixtures' `variantModes`. An edit is sent
+        /// exactly what `current` sends: its prompt is #106's.
+        case modes2026 = "2026-11"
     }
 
     /// One request a variant made.
@@ -157,6 +163,9 @@ enum RewriteEvaluation {
         /// The marker's name as written, before it was matched to a preset.
         var rawMode: String?
         var routed: Bool?
+        /// The mode was chosen by code, not by the model (`2026-11`, a field for another
+        /// program), so it is right by construction and is not counted as routing.
+        var modeByCode: Bool?
         var verdict: RewriteVerdict?
         var error: String?
         var calls: [Call] = []
@@ -171,7 +180,7 @@ enum RewriteEvaluation {
         var ran: Bool { status != "not installed" && status != "no key" }
         /// The text checks passed. The mode is counted apart: it depends on the variant.
         var passed: Bool { status == "ok" && verdict?.passed == true }
-        var markerless: Bool { status == "ok" && rawMode == nil }
+        var markerless: Bool { status == "ok" && rawMode == nil && modeByCode != true }
         /// A marker was written but named no preset — usually an abbreviation.
         var abbreviated: Bool { status == "ok" && rawMode != nil && mode == nil }
         var cost: Double? { calls.isEmpty ? nil : calls.compactMap(\.cost).reduce(0, +) }
@@ -200,6 +209,8 @@ enum RewriteEvaluation {
         var judgeList: [String]?
         var systemPromptCharacters: Int
         var editSystemPromptCharacters: Int
+        /// A variant with more than one system prompt: each one's length, by name.
+        var promptCharacters: [String: Int]?
         var llamaBuild: String
         var sampling: LlamaSampling
         var contextLength: Int
@@ -292,7 +303,9 @@ enum RewriteEvaluation {
         let environment = ProcessInfo.processInfo.environment
         let setup = Setup(
             variant: variant, presets: presets,
-            system: TextRefinementService.buildSystemPrompt(presets: presets, defaultPresetID: nil),
+            system: variant == .modes2026
+                ? RewriteModes.request(context: nil, ownPresets: []).system
+                : TextRefinementService.buildSystemPrompt(presets: presets, defaultPresetID: nil),
             editSystem: TextRefinementService.buildEditSystemPrompt(presets: presets),
             repeats: repeats, reasoningEffort: effort, judges: judges, concurrency: concurrency,
             keys: environment.filter { $0.key.hasSuffix("_API_KEY") })
@@ -300,6 +313,8 @@ enum RewriteEvaluation {
         let report = Report(date: Date(), machine: machineDescription(), variant: variant.rawValue,
                             reasoningEffort: effortArgument, judge: nil, judgeList: judges.map(\.spec),
                             systemPromptCharacters: setup.system.count, editSystemPromptCharacters: setup.editSystem.count,
+                            promptCharacters: variant == .modes2026
+                                ? ["routing": setup.system.count, "clean-up only": RewriteModes.cleanUpOnlyPrompt.count] : nil,
                             llamaBuild: llamaBuild, sampling: sampling, contextLength: contextLength,
                             engines: [], rows: [])
         let sink = ReportSink(report: report, fixtures: fixtures, folder: folder)
@@ -510,26 +525,24 @@ enum RewriteEvaluation {
         var row = Row(fixture: fixture.id, engine: engine.spec, variant: setup.variant.rawValue,
                       attempt: attempt, status: "ok")
         do {
-            switch setup.variant {
-            case .current:
-                let (system, user) = messages(fixture, setup: setup)
-                let completion = try await complete(system, user)
-                row.calls = [completion.call]
-                row.raw = completion.reply
-                row.generated = completion.generated
-                let names = setup.presetNames + (fixture.isEdit
-                    ? [TextRefinementService.editDefaultModeName, TextRefinementService.editCustomModeName] : [])
-                let read = RewriteChecks.read(completion.reply, fixture: fixture, presetNames: names)
-                row.reply = read.text
-                row.mode = read.mode
-                row.rawMode = read.rawMode
-                var verdict = RewriteChecks.check(fixture, text: read.text, raw: completion.reply)
-                if let generated = completion.generated, RewriteChecks.leaksReasoning(completion.reply)
-                    || (read.text.isEmpty && RewriteChecks.leaksReasoning(generated)) {
-                    verdict.reasoningLeak = true
-                }
-                row.verdict = verdict
+            // Both variants make one request; they differ in what it holds and how its marker
+            // is read.
+            let request = plan(fixture, variant: setup.variant, setup: setup)
+            let completion = try await complete(request.system, request.user)
+            row.calls = [completion.call]
+            row.raw = completion.reply
+            row.generated = completion.generated
+            let read = RewriteChecks.read(completion.reply, fixture: fixture, presetNames: request.modeNames)
+            row.reply = read.text
+            row.mode = request.decidedMode ?? read.mode
+            row.rawMode = read.rawMode
+            if request.decidedMode != nil { row.modeByCode = true }
+            var verdict = RewriteChecks.check(fixture, text: read.text, raw: completion.reply)
+            if let generated = completion.generated, RewriteChecks.leaksReasoning(completion.reply)
+                || (read.text.isEmpty && RewriteChecks.leaksReasoning(generated)) {
+                verdict.reasoningLeak = true
             }
+            row.verdict = verdict
             row.routed = RewriteChecks.modeMatches(fixture, variant: setup.variant.rawValue, mode: row.mode)
             if row.reply?.isEmpty != false, fixture.allowsEmpty != true { row.status = "failed" }
         } catch LLMError.cutOff {
@@ -539,6 +552,41 @@ enum RewriteEvaluation {
             row.error = error.localizedDescription
         }
         return row
+    }
+
+    /// One fixture's request under a variant: what is sent, the names its marker may take,
+    /// and the mode when code chose it.
+    struct Plan {
+        var system: String
+        var user: String
+        var modeNames: [String]
+        var decidedMode: String?
+    }
+
+    static let editModeNames = [TextRefinementService.editDefaultModeName, TextRefinementService.editCustomModeName]
+
+    static func plan(_ fixture: RewriteFixture, variant: Variant, setup: Setup) -> Plan {
+        let (system, user) = messages(fixture, setup: setup)
+        if fixture.isEdit { return Plan(system: system, user: user, modeNames: setup.presetNames + editModeNames) }
+        switch variant {
+        case .current:
+            return Plan(system: system, user: user, modeNames: setup.presetNames)
+        case .modes2026:
+            let request = modesRequest(fixture)
+            return Plan(system: request.system, user: user, modeNames: request.modeNames, decidedMode: request.decidedMode)
+        }
+    }
+
+    static func modesRequest(_ fixture: RewriteFixture) -> RewriteModes.Request {
+        RewriteModes.request(context: focusContext(fixture), ownPresets: (fixture.presets ?? []).map {
+            PromptPreset(name: $0.name, whenToUse: $0.whenToUse, instructions: $0.instructions)
+        })
+    }
+
+    static func focusContext(_ fixture: RewriteFixture) -> FocusContext? {
+        fixture.context.map {
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel)
+        }
     }
 
     /// The system prompt and user message `TextRefinementService` would send.
@@ -716,15 +764,17 @@ enum RewriteEvaluation {
         report.rows = report.rows.map { row in
             guard row.status == "ok" || row.status == "failed", let raw = row.raw, let fixture = byID[row.fixture] else { return row }
             var row = row
-            let read = RewriteChecks.read(raw, fixture: fixture, presetNames: names + (fixture.isEdit
-                ? [TextRefinementService.editDefaultModeName, TextRefinementService.editCustomModeName] : []))
+            let modes = row.variant == Variant.modes2026.rawValue && !fixture.isEdit ? modesRequest(fixture) : nil
+            let read = RewriteChecks.read(raw, fixture: fixture, presetNames: modes?.modeNames
+                ?? names + (fixture.isEdit ? editModeNames : []))
             row.reply = read.text
-            row.mode = read.mode
+            row.mode = modes?.decidedMode ?? read.mode
             row.rawMode = read.rawMode
+            row.modeByCode = modes?.decidedMode != nil ? true : nil
             var verdict = RewriteChecks.check(fixture, text: read.text, raw: raw)
             if let generated = row.generated, read.text.isEmpty, RewriteChecks.leaksReasoning(generated) { verdict.reasoningLeak = true }
             row.verdict = verdict
-            row.routed = RewriteChecks.modeMatches(fixture, variant: row.variant, mode: read.mode)
+            row.routed = RewriteChecks.modeMatches(fixture, variant: row.variant, mode: row.mode)
             row.status = read.text.isEmpty && fixture.allowsEmpty != true ? "failed" : "ok"
             return row
         }
@@ -874,7 +924,12 @@ enum RewriteEvaluation {
     static func summary(_ report: Report, fixtures: [RewriteFixture]) -> String {
         var out = "# AI Rewrite — variant `\(report.variant)`\n\n"
         out += "\(ISO8601DateFormatter().string(from: report.date)) · \(report.machine) · reasoning effort: \(report.reasoningEffort)"
-        out += " · system prompt \(report.systemPromptCharacters) characters (edit \(report.editSystemPromptCharacters))"
+        if let sizes = report.promptCharacters {
+            out += " · system prompts " + sizes.sorted { $0.key > $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", ")
+            out += " characters (edit \(report.editSystemPromptCharacters))"
+        } else {
+            out += " · system prompt \(report.systemPromptCharacters) characters (edit \(report.editSystemPromptCharacters))"
+        }
         if let sources = report.rechecked { out += " · rechecked from \(sources.count) run(s)" }
         let judgeNames = report.judgeList ?? report.judge.map { [$0] } ?? []
         if !judgeNames.isEmpty {
@@ -911,7 +966,9 @@ enum RewriteEvaluation {
                 .map { "\($0.key) \($0.value)" }.joined(separator: " · ")
             let costs = answered.compactMap(\.cost)
             let perThousand = costs.isEmpty ? "—" : String(format: "%.2f", costs.reduce(0, +) / Double(costs.count) * 1000)
-            let routable = ran.filter { $0.routed != nil }
+            // A mode code chose is right by construction: counted apart, not as routing.
+            let routable = ran.filter { $0.routed != nil && $0.modeByCode != true }
+            let byCode = ran.filter { $0.modeByCode == true }.count
             // Per judge: judges keep different scales, so a mean across them would rank an
             // engine by who happened to grade it.
             let perJudge = Dictionary(grouping: ran.flatMap(\.grades), by: \.judge).sorted { $0.key < $1.key }
@@ -929,7 +986,7 @@ enum RewriteEvaluation {
             let clean = ran.filter { !dirtyIDs.contains($0.fixture) }, dirty = ran.filter { dirtyIDs.contains($0.fixture) }
             out += "| \(engine.name) | \(ran.filter(\.passed).count)/\(ran.count)"
             out += " | \(clean.filter(\.passed).count)/\(clean.count) / \(dirty.filter(\.passed).count)/\(dirty.count)"
-            out += " | \(routable.filter { $0.routed == true }.count)/\(routable.count)"
+            out += " | \(routable.filter { $0.routed == true }.count)/\(routable.count)\(byCode > 0 ? " (+\(byCode) by code)" : "")"
             out += " | \(ran.filter(\.abbreviated).count) / \(ran.filter(\.markerless).count)"
             out += " | \(failures.isEmpty ? "—" : failures)"
             out += " | \(ran.filter { $0.status != "ok" }.count)\(retried > 0 ? " (\(retried) retried)" : "")"

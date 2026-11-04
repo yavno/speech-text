@@ -23,6 +23,13 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 - the client `LLMConfiguration.makeChatClient(model:apiKey:)` builds for the app, with each model's catalogue switches;
 - `parse`, then `polishedReply` with the fixture's Dictionary.
 
+`--variant 2026-11` is the one-step prompt on the modes of the 2026-11-03 spec (#109, `RewriteModes`), which the app does not send yet:
+
+- the three modes, Clean-up, Message and Document, with the fixture's own `presets` beside them;
+- language, format, length and tone as rules on top of any mode;
+- in an editor, a terminal or an AI's field, Clean-up alone, chosen by code and sent with no marker; with `presets`, Clean-up and those, picked by the model. The summary counts the rows code decided apart from the routing (`+n by code`);
+- an edit, exactly what `current` sends.
+
 `--reasoning-effort omit|<value>` overrides a model's reasoning switch. It is a measurement for the next prompt, not the baseline. A new way of prompting is a new case of `RewriteEvaluation.Variant`, judged by the same checks.
 
 ## Fixtures
