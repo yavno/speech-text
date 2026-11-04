@@ -4,8 +4,9 @@ When a vendor switches a model off, our release moves users off it. That only wo
 know weeks in advance, from the vendor rather than from a "Transcription failed" in
 someone's History. Two things keep us informed. One is a script that compares the
 catalogues with each vendor's own API, looks each model up on the vendor's deprecation
-page, and shows what is new on its changelog. The other is a weekly agent that runs the
-script and opens an issue when something changed.
+page, and shows what is new on its changelog. The other is a weekly workflow that runs the
+script and files an issue when something changed. Neither uses a language model: what the
+script finds is decided by code, and what a changelog line means is left to a person.
 
 The catalogues give each model a lifecycle state: `current`, `superseded`, `deprecated` or
 `retired`, with the vendor's shutdown date once one is announced. A retired model stays in
@@ -136,9 +137,8 @@ decided by the script: it shows the new lines (`TEXT_PAGES`), and a person reads
 
 ## The workflow
 
-`.github/workflows/vendor-watch.yml` runs the script on GitHub's machines, started by hand
-from `main` (`gh workflow run vendor-watch.yml`) until a weekly schedule replaces the agent
-below.
+`.github/workflows/vendor-watch.yml` runs the script on GitHub's machines every Monday
+(06:17 UTC), and by hand from `main` (`gh workflow run vendor-watch.yml --ref main`).
 
 - **Check** (a hosted Mac) builds `SpeechTextEvaluation` and exports the catalogues on the
   day, takes the newest `vendor-watch-snapshots` artifact any run on `main` left, runs the
@@ -159,23 +159,10 @@ below.
   Models read; ElevenLabs: speech-to-text), under a spending limit. Only the Check job
   sees them; File issues holds no key, and Check cannot write to the repository. Nothing
   runs on a pull request or on a self-hosted machine.
-
-## The weekly agent
-
-The agent runs once a week as a scheduled task on the maintainer's Mac, until the
-workflow above runs on a schedule. Its prompt is below. `<repo>` is the main
-checkout, and `<watch>` is the private folder that holds the reports and snapshots,
-outside the repository.
-
-```text
-Weekly vendor watch for SpeechText (docs/vendor-watch.md). Talk to me in Ukrainian; issues in English.
-
-1. Check out fresh origin/main in a detached worktree. Run git -C <repo> fetch origin and git -C <repo> worktree prune. Then run git -C <repo> worktree add --detach /tmp/vendor-watch origin/main, or, if /tmp/vendor-watch exists, git -C /tmp/vendor-watch checkout --detach origin/main. Never commit anything.
-2. Run in /tmp/vendor-watch: SPEECHTEXT_VENDOR_WATCH=<watch> scripts/check-vendor-models.sh --out /tmp/vendor-watch-script.md. Never print or quote an API key.
-3. Read the script's "On the vendor's deprecation page" and "New lines on the vendors' pages"; open a page only to see what a new line means. For each model in the catalogue export (the script's report lists what is gone, going and new) note any deprecation, shutdown date, replacement, price change, or a new model relevant to dictation (speech-to-text) or text rewriting. Read the script's "Language lists" too: a list added to or dropped from at its source, a source to read by hand, and whether OpenAI now publishes a list.
-4. Read the previous report, the newest <watch>/<date>.md before today.
-5. Write <watch>/<today>.md: the script's report, then "Pages", with what the new lines mean and the URL of each claim, then "New since <previous date>".
-6. If something needs action and no open issue covers it yet (a catalogue model deprecated or gone, a shutdown date, a replacement, price drift, a language list that changed at its source or is now published, a new candidate model, a newer FluidAudio or WhisperKit release with models), first search the open issues: gh issue list --label model-lifecycle --state open. Comment on an existing issue for the same model rather than opening a second one. Otherwise open one with gh issue create --label model-lifecycle: the model, vendor, shutdown date, replacement, the source URL, and what to do in the catalogue (lifecycle state, shutdown date, migration target, price). Then tell me in a few lines what you filed.
-7. If nothing needs action beyond the open issues, write the report only and tell me "нічого нового" in one line.
-8. If the script exits 3 (a vendor was not checked), say which vendor and why. That week is not an all-clear. If it exits 2, the build failed: say so, with the log's path.
-```
+- **Releases.** A tag is released only after a green Check in the latest run on `main`,
+  at most seven days old (`release.yml`'s *Vendor watch is green*; docs/releasing.md).
+  GitHub turns a public repository's schedule off after 60 days with no activity: the
+  gate then stops the next tag instead of releasing on old results.
+- **Reading a run.** The report is the run's summary; the issues it filed or commented on
+  are listed under it. The lines new on the vendors' pages are not filed unless they name
+  a catalogue model with a lifecycle word: someone reads them each week.

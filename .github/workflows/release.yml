@@ -63,8 +63,58 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # A tag is released only when the vendor watch (vendor-watch.yml) found nothing
+  # that blocks a release, and found it recently: its Check job, in the latest run
+  # on main, green and at most seven days old. docs/releasing.md has the rule. It
+  # reads the Check job rather than the run, because a red File issues job (the
+  # issues API failing) says nothing about the vendors. It checks nothing out and
+  # runs none of the repository's code, and it fails before a Mac is started.
+  vendor-watch-gate:
+    name: Vendor watch is green
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: The latest vendor watch on main passed, within seven days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          run=$(gh api "repos/$GH_REPO/actions/workflows/vendor-watch.yml/runs?branch=main&status=completed&per_page=20" \
+            --jq '[.workflow_runs[] | select(.conclusion != "cancelled")][0] // empty | "\(.id) \(.html_url) \(((now - (.created_at | fromdate)) / 3600) | floor)"')
+          if [ -z "$run" ]; then
+            echo "::error::No finished vendor watch run on main. Start one with: gh workflow run vendor-watch.yml --ref main"
+            exit 1
+          fi
+          read -r id url hours <<< "$run"
+          check=$(gh api "repos/$GH_REPO/actions/runs/$id/jobs" --jq '[.jobs[] | select(.name == "Check")][0].conclusion // "missing"')
+          echo "Vendor watch $url: Check $check, $hours hours ago."
+          if [ "$check" != "success" ]; then
+            echo "::error::The latest vendor watch on main is red (Check: $check): $url. Fix what its report says, or run it again once a vendor answers (gh workflow run vendor-watch.yml --ref main), then re-run this release."
+            exit 1
+          fi
+          if [ "$hours" -gt 168 ]; then
+            echo "::error::The latest vendor watch on main is $((hours / 24)) days old: $url. Run it again (gh workflow run vendor-watch.yml --ref main), then re-run this release."
+            exit 1
+          fi
+          # The watch read main's catalogue. A tag cut from main, as releases are, has
+          # that catalogue or an older one; any other commit is worth a look.
+          status=$(gh api "repos/$GH_REPO/compare/main...$GITHUB_SHA" --jq .status)
+          case "$status" in
+            identical|behind) ;;
+            *) echo "::warning::$GITHUB_REF_NAME is not on main ($status): the vendor watch checked main's catalogue, not this commit's." ;;
+          esac
+
   package:
     name: Package
+    # After the gate for a tag; a pull request or a manual run has no gate, and a
+    # skipped need would otherwise skip this job too.
+    needs: vendor-watch-gate
+    if: ${{ !failure() && !cancelled() }}
     # A machine that is thrown away after the job, whatever started it. An
     # unrecognised visibility falls through to the hosted Mac too, so a mistake is a
     # job that waits for a runner rather than a stranger's code on someone's Mac.

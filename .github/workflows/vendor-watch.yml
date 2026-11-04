@@ -2,8 +2,8 @@ name: Vendor watch
 
 # Compares the app's model catalogues with what each vendor serves and says
 # (docs/vendor-watch.md), and files what needs acting on as `model-lifecycle`
-# issues. Started by hand for now; a weekly schedule comes once a run from here has
-# shown every vendor page readable from a hosted runner.
+# issues. Every Monday, and by hand (gh workflow run vendor-watch.yml --ref main).
+# A tag is released only after a green Check here within seven days (release.yml).
 #
 # The vendors' keys are secrets of the `vendor-watch` environment, which only `main`
 # may deploy to: a run started on any other branch gets none. Nothing here runs on
@@ -20,6 +20,12 @@ name: Vendor watch
 # Anything that gates on this workflow reads the conclusion of `check`, not of the
 # whole run: a red `file` (GitHub's issues API failing) does not mean a vendor changed.
 on:
+  # Monday 06:17 UTC: off the top of the hour, when GitHub delays scheduled runs
+  # most. A schedule runs on the default branch only. GitHub turns it off in a
+  # public repository after 60 days with no activity; the release gate then
+  # stops the next tag rather than letting old results through.
+  schedule:
+    - cron: '17 6 * * 1'
   workflow_dispatch:
 
 permissions: {}
