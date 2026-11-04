@@ -134,13 +134,16 @@ public enum RewriteModes {
         an AI. Your output is pasted at the user's cursor there.
         """
 
-    /// Said once, for every mode: "output only", "invent nothing" and the clean-up.
+    /// Said once, for every mode: "output only", "invent nothing" and the clean-up. The
+    /// wrong script is named because "keep the user's words" otherwise keeps «сетінгс»:
+    /// Sonnet and Haiku 5.5 kept it 3 of 3 times each in an AI's field (2026-11-04).
     private static let rules = """
         Rules:
         - Output only the finished text: no greeting, preamble, commentary or "Here is…"; \
         no quotation marks or code fences unless code was asked for.
         - Fix speech-recognition noise: misheard words, homophones, punctuation, capitals; \
-        drop fillers.
+        a term the engine spelled in the wrong script goes back to its own («гітхаб» is \
+        GitHub); drop fillers.
         - Spoken formatting commands ("new paragraph", "bullet point") are applied, never \
         written out.
         - Invent nothing. Too short or garbled to act on: output it cleaned up.
@@ -173,8 +176,9 @@ public enum RewriteModes {
     /// translate the English half of a mixed sentence 3 of 3 times (2026-11-04).
     private static let modifiers = """
         Then do what the transcript asks of any text:
-        - Language: the one asked for. Otherwise keep the dictated one, and a sentence \
-        that mixes languages stays mixed. Terms, names and code stay as said.
+        - Language: the one asked for («англійською», "in Polish"), whatever the mode. \
+        Otherwise keep the dictated one, and a sentence that mixes languages stays \
+        mixed. Terms, names and code stay as said.
         - Format: plain text unless asked. A "- " or numbered list when one is asked for; \
         headings, bold or tables only when named.
         - Length, tone, "rewrite it", "make it better": done, on whichever mode fits.

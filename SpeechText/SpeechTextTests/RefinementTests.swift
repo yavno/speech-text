@@ -417,13 +417,13 @@ final class RewriteModesTests: XCTestCase {
     }
 
     func testTheRoutingPromptStaysWithinItsBudget() {
-        // Today's prompt is 3615 characters with its six built-ins; this one, 2963, its
-        // framing 1741 and the three modes 1222 (2026-11-04).
+        // Today's prompt is 3615 characters with its six built-ins; this one, 3100, its
+        // framing 1878 and the three modes 1222; Clean-up alone is 1454 (2026-11-04).
         let framing = RewriteModes.routingPrompt(modes: [], forAnotherProgram: false).count
         let whole = RewriteModes.request(context: nil, ownPresets: []).system.count
-        XCTAssertLessThanOrEqual(framing, 1800, "framing is \(framing) characters")
+        XCTAssertLessThanOrEqual(framing, 1900, "framing is \(framing) characters")
         XCTAssertLessThanOrEqual(whole - framing, 1250, "the three modes render as \(whole - framing) characters")
-        XCTAssertLessThanOrEqual(RewriteModes.cleanUpOnlyPrompt.count, 1400)
+        XCTAssertLessThanOrEqual(RewriteModes.cleanUpOnlyPrompt.count, 1500)
     }
 
     func testAFieldForAnotherProgramGetsCleanUpByCode() {
