@@ -131,7 +131,9 @@ Code then turns an asked language that is the same as the dictated one into *non
 - The dictated language comes from `NLLanguageRecognizer`, limited to `spokenLanguages` plus English.
 - The `Core imports` check forbids only SwiftUI and the engines, so NaturalLanguage may be imported in SpeechTextCore.
 - Script alone is not enough: it does not tell English from Polish.
-- The rule only removes a request, and a request for the language already spoken changes nothing in the text. So where the recogniser is unsure, as on a dictation of two or three words, code leaves the model's answer alone. The confidence threshold is set on the fixtures.
+- The rule only removes a request, and a request for the language already spoken changes nothing in the text. So where the recogniser is unsure, code leaves the model's answer alone.
+  - Between languages written in different scripts, such as Ukrainian and English, the script decides: on every fixture, a single word included, the recogniser was at least 0.9999 sure (router v4, 2026-11-03). A threshold only matters between languages that share a script, such as English and Polish, and is set when a fixture needs one.
+  - A Ukrainian dictation that is mostly identifiers reads as English (`uk-ai-coding-prompt`). A request for Ukrainian on it is then kept, which is harmless; a request for English on it would be dropped.
 
 **D5 — The format: plain unless asked; Markdown only when named or rendered.**
 - Plain text is the default.
@@ -144,25 +146,33 @@ The format question's *list* option says it covers lists only. In the spike ever
 
 Step one answers three questions: the mode, the language asked for, and the format. Each option is one letter.
 
-The 1 s limit is the owner's (2026-11-03). Step one has two options:
-- **Locally,** with the model already loaded for AI Rewrite.
-- **Hosted,** with Jev, which joins as a provider (the owner's call, 2026-11-03).
+The 1 s limit is the owner's (2026-11-03). Step one has three options (the owner's calls, 2026-11-03 and 04):
+- **Locally, with the model already loaded** for AI Rewrite: Gemma 4 12B or Qwen3.5 9B.
+- **Locally, with OneJev 1.6,** a Qwen3.5 fine-tune made for picking between options (Apache 2.0), in two sizes, 0.8B and 4B. It is a download of its own and is held in memory beside the rewrite model, so a Mac whose AI Rewrite runs in the cloud can pick on this Mac (#152).
+- **Hosted,** with Jev, which joins as a provider (#143).
 
-What meets the limit, as measured in the spike:
+As measured in router v4 (2026-11-03/04): the new modes, D3 and D4 applied, 66 dictation fixtures of which 43 are asked and the rest answered by rule; one run each; the fixtures shaped the prompts, so these are upper bounds.
 
-| Where AI Rewrite runs | Step one | All three right | Median |
+| Step one | Read how | All three right, of 43 | Median |
 |---|---|---|---|
-| This Mac | The model already loaded for AI Rewrite, read by next-token probabilities in our llama.cpp: questions in the cached system turn, the dictation read once, the three answers read in a row in one pass ("chained") | Gemma 4 12B 57/65, Qwen3.5 9B 57/65 | 0.96 s, 0.70 s |
-| Groq | GPT-OSS 20B, JSON with a strict schema | 55/65 (v1), 53/65 (v2, clearer language labels) | 0.39 s, 0.64 s |
-| Jev (a provider of its own, any AI pick) | A hosted model built for decisions like these, asked all three questions in one request | 60/65 | 0.19 s |
-| Anthropic, OpenAI themselves | Nothing measured under 1 s. Haiku 5.5 took 1.24 s; GPT-6 Luna was not measured. | — | — |
+| Jev (a provider of its own, any AI pick) | all three questions in one request | 42 | 0.33 s |
+| Gemma 4 12B, already loaded | next-token probabilities in our llama.cpp: questions in the cached system turn, the dictation read once, the three answers read in a row in one pass ("chained") | 42 | 0.86 s |
+| Qwen3.5 9B, already loaded | the same, chained | 41 | 0.64 s |
+| OneJev 1.6 4B Q8_0 (4.5 GB) | next-token probabilities in our llama.cpp, with OneJev's own prompt layout | 38 | 1.10 s |
+| OneJev 1.6 0.8B Q8_0 (0.8 GB) | the same | 37 | 0.23 s |
 
-- **On this Mac,** "shared" reading (the state copied once per question) gave Qwen3.5 9B 60/65 at 1.04 s, just over the limit. Chained reading is the default. Shared is measured again after D3 and D4, since both take load off the model.
+Not offered:
+- **GPT-OSS 20B on Groq,** JSON with a strict schema: 34/43, at 0.66 s median but 1.6 s at p90. A Groq user gets the one-step prompt instead (the owner's call, 2026-11-04).
+- **OneJev 1.6 9B** (Q4_K_M, 5.6 GB): 39/43 at 2.20 s, over the timeout.
+- **Plain small models** read the same way: Qwen3.5 4B 37/43 at 0.37 s chained, 2B 24–32, 0.8B 17. Without the fine-tune, a small model is not usable.
+- **Anthropic and OpenAI themselves:** nothing measured under 1 s. Haiku 5.5 took 1.24 s; GPT-6 Luna was not measured.
+
+- **On this Mac,** chained reading is the default. "Shared" reading (the state copied once per question) gave Qwen3.5 9B 42/43 at 0.90 s and Gemma 4 12B 42/43 at 1.31 s in router v4: one more right for Qwen, at a quarter of a second more. The step-one prompt, with the user's own modes in it, is read when the model loads and again after a prompt is edited: read cold, it took 2.6–3.8 s, over the timeout, and 0.6–0.95 s once read (router v4).
 - **Which step one runs,** by default, follows from what the user has:
   - with a Jev key, Jev, whatever the AI pick;
-  - else, with AI Rewrite on this Mac, the local reading;
-  - else, on Groq, GPT-OSS 20B.
-- **Otherwise,** Anthropic and OpenAI users get the cleaned one-step prompt with the code rules of D3–D5.
+  - else, with AI Rewrite on this Mac, the model already loaded;
+  - else, with OneJev downloaded, OneJev.
+- **Otherwise,** the user gets the cleaned one-step prompt with the code rules of D3–D5.
 - **Choosing between them** is #130's settings question, not this spec's.
 - **Jev is a new place the user's words go:** the transcript and the `<context>` block, nothing else.
   - It is added like any provider (`docs/adding-a-provider.md`, a key in `APIKeyStore`), in its own issue.
@@ -170,7 +180,7 @@ What meets the limit, as measured in the spike:
   - Nothing goes to it without a key the user entered.
 - **On reasoning:** step one never asks for reasoning. Local reading generates no tokens at all. The cloud answer is one compact JSON object whose default values are left out.
 - **When step one fails:** a failure or a reply that is not one of the options means the one-step prompt is sent instead. So does no answer within the timeout.
-  - The timeout is 2 s (the owner's call, 2026-11-03), above the 1 s target, because Gemma 4 12B's median, 0.96 s, sits at the limit.
+  - The timeout is 2 s (the owner's call, 2026-11-03), above the 1 s target, because Gemma 4 12B's median sat at the limit (0.96 s in the spike, 0.86 s in router v4) and OneJev 4B's is above it.
   - The worst case is therefore 2 s plus a full one-step request.
   - The dictation never waits on step one twice.
 - **The code:** the spike's code (`LlamaModel.chainedProbabilities` and `branchProbabilities`, on the local branch `spike/router-logits`, never pushed) is rewritten for main with tests. It is not merged as it is.
@@ -294,7 +304,7 @@ If the predictions hold, the strongest local models would be left with one or tw
 ## Measurement before the app changes
 
 1. **Fixtures:** add `variantModes`, `askedLanguage` and `format` (D12). No app code changes in this step.
-2. **Router:** rerun on the new modes with the code rules applied. Candidates: Gemma 4 12B and Qwen3.5 9B (chained and shared), GPT-OSS 20B with JSON, and Jev. The target is at least 60/65 with all three answers right, at a median under 1 s.
+2. **Router:** rerun on the new modes with the code rules applied. Done as router v4 (2026-11-03/04); the results are in D6. The target was at least 60/65 with all three answers right, at a median under 1 s; Jev, Gemma 4 12B and Qwen3.5 9B reached 41–42 of 43 asked, each at a median under 1 s.
 3. **Text:** `current` against the cleaned one-step prompt (#109) and the two-step one (#110), on the six engines of #114, three runs.
    - **The cleaned one-step prompt** may lose no more than noise against the baseline on any engine: two rows of 216.
    - **Two steps** ship for an engine only where they write better text, or write the same text faster than its one-step prompt.
@@ -304,10 +314,12 @@ If the predictions hold, the strongest local models would be left with one or tw
 
 On 2026-11-03, the owner gave these answers. Each is written into the decision it changes.
 1. **Technical merges with Notes** into one mode, whose name may still change (D1).
-2. **Jev joins as a provider** for step one. A local option is needed beside it, and the local reading is that option (D6).
+2. **Jev joins as a provider** for step one. A local option is needed beside it: the model already loaded, or OneJev 0.8B or 4B (D6).
 3. **Step one's timeout is 2 s** (D6).
 4. **In an editor, a terminal or an AI field the user's own modes are still offered;** only the built-ins and the modifiers are ruled out (D3).
 5. **Clean-up keeps the dictated language unless another was asked for** (D1).
 6. **The merged mode is called Document for now;** a new name is proposed once its prompt is written (D1).
 7. **Length and tone get no router questions** (D2).
 8. **The Edit prompt keeps its `<<mode:…>>` marker** (D11).
+9. **OneJev 0.8B and 4B are offered as local step-one models** (2026-11-04, D6, #152).
+10. **GPT-OSS 20B on Groq is not a step-one option** (2026-11-04, D6).
