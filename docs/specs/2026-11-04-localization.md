@@ -94,7 +94,7 @@ The supported languages are the ones in `knownRegions` other than `Base` and `en
 
 | Where | What | How |
 |---|---|---|
-| CI, every pull request (*Tests*, which already builds the app) | The catalogs hold exactly the code's keys: nothing the code uses is missing, nothing it no longer uses is left. | Compare the keys from `xcodebuild -exportLocalizations` with the catalogs. This is the plan, because only the IDE is known to update a catalog during a build. If `xcodebuild` turns out to sync catalogs too, a build followed by `git diff --exit-code -- '*.xcstrings'` is the simpler alternative. |
+| CI, every pull request (*Tests*, which already builds the app) | The catalogs hold exactly the code's keys: nothing the code uses is missing, nothing it no longer uses is left. | `scripts/sync-strings.sh --check`: it syncs the test build's `.stringsdata` (what the compiler extracted from each file) into a copy of the catalog with `xcstringstool sync`, the step the IDE runs, and fails when that changes anything or leaves an entry stale. Settled in *build*: `xcodebuild` does not sync a catalog itself (Xcode 27.2), so the plain build-and-diff does not work, and the sync is more direct than comparing `-exportLocalizations` output. |
 | CI, every pull request | Every entry has a `comment`. | A script over the catalogs. |
 | CI, every pull request | The files in the inventory hand the UI localized strings. | A script with the list of those files, in the manner of `scripts/check-core-imports.sh`. |
 | CI, every pull request, and the job before it pushes | Every translation keeps its source's placeholders (`%lld`, `%@`, positional forms) and its Markdown (links, emphasis) intact. | A script that compares the format specifiers and Markdown of each value with the English source. Valid JSON alone does not catch a dropped `%lld`. |
@@ -137,4 +137,3 @@ A new issue template, `.github/ISSUE_TEMPLATE/translation_error.yml`, labeled `t
 ## Open
 
 - **`Bundle.module` in `SpeechTextEvaluation`.** `SpeechTextCore` is linked into the app, the tests and the tool. Once the package has resources, `Bundle.module` traps if the resource bundle is not found next to the binary. *Build* step 3 checks that the tool still runs, and copies the bundle or keeps the tool's code paths off localized strings if it does not.
-- **Whether `xcodebuild` syncs String Catalogs** the way the IDE does. Not needed for the plan above; it would only allow the simpler build-and-diff check.

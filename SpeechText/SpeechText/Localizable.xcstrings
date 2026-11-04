@@ -1,0 +1,1249 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    " " : {
+
+    },
+    " %@" : {
+
+    },
+    " %@ " : {
+
+    },
+    " In this period that's " : {
+
+    },
+    " and AI turns what you say — or what you ask for — into clean text for the app you're in." : {
+
+    },
+    " faster" : {
+
+    },
+    " in everything you dictate." : {
+
+    },
+    " instead of " : {
+
+    },
+    " will become " : {
+
+    },
+    " words a minute and type at " : {
+
+    },
+    " wpm" : {
+
+    },
+    " you didn't spend typing." : {
+
+    },
+    " · " : {
+
+    },
+    " — an average, until you set yours." : {
+
+    },
+    "$0" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ (not connected)" : {
+
+    },
+    "%@ dictations" : {
+
+    },
+    "%@ is newer." : {
+
+    },
+    "%@ key" : {
+
+    },
+    "%@ key, ending %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ key, ending %2$@"
+          }
+        }
+      }
+    },
+    "%@ of models on this Mac" : {
+
+    },
+    "%@ words" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %lld%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$lld%%"
+          }
+        }
+      }
+    },
+    "%@ — %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@"
+          }
+        }
+      }
+    },
+    "%@ — %@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@%3$@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld entries" : {
+
+    },
+    "%lld refused" : {
+
+    },
+    "%lld wpm" : {
+
+    },
+    "%llds" : {
+
+    },
+    "%lld×" : {
+
+    },
+    "**Not in the list?** Drag SpeechText into it, or click + under the list and choose it in Applications." : {
+
+    },
+    "+%lld" : {
+
+    },
+    ", " : {
+
+    },
+    "." : {
+
+    },
+    "1 dictation" : {
+
+    },
+    "A dictation being typed into %@" : {
+
+    },
+    "A key is like a password that lets SpeechText use your account." : {
+
+    },
+    "A typical wait for an answer: half were faster, half slower." : {
+
+    },
+    "AI POLISH" : {
+
+    },
+    "AI Rewrite" : {
+
+    },
+    "AI Rewrite pastes your words as said until you add a key." : {
+
+    },
+    "AI Rewrite was told it was for " : {
+
+    },
+    "AI couldn't answer this time" : {
+
+    },
+    "AI dictation — rewritten before it is pasted" : {
+
+    },
+    "AI is tidying up your text…" : {
+
+    },
+    "AI polish is almost ready" : {
+
+    },
+    "About SpeechText" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add a key to use %@." : {
+
+    },
+    "Add a language" : {
+
+    },
+    "Add the languages you speak to see which models know them." : {
+
+    },
+    "Add the names and terms SpeechText gets wrong — a colleague's name, your product, a code identifier — and how they come out instead. They're put right after every dictation." : {
+
+    },
+    "Add word" : {
+
+    },
+    "Add “%@” — used in %lld dictations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add “%1$@” — used in %2$lld dictations"
+          }
+        }
+      }
+    },
+    "All" : {
+
+    },
+    "Allow" : {
+
+    },
+    "Almost ready…" : {
+
+    },
+    "An example: what you say, and the prompt it fits" : {
+
+    },
+    "Any app, any time" : {
+
+    },
+    "Any color" : {
+
+    },
+    "Any color — the glass and the shell follow its hue" : {
+
+    },
+    "Appears when you're done." : {
+
+    },
+    "Auto-scroll" : {
+
+    },
+    "Automatic" : {
+
+    },
+    "Back" : {
+
+    },
+    "Back to %@" : {
+
+    },
+    "Back to Speech" : {
+
+    },
+    "Can be used for %@" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Cancel download" : {
+
+    },
+    "Change" : {
+
+    },
+    "Check Now…" : {
+
+    },
+    "Check that the right microphone is selected — it's shown on the right — then try again." : {
+
+    },
+    "Check your internet connection and try again." : {
+
+    },
+    "Checking the download" : {
+
+    },
+    "Choose a model — the one you had is no longer available, and dictation waits for your pick." : {
+
+    },
+    "Choose a provider" : {
+
+    },
+    "Choose another model…" : {
+
+    },
+    "Choose another option" : {
+
+    },
+    "Chosen for %lld %@ in History" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Chosen for %1$lld %2$@ in History"
+          }
+        }
+      }
+    },
+    "Clear" : {
+
+    },
+    "Clear History" : {
+
+    },
+    "Clear all of History?" : {
+
+    },
+    "Clear search" : {
+
+    },
+    "Clicks and ⌘Tab work as usual while you hold it. Let go of %@ when you're done." : {
+
+    },
+    "Color" : {
+
+    },
+    "Come back here — we'll pick it up automatically." : {
+
+    },
+    "Connect your %@ account" : {
+
+    },
+    "Continue Setup" : {
+
+    },
+    "Copied" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Copy Instruction" : {
+
+    },
+    "Copy What You Said" : {
+
+    },
+    "Copy this build's version" : {
+
+    },
+    "Dashes" : {
+
+    },
+    "Debug Log" : {
+
+    },
+    "Debug lines" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete “%@”" : {
+
+    },
+    "Dictation" : {
+
+    },
+    "Dictations fail until you add a key." : {
+
+    },
+    "Done" : {
+
+    },
+    "Download %@ (%@) and show it in Settings — then retry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download %1$@ (%2$@) and show it in Settings — then retry"
+          }
+        }
+      }
+    },
+    "Download failed — check your internet." : {
+
+    },
+    "Download failed." : {
+
+    },
+    "Download it to try dictating here." : {
+
+    },
+    "Downloading · %lld%%" : {
+
+    },
+    "Drag into the Accessibility list" : {
+
+    },
+    "Drag to reorder" : {
+
+    },
+    "Duplicate" : {
+
+    },
+    "Each is replaced by the word, as a whole word, whatever its capitals." : {
+
+    },
+    "Earlier versions. They still work, but the models above replace them." : {
+
+    },
+    "Edit Prompts…" : {
+
+    },
+    "Editing the selected text — say how to change it" : {
+
+    },
+    "Edit…" : {
+
+    },
+    "Error" : {
+
+    },
+    "Errors and faults" : {
+
+    },
+    "Every dictation and the audio kept for a retry are deleted. This can't be undone." : {
+
+    },
+    "FOR EXAMPLE" : {
+
+    },
+    "Fault" : {
+
+    },
+    "Filter..." : {
+
+    },
+    "Find" : {
+
+    },
+    "Find **SpeechText** in the list and click its switch. You may need to enter your Mac password." : {
+
+    },
+    "Finish setting up SpeechText" : {
+
+    },
+    "For your %@" : {
+
+    },
+    "Getting ready for your Mac — first time only" : {
+
+    },
+    "Getting ready for your Mac. This happens only once and takes %@. You can keep going." : {
+
+    },
+    "Getting ready for your Mac…" : {
+
+    },
+    "Given to the engine and AI Rewrite" : {
+
+    },
+    "Go back and paste your key again." : {
+
+    },
+    "Grant Access" : {
+
+    },
+    "Here's the AI version" : {
+
+    },
+    "Hi John, I'll be about 10 minutes late — traffic is bad. Sorry!" : {
+
+    },
+    "Hidden, %lld" : {
+
+    },
+    "Hide debug" : {
+
+    },
+    "Hide models too heavy for this Mac" : {
+
+    },
+    "Hides the details" : {
+
+    },
+    "History" : {
+
+    },
+    "History settings" : {
+
+    },
+    "Hold" : {
+
+    },
+    "Home" : {
+
+    },
+    "How AI Rewrite picks a prompt" : {
+
+    },
+    "How SpeechText works" : {
+
+    },
+    "How fast do you type?" : {
+
+    },
+    "How much History keeps" : {
+
+    },
+    "How the shortcut records" : {
+
+    },
+    "In %lld %@ History keeps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In %1$lld %2$@ History keeps"
+          }
+        }
+      }
+    },
+    "In any app, your words would be typed as you said them." : {
+
+    },
+    "In use: %@" : {
+
+    },
+    "Install" : {
+
+    },
+    "Installing…" : {
+
+    },
+    "It is the model in use. AI Rewrite pastes your words as said until you download another." : {
+
+    },
+    "It is the model in use. AI Rewrite switches to %@." : {
+
+    },
+    "It is the model in use. Dictation switches to %@ until you pick another." : {
+
+    },
+    "It works!" : {
+
+    },
+    "Its capitals are put back as written" : {
+
+    },
+    "Its model is still downloading (%lld%%). You can wait here, or try it later." : {
+
+    },
+    "Its window opens next. Once you close it, click SpeechText in the Dock or the icon at the top of your screen to open it again." : {
+
+    },
+    "Just %@ — that's it" : {
+
+    },
+    "Keep %@" : {
+
+    },
+    "Keep %@ down — it alone keeps recording, and your hand is free for the mouse and ⌘Tab." : {
+
+    },
+    "Keep debug lines — every partial, every key event posted — in this window. They push older lines out of the last 1000. On in a debug build; the system log gets them either way." : {
+
+    },
+    "Language" : {
+
+    },
+    "Languages I speak" : {
+
+    },
+    "Legacy models" : {
+
+    },
+    "Let go of %@ when you're done." : {
+
+    },
+    "Listening…" : {
+
+    },
+    "Mark setup as done. Everything it asks is in Settings." : {
+
+    },
+    "Measure again…" : {
+
+    },
+    "Measure your typing speed" : {
+
+    },
+    "Measure…" : {
+
+    },
+    "Message" : {
+
+    },
+    "Microphone" : {
+
+    },
+    "Microphone is turned off for SpeechText." : {
+
+    },
+    "Move Down" : {
+
+    },
+    "Move Up" : {
+
+    },
+    "Name" : {
+
+    },
+    "New prompt" : {
+
+    },
+    "Newer version: %@" : {
+
+    },
+    "No %@ yet." : {
+
+    },
+    "No internet connection" : {
+
+    },
+    "No match" : {
+
+    },
+    "No models downloaded yet" : {
+
+    },
+    "No requests to a provider in this period." : {
+
+    },
+    "No words yet." : {
+
+    },
+    "Not chosen in History yet" : {
+
+    },
+    "Not chosen yet. Say something that fits its “When to use” with %@, and it shows up here." : {
+
+    },
+    "Not downloaded" : {
+
+    },
+    "Not priced" : {
+
+    },
+    "Not started" : {
+
+    },
+    "Nothing %@%@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nothing %1$@%2$@."
+          }
+        }
+      }
+    },
+    "Nothing dictated in this period." : {
+
+    },
+    "Nothing dictated yet. Press %@ in any app, speak, and press it again — every dictation is kept here." : {
+
+    },
+    "Nothing dictated yet. Press %@ in any app, speak, and press it again." : {
+
+    },
+    "Nothing matches “%@”%@%@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nothing matches “%1$@”%2$@%3$@."
+          }
+        }
+      }
+    },
+    "Nothing pasted in this period." : {
+
+    },
+    "Notice" : {
+
+    },
+    "Notices and above" : {
+
+    },
+    "Now let go of %@" : {
+
+    },
+    "Now try AI polish: hold" : {
+
+    },
+    "Now try AI polish: press" : {
+
+    },
+    "Off" : {
+
+    },
+    "On this Mac or online — you can change it later." : {
+
+    },
+    "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
+
+    },
+    "Once you've dictated for a minute or so, this says how much faster speaking is than typing — and how much time it saved you." : {
+
+    },
+    "Online services need internet. Connect, then try again." : {
+
+    },
+    "Open" : {
+
+    },
+    "Open Keyboard Settings" : {
+
+    },
+    "Open Sound Settings" : {
+
+    },
+    "Open System Settings" : {
+
+    },
+    "Open again" : {
+
+    },
+    "Open at login" : {
+
+    },
+    "Opens History" : {
+
+    },
+    "Optional" : {
+
+    },
+    "Optional. Press " : {
+
+    },
+    "Or set it yourself" : {
+
+    },
+    "Paste" : {
+
+    },
+    "Paste your key here" : {
+
+    },
+    "Preparing %@ for your Mac…" : {
+
+    },
+    "Preparing a model for your Mac takes a while the first time — up to 10 minutes. You can continue while it runs." : {
+
+    },
+    "Preparing speech model for your Mac…" : {
+
+    },
+    "Press" : {
+
+    },
+    "Press %@ again when you're done." : {
+
+    },
+    "Press a shortcut, say what you want to write, and your words appear wherever your cursor is — in any app." : {
+
+    },
+    "Press shortcut..." : {
+
+    },
+    "RESULT" : {
+
+    },
+    "Ready to use" : {
+
+    },
+    "Ready." : {
+
+    },
+    "Recommended for your " : {
+
+    },
+    "Record" : {
+
+    },
+    "Record traces" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Remove %@?" : {
+
+    },
+    "Remove your %@ key?" : {
+
+    },
+    "Remove “%@”" : {
+
+    },
+    "Requests are counted from this update on." : {
+
+    },
+    "Restore Built-in Prompts" : {
+
+    },
+    "Restore the built-in prompts?" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Rewriting…" : {
+
+    },
+    "Right-click a prompt to make it the default, duplicate or move it." : {
+
+    },
+    "Save each streamed inline dictation to Traces/ so it can be replayed as a test. The words you dictate are saved there in plain text." : {
+
+    },
+    "Saved" : {
+
+    },
+    "Say anything — or read this out, then let go." : {
+
+    },
+    "Say anything — or read this out, then press the keys again." : {
+
+    },
+    "Say something the way you'd say it, hesitations and all — for example:" : {
+
+    },
+    "Scroll down to **Dictation** and click the switch beside the microphone, then **Enable** if macOS asks." : {
+
+    },
+    "Search languages" : {
+
+    },
+    "Search what you said" : {
+
+    },
+    "Selected text in %@ being rewritten" : {
+
+    },
+    "Send your words to the speech engine with every dictation" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Settings…" : {
+
+    },
+    "Shortcuts" : {
+
+    },
+    "Show" : {
+
+    },
+    "Show %lld %@ too heavy for this Mac" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show %1$lld %2$@ too heavy for this Mac"
+          }
+        }
+      }
+    },
+    "Show all" : {
+
+    },
+    "Show all · %lld more" : {
+
+    },
+    "Show fewer" : {
+
+    },
+    "Show in Dock" : {
+
+    },
+    "Show in Finder" : {
+
+    },
+    "Show less" : {
+
+    },
+    "Show levels" : {
+
+    },
+    "Shown, %lld" : {
+
+    },
+    "Shows the details" : {
+
+    },
+    "Skip" : {
+
+    },
+    "Soon" : {
+
+    },
+    "Speak, and see" : {
+
+    },
+    "Speaking %lld words a minute, typing %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Speaking %1$lld words a minute, typing %2$lld"
+          }
+        }
+      }
+    },
+    "Speaking vs typing" : {
+
+    },
+    "Speech" : {
+
+    },
+    "SpeechText" : {
+
+    },
+    "SpeechText has no list price for this model, so it isn't counted in Spent." : {
+
+    },
+    "SpeechText lives in your menu bar" : {
+
+    },
+    "SpeechText needs these to hear you and to type for you." : {
+
+    },
+    "Start typing here" : {
+
+    },
+    "Suggested from your dictations" : {
+
+    },
+    "Switch" : {
+
+    },
+    "Switch to %@? The current download will stop." : {
+
+    },
+    "Switch to it" : {
+
+    },
+    "System Default" : {
+
+    },
+    "Talk instead of typing" : {
+
+    },
+    "Talk, or say what you want" : {
+
+    },
+    "Team chat" : {
+
+    },
+    "Tell the speech engine" : {
+
+    },
+    "That didn't work" : {
+
+    },
+    "That's your voice, typed." : {
+
+    },
+    "The audio is kept %@, for a retry with the settings you have now." : {
+
+    },
+    "The audio is no longer kept, so this one can't be retried." : {
+
+    },
+    "The download didn't finish" : {
+
+    },
+    "The download stopped. Check your internet connection." : {
+
+    },
+    "This can't be undone." : {
+
+    },
+    "This happens only once and takes %@. You can wait here or finish setup now — we'll let you know when it's ready." : {
+
+    },
+    "This model may be slow on your Mac. We recommend %@." : {
+
+    },
+    "This part of SpeechText is on its way." : {
+
+    },
+    "This takes a few seconds." : {
+
+    },
+    "Three quick settings" : {
+
+    },
+    "Traces" : {
+
+    },
+    "Transcribe the saved audio again, with the settings you have now" : {
+
+    },
+    "Transparency" : {
+
+    },
+    "Try again" : {
+
+    },
+    "Try it: hold" : {
+
+    },
+    "Try it: press" : {
+
+    },
+    "Turn On…" : {
+
+    },
+    "Turn on Dictation" : {
+
+    },
+    "Turn on SpeechText" : {
+
+    },
+    "Turning your speech into text…" : {
+
+    },
+    "Two quick permissions" : {
+
+    },
+    "Type the sentence below. The clock starts with your first key." : {
+
+    },
+    "Use %@" : {
+
+    },
+    "Use %lld wpm" : {
+
+    },
+    "Use as Default" : {
+
+    },
+    "Use as default" : {
+
+    },
+    "Use the average, 40 wpm" : {
+
+    },
+    "Used for %@" : {
+
+    },
+    "Used when nothing else clearly fits what you said" : {
+
+    },
+    "Version" : {
+
+    },
+    "Waiting for you to turn on SpeechText in System Settings." : {
+
+    },
+    "Want AI to tidy up your text?" : {
+
+    },
+    "We didn't hear anything" : {
+
+    },
+    "What uses it stops working until you add a key again." : {
+
+    },
+    "What you said, and what AI polish wrote from it — in any app, only the AI version is typed." : {
+
+    },
+    "Where should your speech become text?" : {
+
+    },
+    "Words are kept on this Mac. One reaches the speech engine or AI Rewrite only with a dictation — never on its own." : {
+
+    },
+    "Words dictated each day this week" : {
+
+    },
+    "Words to tidy up, or a request like “make it a list, in English”: it picks the prompt whose “When to use” fits and does what else you asked. Nothing fits? The Default does." : {
+
+    },
+    "Work in any app. Hold to talk, let go to stop. Change them any time in " : {
+
+    },
+    "Work in any app. Press once to start, again to stop. Change them any time in " : {
+
+    },
+    "Write something your way whenever it is said — “кома” as “,”, “mail sign” as your signature. Whole words, any capitals. Unlike a word above, a replacement isn't sent to the engine or AI Rewrite; it only puts the text right." : {
+
+    },
+    "Write the word the way it should appear. If SpeechText spells it wrong, add how it comes out — each of those will be replaced by it." : {
+
+    },
+    "You can add it again at any time." : {
+
+    },
+    "You can let go of the keys now — speak." : {
+
+    },
+    "You can turn this on later in Settings." : {
+
+    },
+    "You say" : {
+
+    },
+    "You speak at " : {
+
+    },
+    "You type at %lld wpm" : {
+
+    },
+    "You're all set" : {
+
+    },
+    "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac." : {
+
+    },
+    "Your key stopped working" : {
+
+    },
+    "Your languages, for better accuracy" : {
+
+    },
+    "Your own prompts and changes are replaced by the six that come with SpeechText." : {
+
+    },
+    "Your shortcuts" : {
+
+    },
+    "Your speech model is still downloading (%lld%%). You can wait here or finish setup now — we'll let you know when it's ready." : {
+
+    },
+    "Your speech model is still getting ready. We'll show a message when you can start dictating." : {
+
+    },
+    "Your speech model isn't downloaded" : {
+
+    },
+    "Your words will appear here." : {
+
+    },
+    "choose a provider" : {
+
+    },
+    "from “%@”" : {
+
+    },
+    "optional" : {
+
+    },
+    "sign in, then click **%@**." : {
+
+    },
+    "words a minute" : {
+
+    },
+    "·" : {
+
+    },
+    "· %@" : {
+
+    },
+    "—" : {
+
+    },
+    "“%@”" : {
+
+    },
+    "“%@” will be given to the speech engine and AI Rewrite, so they spell it your way." : {
+
+    },
+    "“uh so um tell John that I'm gonna be like— wait no, ten, ten minutes late I think? cause the traffic is just, ugh. yeah sorry”" : {
+
+    },
+    "→" : {
+
+    },
+    "≈ %@" : {
+
+    },
+    "⚠︎ %@" : {
+
+    },
+    "⚠︎ %@ download failed · Retry" : {
+
+    },
+    "⚠︎ Couldn't check the key — no internet connection. You can continue and we'll try again later." : {
+
+    },
+    "✓ " : {
+
+    },
+    "✓ %@" : {
+
+    },
+    "✓ %@ ready" : {
+
+    },
+    "✓ Allowed" : {
+
+    },
+    "✓ Downloaded" : {
+
+    },
+    "✓ It works!" : {
+
+    },
+    "✨ AI writes" : {
+
+    },
+    "🎉" : {
+
+    }
+  },
+  "version" : "1.0"
+}

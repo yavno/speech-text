@@ -61,6 +61,7 @@
 		A10000010000000000000008 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000008 /* HotkeyManager.swift */; };
 		A1000001000000000000000A /* DirectRecordingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000D /* DirectRecordingPanel.swift */; };
 		A1000001000000000000000D /* HotkeyRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000010 /* HotkeyRecorderView.swift */; };
+		A10000010000000000000F01 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000F01 /* Localizable.xcstrings */; };
 		A1000001000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000011 /* Assets.xcassets */; };
 		F75005000000000000000004 /* ThirdPartyNotices.txt in Resources */ = {isa = PBXBuildFile; fileRef = F75001000000000000000004 /* ThirdPartyNotices.txt */; };
 		A10000010000000000000010 /* DebugLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000013 /* DebugLogView.swift */; };
@@ -160,6 +161,7 @@
 		A2000001000000000000000C /* SpeechText.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeechText.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000001000000000000000D /* DirectRecordingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectRecordingPanel.swift; sourceTree = "<group>"; };
 		A20000010000000000000010 /* HotkeyRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyRecorderView.swift; sourceTree = "<group>"; };
+		A20000010000000000000F01 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A20000010000000000000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F75001000000000000000004 /* ThirdPartyNotices.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = ThirdPartyNotices.txt; path = Resources/ThirdPartyNotices.txt; sourceTree = "<group>"; };
 		A20000010000000000000013 /* DebugLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogView.swift; sourceTree = "<group>"; };
@@ -335,6 +337,7 @@
 				F79001000000000000000002 /* KeychainSecretStorage.swift */,
 				D20000010000000000000002 /* RecognitionSessionFactory.swift */,
 				A20000010000000000000011 /* Assets.xcassets */,
+				A20000010000000000000F01 /* Localizable.xcstrings */,
 				A2000001000000000000000A /* Info.plist */,
 				A2000001000000000000000B /* SpeechText.entitlements */,
 				F90000000000000000000009 /* LocalLlamaRuntime.swift */,
@@ -548,6 +551,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000000E /* Assets.xcassets in Resources */,
+				A10000010000000000000F01 /* Localizable.xcstrings in Resources */,
 				F75005000000000000000003 /* silero-vad-unified-256ms-v6.2.1.mlmodelc in Resources */,
 				F75005000000000000000004 /* ThirdPartyNotices.txt in Resources */,
 			);

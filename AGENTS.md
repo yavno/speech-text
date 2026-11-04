@@ -215,6 +215,8 @@ When the user names something, the word may be one they coined rather than the a
 
 Words the user reads — titles, captions, notices, VoiceOver labels — are spelled in American English ("color", "canceled", "recognize"), as macOS's own windows are, which the app shows beside its own (the color panel, System Settings). Comments, logs and these docs are not held to it.
 
+Those words live in the String Catalog, `SpeechText/SpeechText/Localizable.xcstrings`, keyed by the English text. A string literal passed to SwiftUI (`Text("…")`, `Button("…")`, …) gets there on its own: after adding or changing one, run `scripts/sync-strings.sh` and commit the catalog with the code. CI's *String Catalog matches the code* step fails when it is out of step. The rest of the rules — comments, plurals, what stays verbatim — are in docs/specs/2026-11-04-localization.md.
+
 ## Taste
 
 - Match the surrounding code: its layout, naming, comment density and idiom. The code is
