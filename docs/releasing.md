@@ -190,8 +190,11 @@ on 2026-09-28 expires in 2044.
 
 ## Cutting a release
 
-Before the tag, run `scripts/check-vendor-models.sh` on the commit being tagged
-([vendor watch](vendor-watch.md)). It must exit **0**:
+The [vendor watch](vendor-watch.md) must have passed on `main` within the last seven days:
+its Check job green, which is the script exiting **0**. The release workflow checks this
+first (*Vendor watch is green*) and stops the tag otherwise; to pass it, run the watch
+again (`gh workflow run vendor-watch.yml --ref main`) and re-run the release. The script
+exits 0 when:
 
 - **No catalogue model may be one the vendor no longer serves while it is in any state
   but `deprecated` or `retired`.** Such a model fails every dictation or rewrite that
