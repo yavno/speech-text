@@ -126,10 +126,18 @@ jobs:
             -scheme SpeechText \
             -destination 'platform=macOS' \
             -clonedSourcePackagesDirPath .swiftpm-cache \
+            -derivedDataPath "$RUNNER_TEMP/derived-data" \
             -enableCodeCoverage YES \
             -resultBundlePath "$RUNNER_TEMP/tests.xcresult" \
             CODE_SIGNING_ALLOWED=NO \
             SPT_WARNINGS_AS_ERRORS=YES
+
+      # The test build compiled the app, and with it the .stringsdata that say which
+      # strings each source file uses; the check syncs them into a copy of the
+      # catalog and fails when that changes anything (scripts/sync-strings.sh).
+      - name: String Catalog matches the code
+        if: ${{ !cancelled() }}
+        run: scripts/sync-strings.sh --check --derived-data "$RUNNER_TEMP/derived-data"
 
       - name: Coverage summary
         if: always()
