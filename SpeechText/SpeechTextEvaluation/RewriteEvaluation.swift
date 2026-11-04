@@ -749,11 +749,16 @@ enum RewriteEvaluation {
 
     // MARK: - Self-check
 
-    /// Runs the text checks on every fixture's examples. Returns the number of examples the
-    /// checks got wrong.
+    /// Runs the text checks on every fixture's examples, and holds each fixture's routing
+    /// expectations to what a router can answer. Returns the number of examples the checks
+    /// got wrong plus the number of fixtures with an expectation no answer could meet.
     static func selfCheck(_ url: URL) throws -> Int {
-        var wrong = 0, total = 0
+        var wrong = 0, total = 0, problems = 0
         for fixture in try loadFixtures(url) {
+            for problem in routingProblems(fixture) {
+                problems += 1
+                print("✗ \(fixture.id): \(problem)")
+            }
             for example in fixture.examples ?? [] {
                 total += 1
                 let verdict = RewriteChecks.check(fixture, text: example.reply, raw: example.reply)
@@ -764,8 +769,41 @@ enum RewriteEvaluation {
                       + (example.note.map { " — \($0)" } ?? ""))
             }
         }
-        print("self-check: \(total - wrong)/\(total) examples judged as expected")
-        return wrong
+        print("self-check: \(total - wrong)/\(total) examples judged as expected, \(problems) routing expectations no router could meet")
+        return wrong + problems
+    }
+
+    /// The three modes of the 2026-11 spec, which `variantModes["2026-11"]` names.
+    static let modes202611 = ["Clean-up", "Message", "Document"]
+    static let formats = ["plain", "list", "markdown"]
+
+    /// What in a fixture's routing expectations no router could answer: a mode that is
+    /// neither one of the 2026-11 three nor one of the fixture's own, a language that is
+    /// not a code, a format that is not one of the three. An edit is not routed at all.
+    static func routingProblems(_ fixture: RewriteFixture) -> [String] {
+        var problems: [String] = []
+        if fixture.isEdit {
+            if fixture.askedLanguage != nil || fixture.format != nil || fixture.variantModes?["2026-11"] != nil {
+                problems.append("an edit is not routed, so it takes no askedLanguage, format or 2026-11 modes")
+            }
+            return problems
+        }
+        let own = (fixture.presets ?? []).map(\.name)
+        if let modes = fixture.variantModes?["2026-11"] {
+            if modes.isEmpty { problems.append("no 2026-11 mode") }
+            for mode in modes where !(modes202611 + own).contains(mode) {
+                problems.append("2026-11 mode \(mode) is neither a built-in nor one of the fixture's presets")
+            }
+        }
+        if let language = fixture.askedLanguage,
+           language.count != 2 || !language.allSatisfy({ $0.isASCII && $0.isLowercase }) {
+            problems.append("askedLanguage \(language) is not an ISO 639-1 code")
+        }
+        if let format = fixture.format {
+            if format.isEmpty { problems.append("an empty format list") }
+            for name in format where !formats.contains(name) { problems.append("unknown format \(name)") }
+        }
+        return problems
     }
 
     // MARK: - Template check

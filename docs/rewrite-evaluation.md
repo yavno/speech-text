@@ -41,10 +41,12 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
     - `noCode`;
     - `minLengthRatio` / `maxLengthRatio`;
     - and, always: no preamble, no leaked marker, no reasoning, not wrapped in quotes.
-  - **Modes**: `modes` for `current` (the first is the expected one), `variantModes` for any other variant, since a variant may rename or merge them.
+  - **Modes**: `modes` for `current` (the first is the expected one), `variantModes` for another set of modes, since a variant may rename or merge them. `variantModes["2026-11"]` holds the three modes of the 2026-11-03 spec (Clean-up, Message, Document), Clean-up alone in an editor, a terminal or an AI's field, and the fixture's own `presets` by name.
+  - **The route**, for the variants that pick a mode and its modifiers first: `askedLanguage`, an ISO 639-1 code (absent when the dictation asks for no language), and `format`, the formats a right answer may pick (`plain`, `list`, `markdown`; absent means plain). An edit is not routed and has neither.
+- **The user's own prompts:** `presets` (name, when to use, instructions), for a variant that sends them beside the built-ins. `current` sends the built-ins alone.
 - **Examples:** `examples`, replies written by hand that the checks must pass or fail.
 
-`--self-check` runs the checks on every example and asks no model. The script runs it first and stops on a mismatch.
+`--self-check` runs the checks on every example, holds every routing expectation to what a router can answer, and asks no model. The script runs it first and stops on a mismatch.
 
 A check must almost never fail a good answer, so the strict ones are opt-in per fixture, and anything fuzzy is left to the judge. Where today's prompt contradicts itself, a fixture asserts the behaviour the specific rule asks for. In a terminal, an instruction is written down, not turned into a command.
 
