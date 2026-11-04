@@ -39,6 +39,12 @@ KEY_MARKER = "<!-- vendor-watch:key=%s -->"
 HASH_MARKER = "<!-- vendor-watch:hash=%s -->"
 KEY_IN_BODY = re.compile(r"<!-- vendor-watch:key=(.+?) -->")
 IGNORE = "vendor-watch:ignore"
+
+
+def silenced(comment):
+    """A person's `vendor-watch:ignore`. The watch's own comments name the phrase too, in
+    their closing line, and always carry the hash marker: those never count."""
+    return IGNORE in comment and "<!-- vendor-watch:hash=" not in comment
 # Listed in the summary, never filed.
 SUMMARY_ONLY = {"new_repository"}
 # A run that would open more than this is wrong somewhere: the rest go to the summary.
@@ -156,7 +162,7 @@ def plan(findings, issues):
         if known:
             issue = known[0]
             texts = [issue.get("body") or ""] + issue.get("comments", [])
-            if "wontfix" in issue.get("labels", []) or any(IGNORE in c for c in issue.get("comments", [])):
+            if "wontfix" in issue.get("labels", []) or any(silenced(c) for c in issue.get("comments", [])):
                 actions.append(("ignored", key, entries, issue["number"]))
                 continue
             if any(said in t for t in texts):
@@ -191,8 +197,9 @@ def label_issues(repo):
         body = issue.get("body") or ""
         comments = []
         if KEY_IN_BODY.search(body) and issue.get("comments"):
-            comments = [c["body"] or "" for c in
-                        json.loads(gh("api", "repos/%s/issues/%d/comments?per_page=100" % (repo, issue["number"])))]
+            pages = json.loads(gh("api", "--paginate", "--slurp",
+                                  "repos/%s/issues/%d/comments?per_page=100" % (repo, issue["number"])))
+            comments = [c["body"] or "" for page in pages for c in page]
         out.append({"number": issue["number"], "state": issue["state"], "body": body, "comments": comments,
                     "labels": [label["name"] for label in issue.get("labels", [])]})
     return sorted(out, key=lambda i: -i["number"])

@@ -68,6 +68,15 @@ class Plan(unittest.TestCase):
         self.assertEqual(actions([new], [issue(39, [old], state="closed", comments=["vendor-watch:ignore"])]),
                          [("ignored", new["key"], 39)])
 
+    def test_the_watch_s_own_comment_does_not_silence_a_key(self):
+        # Every comment the watch writes ends by naming `vendor-watch:ignore`.
+        old, middle, new = finding(), finding(details="changed"), finding(details="changed again")
+        own = "The vendor watch found something new:\n\n" + fi.text(middle["key"], [middle], None,
+                                                                      fi.finding_hash([middle]))
+        self.assertIn(fi.IGNORE, own)
+        self.assertEqual(actions([new], [issue(39, [old], state="closed", comments=[own])]),
+                         [("open", new["key"], 39)])
+
     def test_findings_with_one_key_are_one_issue(self):
         a = finding("openAI/gpt-6-luna", "deprecation_listed", "listed")
         b = finding("openAI/gpt-6-luna", "page_mention", "named")
