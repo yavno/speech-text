@@ -12,7 +12,7 @@
 #
 #   --engines groq/openai/gpt-oss-120b,anthropic/claude-haiku-5-5,…   (default: the six of #114)
 #   --fixtures id,…        --repeat n        --judge provider/model,…
-#   --reasoning-effort default|omit|<value>  --variant current  --concurrency n
+#   --reasoning-effort default|omit|<value>  --variant current|2026-11  --concurrency n
 #
 # Keys: GROQ_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY from the environment, or else from
 # ~/.config/speech-text/test-keys.env. A model on this Mac needs SPEECHTEXT_LLM_MODELS, the
