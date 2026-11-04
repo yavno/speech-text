@@ -56,7 +56,7 @@ struct RewriteFixture: Codable, Sendable {
     /// The modes a right answer may report under today's prompt; the first is the expected one.
     var modes: [String]
     /// The same for another set of modes, by its name. `2026-11` is the three of
-    /// docs/specs/2026-11-03-rewrite-modes-and-router.md — Clean-up, Message, Document — and
+    /// docs/specs/2026-11-03-rewrite-modes-and-router.md — Clean-up, Message, Structured — and
     /// the names of the fixture's own `presets`; every variant built on them looks there.
     var variantModes: [String: [String]]?
     /// What the first step should find, for the variants that route (2026-11). The language

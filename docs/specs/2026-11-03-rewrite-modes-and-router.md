@@ -41,24 +41,24 @@ The cleaned one-step prompt (#109) uses the same modes and rules. Whether two st
 |---|---|---|---|
 | 01 | **Clean-up** (default) | The user dictated the text itself and asked for no other kind of text. | Write down what was said as finished text: fix recognition errors, punctuation, capitals and paragraphs; drop fillers, false starts and repeats. Keep the user's words and order of thought, and their language unless they asked for another. Add nothing, and add no structure that was not asked for. |
 | 03 | **Message** | An email, letter, chat message or reply addressed to someone. | The register asked for, else polite and natural for the app. A greeting and sign-off only where the form calls for them. Invent no names, dates or facts; leave a `[placeholder]`. |
-| 05 | **Document** (working name) | The user asked for a text with a form of its own: notes, a summary, a list, a plan or an outline; a commit message, a PR or ticket description, a bug report; or a prompt for an AI written anywhere but that AI's own prompt field. | The usual form of that text: compact `- ` points grouped by topic, in the order said; an imperative commit subject; problem, steps, expected result; a prompt as explicit steps. Headings only when asked for. Keep identifiers, paths and commands exactly. No padding. |
+| 05 | **Structured** | The user asked for a text with a form of its own: notes, a summary, a list, a plan or an outline; a commit message, a PR or ticket description, a bug report; or a prompt for an AI written anywhere but that AI's own prompt field. | The usual form of that text: compact `- ` points grouped by topic, in the order said; an imperative commit subject; problem, steps, expected result; a prompt as explicit steps. Headings only when asked for. Keep identifiers, paths and commands exactly. No padding. |
 
 The exact wording is settled in #109 against the budget tests. This table fixes what each mode is for and where its edges are.
 
 Three built-ins leave:
 - **02 Rewrite / Draft.** Writing it better, longer, shorter or in another tone can be done to any kind of text, so it becomes a modifier (D2).
 - **04 Translate.** A language is a modifier too (D2).
-- **06 Technical / Prompt** merges into 05, which becomes Document. Notes and a commit message are both a text with a form of its own, and the router confused the two (the owner's call, 2026-11-03).
+- **06 Technical / Prompt** merges into 05, which becomes Structured. Notes and a commit message are both a text with a form of its own, and the router confused the two (the owner's call, 2026-11-03).
 
 The IDs 02, 04 and 06 are never reused. The user's own prompts stay modes, as they are now.
 
-No standard name covers notes, summaries and technical texts at once. The mode is called *Document* for now. Once its prompt is written (#109), a better name is proposed to the owner, and the rename lands before it ships.
+No standard name covers notes, summaries and technical texts at once. The mode is called *Structured*, for what it does: it gives the text the form that kind of text has (the owner's call, 2026-11-04, after the prompt of #109 was written as *Document*). The name is read by the model, so the measurement of #109 is repeated with it.
 
 This departs from #104, which listed six modes, Rewrite and *AI prompt* among them:
 - Rewrite is a modifier for the reason above.
-- A prompt for an AI is either text dictated *into* an AI's field, which is Clean-up by D3, or a prompt written elsewhere, which is Document.
+- A prompt for an AI is either text dictated *into* an AI's field, which is Clean-up by D3, or a prompt written elsewhere, which is Structured.
 
-Document keeps the word "summary" in its *When to use*. `TextRefinementService.isSummarising` reads it there to let a summary shrink the text, and without it the Record Window's collapse guard would refuse summaries (see *Code the rename touches*). A commit message written from a long dictation may then shrink too, which is right for it.
+Structured keeps the word "summary" in its *When to use*. `TextRefinementService.isSummarising` reads it there to let a summary shrink the text, and without it the Record Window's collapse guard would refuse summaries (see *Code the rename touches*). A commit message written from a long dictation may then shrink too, which is right for it.
 
 **D2 — Modifiers are rules of our prompt, applied on top of any mode.**
 
@@ -112,7 +112,7 @@ This rule has three consequences:
 
    On this Mac the service saves two states today (`LlamaModel.savedPrefixes = 2`): the dictation's system prompt and the Edit shortcut's. The limit grows to hold the step-one prompt, the Edit prompt and one prompt per mode.
 2. **`contextSection` loses two clauses:** "editor or terminal → code or a command" and "AI prompt → a clear prompt". They are the contradiction the harness spec named.
-3. **Document's *When to use* does not mention an instruction meant for an AI coding tool,** as today's Technical / Prompt does.
+3. **Structured's *When to use* does not mention an instruction meant for an AI coding tool,** as today's Technical / Prompt does.
 
 **D4 — The language: what was asked for, else what was dictated. Code decides when asking means nothing.**
 - A language asked for in the dictation wins.
@@ -212,7 +212,7 @@ The marker stays in the one-step prompt, because the mode is still the model's c
 
 `load()` returns the stored list as it is. A user who ever saved a prompt therefore keeps the old built-ins, and the new ones would reach only users who never edited anything. A one-time migration runs at launch (`promptPresetsVersion`):
 
-- **A built-in left as it shipped** is replaced by the new text and name: 01 Clean-up, 03 Message, 05 Document.
+- **A built-in left as it shipped** is replaced by the new text and name: 01 Clean-up, 03 Message, 05 Structured.
   - "As it shipped" means equal to *any* text that built-in ever had. The stored copy holds whatever text was current when the user saved. Git history holds four distinct texts of the built-ins, across the file's three paths (`VoicePeter/`, `SpeechText/SpeechText/`, `Packages/SpeechTextCore/`):
     - `71edce8` (2026-08-26), the one v0.9.x shipped from the archived repository;
     - `545f058` (2026-10-01);
@@ -250,7 +250,7 @@ The `<<mode:…>>` marker stays. It costs one line and is History's only label f
 
 **D12 — The fixtures measure the router, in the repository.**
 - **Mode expectations:** `modes` keeps today's names for `current` (harness D3). The new names go in `variantModes`.
-- **Editor fixtures:** a fixture in an editor, terminal or AI field that accepts Technical or Clean-up today accepts only Clean-up under the new modes. Fixtures that accept Notes / Bullets or Technical / Prompt elsewhere accept Document.
+- **Editor fixtures:** a fixture in an editor, terminal or AI field that accepts Technical or Clean-up today accepts only Clean-up under the new modes. Fixtures that accept Notes / Bullets or Technical / Prompt elsewhere accept Structured.
 - **One fixture with a prompt of the user's own** in an editor field checks that the mode is still offered there (D3). Fixtures may carry `presets` for this.
 - **Language and format:** the expectations for the asked language and the format exist so far only in the private spike script. They become fixture fields, `askedLanguage` (default none) and `format` (default plain, or a set). A `route` variant can then score step one alone with the committed harness, with no private script.
 - **The language options** depend on `spokenLanguages` (D4), so the `route` variant runs with a stated list, `--spoken-languages uk,en` by default. A fixture may set its own.
@@ -282,7 +282,7 @@ If the predictions hold, the strongest local models would be left with one or tw
 
 ## Code the rename touches
 
-- `TextRefinementService.isSummarising` reads "summar" / "підсум" in a preset's name and *When to use*. Document keeps "summary" (D1), and `RefinementTests` checks that Document is the one summarising built-in.
+- `TextRefinementService.isSummarising` reads "summar" / "підсум" in a preset's name and *When to use*. Structured keeps "summary" (D1), and `RefinementTests` checks that Structured is the one summarising built-in.
 - The budget and rule tests are rewritten in #109:
   - `testTheBuiltInPromptsStayCompact`;
   - `testTheRoutingPromptStaysWithinItsBudget` (1700 / 2100);
@@ -318,7 +318,7 @@ On 2026-11-03, the owner gave these answers. Each is written into the decision i
 3. **Step one's timeout is 2 s** (D6).
 4. **In an editor, a terminal or an AI field the user's own modes are still offered;** only the built-ins and the modifiers are ruled out (D3).
 5. **Clean-up keeps the dictated language unless another was asked for** (D1).
-6. **The merged mode is called Document for now;** a new name is proposed once its prompt is written (D1).
+6. **The merged mode is called Structured** (2026-11-04, after #109's prompt was written as Document; D1).
 7. **Length and tone get no router questions** (D2).
 8. **The Edit prompt keeps its `<<mode:…>>` marker** (D11).
 9. **OneJev 0.8B and 4B are offered as local step-one models** (2026-11-04, D6, #152).

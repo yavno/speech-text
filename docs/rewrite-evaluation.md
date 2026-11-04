@@ -25,7 +25,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 `--variant 2026-11` is the one-step prompt on the modes of the 2026-11-03 spec (#109, `RewriteModes`), which the app does not send yet:
 
-- the three modes, Clean-up, Message and Document, with the fixture's own `presets` beside them;
+- the three modes, Clean-up, Message and Structured, with the fixture's own `presets` beside them;
 - language, format, length and tone as rules on top of any mode;
 - in an editor, a terminal or an AI's field, Clean-up alone, chosen by code and sent with no marker; with `presets`, Clean-up and those, picked by the model. The summary counts the rows code decided apart from the routing (`+n by code`);
 - an edit, exactly what `current` sends.
@@ -48,7 +48,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
     - `noCode`;
     - `minLengthRatio` / `maxLengthRatio`;
     - and, always: no preamble, no leaked marker, no reasoning, not wrapped in quotes.
-  - **Modes**: `modes` for `current` (the first is the expected one), `variantModes` for another set of modes, since a variant may rename or merge them. `variantModes["2026-11"]` holds the three modes of the 2026-11-03 spec (Clean-up, Message, Document), Clean-up alone in an editor, a terminal or an AI's field, and the fixture's own `presets` by name.
+  - **Modes**: `modes` for `current` (the first is the expected one), `variantModes` for another set of modes, since a variant may rename or merge them. `variantModes["2026-11"]` holds the three modes of the 2026-11-03 spec (Clean-up, Message, Structured), Clean-up alone in an editor, a terminal or an AI's field, and the fixture's own `presets` by name.
   - **The route**, for the variants that pick a mode and its modifiers first: `askedLanguage`, an ISO 639-1 code (absent when the dictation asks for no language), and `format`, the formats a right answer may pick (`plain`, `list`, `markdown`; absent means plain). An edit is not routed and has neither.
 - **The user's own prompts:** `presets` (name, when to use, instructions), for a variant that sends them beside the built-ins. `current` sends the built-ins alone.
 - **Examples:** `examples`, replies written by hand that the checks must pass or fail.

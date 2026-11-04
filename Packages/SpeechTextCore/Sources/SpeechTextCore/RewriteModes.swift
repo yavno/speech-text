@@ -16,7 +16,7 @@ public enum RewriteModes {
     public static let cleanUpName = "Clean-up"
 
     /// D1. The IDs are the built-ins' own: 01 and 03 keep their place, 05 becomes
-    /// Document; 02, 04 and 06 are never reused. Document keeps "summary" in its *When
+    /// Structured; 02, 04 and 06 are never reused. Structured keeps "summary" in its *When
     /// to use*, which `TextRefinementService.isSummarising` reads.
     public static let builtIns: [PromptPreset] = [
         PromptPreset(
@@ -39,7 +39,7 @@ public enum RewriteModes {
         ),
         PromptPreset(
             id: fixedID("05"),
-            name: "Document",
+            name: "Structured",
             whenToUse: """
             A text with a form of its own: notes, a summary, a list, a plan or an outline; \
             a commit message, a PR or ticket description, a bug report; a prompt for an AI.
