@@ -4,7 +4,7 @@ When a vendor switches a model off, our release moves users off it. That only wo
 know weeks in advance, from the vendor rather than from a "Transcription failed" in
 someone's History. Two things keep us informed. One is a script that compares the
 catalogues with each vendor's own API, looks each model up on the vendor's deprecation
-page, and shows what is new on its changelog. The other is a weekly workflow that runs the
+page, and shows what is new on its changelog. The other is a daily workflow that runs the
 script and files an issue when something changed. Neither uses a language model: what the
 script finds is decided by code, and what a changelog line means is left to a person.
 
@@ -137,7 +137,7 @@ decided by the script: it shows the new lines (`TEXT_PAGES`), and a person reads
 
 ## The workflow
 
-`.github/workflows/vendor-watch.yml` runs the script on GitHub's machines every Monday
+`.github/workflows/vendor-watch.yml` runs the script on GitHub's machines every day
 (06:17 UTC), and by hand from `main` (`gh workflow run vendor-watch.yml --ref main`).
 
 - **Check** (a hosted Mac) builds `SpeechTextEvaluation` and exports the catalogues on the
@@ -165,4 +165,4 @@ decided by the script: it shows the new lines (`TEXT_PAGES`), and a person reads
   gate then stops the next tag instead of releasing on old results.
 - **Reading a run.** The report is the run's summary; the issues it filed or commented on
   are listed under it. The lines new on the vendors' pages are not filed unless they name
-  a catalogue model with a lifecycle word: someone reads them each week.
+  a catalogue model with a lifecycle word: someone reads them.
