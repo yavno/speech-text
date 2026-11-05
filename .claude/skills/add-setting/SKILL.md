@@ -1,6 +1,6 @@
 ---
 name: add-setting
-description: Add or change a user setting in SpeechText — a new UserDefaults key, its default, whether it survives a rename (SettingsKeys.portable), its control in Settings and its row in AGENTS.md's Settings Keys Reference. Use it whenever a change adds a toggle, picker, option or preference, renames or retires a settings key, or changes a default, even if the user only says "make it configurable" or "add an option for…".
+description: Add or change a user setting in SpeechText — a new UserDefaults key, its default, whether it survives a rename (SettingsKeys.portable), its control in Settings and its row in docs/settings-keys.md. Use it whenever a change adds a toggle, picker, option or preference, renames or retires a settings key, or changes a default, even if the user only says "make it configurable" or "add an option for…".
 ---
 
 # Add a setting
@@ -27,8 +27,8 @@ workflow; a new setting needs an agreed issue first. Then:
    that takes the value as a parameter, so a test can call it without `UserDefaults`.
 7. **Changing or retiring a key.** Never reuse a key for a different meaning. Move the
    old value once at launch (the `migrate…IfNeeded` functions are the pattern) and say
-   in its `AGENTS.md` row when the old key is read and when it is deleted.
-8. **Docs.** A row in `AGENTS.md` › Settings Keys Reference (key, purpose, default), its
+   in its `docs/settings-keys.md` row when the old key is read and when it is deleted.
+8. **Docs.** A row in `docs/settings-keys.md` (key, purpose, default), its
    entry in `docs/decisions.md` if a decision changed, `CHANGELOG.md` under `[Unreleased]`.
 
 Tests: the decision function's cases and the `portable` set. In *Needs a real-app run*,

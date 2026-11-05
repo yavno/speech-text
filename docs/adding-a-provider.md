@@ -253,10 +253,10 @@ Read the streaming entries in docs/decisions.md › Key patterns first. The rule
   edit; the test bundle compiles no app file, so anything a test needs goes there too. Test
   request builders and parsers as pure functions; realtime vendors get a
   `DictationReplay` script with a drop and a `Vendor` case in the realtime contract tests.
-- Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md, AGENTS.md (Settings Keys
-  table), CHANGELOG. What only a person can check — a live socket
-  from a microphone, a real key against the service — goes under *Needs a real-app run*
-  in the pull request.
+- Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md,
+  docs/settings-keys.md, CHANGELOG. What only a person can check — a live socket from a
+  microphone, a real key against the service — goes under *Needs a real-app run* in the
+  pull request.
 
 ## 9. Keeping this guide true
 
@@ -311,6 +311,6 @@ key      | Packages/SpeechTextCore/Sources/SpeechTextCore/SetupServices.swift   
 key      | docs/development.md                                                        | ## API keys                            | manual      | the list of keys
 docs     | docs/privacy.md                                                            | # Where your audio goes                | manual      | the privacy list, the engine table and the AI Rewrite paragraph
 docs     | SECURITY.md                                                                | The privacy practices of               | manual:file | add the vendor
-docs     | AGENTS.md                                                                  | ## Settings Keys Reference             | manual      | the new keys
+docs     | docs/settings-keys.md                                                      | # Settings keys                        | manual      | the new keys
 docs     | CHANGELOG.md                                                               | ## [Unreleased]                        | manual:file | an Added entry
 ```

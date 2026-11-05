@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: plan-a-new-toggle
 expected_outcome: |
-  A complete checklist: key, default, portable and its pinned test, control, AGENTS.md row, CHANGELOG, tests without UserDefaults.
+  A complete checklist: key, default, portable and its pinned test, control, docs/settings-keys.md row, CHANGELOG, tests without UserDefaults.
 context:
   scaffold_script: place-repo.sh

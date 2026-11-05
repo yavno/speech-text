@@ -10,7 +10,7 @@ Closes #
 
 - [ ] Tests added or updated — or, if none are possible, why not: 
 - [ ] `CHANGELOG.md` has an entry under `[Unreleased]` if users will notice the change
-- [ ] `AGENTS.md`, `docs/decisions.md` and the docs are updated if a rule, a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers)
+- [ ] `AGENTS.md`, `docs/decisions.md`, `docs/settings-keys.md` and the docs are updated if a rule, a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers)
 
 **Privacy** — does this send, store or log user text or audio anywhere new?  
 <!-- Yes / No. If yes: what, where, and why it is needed. -->
