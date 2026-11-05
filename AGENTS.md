@@ -218,6 +218,9 @@ by the English text:
 - After adding or changing a string literal passed to SwiftUI (`Text("…")`, `Button("…")`,
   …), run `scripts/sync-strings.sh` and commit the catalog with the code; CI fails when
   the two are out of step.
+- The permission prompts and the copyright line are in `Info.plist` and again, as
+  their English source, in `InfoPlist.xcstrings`; change both together
+  (`scripts/check-infoplist-strings.sh`).
 - The rest — comments, plurals, what stays verbatim — is in
   docs/specs/2026-11-04-localization.md.
 

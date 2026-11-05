@@ -257,6 +257,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: scripts/check-log-privacy.sh
 
+      # The permission prompts' English lives in Info.plist and again in
+      # InfoPlist.xcstrings, beside their translations; xcodebuild does not sync the two.
+      - name: Info.plist strings
+        if: ${{ !cancelled() }}
+        run: scripts/check-infoplist-strings.sh
+
       # Packages/SpeechTextCore is the logic the tests reach without the app,
       # so no file there may import SwiftUI — a system framework its manifest cannot
       # refuse. The engines are a build error there already and are checked anyway.
