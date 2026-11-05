@@ -251,6 +251,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: scripts/check-provider-guide.sh
 
+      # docs/settings-keys.md has a row for every key in SettingsKeys, and no row
+      # for a key that was renamed or retired.
+      - name: Settings keys
+        if: ${{ !cancelled() }}
+        run: scripts/check-settings-keys.sh
+
       # Every Debug Log entry also goes to the system log as public, so a dlog
       # line may say how long a dictation is, never what it says.
       - name: Log privacy
