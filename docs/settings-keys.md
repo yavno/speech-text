@@ -23,7 +23,7 @@ across a bundle-identifier rename.
 | `hotkeyKeyCode` / `hotkeyModifierFlags` | Inline recording hotkey | `12` (Q) / Control+Shift |
 | `recordWindowHotkeyKeyCode` / `recordWindowHotkeyModifierFlags` | Record window hotkey | `13` (W) / Control+Shift |
 | `aiHotkeyKeyCode` / `aiHotkeyModifierFlags` | AI recording hotkey | `0` (A) / Control+Shift |
-| `holdToTalk` | Holding a dictation shortcut records until it is let go (a lone tap cancels, a double tap locks it on hands-free); for the Edit shortcut, a hold is the instruction and a double tap sends none | `false` |
+| `holdToTalk` | Holding a dictation shortcut records until it is let go (a lone tap cancels, a double tap locks it on hands-free); for the Edit shortcut, a hold is the instruction and a double tap sends none. Setup stores `true` when the key is absent, so a new install starts on hold | `false` |
 | `escapeCancelsDictation` | ⎋ cancels a dictation or an edit while the overlay is up; global for that time, so ⎋ reaches no other app | `false` |
 | `editHotkeyKeyCode` / `editHotkeyModifierFlags` | Edit-selection-with-AI hotkey | `14` (E) / Control+Shift |
 | `hotkeyLayoutVersion` | Shortcut-layout migration marker | `0` (unmigrated) |
@@ -49,8 +49,8 @@ across a bundle-identifier rename.
 | `typingWordsPerMinute` | The user's typing speed, which Usage's and Home's time saved weigh dictation against; below 10 or absent means 40 wpm, an average | absent |
 | `microphone` | The microphone a dictation records from: empty for Automatic, `"system"` for System Default, otherwise a Core Audio device UID. Machine-local, not in `portable` | `""` |
 | `microphoneName` | The picked device's name, so the picker can name it while it is not connected. Machine-local | absent |
-| `modelMigrations` | Stored model choices the launch moved to a replacement or cleared (JSON `[ModelMigration]`, newest last, at most 20), for the next dictation's notice. Machine-local, not in `portable` | absent |
-| `modelNoticesShown` | Model IDs whose lifecycle notice was shown. Machine-local | absent |
+| `modelMigrations` | Stored model choices the launch moved to a replacement or cleared (JSON `[ModelMigration]`, newest last, at most 20): a move is told once, at the next dictation; a cleared choice refuses each dictation with a notice until the user picks a model. Machine-local, not in `portable` | absent |
+| `modelNoticesShown` | The IDs of lifecycle notices already shown (`ModelNotice.id`, such as `moved:<key>:<old model>`), so each is told once. Machine-local | absent |
 | `microphoneNoticeShown` | The one-time notice that Automatic recorded with the Mac's microphone instead of Bluetooth headphones was shown. Machine-local | `false` |
 | `overlayOrigin` | Where the user dragged the inline overlay: the strip's bottom-left corner as `"x,y"` in screen coordinates; empty means the bottom-right corner. Machine-local, not in `portable` | `""` |
 | `recordDictationTraces` | Debug Log › Record traces: save each streamed inline dictation to `Traces/` (dictated text in plain text); machine-local, not in `portable` | `false` |

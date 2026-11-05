@@ -139,8 +139,8 @@ app the e2e run cannot read back — goes under *Needs a real-app run* in the pu
 
 The test bundle is standalone — no `TEST_HOST`, no `@testable import` of the app: the
 app is a menu bar agent that asks for the microphone at launch, so hosting tests in it
-would hang a headless run. What a test needs lives in `Packages/SpeechTextCore`, `public`
-where the app calls it; a file there needs no `project.pbxproj` edit, never reaches into
+would hang a headless run. What a test needs lives in `Packages/SpeechTextCore/Sources/SpeechTextCore/`,
+`public` where the app calls it; a file there needs no `project.pbxproj` edit, never reaches into
 views, `AppState` or `SpeechEngine`, and imports neither SwiftUI nor an engine (CI's
 *Core imports*). docs/development.md › Tests has the rest, and
 [docs/test-coverage.md](docs/test-coverage.md) says which test covers what.
@@ -184,8 +184,9 @@ walks it), and update that guide in any PR that changes the provider abstraction
 - **Rewrite, do not append.** When a decision changes, replace its text; a paragraph
   that grows a "but now…" every release reads as history, and history is in git.
 - **The code wins.** Where a doc and the code disagree, fix the doc in the same PR.
-- A change to the provider abstractions updates docs/adding-a-provider.md; a settings key,
-  [docs/settings-keys.md](docs/settings-keys.md); a user-facing change, CHANGELOG.md.
+- A change to the provider abstractions updates docs/adding-a-provider.md; a settings-key
+  change updates [docs/settings-keys.md](docs/settings-keys.md); a user-facing change
+  updates CHANGELOG.md.
 
 ## Plans and work artifacts
 
@@ -197,7 +198,8 @@ anything holding dictated words stay outside the repository.
 
 - `SpeechText/SpeechText/` — the app: views, `AppState`, `SpeechEngine`, capture, the
   hotkeys, the engine runtimes, the stores.
-- `Packages/SpeechTextCore/` — the logic, and everything a test needs.
+- `Packages/SpeechTextCore/Sources/SpeechTextCore/` — the logic, and everything a test
+  needs; `Sources/ChatTemplates/` is a product of its own.
 - `SpeechText/SpeechTextLLM/` — the XPC service that runs AI Rewrite on this Mac;
   `Packages/LlamaBinary/` is the llama.cpp it links, prebuilt and pinned.
 
