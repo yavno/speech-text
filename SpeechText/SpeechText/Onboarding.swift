@@ -45,7 +45,7 @@ final class DictationTest {
             case .typed(let text):
                 rewrite = .wrote(said: text, text: text)
                 return
-            case .nothingHeard: reason = "We didn't hear anything."
+            case .nothingHeard: reason = String(localized: "We didn't hear anything.")
             case .failed(let message): reason = message
             }
             rewrite = .failed(said: "", reason: reason)
@@ -317,7 +317,7 @@ final class OnboardingModel {
         speechModelID = id
     }
 
-    var speechPrimaryTitle: String {
+    var speechPrimaryTitle: LocalizedStringKey {
         guard speechPath == .local, !speechUsesApple else { return "Continue" }
         switch store.state(for: speechModelID) {
         case .notInstalled: return "Download and continue"
@@ -381,7 +381,7 @@ final class OnboardingModel {
         aiPath = path
     }
 
-    var aiPrimaryTitle: String {
+    var aiPrimaryTitle: LocalizedStringKey {
         guard aiPath == .local, let chat = localChatModel(id: aiModelID) else { return "Continue" }
         switch chatStore.state(for: chat) {
         case .installed, .downloading, .optimizing: return "Continue"
@@ -670,8 +670,8 @@ final class OnboardingModel {
                     try? await Task.sleep(for: .seconds(1))
                 }
                 guard store.state(for: id) == .installed else { return }
-                appState.showStatus(icon: "checkmark.circle.fill", title: "SpeechText is ready",
-                                    detail: "Press \(shortcutText(for: .inline)) to dictate.",
+                appState.showStatus(icon: "checkmark.circle.fill", title: String(localized: "SpeechText is ready"),
+                                    detail: String(localized: "Press \(shortcutText(for: .inline)) to dictate."),
                                     tint: Semantic.confirmation, duration: 8)
             }
         }

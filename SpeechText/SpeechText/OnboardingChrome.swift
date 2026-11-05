@@ -336,7 +336,7 @@ struct SetupStepsBar: View {
         let state = state(of: step)
         let label = HStack(spacing: 6) {
             StepDot(state: state)
-            Text(step.title)
+            Text(verbatim: step.title)
                 .font(.system(size: 12, weight: state == .current ? .semibold : .regular))
                 .foregroundStyle(state == .current ? SetupColor.label : state == .done ? SetupColor.label2 : SetupColor.label3)
                 .fixedSize()
@@ -473,7 +473,7 @@ struct SetupInlineLinkStyle: ButtonStyle {
 /// The way past a step — one text button everywhere: bolder and in the step's colour so it
 /// reads as clickable, never a capsule that would compete with Back and Continue.
 struct SetupSkipButton: View {
-    let title: String
+    let title: LocalizedStringKey
     let action: () -> Void
 
     var body: some View {
@@ -643,7 +643,7 @@ struct SetupRow<Detail: View>: View {
                     Text(title).font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(dimmed ? SetupColor.label2 : SetupColor.label)
                     if let subtitle {
-                        Text("· \(subtitle)").font(.system(size: 13)).foregroundStyle(SetupColor.label2)
+                        Text(verbatim: "· \(subtitle)").font(.system(size: 13)).foregroundStyle(SetupColor.label2)
                     }
                     if let badge { badge.padding(.leading, 4) }
                     if let languageBadge { languageBadge.padding(.leading, badge == nil ? 4 : 0) }
@@ -742,7 +742,7 @@ struct SetupKeyBlock: View {
     var collapsedText: String?
     var compact = false
     @State private var draft = ""
-    @State private var pasteHint: String?
+    @State private var pasteHint: LocalizedStringKey?
     @FocusState private var focused: Bool
     @Environment(\.setupTint) private var tint
 
@@ -755,7 +755,7 @@ struct SetupKeyBlock: View {
                 .font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
                 .padding(.bottom, 2)
             if let collapsedText {
-                statusLine(.ok, text: "✓ \(collapsedText)")
+                statusLine(.ok, text: Text(verbatim: "✓ \(collapsedText)"))
             } else {
                 Text("A key is like a password that lets SpeechText use your account.")
                     .font(.system(size: 11.5)).foregroundStyle(SetupColor.label2)
@@ -807,7 +807,7 @@ struct SetupKeyBlock: View {
         let shape = RoundedRectangle(cornerRadius: 9)
         HStack(spacing: 6) {
             if entry.status.isLocked {
-                Text(mask(entry.value))
+                Text(verbatim: mask(entry.value))
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(SetupColor.label)
                     .lineLimit(1)
@@ -848,15 +848,15 @@ struct SetupKeyBlock: View {
     private var status: some View {
         Group {
             if let pasteHint, entry.status == .empty {
-                statusLine(.plain, text: pasteHint)
+                statusLine(.plain, text: Text(pasteHint))
             } else {
                 switch entry.status {
-                case .empty: statusLine(.plain, text: "")
-                case .waiting: statusLine(.plain, text: "Waiting for your key… Copy it on the website and come back.", spinner: true)
-                case .found: statusLine(.plain, text: "Found a key on your clipboard.", spinner: true)
-                case .checking: statusLine(.plain, text: "Checking your key…", spinner: true)
-                case .valid: statusLine(.ok, text: "✓ Your key works.")
-                case .invalid: statusLine(.bad, text: "✗ This key didn't work. Copy it again from the website — make sure you copied all of it.")
+                case .empty: statusLine(.plain, text: Text(verbatim: ""))
+                case .waiting: statusLine(.plain, text: Text("Waiting for your key… Copy it on the website and come back."), spinner: true)
+                case .found: statusLine(.plain, text: Text("Found a key on your clipboard."), spinner: true)
+                case .checking: statusLine(.plain, text: Text("Checking your key…"), spinner: true)
+                case .valid: statusLine(.ok, text: Text("✓ Your key works."))
+                case .invalid: statusLine(.bad, text: Text("✗ This key didn't work. Copy it again from the website — make sure you copied all of it."))
                 case .offline:
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("⚠︎ Couldn't check the key — no internet connection. You can continue and we'll try again later.")
@@ -872,10 +872,10 @@ struct SetupKeyBlock: View {
         .padding(.top, 7)
     }
 
-    private func statusLine(_ tone: Tone, text: String, spinner: Bool = false) -> some View {
+    private func statusLine(_ tone: Tone, text: Text, spinner: Bool = false) -> some View {
         HStack(alignment: .top, spacing: 6) {
             if spinner { SetupSpinner().padding(.top, 1) }
-            Text(text)
+            text
                 .font(.system(size: 11.5, weight: tone == .ok ? .medium : .regular))
                 .foregroundStyle(tone == .ok ? SetupColor.ok : tone == .bad ? SetupColor.danger
                                  : tone == .warn ? SetupColor.warn : SetupColor.label2)
@@ -901,7 +901,7 @@ struct SetupTaskPill: View {
         let size: String
         let phase: Phase
         /// How long "Getting ready" takes, as the Try it step says it too.
-        var preparation = "a few minutes"
+        var preparation = String(localized: "a few minutes")
     }
 
     private var tasks: [Task] {
@@ -915,7 +915,7 @@ struct SetupTaskPill: View {
             case .notInstalled: nil
             }
             if let phase {
-                tasks.append(Task(id: "speech", label: "Speech model", name: speech.displayName,
+                tasks.append(Task(id: "speech", label: String(localized: "Speech model"), name: speech.displayName,
                                   size: speech.downloadSizeDescription, phase: phase,
                                   preparation: preparationEstimate(speech)))
             }
@@ -929,7 +929,7 @@ struct SetupTaskPill: View {
             case .notInstalled: nil
             }
             if let phase {
-                tasks.append(Task(id: "ai", label: "AI model", name: chat.displayName,
+                tasks.append(Task(id: "ai", label: String(localized: "AI model"), name: chat.displayName,
                                   size: chat.downloadSizeDescription, phase: phase))
             }
         }
@@ -1003,7 +1003,7 @@ struct SetupTaskPill: View {
             ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
                 if index > 0 { Divider() }
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(task.label) — \(task.name)\(task.size.isEmpty ? "" : " (\(task.size))")")
+                    Text(verbatim: "\(task.label) — \(task.name)\(task.size.isEmpty ? "" : " (\(task.size))")")
                         .font(.system(size: 12.5, weight: .semibold))
                     switch task.phase {
                     case .downloading(let f):
@@ -1016,7 +1016,7 @@ struct SetupTaskPill: View {
                         Text("Ready.").foregroundStyle(.secondary)
                     case .failed(let why):
                         Text("The download stopped. Check your internet connection.").foregroundStyle(.secondary)
-                        Text(why).font(.system(size: 11)).foregroundStyle(.tertiary).fixedSize(horizontal: false, vertical: true)
+                        Text(verbatim: why).font(.system(size: 11)).foregroundStyle(.tertiary).fixedSize(horizontal: false, vertical: true)
                         Button("Retry") { retry(task) }.buttonStyle(SetupButtonStyle(kind: .secondary, height: 26))
                     }
                 }
@@ -1164,7 +1164,8 @@ struct LiveShortcutKeycaps: View {
 /// wherever it says so. Measured on an M1 Pro (2026-10-16): Whisper Turbo nine minutes,
 /// every Parakeet and Whisper Small under two.
 func preparationEstimate(_ model: LocalSTTModel) -> String {
-    model.engine == .whisperKit && model.downloadBytes > 500_000_000 ? "up to 10 minutes" : "a minute or two"
+    model.engine == .whisperKit && model.downloadBytes > 500_000_000
+        ? String(localized: "up to 10 minutes") : String(localized: "a minute or two")
 }
 
 /// The modifier keys as they are now, for the views that draw them live. Kept from the
@@ -1264,7 +1265,7 @@ func shortcutKeys(_ text: String) -> [String] {
 /// both draw it; `set` writes the list wherever its owner keeps it.
 struct SpokenLanguagesChips: View {
     let selected: [String]
-    var addTitle = "Add"
+    var addTitle: LocalizedStringKey = "Add"
     /// "Any language" while none is stated — left out where the words beside it ask for one.
     var showsAnyLanguage = true
     let set: ([String]) -> Void
@@ -1276,7 +1277,7 @@ struct SpokenLanguagesChips: View {
             if selected.isEmpty && showsAnyLanguage {
                 // A click on it is a click on Add: it is the empty list, and the list is filled there.
                 Button { adding = true } label: {
-                    LanguageChip(title: "Any language", symbol: "globe", placeholder: true)
+                    LanguageChip(title: String(localized: "Any language"), symbol: "globe", placeholder: true)
                         .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
@@ -1292,7 +1293,7 @@ struct SpokenLanguagesChips: View {
                         move(moved, before: code)
                         return true
                     }
-                    .help(selected.count > 1 ? "Drag to reorder" : "")
+                    .help(selected.count > 1 ? Text("Drag to reorder") : Text(verbatim: ""))
             }
             Button { adding = true } label: {
                 Label(addTitle, systemImage: "plus")
@@ -1414,7 +1415,7 @@ struct LanguagePicker: View {
         .frame(width: 240, height: 300)
     }
 
-    private func section(_ title: String) -> some View {
+    private func section(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(SetupColor.label2)

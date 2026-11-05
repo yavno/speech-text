@@ -31,7 +31,7 @@ final class OnboardingWindow: NSWindow {
         backgroundColor = .clear
         hasShadow = true
         isMovableByWindowBackground = true
-        title = "SpeechText Setup"
+        title = String(localized: "SpeechText Setup")
         let host = NSHostingView(rootView: OnboardingView(model: model, window: SetupWindowRef(self)))
         host.frame = NSRect(origin: .zero, size: Self.size)
         contentView = host
@@ -313,7 +313,7 @@ struct SystemSettingsHelperView: View {
                 Text(help == .accessibility ? "Turn on SpeechText" : "Turn on Dictation")
                     .font(.system(size: 13, weight: .semibold))
                 if pointsRight {
-                    Text("→")
+                    Text(verbatim: "→")
                         .foregroundStyle(Color(hex: 0x0A84FF))
                         .offset(x: nudge ? 3 : 0)
                 }
@@ -354,7 +354,7 @@ struct SystemSettingsHelperView: View {
         HStack(spacing: 8) {
             if help == .accessibility {
                 Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 18, height: 18)
-                Text("SpeechText").font(.system(size: 12))
+                Text(verbatim: "SpeechText").font(.system(size: 12))
             } else {
                 // Keyboard's row has no name beside its switch, only its microphone: drawn
                 // so, so the user looks for what is really there.
@@ -384,7 +384,7 @@ struct SystemSettingsHelperView: View {
             .padding(.top, 2)
         HStack(spacing: 8) {
             Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 18, height: 18)
-            Text("SpeechText").font(.system(size: 12, weight: .medium))
+            Text(verbatim: "SpeechText").font(.system(size: 12, weight: .medium))
             Spacer()
             Image(systemName: "hand.draw").font(.system(size: 12)).foregroundStyle(.secondary)
         }

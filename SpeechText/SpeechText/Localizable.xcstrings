@@ -2,27 +2,12 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
-    },
-    " " : {
-
-    },
-    " %@" : {
-
-    },
-    " %@ " : {
-
+      "comment" : "An empty label (a text field whose placeholder is given separately). Leave it empty."
     },
     " In this period that's " : {
 
     },
-    " and AI turns what you say — or what you ask for — into clean text for the app you're in." : {
-
-    },
     " faster" : {
-
-    },
-    " instead of " : {
 
     },
     " words a minute and type at " : {
@@ -80,7 +65,7 @@
       "comment" : "Dictionary page, What a word does: row title. %@ is the name of the speech model in use."
     },
     "%@ key" : {
-
+      "comment" : "VoiceOver label of the field for an online service's API key. %@ is the service, e.g. Groq."
     },
     "%@ key, ending %@" : {
       "localizations" : {
@@ -127,7 +112,8 @@
             "value" : "%1$@ · %2$lld%%"
           }
         }
-      }
+      },
+      "comment" : "Setup window: a download in progress. %@ is what is downloading (e.g. Speech model, or a model's name), %lld the percent done. Keep %%."
     },
     "%@ — %@" : {
       "localizations" : {
@@ -135,16 +121,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ — %2$@"
-          }
-        }
-      }
-    },
-    "%@ — %@%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ — %2$@%3$@"
           }
         }
       }
@@ -222,7 +198,7 @@
       "comment" : "Dictionary page: how many times a word was used, e.g. 12×. Keep the × sign."
     },
     "**Not in the list?** Drag SpeechText into it, or click + under the list and choose it in Applications." : {
-
+      "comment" : "Setup window: helper panel beside System Settings › Privacy & Security › Accessibility. ** marks bold. Applications is the Finder folder; use its name in your language."
     },
     "+%lld" : {
       "comment" : "Dictionary page: on a word's card, how many more wrong spellings there are than the four shown, e.g. +3."
@@ -237,13 +213,13 @@
 
     },
     "A key is like a password that lets SpeechText use your account." : {
-
+      "comment" : "Setup window: under 'Connect your … account', explains what an API key is."
     },
     "A typical wait for an answer: half were faster, half slower." : {
 
     },
     "AI POLISH" : {
-
+      "comment" : "Setup window, Try it step: small label in capitals over the AI dictation's result."
     },
     "AI Rewrite" : {
 
@@ -258,16 +234,22 @@
 
     },
     "AI couldn't answer this time" : {
-
+      "comment" : "Setup window, Try it step: title when the AI dictation failed."
     },
     "AI dictation — rewritten before it is pasted" : {
 
     },
     "AI is tidying up your text…" : {
-
+      "comment" : "Setup window, Try it step: title while AI polish rewrites what was said."
+    },
+    "AI model" : {
+      "comment" : "Setup window: what is downloading in the corner pill — the AI model (as opposed to the speech model). Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'."
     },
     "AI polish is almost ready" : {
-
+      "comment" : "Setup window, Try it step: title while the AI model is still downloading. AI polish is the setup's name for AI Rewrite."
+    },
+    "AI polish is ready — it uses your %@ key." : {
+      "comment" : "Setup window, AI step: shown instead of the key form when the key entered on the Speech step works for AI too. %@ is the service, e.g. Groq."
     },
     "About SpeechText" : {
 
@@ -279,7 +261,7 @@
 
     },
     "Add a language" : {
-
+      "comment" : "Tooltip on the 'Any language' chip; clicking it adds a language."
     },
     "Add a spelling, then Return" : {
       "comment" : "Dictionary page, editing a word: placeholder in the field that adds a wrong spelling. Return is the key."
@@ -287,8 +269,11 @@
     "Add a word" : {
       "comment" : "Dictionary page: section heading over the form that adds a word."
     },
+    "Add languages" : {
+      "comment" : "Setup window, Speech step: button that adds the languages the user speaks."
+    },
     "Add the languages you speak to see which models know them." : {
-
+      "comment" : "Setup window, Speech step: prompt above the language chips when none is stated."
     },
     "Add the names and terms SpeechText gets wrong — a colleague's name, your product, a code identifier — and how they come out instead. They're put right after every dictation." : {
       "comment" : "Dictionary page: shown under 'No words yet.' when the list of words is empty. SpeechText is the app's name."
@@ -321,11 +306,17 @@
         }
       }
     },
+    "All languages" : {
+      "comment" : "Language picker: section heading over all the other languages."
+    },
     "Allow" : {
-
+      "comment" : "Button that asks macOS for a permission (e.g. the microphone)."
+    },
+    "Allowed" : {
+      "comment" : "Setup window, permissions: shown after ✓ when a permission is granted."
     },
     "Almost ready…" : {
-
+      "comment" : "Setup window, Try it step: title while the speech model is still downloading."
     },
     "An example: what you say, and the prompt it fits" : {
       "comment" : "Prompts page: VoiceOver label of the animated examples at the top (a dictation, then the prompt chosen for it)."
@@ -339,11 +330,20 @@
     "Any color — the glass and the shell follow its hue" : {
 
     },
+    "Any language" : {
+      "comment" : "Language chips: shown while no language is stated — every language is detected. Clicking it adds one."
+    },
     "Appears when you're done." : {
-
+      "comment" : "Setup window, Try it step: placeholder for what AI wrote, while the user is still speaking."
+    },
+    "Apple Dictation needs it on." : {
+      "comment" : "Setup window, permissions: under the Dictation row — macOS Dictation must be on for Apple Dictation to work."
     },
     "Apple's recognizer listens for them" : {
       "comment" : "Dictionary page, What a word does: row title when Apple's speech recognizer is in use and is given the user's words."
+    },
+    "Are you joining the 10:00 call?" : {
+      "comment" : "Setup window, welcome animation: a message received in a made-up team chat. Write a natural chat message in your language."
     },
     "Auto-scroll" : {
 
@@ -352,13 +352,22 @@
 
     },
     "Back" : {
-
+      "comment" : "Setup window: footer button that goes to the previous step."
     },
     "Back to %@" : {
-
+      "comment" : "Setup window: tooltip on a finished step in the steps bar. %@ is the step's name."
     },
     "Back to Speech" : {
-
+      "comment" : "Setup window, Try it step: button that goes back to the Speech step after a key stopped working. Speech is the step's name."
+    },
+    "Best choice for your Mac." : {
+      "comment" : "Setup window: a note on the recommended answer (on this Mac or online)."
+    },
+    "Best quality" : {
+      "comment" : "Badge on the model with the best quality among those that fit this Mac."
+    },
+    "Built in" : {
+      "comment" : "Setup window, Speech step: note after 'Apple Dictation' — it comes with macOS."
     },
     "By engine" : {
       "comment" : "Usage page: section heading over words and cost by speech engine."
@@ -370,10 +379,10 @@
 
     },
     "Cancel" : {
-
+      "comment" : "Cancel button."
     },
     "Cancel download" : {
-
+      "comment" : "Setup window: button in the download pill's popover that stops a model download."
     },
     "Change" : {
       "comment" : "Button-like link that opens the setting to change, e.g. on the History page."
@@ -385,13 +394,16 @@
 
     },
     "Check that the right microphone is selected — it's shown on the right — then try again." : {
-
+      "comment" : "Setup window, Try it step: when nothing was heard. The microphone's name is shown in the panel on the right."
     },
     "Check your internet connection and try again." : {
-
+      "comment" : "Setup window, Try it step: when the speech model download did not finish."
     },
     "Checking the download" : {
 
+    },
+    "Checking your key…" : {
+      "comment" : "Setup window: status under the key field while the key is checked with the service."
     },
     "Choose a model — the one you had is no longer available, and dictation waits for your pick." : {
 
@@ -403,7 +415,7 @@
 
     },
     "Choose another option" : {
-
+      "comment" : "Setup window, Try it step: link back to the Speech step when the model download failed."
     },
     "Chosen for %lld dictations in History" : {
       "comment" : "Prompts page: tooltip on a prompt's use count. %lld is how many dictations in History AI Rewrite chose this prompt for.",
@@ -444,19 +456,22 @@
 
     },
     "Clicks and ⌘Tab work as usual while you hold it. Let go of %@ when you're done." : {
-
+      "comment" : "Setup window, Try it step: while holding the shortcut's letter alone. %@ is that key, e.g. Q."
     },
     "Color" : {
 
     },
     "Come back here — we'll pick it up automatically." : {
-
+      "comment" : "Setup window: third step of getting a key — the app reads it from the clipboard."
     },
     "Comes out as" : {
       "comment" : "Dictionary page, editing a word: small label in capitals over the list of wrong spellings."
     },
     "Connect your %@ account" : {
-
+      "comment" : "Setup window: heading of the key form. %@ is the service, e.g. Groq."
+    },
+    "Continue" : {
+      "comment" : "Setup window: footer button that goes to the next step."
     },
     "Continue Setup" : {
 
@@ -497,14 +512,26 @@
     "Delete “%@”" : {
       "comment" : "Dictionary page: context menu item on a word's card. %@ is the word."
     },
+    "Dictate" : {
+      "comment" : "Setup window, Done step: what the dictation shortcut does."
+    },
+    "Dictate with AI" : {
+      "comment" : "Setup window, Done step: what the AI shortcut does."
+    },
+    "Dictate with AI · off" : {
+      "comment" : "Setup window, Done step: the AI shortcut when AI is not set up."
+    },
     "Dictation" : {
-
+      "comment" : "The word Dictation. In the Setup window's helper it names macOS's own Dictation setting in System Settings › Keyboard: use the name macOS shows in your language."
+    },
+    "Dictation window" : {
+      "comment" : "Setup window, Done step: what the Record Window shortcut opens."
     },
     "Dictations fail until you add a key." : {
 
     },
     "Done" : {
-
+      "comment" : "Setup window: button that closes the helper panel beside System Settings."
     },
     "Download %@ (%@) and show it in Settings — then retry" : {
       "localizations" : {
@@ -516,23 +543,26 @@
         }
       }
     },
+    "Download and continue" : {
+      "comment" : "Setup window: footer button when the chosen local model is not downloaded yet."
+    },
     "Download failed — check your internet." : {
-
+      "comment" : "Setup window, Speech step: under a speech model whose download failed."
     },
     "Download failed." : {
-
+      "comment" : "Setup window, AI step: under an AI model whose download failed."
     },
     "Download it to try dictating here." : {
-
+      "comment" : "Setup window, Try it step: when the speech model is not downloaded."
     },
     "Downloading · %lld%%" : {
-
+      "comment" : "Under a model row while it downloads. %lld is the percent done; keep %%."
     },
     "Drag into the Accessibility list" : {
-
+      "comment" : "Setup window: tooltip on the app's row in the helper; it can be dragged into System Settings' Accessibility list."
     },
     "Drag to reorder" : {
-
+      "comment" : "Tooltip on a language chip when there are several; dragging changes their order."
     },
     "Duplicate" : {
       "comment" : "Prompts page: context menu item that copies a prompt."
@@ -548,6 +578,12 @@
     },
     "Edit prompt" : {
       "comment" : "Prompts page: section heading over the editor of the selected prompt."
+    },
+    "Edit selection" : {
+      "comment" : "Setup window, Done step: what the Edit shortcut does (AI edits the selected text)."
+    },
+    "Edit selection · off" : {
+      "comment" : "Setup window, Done step: the Edit shortcut when AI is not set up."
     },
     "Editing the selected text — say how to change it" : {
 
@@ -568,7 +604,10 @@
 
     },
     "FOR EXAMPLE" : {
-
+      "comment" : "Setup window, AI step: small label in capitals over an example of what AI polish does."
+    },
+    "Fast on any Mac. Needs an account — Groq has a free plan." : {
+      "comment" : "Setup window, AI step: facts about online AI. Groq is a company name."
     },
     "Fault" : {
 
@@ -580,7 +619,7 @@
 
     },
     "Find **SpeechText** in the list and click its switch. You may need to enter your Mac password." : {
-
+      "comment" : "Setup window: helper beside System Settings › Accessibility. ** marks bold."
     },
     "Finish setting up SpeechText" : {
 
@@ -588,23 +627,29 @@
     "For your %@" : {
 
     },
+    "Found a key on your clipboard." : {
+      "comment" : "Setup window: status under the key field when a key was found on the clipboard."
+    },
     "Free on this Mac" : {
       "comment" : "Usage page: chip on an engine that runs on this Mac and costs nothing."
+    },
+    "Get started" : {
+      "comment" : "Setup window: footer button on the first step."
     },
     "Getting ready for your Mac — first time only" : {
 
     },
     "Getting ready for your Mac. This happens only once and takes %@. You can keep going." : {
-
+      "comment" : "Setup window: download pill's popover while a model is prepared. %@ is a duration such as 'a minute or two'."
     },
     "Getting ready for your Mac…" : {
-
+      "comment" : "Setup window: under a model row, or as a title, while the model is prepared for this Mac after download."
     },
     "Given to the engine and AI Rewrite" : {
       "comment" : "Dictionary page: small note on a word's card that has no wrong spellings."
     },
     "Go back and paste your key again." : {
-
+      "comment" : "Setup window, Try it step: when the service rejected the key."
     },
     "Grant Access" : {
 
@@ -612,11 +657,17 @@
     "Groq's Whisper is given them as a hint" : {
       "comment" : "Dictionary page, What a word does: row title when Groq's Whisper model is in use. Groq and Whisper are names; keep them."
     },
+    "Heavier models" : {
+      "comment" : "Setup window, AI step: heading in capitals over models too heavy for this Mac."
+    },
     "Here's the AI version" : {
-
+      "comment" : "Setup window, Try it step: title after AI polish worked; after a ✓."
     },
     "Hi John, I'll be about 10 minutes late — traffic is bad. Sorry!" : {
-
+      "comment" : "Setup window, AI step: the example's result — the rough speech above, tidied by AI. Translate together with that example."
+    },
+    "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon." : {
+      "comment" : "Setup window, Try it step: a short text for the user to read out loud. Write a natural one in your language."
     },
     "Hidden, %lld" : {
 
@@ -625,7 +676,7 @@
 
     },
     "Hide models too heavy for this Mac" : {
-
+      "comment" : "Link that hides the models too heavy for this Mac again."
     },
     "Hides the details" : {
 
@@ -637,7 +688,7 @@
 
     },
     "Hold" : {
-
+      "comment" : "Setup window, welcome animation: label beside the keys, when the shortcut is held while speaking."
     },
     "Home" : {
 
@@ -646,7 +697,7 @@
       "comment" : "Prompts page: small heading at the top of the page. AI Rewrite is a feature of the app."
     },
     "How SpeechText works" : {
-
+      "comment" : "Setup window: VoiceOver label of the welcome animation."
     },
     "How fast do you type?" : {
 
@@ -655,7 +706,7 @@
 
     },
     "How the shortcut records" : {
-
+      "comment" : "Setup window, Try it step: label over the choice between hold and press."
     },
     "How this is counted" : {
       "comment" : "Usage page: section heading over the explanation of how usage is counted."
@@ -684,7 +735,7 @@
       }
     },
     "In any app, your words would be typed as you said them." : {
-
+      "comment" : "Setup window, Try it step: when AI could not answer — what happens then in real use."
     },
     "In use: %@" : {
 
@@ -711,7 +762,7 @@
       "comment" : "Dictionary page, What a word does: row text when the speech model takes no word list. GPT Transcribe and GPT Live Transcribe are model names; keep them."
     },
     "It works!" : {
-
+      "comment" : "Setup window, Try it step: title after the first dictation worked; after a ✓."
     },
     "It's given your words with every AI dictation and told to spell them your way." : {
       "comment" : "Dictionary page, What a word does: row text when AI Rewrite is set up."
@@ -720,22 +771,28 @@
       "comment" : "Dictionary page: small note on a word's card whose only wrong spellings differ in capitals."
     },
     "Its model is still downloading (%lld%%). You can wait here, or try it later." : {
-
+      "comment" : "Setup window, Try it step: the AI model is still downloading. %lld is the percent; keep %%."
     },
     "Its window opens next. Once you close it, click SpeechText in the Dock or the icon at the top of your screen to open it again." : {
-
+      "comment" : "Setup window, Done step. 'Its window' is the app's main window."
+    },
+    "Joining now, see you there." : {
+      "comment" : "Setup window, welcome animation: a chat reply typed by voice. Write a natural one in your language; it is typed word by word."
     },
     "Just %@ — that's it" : {
-
+      "comment" : "Setup window, Try it step: title when the user holds only the letter key. %@ is that key, e.g. Q."
     },
     "Keep %@" : {
-
+      "comment" : "Setup window, Speech step: button that keeps the model already downloading. %@ is its name."
     },
     "Keep %@ down — it alone keeps recording, and your hand is free for the mouse and ⌘Tab." : {
-
+      "comment" : "Setup window, Try it step: %@ is the shortcut's letter key, e.g. Q."
     },
     "Keep debug lines — every partial, every key event posted — in this window. They push older lines out of the last 1000. On in a debug build; the system log gets them either way." : {
 
+    },
+    "Keep it" : {
+      "comment" : "Setup window, Speech step: button that keeps the model already downloading, when its name is not known."
     },
     "Language" : {
 
@@ -753,13 +810,19 @@
 
     },
     "Let go of %@ when you're done." : {
-
+      "comment" : "Setup window, Try it step: %@ is the key held, e.g. Q."
     },
     "Limits right now" : {
       "comment" : "Usage page: section heading over each provider's current rate limits."
     },
+    "Listening" : {
+      "comment" : "Setup window, Try it step: small chip while recording."
+    },
     "Listening…" : {
-
+      "comment" : "Setup window, Try it step: while recording."
+    },
+    "Listens only while you dictate" : {
+      "comment" : "Setup window, permissions: a promise, in bold; followed by '— from one press of the shortcut to the next.'"
     },
     "Local models take no list of words — the replacements still put them right." : {
       "comment" : "Dictionary page, What a word does: row text when a local speech model is in use."
@@ -777,13 +840,13 @@
 
     },
     "Message" : {
-
+      "comment" : "Setup window, welcome animation: placeholder of a made-up chat's message field."
     },
     "Microphone" : {
-
+      "comment" : "The microphone: a permission's name, or the input shown when the device's name is unknown."
     },
     "Microphone is turned off for SpeechText." : {
-
+      "comment" : "Setup window, permissions: the user denied microphone access."
     },
     "More ways to dictate" : {
       "comment" : "Home page: section heading over the other dictation shortcuts."
@@ -810,10 +873,10 @@
 
     },
     "No internet connection" : {
-
+      "comment" : "Setup window, Try it step: title when an online service could not be reached."
     },
     "No match" : {
-
+      "comment" : "Language picker: no language matches the search."
     },
     "No models downloaded yet" : {
 
@@ -884,13 +947,13 @@
 
     },
     "Now let go of %@" : {
-
+      "comment" : "Setup window, Try it step: %@ is the shortcut's modifier keys, e.g. ⌃⇧."
     },
     "Now try AI polish: hold" : {
-
+      "comment" : "Setup window, Try it step: title over the AI shortcut's keys, when the shortcut is held. AI polish is the setup's name for AI Rewrite."
     },
     "Now try AI polish: press" : {
-
+      "comment" : "Setup window, Try it step: title over the AI shortcut's keys, when the shortcut is pressed."
     },
     "Off" : {
 
@@ -898,8 +961,17 @@
     "Often comes out as" : {
       "comment" : "Dictionary page, Add a word: label over the field for the ways the word is misheard."
     },
+    "On" : {
+      "comment" : "Setup window, permissions: shown after ✓ when macOS Dictation is on."
+    },
+    "On this Mac" : {
+      "comment" : "Setup window: answer card — speech or AI runs on this Mac."
+    },
     "On this Mac or online — you can change it later." : {
-
+      "comment" : "Setup window, Speech step: lead under the question."
+    },
+    "On your keyboards" : {
+      "comment" : "Language picker: section heading over the languages of this Mac's keyboards."
     },
     "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
       "comment" : "Prompts page: text at the top when AI Rewrite has no provider. “When to use” is the name of a field."
@@ -910,8 +982,11 @@
     "Once you've dictated for a minute or so, this says how much faster speaking is than typing — and how much time it saved you." : {
 
     },
+    "Online service" : {
+      "comment" : "Setup window: answer card — speech or AI runs on an online service."
+    },
     "Online services need internet. Connect, then try again." : {
-
+      "comment" : "Setup window, Try it step: when offline."
     },
     "Open" : {
 
@@ -923,82 +998,117 @@
       "comment" : "Home page: link after the 'Recent' heading; opens the History page."
     },
     "Open Keyboard Settings" : {
-
+      "comment" : "Button that opens System Settings › Keyboard."
+    },
+    "Open Privacy Settings" : {
+      "comment" : "Button that opens System Settings › Privacy & Security › Speech Recognition."
     },
     "Open Settings" : {
       "comment" : "Home page: link after the 'Engines' heading; opens Settings."
     },
     "Open Sound Settings" : {
-
+      "comment" : "Button that opens System Settings › Sound."
     },
     "Open System Settings" : {
-
+      "comment" : "Button that opens System Settings."
     },
     "Open Usage" : {
       "comment" : "Home page: link after the 'Last 7 days' heading; opens the Usage page."
     },
     "Open again" : {
-
+      "comment" : "Setup window, permissions: opens System Settings › Accessibility again."
     },
     "Open at login" : {
-
+      "comment" : "Setup window, permissions: row title and switch label — start the app when the Mac starts."
     },
     "Opens History" : {
 
     },
     "Optional" : {
-
+      "comment" : "Setup window, welcome step: note after 'Your languages, for better accuracy'."
     },
-    "Optional. Press " : {
-
+    "Optional. Press %@ instead of %@ and AI turns what you say — or what you ask for — into clean text for the app you're in." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Optional. Press %1$@ instead of %2$@ and AI turns what you say — or what you ask for — into clean text for the app you're in."
+          }
+        }
+      },
+      "comment" : "Setup window, AI step. The first %@ is the AI shortcut, the second the dictation shortcut, both shown as keys."
     },
     "Or set it yourself" : {
 
+    },
+    "Other models" : {
+      "comment" : "Setup window, AI step: heading in capitals over the remaining models."
     },
     "Overhead" : {
       "comment" : "Usage page: section heading over what was paid for without becoming text, and what was never sent."
     },
     "Paste" : {
-
+      "comment" : "Button that pastes the key from the clipboard."
     },
     "Paste your key here" : {
-
+      "comment" : "Placeholder of the API key field."
     },
     "Preparing %@ for your Mac…" : {
-
+      "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name."
     },
     "Preparing a model for your Mac takes a while the first time — up to 10 minutes. You can continue while it runs." : {
-
+      "comment" : "Setup window, Speech step: note under the models."
     },
     "Preparing speech model for your Mac…" : {
-
+      "comment" : "Setup window: download pill while the speech model is prepared."
     },
     "Press" : {
-
+      "comment" : "Setup window, welcome animation: label beside the keys, when the shortcut is pressed to start and again to stop."
     },
     "Press %@ again when you're done." : {
-
+      "comment" : "Setup window, Try it step: %@ is the shortcut, e.g. ⌃⇧Q."
+    },
+    "Press %@ to dictate." : {
+      "comment" : "Notification after setup when the speech model is ready. %@ is the dictation shortcut, e.g. ⌃⇧Q."
     },
     "Press a shortcut, say what you want to write, and your words appear wherever your cursor is — in any app." : {
-
+      "comment" : "Setup window, welcome step: lead under the title."
     },
     "Press shortcut..." : {
 
     },
+    "Private and free, but slow on an Intel Mac. A 3–19 GB download." : {
+      "comment" : "Setup window, AI step: facts about local AI on an Intel Mac."
+    },
+    "Private and free. A 3–19 GB download, nothing else to install." : {
+      "comment" : "Setup window, AI step: facts about local AI."
+    },
+    "Private and free. Your voice stays on your Mac; works offline after one download." : {
+      "comment" : "Setup window, Speech step: facts about local speech."
+    },
     "RESULT" : {
-
+      "comment" : "Setup window, Try it step: small label in capitals over what was typed."
+    },
+    "Ready" : {
+      "comment" : "Setup window, AI step: badge on 'Online service' when a key is already connected."
     },
     "Ready to use" : {
 
     },
     "Ready." : {
-
+      "comment" : "Setup window: download pill's popover when the download finished."
     },
     "Recent" : {
       "comment" : "Home page: section heading over the latest dictations."
     },
-    "Recommended for your " : {
-
+    "Recommended" : {
+      "comment" : "Badge on the recommended model or option."
+    },
+    "Recommended for your %@" : {
+      "comment" : "Setup window, Speech step: over the recommended models. %@ is the Mac, e.g. 'M1 Pro, 32 GB', in bold."
+    },
+    "Recommended for your Mac (%@)" : {
+      "comment" : "Setup window, AI step: heading in capitals. %@ is the Mac, e.g. 'M1 Pro, 32 GB'."
     },
     "Record" : {
 
@@ -1010,7 +1120,7 @@
 
     },
     "Remove %@" : {
-
+      "comment" : "Tooltip on the × of a language chip. %@ is the language."
     },
     "Remove %@?" : {
 
@@ -1046,13 +1156,22 @@
       "comment" : "Prompts page: title of the confirmation before the built-in prompts are restored."
     },
     "Retry" : {
-
+      "comment" : "Button that tries a failed download or request again."
+    },
+    "Retry and continue" : {
+      "comment" : "Setup window: footer button when the chosen model's download failed."
+    },
+    "Rewriting" : {
+      "comment" : "Setup window, Try it step: small chip while AI rewrites."
     },
     "Rewriting…" : {
-
+      "comment" : "Setup window, Try it step: while AI rewrites."
     },
     "Right-click a prompt to make it the default, duplicate or move it." : {
       "comment" : "Prompts page: hint under the list of prompts."
+    },
+    "Running ten minutes late – start without me." : {
+      "comment" : "Setup window, welcome animation: a chat message typed by voice, word by word. Write a natural one in your language."
     },
     "Save each streamed inline dictation to Traces/ so it can be replayed as a test. The words you dictate are saved there in plain text." : {
 
@@ -1061,22 +1180,25 @@
 
     },
     "Say anything — or read this out, then let go." : {
-
+      "comment" : "Setup window, Try it step, hold mode: an example text follows."
     },
     "Say anything — or read this out, then press the keys again." : {
-
+      "comment" : "Setup window, Try it step, press mode: an example text follows."
     },
     "Say something the way you'd say it, hesitations and all — for example:" : {
-
+      "comment" : "Setup window, Try it step: before an example of rough speech for AI polish."
     },
     "Scroll down to **Dictation** and click the switch beside the microphone, then **Enable** if macOS asks." : {
-
+      "comment" : "Setup window: helper beside System Settings › Keyboard. ** marks bold. Dictation and Enable are macOS's own words; use the ones macOS shows in your language."
     },
     "Search languages" : {
-
+      "comment" : "Language picker: placeholder of the search field."
     },
     "Search what you said" : {
 
+    },
+    "See the small bar at the bottom of your screen? That's SpeechText listening." : {
+      "comment" : "Setup window, Try it step: hint while recording."
     },
     "Selected text in %@ being rewritten" : {
 
@@ -1085,7 +1207,7 @@
       "comment" : "Dictionary page, What a word does: tooltip on the switch that sends the words to the speech engine."
     },
     "Settings" : {
-
+      "comment" : "The app's Settings window. In the Setup window's Done step it is bold, inside 'Change them any time in %@.'"
     },
     "Settings…" : {
 
@@ -1106,8 +1228,31 @@
         }
       }
     },
+    "Show %lld models too heavy for this Mac" : {
+      "comment" : "Setup window, Speech step: link that shows the hidden models. %lld is how many.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Show %lld model too heavy for this Mac"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Show %lld models too heavy for this Mac"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Show all" : {
-
+      "comment" : "Button that shows the whole text."
     },
     "Show all · %lld more" : {
       "comment" : "Dictionary and History pages: button under a list that shows the rest of it. %lld is how many are hidden."
@@ -1122,7 +1267,7 @@
 
     },
     "Show less" : {
-
+      "comment" : "Setup window, Try it step: folds what was said back to one line."
     },
     "Show levels" : {
 
@@ -1135,6 +1280,21 @@
     },
     "Skip" : {
 
+    },
+    "Skip for now" : {
+      "comment" : "Setup window, AI step: skips setting up AI."
+    },
+    "Skip test and finish setup" : {
+      "comment" : "Setup window, Try it step: skips the test."
+    },
+    "So SpeechText can hear you." : {
+      "comment" : "Setup window, permissions: why the microphone is needed."
+    },
+    "So SpeechText is always ready when you start your Mac." : {
+      "comment" : "Setup window, permissions: why to open at login."
+    },
+    "So your words appear where your cursor is." : {
+      "comment" : "Setup window, permissions: why 'Type for you' (Accessibility) is needed."
     },
     "Soon" : {
 
@@ -1158,17 +1318,23 @@
     "Speech" : {
 
     },
-    "SpeechText" : {
-
+    "Speech model" : {
+      "comment" : "Setup window: what is downloading in the corner pill — the speech model. Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'."
+    },
+    "SpeechText Setup" : {
+      "comment" : "Setup window: the window's title (in the Window menu and Mission Control)."
     },
     "SpeechText has no list price for this model, so it isn't counted in Spent." : {
 
     },
+    "SpeechText is ready" : {
+      "comment" : "Notification after setup when the speech model finished preparing."
+    },
     "SpeechText lives in your menu bar" : {
-
+      "comment" : "Setup window, Done step."
     },
     "SpeechText needs these to hear you and to type for you." : {
-
+      "comment" : "Setup window, permissions: lead under the title."
     },
     "Spelled" : {
       "comment" : "Dictionary page, editing a word: small label in capitals over the word's field."
@@ -1176,14 +1342,17 @@
     "Start typing here" : {
 
     },
+    "Start using SpeechText" : {
+      "comment" : "Setup window: footer button on the last step; opens the app."
+    },
     "Suggested from your dictations" : {
       "comment" : "Dictionary page, Add a word: label over words from the user's dictations that could be added."
     },
     "Switch" : {
-
+      "comment" : "Setup window, Speech step: confirms switching to another model, stopping the current download."
     },
     "Switch to %@? The current download will stop." : {
-
+      "comment" : "Setup window, Speech step: %@ is the model's name."
     },
     "Switch to it" : {
 
@@ -1192,13 +1361,13 @@
 
     },
     "Talk instead of typing" : {
-
+      "comment" : "Setup window, welcome step: the large title."
     },
     "Talk, or say what you want" : {
       "comment" : "Prompts page: large title at the top of the page; one line, shrinks to fit."
     },
     "Team chat" : {
-
+      "comment" : "Setup window, welcome animation: the title of a made-up chat window."
     },
     "Tell the speech engine" : {
       "comment" : "Dictionary page, What a word does: label of the switch that sends the words to the speech engine (read by VoiceOver; not shown)."
@@ -1207,10 +1376,10 @@
       "comment" : "Dictionary page, Replacements: error under the form when the same text is already replaced."
     },
     "That didn't work" : {
-
+      "comment" : "Setup window, Try it step: title when the dictation failed; the error follows."
     },
     "That's your voice, typed." : {
-
+      "comment" : "Setup window, Try it step: after the first dictation worked."
     },
     "The app, its window and the field — so the same words become a chat message in Slack and a letter in Mail. Never a password manager's." : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile text under 'Where you're dictating'. Slack and Mail are app names."
@@ -1222,10 +1391,10 @@
 
     },
     "The download didn't finish" : {
-
+      "comment" : "Setup window, Try it step: title when the speech model's download failed."
     },
     "The download stopped. Check your internet connection." : {
-
+      "comment" : "Setup window: download pill's popover when a download failed."
     },
     "The model on this Mac isn't given them" : {
       "comment" : "Dictionary page, What a word does: row title when a local speech model is in use."
@@ -1243,19 +1412,25 @@
 
     },
     "This happens only once and takes %@. You can wait here or finish setup now — we'll let you know when it's ready." : {
-
+      "comment" : "Setup window, Try it step. %@ is a duration such as 'a minute or two'."
     },
     "This model may be slow on your Mac. We recommend %@." : {
-
+      "comment" : "Setup window, AI step: under a heavy model. %@ is the recommended model's name."
+    },
+    "This model may be slow on your Mac. We recommend a lighter one." : {
+      "comment" : "Setup window, AI step: under a heavy model when there is no recommendation."
     },
     "This part of SpeechText is on its way." : {
 
     },
     "This takes a few seconds." : {
-
+      "comment" : "Setup window, Try it step: while AI rewrites."
     },
     "Three quick settings" : {
-
+      "comment" : "Setup window, permissions: title when Dictation must be turned on too."
+    },
+    "Too heavy for this Mac" : {
+      "comment" : "Badge on a model that needs more memory than this Mac has."
     },
     "Traces" : {
 
@@ -1263,35 +1438,41 @@
     "Transcribe the saved audio again, with the settings you have now" : {
 
     },
+    "Transcribing" : {
+      "comment" : "Setup window, Try it step: small chip while speech becomes text."
+    },
     "Transparency" : {
 
     },
     "Try again" : {
-
+      "comment" : "Button that tries again."
     },
     "Try it: hold" : {
-
+      "comment" : "Setup window, Try it step: title over the shortcut's keys, hold mode."
     },
     "Try it: press" : {
-
+      "comment" : "Setup window, Try it step: title over the shortcut's keys, press mode."
     },
     "Turn On…" : {
 
     },
     "Turn on Dictation" : {
-
+      "comment" : "Setup window: helper title beside System Settings › Keyboard. Dictation is macOS's setting."
     },
     "Turn on SpeechText" : {
-
+      "comment" : "Setup window: helper title beside System Settings › Accessibility."
     },
     "Turned off. Wrong spellings are still replaced, and AI Rewrite still keeps them as written." : {
       "comment" : "Dictionary page, What a word does: row text when sending the words to the speech engine is turned off."
     },
     "Turning your speech into text…" : {
-
+      "comment" : "Setup window, Try it step: while transcribing."
     },
     "Two quick permissions" : {
-
+      "comment" : "Setup window, permissions: title."
+    },
+    "Type for you" : {
+      "comment" : "Setup window, permissions: row title for Accessibility access, which lets the app type."
     },
     "Type how it should be written." : {
       "comment" : "Dictionary page, Replacements: error under the form when the With field is empty."
@@ -1301,6 +1482,12 @@
     },
     "Type what is recognized now." : {
       "comment" : "Dictionary page, Replacements: error under the form when the Replace field is empty."
+    },
+    "Types only what you said" : {
+      "comment" : "Setup window, permissions: a promise, in bold; followed by '— right where your cursor is.'"
+    },
+    "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too." : {
+      "comment" : "Setup window, Try it step: rough speech for the user to read out, for AI polish to tidy. Keep the hesitations and the correction."
     },
     "Untitled" : {
       "comment" : "Dictionary page: shown on a word's card when the word itself is empty."
@@ -1352,14 +1539,23 @@
     "Version" : {
 
     },
+    "Waiting for %@" : {
+      "comment" : "Setup window, Try it step: small chip. %@ is the shortcut, e.g. ⌃⇧Q."
+    },
     "Waiting for you to turn on SpeechText in System Settings." : {
-
+      "comment" : "Setup window, permissions: after System Settings › Accessibility was opened."
+    },
+    "Waiting for your key… Copy it on the website and come back." : {
+      "comment" : "Setup window: status under the key field after the service's website was opened."
     },
     "Want AI to tidy up your text?" : {
-
+      "comment" : "Setup window, AI step: the title."
     },
     "We didn't hear anything" : {
-
+      "comment" : "Setup window, Try it step: title when the recording was silent."
+    },
+    "We didn't hear anything." : {
+      "comment" : "Setup window, Try it step: shown as the AI result when the AI dictation was silent."
     },
     "What a word does" : {
       "comment" : "Dictionary page: section heading over three rows that say what the user's words do with the current speech engine and AI Rewrite."
@@ -1374,13 +1570,13 @@
 
     },
     "What you said, and what AI polish wrote from it — in any app, only the AI version is typed." : {
-
+      "comment" : "Setup window, Try it step: after AI polish worked."
     },
     "When to use" : {
       "comment" : "Prompts page, editing a prompt: small label in capitals over the field that says when the prompt fits."
     },
     "Where should your speech become text?" : {
-
+      "comment" : "Setup window, Speech step: the title."
     },
     "Where you're dictating" : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile title."
@@ -1406,11 +1602,14 @@
     "Words to tidy up, or a request like “make it a list, in English”: it picks the prompt whose “When to use” fits and does what else you asked. Nothing fits? The Default does." : {
       "comment" : "Prompts page: text at the top. “When to use” is the name of a field; Default is the default prompt."
     },
-    "Work in any app. Hold to talk, let go to stop. Change them any time in " : {
-
+    "Work in any app. Hold to talk, let go to stop. Change them any time in %@." : {
+      "comment" : "Setup window, Done step, under the shortcuts. %@ is 'Settings', in bold."
     },
-    "Work in any app. Press once to start, again to stop. Change them any time in " : {
-
+    "Work in any app. Press once to start, again to stop. Change them any time in %@." : {
+      "comment" : "Setup window, Done step, under the shortcuts. %@ is 'Settings', in bold."
+    },
+    "Works on any Mac. Needs internet and a free account; your recording is sent to the service." : {
+      "comment" : "Setup window, Speech step: facts about online speech."
     },
     "Write something your way whenever it is said — “кома” as “,”, “mail sign” as your signature. Whole words, any capitals. Unlike a word above, a replacement isn't sent to the engine or AI Rewrite; it only puts the text right." : {
       "comment" : "Dictionary page, Replacements: text under the heading. “кома” is the Ukrainian word for comma, an example of a spoken word written as a sign; the examples may be adapted to your language."
@@ -1425,13 +1624,16 @@
 
     },
     "You can let go of the keys now — speak." : {
-
+      "comment" : "Setup window, Try it step: press mode, keys still down."
     },
     "You can turn this on later in Settings." : {
-
+      "comment" : "Setup window, AI step: beside 'Skip for now'."
+    },
+    "You said" : {
+      "comment" : "Setup window, Try it step: label over what was said."
     },
     "You say" : {
-
+      "comment" : "Setup window, AI step: label over the example of rough speech."
     },
     "You speak at " : {
 
@@ -1440,19 +1642,22 @@
 
     },
     "You're all set" : {
-
+      "comment" : "Setup window, Done step: the title."
     },
     "Your Dictionary" : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile title. Dictionary is a page of the app."
     },
     "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac." : {
-
+      "comment" : "Setup window, permissions: microphone restricted by the Mac's management profile."
+    },
+    "Your clipboard is empty — copy the key on the website first." : {
+      "comment" : "Setup window: after Paste with nothing on the clipboard."
     },
     "Your key stopped working" : {
-
+      "comment" : "Setup window, Try it step: title when the service rejected the key."
     },
     "Your languages, for better accuracy" : {
-
+      "comment" : "Setup window, welcome step: label over the language chips."
     },
     "Your own prompts and changes are replaced by the six that come with SpeechText." : {
       "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name."
@@ -1461,16 +1666,16 @@
       "comment" : "Prompts page: section heading over the list of prompts. A count follows it."
     },
     "Your shortcuts" : {
-
+      "comment" : "Setup window, Done step: heading over the shortcuts."
     },
     "Your speech model is still downloading (%lld%%). You can wait here or finish setup now — we'll let you know when it's ready." : {
-
+      "comment" : "Setup window, Try it step. %lld is the percent; keep %%."
     },
     "Your speech model is still getting ready. We'll show a message when you can start dictating." : {
-
+      "comment" : "Setup window, Done step: while the model is prepared."
     },
     "Your speech model isn't downloaded" : {
-
+      "comment" : "Setup window, Try it step: title."
     },
     "Your words" : {
       "comment" : "Dictionary page: section heading over the list of the user's words. A count follows it."
@@ -1479,7 +1684,13 @@
       "comment" : "Dictionary page, What a word does: row text when there are no words yet. %@ is the speech model's name."
     },
     "Your words will appear here." : {
-
+      "comment" : "Setup window, Try it step: placeholder for what is typed."
+    },
+    "a few minutes" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar."
+    },
+    "a minute or two" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar."
     },
     "besides the prompt, with every AI dictation" : {
       "comment" : "Prompts page: note after the 'What else AI Rewrite is told' heading."
@@ -1517,6 +1728,9 @@
     "list for the trip passport charger the blue jacket" : {
       "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in list prompt. Write a natural example in your language."
     },
+    "macOS asks to allow Speech Recognition the first time." : {
+      "comment" : "Setup window, Speech step: second sentence of Apple Dictation's description. Speech Recognition is macOS's permission name."
+    },
     "optional" : {
       "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty."
     },
@@ -1524,7 +1738,7 @@
       "comment" : "Prompts page: note after the 'Edit prompt' heading."
     },
     "sign in, then click **%@**." : {
-
+      "comment" : "Setup window: first step of getting a key, after a link to the service's website. %@ is the website's button name, in English as the website shows it; ** marks bold."
     },
     "top %lld of %lld" : {
       "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are.",
@@ -1543,6 +1757,9 @@
     "uh email to Sarah running late start without me" : {
       "comment" : "Prompts page: an example of something said, rough as spoken, shown in quotes, for the built-in email prompt. Write a natural example in your language."
     },
+    "up to 10 minutes" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar."
+    },
     "words a minute" : {
 
     },
@@ -1552,11 +1769,14 @@
     "·" : {
 
     },
-    "· %@" : {
-
-    },
     "—" : {
 
+    },
+    "— from one press of the shortcut to the next." : {
+      "comment" : "Setup window, permissions: continues 'Listens only while you dictate'."
+    },
+    "— right where your cursor is." : {
+      "comment" : "Setup window, permissions: continues 'Types only what you said'."
     },
     "“%@”" : {
       "comment" : "A word the user typed, in quotation marks. Use your language's quotation marks."
@@ -1565,10 +1785,7 @@
       "comment" : "Dictionary page, Add a word: preview under the form when only the word is typed. %@ is the word."
     },
     "“uh so um tell John that I'm gonna be like— wait no, ten, ten minutes late I think? cause the traffic is just, ugh. yeah sorry”" : {
-
-    },
-    "→" : {
-
+      "comment" : "Setup window, AI step: an example of rough speech, in quotes. Translate together with its tidied result ('Hi John, …')."
     },
     "≈ %@" : {
 
@@ -1577,34 +1794,46 @@
 
     },
     "⚠︎ %@ download failed · Retry" : {
-
+      "comment" : "Setup window: download pill. %@ is 'Speech model' or 'AI model'."
     },
     "⚠︎ Couldn't check the key — no internet connection. You can continue and we'll try again later." : {
-
-    },
-    "✓ " : {
-
+      "comment" : "Setup window: status under the key field when offline."
     },
     "✓ %@" : {
 
     },
     "✓ %@ ready" : {
-
+      "comment" : "Setup window: download pill. %@ is 'Speech model' or 'AI model'."
     },
     "✓ Allowed" : {
 
     },
+    "✓ Done" : {
+      "comment" : "Setup window, Try it step: chip after AI polish wrote its text."
+    },
     "✓ Downloaded" : {
-
+      "comment" : "Badge on a model that is downloaded."
+    },
+    "✓ Installed" : {
+      "comment" : "Setup window, Speech step: badge on a model that is downloaded."
     },
     "✓ It works!" : {
-
+      "comment" : "Setup window, Try it step: over the AI offer, after the first dictation worked."
+    },
+    "✓ Typed" : {
+      "comment" : "Setup window, Try it step: chip after the dictation was typed."
+    },
+    "✓ Your key works." : {
+      "comment" : "Setup window: status under the key field."
+    },
+    "✗ This key didn't work. Copy it again from the website — make sure you copied all of it." : {
+      "comment" : "Setup window: status under the key field when the service rejected the key."
     },
     "✨ AI writes" : {
-
+      "comment" : "Setup window, AI step: label over the example's tidied result."
     },
-    "🎉" : {
-
+    "✨ AI wrote" : {
+      "comment" : "Setup window, Try it step: label over what AI wrote."
     }
   },
   "version" : "1.0"
