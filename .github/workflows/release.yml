@@ -148,6 +148,12 @@ jobs:
         if: runner.environment == 'github-hosted'
         run: scripts/ci-select-xcode.sh "$XCODE_VERSION"
 
+      # A release never relies on the fallback to English: every entry in every String
+      # Catalog has a value, with every plural form, in each language in knownRegions
+      # (docs/specs/2026-11-04-localization.md › Checks).
+      - name: Every supported language is complete
+        run: python3 -B scripts/strings/check.py complete
+
       - name: The tag matches the project version
         if: startsWith(github.ref, 'refs/tags/')
         run: |
