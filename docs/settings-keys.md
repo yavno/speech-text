@@ -2,7 +2,8 @@
 
 The `UserDefaults` keys the app reads: what each holds and its default. A setting that is
 added, renamed, retired or given a new default changes its row here in the same pull
-request (the `add-setting` skill walks it). A key in `SettingsKeys.portable` is carried
+request (the `add-setting` skill walks it); CI's *Settings keys* step fails when a key and
+the rows disagree. A key in `SettingsKeys.portable` is carried
 across a bundle-identifier rename.
 
 | Key | Purpose | Default |
