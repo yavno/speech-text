@@ -491,15 +491,43 @@ struct ShellBackground: View {
 struct PlasticButton: View {
     let systemImage: String
     /// What VoiceOver calls the button: a short name, not the tooltip's sentence.
-    let label: String
+    let label: Text
     /// The state VoiceOver reads after the name ("On" for a toggle); empty for none.
-    var value = ""
+    var value = Text(verbatim: "")
     var isOn = false
     /// The lit colour when on; nil takes the display's phosphor.
     var accent: Color? = nil
     var isEnabled = true
-    var help: String = ""
+    var help = Text(verbatim: "")
     let action: () -> Void
+
+    /// Words from the String Catalog.
+    init(systemImage: String, label: LocalizedStringKey, value: LocalizedStringKey? = nil, isOn: Bool = false,
+         accent: Color? = nil, isEnabled: Bool = true, help: LocalizedStringKey? = nil, action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(label), value: value.map { Text($0) } ?? Text(verbatim: ""),
+                  isOn: isOn, accent: accent, isEnabled: isEnabled, help: help.map { Text($0) } ?? Text(verbatim: ""),
+                  action: action)
+    }
+
+    /// Words already made, shown as they are.
+    @_disfavoredOverload
+    init(systemImage: String, label: String, value: String = "", isOn: Bool = false,
+         accent: Color? = nil, isEnabled: Bool = true, help: String = "", action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(verbatim: label), value: Text(verbatim: value),
+                  isOn: isOn, accent: accent, isEnabled: isEnabled, help: Text(verbatim: help), action: action)
+    }
+
+    init(systemImage: String, label: Text, value: Text, isOn: Bool, accent: Color?, isEnabled: Bool, help: Text,
+         action: @escaping () -> Void) {
+        self.systemImage = systemImage
+        self.label = label
+        self.value = value
+        self.isOn = isOn
+        self.accent = accent
+        self.isEnabled = isEnabled
+        self.help = help
+        self.action = action
+    }
 
     static let size: CGFloat = 30
 
@@ -582,14 +610,43 @@ struct TransportKnob: View {
     /// SF Symbol shown on the cap. Ignored while `isBusy`.
     let systemImage: String
     /// What VoiceOver calls the knob, and the state it reads after the name.
-    let label: String
-    var value = ""
+    let label: Text
+    var value = Text(verbatim: "")
     var tint: Color = .white.opacity(0.92)
     /// Replaces the glyph with a sweeping arc while a provider is working.
     var isBusy = false
     var isEnabled = true
-    var help: String = ""
+    var help = Text(verbatim: "")
     let action: () -> Void
+
+    /// Words from the String Catalog.
+    init(systemImage: String, label: LocalizedStringKey, value: LocalizedStringKey? = nil,
+         tint: Color = .white.opacity(0.92), isBusy: Bool = false, isEnabled: Bool = true,
+         help: LocalizedStringKey? = nil, action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(label), value: value.map { Text($0) } ?? Text(verbatim: ""),
+                  tint: tint, isBusy: isBusy, isEnabled: isEnabled, help: help.map { Text($0) } ?? Text(verbatim: ""),
+                  action: action)
+    }
+
+    /// Words already made, shown as they are.
+    @_disfavoredOverload
+    init(systemImage: String, label: String, value: String = "", tint: Color = .white.opacity(0.92),
+         isBusy: Bool = false, isEnabled: Bool = true, help: String = "", action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(verbatim: label), value: Text(verbatim: value),
+                  tint: tint, isBusy: isBusy, isEnabled: isEnabled, help: Text(verbatim: help), action: action)
+    }
+
+    init(systemImage: String, label: Text, value: Text, tint: Color, isBusy: Bool, isEnabled: Bool, help: Text,
+         action: @escaping () -> Void) {
+        self.systemImage = systemImage
+        self.label = label
+        self.value = value
+        self.tint = tint
+        self.isBusy = isBusy
+        self.isEnabled = isEnabled
+        self.help = help
+        self.action = action
+    }
 
     /// Diameter of the outer plastic disc. The bevel and its shadows spill outside it,
     /// which is what seats the knob into the shell.

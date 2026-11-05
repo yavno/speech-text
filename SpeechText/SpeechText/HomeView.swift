@@ -128,7 +128,7 @@ struct HomeAttention: View {
         }
     }
 
-    private func item(_ title: String, done: Bool) -> some View {
+    private func item(_ title: LocalizedStringKey, done: Bool) -> some View {
         HStack(spacing: 6) {
             Image(systemName: done ? "checkmark.circle.fill" : "circle")
                 .foregroundStyle(done ? MainColor.okInk : MainColor.ink3)
@@ -137,7 +137,7 @@ struct HomeAttention: View {
         .font(.system(size: 13))
     }
 
-    private func problem(_ title: String, _ detail: String, fix: @escaping () -> Void) -> some View {
+    private func problem(_ title: LocalizedStringKey, _ detail: LocalizedStringKey, fix: @escaping () -> Void) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.circle.fill")
                 .font(.system(size: 16))
@@ -261,7 +261,7 @@ struct HomeKeycaps: View {
             ForEach(Array(keys.enumerated()), id: \.offset) { index, key in
                 let lit = lit || litKeys.contains(index)
                 let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
-                Text(key)
+                Text(verbatim: key)
                     .font(.system(size: fontSize, weight: weight))
                     .foregroundStyle(lit ? (ai ? Color.white : SetupColor.screen) : MainColor.ink)
                     .frame(minWidth: size, minHeight: size)
@@ -391,7 +391,7 @@ struct HomeIntroCard: View {
 
     // MARK: The words
 
-    private var title: String {
+    private var title: LocalizedStringKey {
         switch tab {
         case .dictate: "Speak, and it's typed"
         case .ai: aiConfigured ? "Speak it, get it polished" : "Rewrite needs a provider"
@@ -399,7 +399,7 @@ struct HomeIntroCard: View {
         }
     }
 
-    private var text: String {
+    private var text: LocalizedStringKey {
         switch tab {
         case .dictate:
             holdToTalk ? "Hold the shortcut and speak, then let go — the text lands wherever your cursor is, in any app."
@@ -465,7 +465,7 @@ struct HomeIntroCard: View {
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(MainColor.ink.opacity(0.06)))
     }
 
-    private func tabButton(_ title: String, _ value: Tab) -> some View {
+    private func tabButton(_ title: LocalizedStringKey, _ value: Tab) -> some View {
         let selected = tab == value
         return Button { tab = value } label: {
             Text(title)
@@ -552,8 +552,8 @@ struct HomeTalkPicture: View {
         }
         .allowsHitTesting(false)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(talk.isEdit ? "Selected text in \(talk.script.app) being rewritten"
-                            : "A dictation being typed into \(talk.script.app)")
+        .accessibilityLabel(talk.isEdit ? Text("Selected text in \(talk.script.app) being rewritten")
+                            : Text("A dictation being typed into \(talk.script.app)"))
     }
 
     // MARK: The message
@@ -562,8 +562,8 @@ struct HomeTalkPicture: View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 7) {
                 HomeAppMark(app: talk.script.app, size: 20, radius: 6)
-                Text(talk.script.app).fontWeight(.semibold).foregroundStyle(MainColor.ink)
-                Text(talk.script.place).foregroundStyle(MainColor.ink3)
+                Text(verbatim: talk.script.app).fontWeight(.semibold).foregroundStyle(MainColor.ink)
+                Text(verbatim: talk.script.place).foregroundStyle(MainColor.ink3)
             }
             .font(.system(size: 12))
 
@@ -571,11 +571,11 @@ struct HomeTalkPicture: View {
                 switch talk.message {
                 case .pasted:
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(talk.script.output)
+                        Text(verbatim: talk.script.output)
                         if talk.isEdit {
                             HomeTag(symbol: "pencil", title: "Edited", tint: .ai, size: 11)
                         } else if talk.isAI, let preset = talk.script.preset {
-                            HomeTag(symbol: "sparkles", title: preset, tint: .ai, size: 11)
+                            HomeTag(symbol: "sparkles", verbatim: preset, tint: .ai, size: 11)
                         }
                     }
                     .transition(.opacity.combined(with: .offset(y: 3)))
@@ -685,7 +685,8 @@ struct HomeTalkPicture: View {
             Text(verbatim: talk.settled).foregroundStyle(ink.opacity(0.9)) + partial
         case .pasted:
             Text(Image(systemName: "checkmark")).font(.system(size: 10, weight: .semibold)).foregroundStyle(ink)
-                + Text(verbatim: talk.isEdit ? "  Selection replaced" : "  Pasted into \(talk.script.app)")
+                + Text(verbatim: "  ").foregroundStyle(ink.opacity(0.9))
+                + (talk.isEdit ? Text("Selection replaced") : Text("Pasted into \(talk.script.app)"))
                     .foregroundStyle(ink.opacity(0.9))
         }
     }
@@ -753,7 +754,7 @@ struct HomeAppMark: View {
                     .overlay(shape.strokeBorder(Color(hex: 0x182C20).opacity(0.18), lineWidth: 0.5))
             } else {
                 let tint = Color(hex: Self.tints[app ?? ""] ?? 0x8A938D)
-                Text(String((app ?? "").prefix(1)).uppercased())
+                Text(verbatim: String((app ?? "").prefix(1)).uppercased())
                     .font(.system(size: size * 0.43, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: size, height: size)
@@ -940,16 +941,33 @@ struct HomeTag: View {
     /// `neutral`: a fact rather than something AI did or something that went wrong.
     enum Tint { case ai, problem, neutral }
     var symbol: String?
-    let title: String
+    let title: Text
     let tint: Tint
     var size: CGFloat = 12
+
+    /// Words from the String Catalog.
+    init(symbol: String? = nil, title: LocalizedStringKey, tint: Tint, size: CGFloat = 12) {
+        self.init(symbol: symbol, text: Text(title), tint: tint, size: size)
+    }
+
+    /// A name the user gave, such as a prompt's, shown as it is.
+    init(symbol: String? = nil, verbatim title: String, tint: Tint, size: CGFloat = 12) {
+        self.init(symbol: symbol, text: Text(verbatim: title), tint: tint, size: size)
+    }
+
+    init(symbol: String?, text: Text, tint: Tint, size: CGFloat) {
+        self.symbol = symbol
+        self.title = text
+        self.tint = tint
+        self.size = size
+    }
 
     var body: some View {
         HStack(spacing: 4) {
             if let symbol {
                 Image(systemName: symbol).font(.system(size: size - 1.5, weight: .medium))
             }
-            Text(title).font(.system(size: size, weight: .medium))
+            title.font(.system(size: size, weight: .medium))
         }
         .foregroundStyle(ink)
         .padding(.leading, 6)
@@ -1002,7 +1020,7 @@ struct HomeEngines: View {
             HomeSectionHeader(title: "Engines", link: "Open Settings") { actions.openSettings(.speech) }
             VStack(spacing: 0) {
                 HomeEngineRow(symbol: "waveform", title: "Speech", ai: false,
-                              value: Text(speechEngine), detail: languages) { actions.openSettings(.speech) }
+                              value: speechEngine, detail: languages) { actions.openSettings(.speech) }
                 Rectangle().fill(MainColor.separator).frame(height: 1)
                 HomeEngineRow(symbol: "sparkles", title: "AI Rewrite", ai: true,
                               value: aiEngine, detail: nil) { actions.openSettings(.ai) }
@@ -1012,28 +1030,29 @@ struct HomeEngines: View {
         }
     }
 
-    private var speechEngine: String {
+    private var speechEngine: Text {
         let provider = STTProviderType(rawValue: sttProvider) ?? .apple
         switch provider {
-        case .apple: return "Apple · On-device"
+        case .apple: return Text("Apple · On-device")
         case .local:
-            return "On this Mac · \(localSTTModel(id: localSTTModelID)?.displayName ?? (localSTTModelID.isEmpty ? "Choose a model" : localSTTModelID))"
+            let name = localSTTModel(id: localSTTModelID)?.displayName ?? (localSTTModelID.isEmpty ? nil : localSTTModelID)
+            return name.map { Text("On this Mac · \($0)") } ?? Text("On this Mac · Choose a model")
         case .groq: return cloudEngine(provider, model: groqModel)
         case .elevenlabs: return cloudEngine(provider, model: elevenLabsModel)
         case .openai: return cloudEngine(provider, model: openAISTTModel)
         }
     }
 
-    private func cloudEngine(_ provider: STTProviderType, model id: String) -> String {
-        guard id != clearedModelChoice else { return "\(provider.vendor.displayName) · Choose a model" }
-        return "\(provider.vendor.displayName) · \(Self.plainName(sttModel(vendor: provider.vendor, id: id).displayName))"
+    private func cloudEngine(_ provider: STTProviderType, model id: String) -> Text {
+        guard id != clearedModelChoice else { return Text("\(provider.vendor.displayName) · Choose a model") }
+        return Text(verbatim: "\(provider.vendor.displayName) · \(Self.plainName(sttModel(vendor: provider.vendor, id: id).displayName))")
     }
 
-    private var languages: String {
+    private var languages: Text {
         let names = parseSpokenLanguages(spokenLanguages).compactMap { id in
             spokenLanguageCatalog.first { $0.id == id }?.displayName
         }
-        return names.isEmpty ? "Any language" : names.joined(separator: ", ")
+        return names.isEmpty ? Text("Any language") : Text(verbatim: names.joined(separator: ", "))
     }
 
     private var aiEngine: Text {
@@ -1041,18 +1060,27 @@ struct HomeEngines: View {
         _ = (groqLLMModel, anthropicModel, openAIModel, localLLMModel)
         guard LLMConfiguration.isConfigured else {
             return Text("Off").foregroundStyle(MainColor.ink2).fontWeight(.regular)
-                + Text(" · ").foregroundStyle(MainColor.ink2).fontWeight(.regular)
+                + Text(verbatim: " · ").foregroundStyle(MainColor.ink2).fontWeight(.regular)
                 + Text("Choose a provider").foregroundStyle(MainColor.aiInk)
         }
         let id = LLMConfiguration.model(for: type)
-        let listed = id == clearedModelChoice ? "Choose a model" : chatModel(provider: type, id: id).displayName
-        let (vendor, name): (String, String) = switch type {
-        case .anthropic: ("Claude", Self.plainName(listed).replacingOccurrences(of: "Claude ", with: ""))
-        case .groq: ("Groq", Self.plainName(listed))
-        case .openai: ("OpenAI", Self.plainName(listed))
-        case .local: ("On this Mac", listed)
+        let listed = chatModel(provider: type, id: id).displayName
+        let vendor: Text = switch type {
+        case .anthropic: Text(verbatim: "Claude")
+        case .groq: Text(verbatim: "Groq")
+        case .openai: Text(verbatim: "OpenAI")
+        case .local: Text("On this Mac")
         }
-        return Text("\(vendor) · \(name)")
+        let name: Text = if id == clearedModelChoice {
+            Text("Choose a model")
+        } else {
+            switch type {
+            case .anthropic: Text(verbatim: Self.plainName(listed).replacingOccurrences(of: "Claude ", with: ""))
+            case .groq, .openai: Text(verbatim: Self.plainName(listed))
+            case .local: Text(verbatim: listed)
+            }
+        }
+        return vendor + Text(verbatim: " · ") + name
     }
 
     /// A catalogue name without its picker note: "Scribe v2 Realtime — live text" and
@@ -1062,10 +1090,10 @@ struct HomeEngines: View {
 
 private struct HomeEngineRow: View {
     let symbol: String
-    let title: String
+    let title: LocalizedStringKey
     let ai: Bool
     let value: Text
-    let detail: String?
+    let detail: Text?
     let action: () -> Void
     @State private var hovering = false
 
@@ -1087,7 +1115,7 @@ private struct HomeEngineRow: View {
                 HStack(spacing: 10) {
                     value.font(.system(size: 14, weight: .medium)).foregroundStyle(MainColor.ink)
                     if let detail {
-                        Text(detail).font(.system(size: 14)).foregroundStyle(MainColor.ink3)
+                        detail.font(.system(size: 14)).foregroundStyle(MainColor.ink3)
                     }
                 }
                 .lineLimit(1)
@@ -1165,22 +1193,19 @@ struct HomeWeekCard: View {
 
     private func stats(_ week: HomeWeek) -> [HomeStat] {
         let (hours, minutes) = HomeFormat.duration(minutes: week.savedMinutes)
-        var saved: [HomeStat.Part] = [.approx]
-        if let hours { saved += [.number("\(hours)"), .unit("h")] }
-        if let minutes { saved += [.number(hours == nil ? "\(minutes)" : " \(minutes)"), .unit("min")] }
-        if hours == nil && minutes == nil { saved += [.number("0"), .unit("min")] }
+        let saved = HomeStat.saved(hours: hours, minutes: minutes)
 
         // Always an estimate: the date of the list prices, and any model they do not cover.
-        let spent: String
+        let spent: Text
         if week.spent > 0 {
-            spent = UsagePrices.disclaimer.prefix(1).uppercased() + UsagePrices.disclaimer.dropFirst()
+            spent = Text(verbatim: UsagePrices.disclaimer.prefix(1).uppercased() + UsagePrices.disclaimer.dropFirst())
         } else if week.dictations > 0 {
-            spent = week.unpricedModels.isEmpty ? "Models on this Mac cost nothing" : "Nothing priced yet"
+            spent = week.unpricedModels.isEmpty ? Text("Models on this Mac cost nothing") : Text("Nothing priced yet")
         } else {
-            spent = "Nothing dictated yet"
+            spent = Text("Nothing dictated yet")
         }
-        let unpriced = week.unpricedModels.isEmpty ? ""
-            : " · not counting \(week.unpricedModels.joined(separator: ", "))"
+        let unpriced = week.unpricedModels.isEmpty ? Text(verbatim: "")
+            : Text(verbatim: " · ") + Text("not counting \(week.unpricedModels.joined(separator: ", "))")
 
         let third = HomeStat(symbol: "creditcard", title: "Spent",
                              value: week.spent > 0 ? [.approx, .number(HomeFormat.money(week.spent))] : [.number("$0")],
@@ -1188,22 +1213,48 @@ struct HomeWeekCard: View {
 
         return [
             HomeStat(symbol: "text.alignleft", title: "Dictated",
-                     value: [.number(HomeFormat.integer(week.words)), .unit("words")],
-                     label: "in \(HomeFormat.integer(week.dictations)) dictations"),
+                     value: [.counted(week.words, AttributedString(localized: "\(week.words) words"))],
+                     label: Text("in \(week.dictations) dictations")),
             HomeStat(symbol: "clock", title: "Time saved", value: saved,
-                     label: storedTyping >= 10 ? "vs typing at \(Int(typing)) wpm"
-                        : "vs an average typist (\(Int(typing)) wpm)"),
+                     label: storedTyping >= 10 ? Text("vs typing at \(Int(typing)) wpm")
+                        : Text("vs an average typist (\(Int(typing)) wpm)")),
             third,
         ]
     }
 }
 
 struct HomeStat {
-    enum Part { case approx, number(String), unit(String) }
+    /// `counted`: a number and its noun as one string of the catalog, so the noun agrees
+    /// with the number in every language; the number in it is drawn as the figure.
+    enum Part {
+        case approx
+        case number(String)
+        case unit(Text)
+        case counted(Int, AttributedString)
+    }
     let symbol: String
-    let title: String
+    let title: LocalizedStringKey
     let value: [Part]
-    let label: String
+    let label: Text
+
+    /// "≈ 1 h 20 min": the time saved, as Home and Usage show it.
+    static func saved(hours: Int?, minutes: Int?) -> [Part] {
+        var parts: [Part] = [.approx]
+        if let hours { parts += [.number("\(hours)"), .unit(Text("h"))] }
+        if let minutes { parts += [.number(hours == nil ? "\(minutes)" : " \(minutes)"), .unit(Text("min"))] }
+        if hours == nil && minutes == nil { parts += [.number("0"), .unit(Text("min"))] }
+        return parts
+    }
+
+    private static func figure(_ count: Int, in words: AttributedString, size: CGFloat) -> AttributedString {
+        var styled = words
+        styled.font = .system(size: size * 0.52, weight: .semibold)
+        if let range = styled.range(of: "\(count)") {
+            styled[range].font = .system(size: size, weight: .bold)
+            styled[range].tracking = -size * 0.04
+        }
+        return styled
+    }
 
     func number(size: CGFloat) -> Text {
         value.reduce(Text(verbatim: "")) { text, part in
@@ -1213,7 +1264,9 @@ struct HomeStat {
             case .number(let n):
                 text + Text(verbatim: n).font(.system(size: size, weight: .bold)).tracking(-size * 0.04)
             case .unit(let u):
-                text + Text(verbatim: " " + u).font(.system(size: size * 0.52, weight: .semibold))
+                text + (Text(verbatim: " ") + u).font(.system(size: size * 0.52, weight: .semibold))
+            case .counted(let count, let words):
+                text + Text(Self.figure(count, in: words, size: size))
             }
         }
     }
@@ -1243,7 +1296,7 @@ private struct HomeStatRow: View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
                 HomeStatKicker(stat: stat)
-                Text(stat.label)
+                stat.label
                     .font(.system(size: 12.5))
                     .foregroundStyle(MainColor.ink3)
                     .padding(.leading, 21)
@@ -1274,7 +1327,7 @@ private struct HomeStatColumn: View {
                 .fixedSize()
                 .padding(.top, 12)
                 .padding(.bottom, 8)
-            Text(stat.label)
+            stat.label
                 .font(.system(size: 12.5))
                 .foregroundStyle(MainColor.ink3)
                 .lineSpacing(2)
@@ -1299,13 +1352,13 @@ private struct HomeWeekDays: View {
                     MainPixelColumn(lit: Array(repeating: MainColor.speech.opacity(0.7),
                                                count: min(Self.rows, week.litRows(for: day, rows: Self.rows))),
                                     columns: 4, rows: Self.rows)
-                    Text(day.isToday ? "Today" : Self.weekday(day.date))
+                    (day.isToday ? Text("Today") : Text(verbatim: Self.weekday(day.date)))
                         .font(.system(size: 11, weight: day.isToday ? .semibold : .regular))
                         .foregroundStyle(day.isToday ? MainColor.ink2 : MainColor.ink3)
                         .fixedSize()
                 }
                 .frame(width: 26)
-                .help("\(HomeFormat.integer(day.words)) words")
+                .help(Text("\(day.words) words"))
             }
         }
         .accessibilityElement(children: .ignore)
@@ -1314,8 +1367,8 @@ private struct HomeWeekDays: View {
 
     private static func weekday(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_GB")
-        formatter.dateFormat = "EEE"
+        formatter.locale = .appLanguage
+        formatter.setLocalizedDateFormatFromTemplate("EEE")
         return formatter.string(from: date)
     }
 }
@@ -1344,10 +1397,10 @@ struct HomeWays: View {
             HStack(alignment: .top, spacing: 6) {
                 HomeWayTile(action: .ai, symbol: .sparkles, name: "Dictate with AI Rewrite",
                             description: "Just talk, or say what you want — AI pastes the finished text.",
-                            off: aiReady ? nil : "Works as plain Dictate until you", actions: actions)
+                            off: aiReady ? nil : .worksAsDictate, actions: actions)
                 HomeWayTile(action: .edit, symbol: .pencil, name: "Edit selection",
                             description: "Select text, then tell AI how to improve it.",
-                            off: aiReady ? nil : "Needs AI Rewrite —", actions: actions)
+                            off: aiReady ? nil : .needsAIRewrite, actions: actions)
                 HomeWayTile(action: .recordWindow, symbol: .record, name: "Record Window",
                             description: "Dictate into a window of its own, then copy or insert.",
                             off: nil, actions: actions)
@@ -1428,17 +1481,26 @@ final class HomeKeyboard {
 
 private struct HomeWayTile: View {
     enum Symbol { case sparkles, pencil, record }
+    /// Why the shortcut cannot do its job without an AI provider: the line that says so
+    /// around its "choose a provider" link.
+    enum Off { case worksAsDictate, needsAIRewrite }
     let action: ShortcutAction
     let symbol: Symbol
-    let name: String
-    let description: String
-    /// Set when the shortcut cannot do its job without an AI provider: what the line says
-    /// before its "choose a provider" link.
-    let off: String?
+    let name: LocalizedStringKey
+    let description: LocalizedStringKey
+    let off: Off?
     let actions: MainWindowActions
 
     private var isAI: Bool { action != .recordWindow }
     private var muted: Bool { off != nil }
+
+    private func offLine(_ off: Off) -> Text {
+        let link = Text("choose a provider").fontWeight(.semibold).foregroundStyle(MainColor.aiInk)
+        return switch off {
+        case .worksAsDictate: Text("Works as plain Dictate until you \(link).")
+        case .needsAIRewrite: Text("Needs AI Rewrite — \(link).")
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -1461,7 +1523,7 @@ private struct HomeWayTile: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(muted ? MainColor.ink2 : MainColor.ink)
                 if let off {
-                    (Text(off + " ") + Text("choose a provider").fontWeight(.semibold).foregroundStyle(MainColor.aiInk) + Text("."))
+                    offLine(off)
                         .font(.system(size: 13))
                         .foregroundStyle(MainColor.ink2)
                         .lineSpacing(3)
@@ -1543,15 +1605,15 @@ private struct HomeRecentRow: View {
         HStack(spacing: 14) {
             HomeEntryMark(entry: entry)
             VStack(alignment: .leading, spacing: 5) {
-                Text(entry.preview)
+                Text(verbatim: entry.preview)
                     .font(.system(size: failed ? 13 : 14))
                     .foregroundStyle(failed ? MainColor.ink2 : MainColor.ink)
                     .lineLimit(1)
                     .truncationMode(.tail)
                 HStack(spacing: 6) {
-                    Text(entry.place).fontWeight(.medium).foregroundStyle(MainColor.ink)
-                    Text("·")
-                    Text(entry.timeText()).monospacedDigit()
+                    HomePlace.text(entry.place).fontWeight(.medium).foregroundStyle(MainColor.ink)
+                    Text(verbatim: "·")
+                    Text(verbatim: entry.timeText()).monospacedDigit()
                     HomeEntryTags(tags: entry.tags)
                 }
                 .font(.system(size: 12))
@@ -1627,13 +1689,13 @@ struct HomeEntryTags: View {
     var body: some View {
         ForEach(Array(tags.enumerated()), id: \.offset) { _, tag in
             switch tag {
-            case .preset(let name): HomeTag(symbol: "sparkles", title: name, tint: .ai).padding(.leading, 8)
+            case .preset(let name): HomeTag(symbol: "sparkles", verbatim: name, tint: .ai).padding(.leading, 8)
             case .edit: HomeTag(symbol: "pencil", title: "Edit", tint: .ai).padding(.leading, 8)
             case .rewriteFailed: HomeTag(symbol: "sparkles", title: "Rewrite failed", tint: .problem).padding(.leading, 8)
             case .failed: HomeTag(symbol: "exclamationmark.circle", title: "Failed", tint: .problem).padding(.leading, 8)
             // Saved with no connection: where it was going, since the row's mark says "Not pasted".
             case .notPasted(let app):
-                HomeTag(symbol: "wifi.slash", title: app.map { "For \($0)" } ?? "Offline", tint: .neutral)
+                HomeTag(symbol: "wifi.slash", text: app.map { Text("For \($0)") } ?? Text("Offline"), tint: .neutral, size: 12)
                     .padding(.leading, 8)
             }
         }
@@ -1647,7 +1709,7 @@ struct HomeEntryTags: View {
 /// turns back into Retry once the model is usable.
 struct HomeRetryButton: View {
     let id: UUID
-    var title = "Retry"
+    var title: LocalizedStringKey = "Retry"
     var height: CGFloat = 28
     let openSettings: (SettingsCategory?) -> Void
     @AppStorage(SettingsKeys.sttProvider) private var sttProvider = STTProviderType.apple.rawValue
@@ -1693,7 +1755,7 @@ struct HomeRetryButton: View {
 /// Copy, then "Copied" for a moment.
 struct HomeCopyButton: View {
     let text: String
-    var title: String?
+    var title: LocalizedStringKey?
     @Binding var copied: Bool
     var height: CGFloat = 28
     @State private var hovering = false
@@ -1716,7 +1778,20 @@ struct HomeCopyButton: View {
         }
         .buttonStyle(SetupButtonStyle(kind: .secondary, height: height, hovered: hovering))
         .onHover { hovering = $0 }
-        .help(title ?? "Copy")
+        .help(Text(title ?? "Copy"))
         .disabled(text.isEmpty)
+    }
+}
+
+/// Where a dictation went, as a row says it: an app's own name as it is; the two places
+/// SpeechText names itself — its Record Window, and nowhere — in the app's words. The
+/// English names stay what History keys and matches on.
+enum HomePlace {
+    static func text(_ place: String) -> Text {
+        switch place {
+        case HomeRecentEntry.notPasted: Text("Not pasted")
+        case "Record Window": Text("Record Window")
+        default: Text(verbatim: place)
+        }
     }
 }

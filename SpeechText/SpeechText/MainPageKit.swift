@@ -248,18 +248,18 @@ struct MainChip: View {
 /// The intro card's tabs and History's filters, for any set of choices: a capsule switch
 /// as macOS 26 draws them.
 struct MainSwitch<Item: Hashable>: View {
-    let items: [(Item, String)]
+    let items: [(Item, Text)]
     @Binding var selection: Item
     var height: CGFloat = 26
-    /// What VoiceOver calls the switch; empty for none.
-    var label = ""
+    /// What VoiceOver calls the switch; nil for none.
+    var label: LocalizedStringKey?
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(Array(items.enumerated()), id: \.offset) { _, item in
                 let selected = selection == item.0
                 Button { withAnimation(.easeOut(duration: 0.15)) { selection = item.0 } } label: {
-                    Text(item.1)
+                    item.1
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(selected ? MainColor.ink : MainColor.ink2)
                         .padding(.horizontal, 11)
@@ -284,8 +284,10 @@ struct MainSwitch<Item: Hashable>: View {
         // VoiceOver gets the segmented control the capsule is drawn after: one element,
         // the selected choice as its value.
         .accessibilityRepresentation {
-            Picker(label, selection: $selection) {
-                ForEach(Array(items.enumerated()), id: \.offset) { _, item in Text(item.1).tag(item.0) }
+            Picker(selection: $selection) {
+                ForEach(Array(items.enumerated()), id: \.offset) { _, item in item.1.tag(item.0) }
+            } label: {
+                if let label { Text(label) }
             }
             .pickerStyle(.segmented)
         }
@@ -489,5 +491,13 @@ struct MainGlassPill<Content: View>: View {
             .background(.ultraThinMaterial, in: Capsule())
             .overlay(Capsule().strokeBorder(Color(hex: 0x182C20).opacity(0.1), lineWidth: 0.5))
             .shadow(color: Color(red: 16 / 255, green: 40 / 255, blue: 28 / 255).opacity(0.2), radius: 8, y: 5)
+    }
+}
+
+extension Locale {
+    /// The language the app's own words are shown in — the String Catalog's, not the
+    /// region's — for dates and weekday names written beside them.
+    static var appLanguage: Locale {
+        Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
     }
 }

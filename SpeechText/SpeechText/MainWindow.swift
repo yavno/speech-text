@@ -95,7 +95,7 @@ enum MainPage: String, CaseIterable, Identifiable {
 
     static let rail: [MainPage] = [.home, .history, .usage, .prompts, .dictionary, .notepad, .notetaker]
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .home: "Home"
         case .history: "History"
@@ -138,9 +138,10 @@ enum MainPage: String, CaseIterable, Identifiable {
     /// so the selected one still stands out from the rest.
     var hasFill: Bool { selectedSymbol != symbol }
 
-    var lead: String {
+    var lead: LocalizedStringKey {
         switch self {
-        case .home: ""
+        // Home has no title row; nothing reads its lead.
+        case .home: LocalizedStringKey(String())
         case .history: "What you said, and what SpeechText did with it."
         case .usage: "What you dictated, what it cost, and the time it saved you."
         case .prompts: "The instructions AI Rewrite follows — one for each kind of text you dictate."
@@ -380,9 +381,9 @@ private struct MainSidebarItem: View {
                                               hovering: hovering, compact: compact))
             .onHover { hovering = $0 }
             .animation(.easeOut(duration: 0.15), value: hovering)
-            .help(page.isComingLater ? "\(page.title) — coming soon" : page.title)
-            .accessibilityLabel(page.title)
-            .accessibilityValue(isOpen ? "Open" : "")
+            .help(page.isComingLater ? Text("\(Text(page.title)) — coming soon") : Text(page.title))
+            .accessibilityLabel(Text(page.title))
+            .accessibilityValue(isOpen ? Text("Open") : Text(verbatim: ""))
             .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
