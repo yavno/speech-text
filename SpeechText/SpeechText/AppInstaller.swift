@@ -67,12 +67,14 @@ enum AppInstaller {
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
         alert.icon = NSApp.applicationIconImage
-        alert.messageText = "Move SpeechText to Applications?"
-        alert.informativeText = "SpeechText is running from the disk image it was downloaded in, "
-            + "and would stop working once the disk image is closed. "
-            + "It will open again from Applications and walk you through setup."
-        alert.addButton(withTitle: "Move to Applications")
-        alert.addButton(withTitle: "Quit")
+        alert.messageText = String(localized: "Move SpeechText to Applications?")
+        alert.informativeText = String(localized: """
+            SpeechText is running from the disk image it was downloaded in, \
+            and would stop working once the disk image is closed. \
+            It will open again from Applications and walk you through setup.
+            """)
+        alert.addButton(withTitle: String(localized: "Move to Applications"))
+        alert.addButton(withTitle: String(localized: "Quit"))
         guard alert.runModal() == .alertFirstButtonReturn else {
             NSApp.terminate(nil)
             return true
@@ -85,9 +87,9 @@ enum AppInstaller {
             dlog("Install", "move failed: \(error.localizedDescription)", level: .error)
             let failure = NSAlert()
             failure.alertStyle = .warning
-            failure.messageText = "SpeechText couldn't move itself to Applications"
-            failure.informativeText = "\(error.localizedDescription)\n\n"
-                + "Drag SpeechText onto the Applications folder in the disk image's window, then open it from Applications."
+            failure.messageText = String(localized: "SpeechText couldn't move itself to Applications")
+            failure.informativeText = error.localizedDescription + "\n\n"
+                + String(localized: "Drag SpeechText onto the Applications folder in the disk image's window, then open it from Applications.")
             failure.runModal()
             NSApp.terminate(nil)
         }

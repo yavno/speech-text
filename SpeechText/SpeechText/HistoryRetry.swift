@@ -41,7 +41,7 @@ final class HistoryRetry {
         guard !inFlight.contains(recordID) else { return .alreadyRunning }
         guard let record = history.record(id: recordID),
               let audioURL = history.audioURL(for: record) else {
-            let message = "Saved audio is no longer available"
+            let message = String(localized: "Saved audio is no longer available")
             history.markRetryFailed(id: recordID, error: message)
             return .failed(message)
         }
@@ -86,7 +86,7 @@ final class HistoryRetry {
                 trimmed = ""
             }
             guard !trimmed.isEmpty else {
-                let message = "Retry returned no text"
+                let message = String(localized: "Retry returned no text")
                 history.markRetryFailed(id: recordID, error: message, event: billed)
                 return .failed(message)
             }

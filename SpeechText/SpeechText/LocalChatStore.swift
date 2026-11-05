@@ -133,8 +133,8 @@ enum LocalChatStoreError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .checksumMismatch: "The download was damaged. Try again."
-        case .incomplete: "The download ended early. Try again to continue it."
+        case .checksumMismatch: String(localized: "The download was damaged. Try again.")
+        case .incomplete: String(localized: "The download ended early. Try again to continue it.")
         }
     }
 }

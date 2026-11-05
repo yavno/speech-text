@@ -22,9 +22,9 @@ enum DockIconMode: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .never: return "Never"
-        case .whileWindowOpen: return "While a window is open"
-        case .always: return "Always"
+        case .never: return String(localized: "Never")
+        case .whileWindowOpen: return String(localized: "While a window is open")
+        case .always: return String(localized: "Always")
         }
     }
 

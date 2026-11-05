@@ -198,7 +198,7 @@ final class TextInsertionHandler {
         textView.breakUndoCoalescing()
         textView.textStorage?.replaceCharacters(in: plan.range, with: plan.text)
         textView.didChangeText()
-        textView.undoManager?.setActionName("AI Rewrite")
+        textView.undoManager?.setActionName(String(localized: "AI Rewrite"))
         dlog("Refine", "replaced \(plan.range.location)+\(plan.range.length) with \((plan.text as NSString).length) chars")
         return plan
     }
@@ -279,7 +279,7 @@ struct LCDTextEditor: NSViewRepresentable {
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.allowsUndo = true
         textView.textColor = NSColor(textColor)
-        textView.setAccessibilityLabel("Transcript")
+        textView.setAccessibilityLabel(String(localized: "Transcript"))
         applyAccent(to: textView)
         insertionHandler.textView = textView
         scrollView.drawsBackground = false
@@ -479,7 +479,7 @@ struct DirectRecordingPanelView: View {
 
             TransportKnob(
                 systemImage: speechEngine.isRecording ? "pause" : "play",
-                label: "Record",
+                label: String(localized: "Record"),
                 value: transportState,
                 tint: aiMode ? TechnoSkin.aiPhosphor.opacity(0.95) : .white.opacity(0.92),
                 isBusy: isBusy,
@@ -689,9 +689,9 @@ struct DirectRecordingPanelView: View {
 
     /// What the glass says before the first word lands.
     private var placeholderText: String? {
-        if speechEngine.isRecording { return "Listening…" }
-        if speechEngine.isStartingEngine { return "Starting…" }
-        if speechEngine.isTranscribing { return "Transcribing…" }
+        if speechEngine.isRecording { return String(localized: "Listening…") }
+        if speechEngine.isStartingEngine { return String(localized: "Starting…") }
+        if speechEngine.isTranscribing { return String(localized: "Transcribing…") }
         return nil
     }
 
@@ -710,7 +710,7 @@ struct DirectRecordingPanelView: View {
 
     private var statusText: String? {
         if let error = speechEngine.errorMessage { return error }
-        if isRefining { return "Rewriting with AI…" }
+        if isRefining { return String(localized: "Rewriting with AI…") }
         return refineStatus
     }
 
@@ -723,20 +723,20 @@ struct DirectRecordingPanelView: View {
     // MARK: - Controls
 
     private var transportHelp: String {
-        if isBusy { return "Working…" }
-        if speechEngine.isRecording { return "Pause and transcribe" }
-        if speechEngine.isPaused { return "Resume recording" }
-        return "Start recording"
+        if isBusy { return String(localized: "Working…") }
+        if speechEngine.isRecording { return String(localized: "Pause and transcribe") }
+        if speechEngine.isPaused { return String(localized: "Resume recording") }
+        return String(localized: "Start recording")
     }
 
     /// What VoiceOver reads after the transport's name, in both skins.
     private var transportState: String {
-        if speechEngine.isStartingEngine { return "Starting" }
-        if isRefining { return "Rewriting with AI" }
-        if speechEngine.isTranscribing { return "Transcribing" }
-        if speechEngine.isRecording { return "Recording" }
-        if speechEngine.isPaused { return "Paused" }
-        return "Not recording"
+        if speechEngine.isStartingEngine { return String(localized: "Starting") }
+        if isRefining { return String(localized: "Rewriting with AI") }
+        if speechEngine.isTranscribing { return String(localized: "Transcribing") }
+        if speechEngine.isRecording { return String(localized: "Recording") }
+        if speechEngine.isPaused { return String(localized: "Paused") }
+        return String(localized: "Not recording")
     }
 
     /// The language badge's code, spelled out for VoiceOver ("EN" → "English").
@@ -789,33 +789,33 @@ struct DirectRecordingPanelView: View {
             RailAction(
                 id: "ai",
                 systemImage: "sparkles",
-                label: "AI Rewrite",
-                value: aiMode ? "On" : "Off",
+                label: String(localized: "AI Rewrite"),
+                value: aiMode ? String(localized: "On") : String(localized: "Off"),
                 isOn: aiMode,
                 accent: skin == .techno ? TechnoSkin.aiPhosphor : Semantic.ai,
                 help: aiMode
-                    ? "AI mode on — dictation is rewritten using your prompt presets"
-                    : "AI mode off — text is inserted as transcribed",
+                    ? String(localized: "AI mode on — dictation is rewritten using your prompt presets")
+                    : String(localized: "AI mode off — text is inserted as transcribed"),
                 action: toggleAIMode
             ),
             RailAction(
                 id: "paste",
                 systemImage: showPasteCheck ? "checkmark" : "text.insert",
-                label: "Insert",
+                label: String(localized: "Insert"),
                 isOn: showPasteCheck,
                 accent: confirmation,
                 isEnabled: hasText,
-                help: "Insert at the cursor in the app you came from",
+                help: String(localized: "Insert at the cursor in the app you came from"),
                 action: pasteAtCursor
             ),
             RailAction(
                 id: "copy",
                 systemImage: showCopyCheck ? "checkmark" : "doc.on.doc",
-                label: "Copy",
+                label: String(localized: "Copy"),
                 isOn: showCopyCheck,
                 accent: confirmation,
                 isEnabled: hasText,
-                help: "Copy to the clipboard",
+                help: String(localized: "Copy to the clipboard"),
                 action: copyToClipboard
             ),
         ]
@@ -858,8 +858,8 @@ struct DirectRecordingPanelView: View {
     private var closeButton: some View {
         PlasticButton(
             systemImage: "xmark",
-            label: "Close",
-            help: "Close (the transcription is kept in History)",
+            label: String(localized: "Close"),
+            help: String(localized: "Close (the transcription is kept in History)"),
             action: onDismiss
         )
         .offset(x: Layout.railLeft + 3, y: railBottom + Layout.closeGap)
@@ -920,8 +920,8 @@ struct DirectRecordingPanelView: View {
     private func enqueueRefinement(_ pending: PendingRefinement) {
         guard TextRefinementService.isConfigured else {
             refineStatus = LLMConfiguration.providerType.needsAPIKey
-                ? "Set an LLM API key in Settings to use AI mode"
-                : "Choose a model in Settings › AI Rewrite to use AI mode"
+                ? String(localized: "Set an LLM API key in Settings to use AI mode")
+                : String(localized: "Choose a model in Settings › AI Rewrite to use AI mode")
             refineFailed = true
             return
         }
@@ -970,7 +970,7 @@ struct DirectRecordingPanelView: View {
                                                     allowsSummary: !pending.wholeText) {
                     let share = Int((Double(result.text.count) / Double(source.count) * 100).rounded())
                     dlog("Refine", "refused: \(result.presetName ?? "no preset") left \(share)% of \(source.count) chars", level: .notice)
-                    refineStatus = "AI cut this to \(share)% of its length — kept what you dictated"
+                    refineStatus = String(localized: "AI cut this to \(share)% of its length — kept what you dictated")
                     refineFailed = true
                     if let recordID {
                         TranscriptionHistory.shared.recordRefinementFailure(
@@ -984,13 +984,13 @@ struct DirectRecordingPanelView: View {
 
                 if source != result.text.trimmingCharacters(in: .whitespacesAndNewlines) {
                     guard let applied = insertionHandler.replace(pending.records, with: result.text) else {
-                        refineStatus = "The text changed while AI was working — left as it is"
+                        refineStatus = String(localized: "The text changed while AI was working — left as it is")
                         refineFailed = true
                         return
                     }
                     shiftQueue(after: applied)
                 }
-                refineStatus = result.presetName.map { "AI · \($0)" } ?? "AI"
+                refineStatus = result.presetName.map { String(localized: "AI · \($0)") } ?? String(localized: "AI")
                 refineFailed = false
                 if let recordID {
                     TranscriptionHistory.shared.recordRefinement(
@@ -1003,7 +1003,7 @@ struct DirectRecordingPanelView: View {
             } catch {
                 guard !Task.isCancelled else { return }
                 // The dictated text stays in the text area — nothing is lost.
-                refineStatus = "AI failed: \(error.localizedDescription)"
+                refineStatus = String(localized: "AI failed: \(error.localizedDescription)")
                 refineFailed = true
                 if let recordID {
                     let type = LLMConfiguration.providerType

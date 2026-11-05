@@ -107,7 +107,7 @@ final class EngineCapture: AudioCapture, @unchecked Sendable {
 enum DeviceCaptureError: LocalizedError {
     case noInput
 
-    var errorDescription: String? { "The microphone offers no input" }
+    var errorDescription: String? { String(localized: "The microphone offers no input") }
 }
 
 final class DeviceCapture: AudioCapture, @unchecked Sendable {
