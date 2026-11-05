@@ -89,6 +89,11 @@ public enum SettingsKeys {
     /// migrated once instead of silently keeping the old assignment.
     public static let hotkeyLayoutVersion = "hotkeyLayoutVersion"
 
+    /// The built-in prompts' version the stored `promptPresets` were last moved to
+    /// (`PromptPresetStore.migrateIfNeeded`). Not in `portable`: the move is idempotent,
+    /// so a list carried across a rename without it is only moved again for nothing.
+    public static let promptPresetsVersion = "promptPresetsVersion"
+
     // Appearance
     /// `AppSkin.rawValue`.
     public static let appSkin = "appSkin"

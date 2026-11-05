@@ -17,10 +17,12 @@ import SpeechTextCore
 ///     SpeechTextEvaluation --self-check <fixtures.json>
 ///
 /// The fixtures are text: AI Rewrite's input is a transcript, so no audio is needed. A
-/// *variant* is a way of turning a fixture into requests and a reply into text; `current`
-/// is exactly what the app sends today — the built-in presets (never the user's),
-/// `buildSystemPrompt` / `buildEditSystemPrompt`, `userMessage`, `parse` and
-/// `polishedReply` with the fixture's Dictionary — through the client
+/// *variant* is a way of turning a fixture into requests and a reply into text; `2026-11`
+/// is exactly what the app sends — the built-in modes (never the user's) and the
+/// fixture's own `presets`, `RewriteModes.request` / `buildEditSystemPrompt`,
+/// `userMessage`, the reply read as the app reads it and `polishedReply` with the
+/// fixture's Dictionary — and `current` is the baseline it was held to, the prompt the app
+/// sent until #109. Both go through the client
 /// `LLMConfiguration.makeChatClient(model:apiKey:)` builds, with each model's catalogue
 /// switches unless `--reasoning-effort` says otherwise. Later variants (#109, #110) are new
 /// cases of `Variant`, judged by the same checks.
@@ -110,14 +112,26 @@ enum RewriteEvaluation {
     }
 
     enum Variant: String, Codable, CaseIterable, Sendable {
-        /// What the app sends today: one request, the routing prompt with every preset.
+        /// The baseline: what the app sent until #109, one request with the routing prompt
+        /// over the six built-ins of October 2026 (`PromptPresetStore.october2026`), the
+        /// edit's prompt over them too. Its name is older than the variant after it, and
+        /// stays, since the fixtures' `modes` and every run kept are keyed to it.
         case current
-        /// One request on the three modes of docs/specs/2026-11-03-rewrite-modes-and-router.md
-        /// (#109, `RewriteModes`): the fixture's own `presets` offered beside them, and a field
-        /// for another program sent Clean-up alone, by code, unless the user has prompts of
-        /// their own. Its name is the key of the fixtures' `variantModes`. An edit is sent
-        /// exactly what `current` sends: its prompt is #106's.
+        /// What the app sends: one request on the three modes of
+        /// docs/specs/2026-11-03-rewrite-modes-and-router.md (#109, `RewriteModes`), the
+        /// fixture's own `presets` offered beside them, and a field for another program sent
+        /// Clean-up alone, by code, unless the user has prompts of their own. Its name is the
+        /// key of the fixtures' `variantModes`. An edit is sent the Edit prompt over the
+        /// three modes (#106 rewrites it).
         case modes2026 = "2026-11"
+
+        /// The built-ins this variant sends, its edits' included.
+        var presets: [PromptPreset] {
+            switch self {
+            case .current: PromptPresetStore.october2026
+            case .modes2026: PromptPresetStore.builtInDefaults
+            }
+        }
     }
 
     /// One request a variant made.
@@ -255,7 +269,7 @@ enum RewriteEvaluation {
         var repeats = 1
         var concurrency = 4
         var sampling = LlamaSampling.rewrite
-        var variant = Variant.current
+        var variant = Variant.modes2026
         var effortArgument = "default"
         var judgeSpecs: [String] = []
         func value(_ flag: String) throws -> String {
@@ -294,7 +308,7 @@ enum RewriteEvaluation {
         let folder = runs.appendingPathComponent(runFolderName(), isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 
-        let presets = PromptPresetStore.builtInDefaults
+        let presets = variant.presets
         let effort: String?? = switch effortArgument {
         case "default": nil
         case "omit": .some(nil)
@@ -304,7 +318,7 @@ enum RewriteEvaluation {
         let setup = Setup(
             variant: variant, presets: presets,
             system: variant == .modes2026
-                ? RewriteModes.request(context: nil, ownPresets: []).system
+                ? RewriteModes.request(context: nil, presets: presets).system
                 : TextRefinementService.buildSystemPrompt(presets: presets, defaultPresetID: nil),
             editSystem: TextRefinementService.buildEditSystemPrompt(presets: presets),
             repeats: repeats, reasoningEffort: effort, judges: judges, concurrency: concurrency,
@@ -578,7 +592,7 @@ enum RewriteEvaluation {
     }
 
     static func modesRequest(_ fixture: RewriteFixture) -> RewriteModes.Request {
-        RewriteModes.request(context: focusContext(fixture), ownPresets: (fixture.presets ?? []).map {
+        RewriteModes.request(context: focusContext(fixture), presets: Variant.modes2026.presets + (fixture.presets ?? []).map {
             PromptPreset(name: $0.name, whenToUse: $0.whenToUse, instructions: $0.instructions)
         })
     }
@@ -760,11 +774,11 @@ enum RewriteEvaluation {
         report.rechecked = sources.map(\.path)
         // A fixture removed since the run takes its rows with it.
         report.rows.removeAll { byID[$0.fixture] == nil }
-        let names = PromptPresetStore.builtInDefaults.map(\.name)
         report.rows = report.rows.map { row in
             guard row.status == "ok" || row.status == "failed", let raw = row.raw, let fixture = byID[row.fixture] else { return row }
             var row = row
             let modes = row.variant == Variant.modes2026.rawValue && !fixture.isEdit ? modesRequest(fixture) : nil
+            let names = (Variant(rawValue: row.variant) ?? .current).presets.map(\.name)
             let read = RewriteChecks.read(raw, fixture: fixture, presetNames: modes?.modeNames
                 ?? names + (fixture.isEdit ? editModeNames : []))
             row.reply = read.text
@@ -781,7 +795,7 @@ enum RewriteEvaluation {
         if !judges.isEmpty {
             report.judgeList = Array(Set((report.judgeList ?? report.judge.map { [$0] } ?? []) + judges.map(\.spec))).sorted()
             report.judge = nil
-            let setup = Setup(variant: .current, presets: PromptPresetStore.builtInDefaults, system: "", editSystem: "",
+            let setup = Setup(variant: .current, presets: Variant.current.presets, system: "", editSystem: "",
                               repeats: 1, reasoningEffort: nil, judges: judges,
                               keys: ProcessInfo.processInfo.environment.filter { $0.key.hasSuffix("_API_KEY") })
             report.rows = await gradeRows(report.rows, fixtures: byID, setup: setup)

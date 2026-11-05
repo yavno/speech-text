@@ -35,6 +35,7 @@ across a bundle-identifier rename.
 | `localLLMModel` | The chat model AI Rewrite runs on this Mac — a `LocalChatModel` id, normalised against `localChatModels` | `"gemma-4-12b-it-qat-q4_0"` |
 | `promptPresets` | JSON-encoded `[PromptPreset]` | built-in defaults |
 | `defaultPresetID` | UUID of the fallback preset | Clean-up |
+| `promptPresetsVersion` | One-shot marker: the built-in prompts' version `promptPresets` was last moved to (`PromptPresetStore.migrateIfNeeded`; 1 = the three modes of 2026-11). Not in `portable`: the move is idempotent | `0` (unmigrated) |
 | `aiModeInRecordWindow` | Record Window ✨ toggle state | `false` |
 | `appSkin` | Appearance (`"techno"` or `"minimal"`) | `"techno"` |
 | `dockIconMode` | When the app shows a Dock / ⌘Tab icon (`"never"`, `"whileWindowOpen"`, `"always"`) — an agent's Settings window is otherwise unfindable once covered | `"always"` |

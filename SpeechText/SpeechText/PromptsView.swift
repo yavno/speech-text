@@ -96,7 +96,7 @@ struct PromptsView: View {
                 selection = presets.first?.id
             }
         } message: {
-            Text("Your own prompts and changes are replaced by the six that come with SpeechText.")
+            Text("Your own prompts and changes are replaced by the three that come with SpeechText.")
         }
     }
 
@@ -184,8 +184,7 @@ struct PromptsView: View {
 
     static func symbol(for preset: PromptPreset) -> String {
         let builtIn: [String: String] = [
-            "01": "wand.and.stars", "02": "pencil.line", "03": "envelope",
-            "04": "character.bubble", "05": "list.bullet", "06": "chevron.left.forwardslash.chevron.right",
+            "01": "wand.and.stars", "03": "envelope", "05": "list.bullet",
         ]
         if PromptPresetStore.builtInDefaults.contains(where: { $0.id == preset.id }),
            let symbol = builtIn[String(preset.id.uuidString.suffix(2))] {
@@ -291,8 +290,8 @@ private struct PromptsBanner: View {
     private static let examples: [Example] = [
         Example(builtIn: "03", said: "uh email to Sarah running late start without me"),
         Example(builtIn: "05", said: "list for the trip passport charger the blue jacket"),
-        Example(builtIn: "04", said: "translate to English дякую що прийшли"),
-        Example(builtIn: "06", said: "fix the bug where the token expires too early"),
+        Example(builtIn: "03", said: "reply to Oleh in English дякую що прийшли"),
+        Example(builtIn: "05", said: "commit message fix the token expiring too early"),
     ]
 
     private var shown: [(said: LocalizedStringKey, preset: PromptPreset)] {

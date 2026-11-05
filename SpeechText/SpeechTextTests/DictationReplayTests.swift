@@ -1444,7 +1444,7 @@ final class SelectionEditTests: XCTestCase {
         let prompt = TextRefinementService.buildEditSystemPrompt(presets: presets)
         XCTAssertTrue(prompt.contains("<<mode:NAME>>"))
         XCTAssertTrue(prompt.contains(TextRefinementService.editDefaultModeName))
-        XCTAssertTrue(prompt.contains("### Translate"))
+        XCTAssertTrue(prompt.contains("### Structured"))
         let parsed = TextRefinementService.parse("<<mode:Polish>>\nThe text.",
                                                  presetNames: presets.map(\.name) + ["Polish"])
         XCTAssertEqual(parsed.presetName, "Polish")

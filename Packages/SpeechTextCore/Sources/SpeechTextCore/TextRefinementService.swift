@@ -40,19 +40,16 @@ public enum TextRefinementService {
         }
 
         let provider = try LLMConfiguration.makeChatClient()
-        let presets = PromptPresetStore.load()
-        // The system prompt describes <context> whether or not this dictation has one:
-        // it stays the same from one recording to the next, and a missing block needs
-        // no explanation.
+        let request = RewriteModes.request(context: context, presets: PromptPresetStore.load(),
+                                           defaultPresetID: PromptPresetStore.storedDefaultPresetID())
         let sent = Date()
         let reply = try await provider.complete(
-            system: buildSystemPrompt(presets: presets,
-                                      defaultPresetID: PromptPresetStore.storedDefaultPresetID()),
+            system: request.system,
             user: userMessage(transcript: source, context: context,
                               vocabulary: Vocabulary.promptBlock(Vocabulary.load()))
         )
 
-        let parsed = parse(reply.text, presetNames: presets.map(\.name))
+        let parsed = RewriteModes.read(reply.text, request: request)
         // Models love "—" as much as Scribe does, and the prompt cannot be trusted to stop
         // them; the paste gets the user's dash either way. The model also quietly swaps
         // ordinary characters for look-alikes — see `replacingConfusablePunctuation`.
@@ -133,8 +130,8 @@ public enum TextRefinementService {
         return true
     }
 
-    /// A preset whose own description says it summarises — the built-in Notes / Bullets
-    /// ("asked for a summary, notes…"). Read off the words because presets are the user's
+    /// A preset whose own description says it summarises — the built-in Structured
+    /// ("notes, a summary, a list…"). Read off the words because presets are the user's
     /// to write; an English or Ukrainian stem is enough.
     static func isSummarising(_ preset: PromptPreset) -> Bool {
         let words = (preset.name + " " + preset.whenToUse).lowercased()
@@ -240,6 +237,10 @@ public enum TextRefinementService {
         return blocks.joined(separator: "\n\n")
     }
 
+    /// The one-step prompt AI Rewrite sent until #109, over `PromptPresetStore.october2026`:
+    /// the harness's `current` variant, the baseline a new prompt is held to. The app sends
+    /// `RewriteModes.request`.
+    ///
     /// `defaultPresetID` is the user's chosen fallback, and it is a parameter rather than
     /// a read: the prompt is pure logic, and the tests may not go near the
     /// user's own settings. There is no default value on purpose — a caller that forgot it

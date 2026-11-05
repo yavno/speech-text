@@ -6,17 +6,13 @@ import Foundation
 /// The one-step prompt on the modes of docs/specs/2026-11-03-rewrite-modes-and-router.md
 /// (#109): three built-in modes, each a kind of text; language, format, length and tone
 /// as rules on top of any of them (D2, D4, D5); and, in a field that takes text for
-/// another program, Clean-up alone, chosen by code (D3).
-///
-/// Measured before it ships: only the harness's `2026-11` variant calls it, and the app
-/// still sends `TextRefinementService.buildSystemPrompt` until the measurement says
-/// otherwise. When it ships, the modes replace `PromptPresetStore.builtInDefaults` (D9)
-/// and the field kinds move into `FocusContext.Kind`.
+/// another program, Clean-up alone, chosen by code (D3). What AI Rewrite sends a dictation,
+/// and what the harness's `2026-11` variant measures, through the same `request`.
 public enum RewriteModes {
     public static let cleanUpName = "Clean-up"
 
-    /// D1. The IDs are the built-ins' own: 01 and 03 keep their place, 05 becomes
-    /// Structured; 02, 04 and 06 are never reused. Structured keeps "summary" in its *When
+    /// D1, and `PromptPresetStore.builtInDefaults`. The IDs are the built-ins' own: 01 and
+    /// 03 keep their place, 05 becomes Structured; 02, 04 and 06 are never reused. Structured keeps "summary" in its *When
     /// to use*, which `TextRefinementService.isSummarising` reads.
     public static let builtIns: [PromptPreset] = [
         PromptPreset(
@@ -64,32 +60,6 @@ public enum RewriteModes {
         UUID(uuidString: "00000000-0000-0000-0000-0000000000\(suffix)")!
     }
 
-    // MARK: - Where the text goes (D3)
-
-    /// Editors and terminals, by bundle-identifier prefix, as read off the apps installed
-    /// on the maintainer's Mac (2026-11-04), plus Cursor's, which a fixture carries. The
-    /// rest of D3's list is added with `FocusContext.Kind`, each checked the same way.
-    static let codeEditorBundleIDPrefixes = [
-        "com.apple.dt.Xcode",
-        "com.microsoft.VSCode",
-        "com.todesktop.230313mzl4w4u92",    // Cursor
-        "com.jetbrains.",
-    ]
-    static let terminalBundleIDPrefixes = [
-        "com.apple.Terminal",
-        "com.googlecode.iterm2",
-        "com.cmuxterm.app",
-    ]
-
-    /// A field whose text is for another program — an editor, a terminal, an AI's prompt
-    /// box — so an instruction in it is written down, never carried out (D3).
-    public static func takesTextForAnotherProgram(_ context: FocusContext?) -> Bool {
-        guard let context else { return false }
-        if context.kind == .aiPrompt { return true }
-        guard let bundleID = context.bundleID else { return false }
-        return (codeEditorBundleIDPrefixes + terminalBundleIDPrefixes).contains { bundleID.hasPrefix($0) }
-    }
-
     // MARK: - The request
 
     /// What one dictation is sent: the system prompt, the mode names its marker may
@@ -100,21 +70,39 @@ public enum RewriteModes {
         public var decidedMode: String?
     }
 
-    /// D3 and D8. `ownPresets` are the user's prompts, offered beside the built-ins,
-    /// and in a field for another program in place of them, beside Clean-up.
-    public static func request(context: FocusContext?, ownPresets: [PromptPreset]) -> Request {
-        let cleanUp = builtIns[0]
-        guard takesTextForAnotherProgram(context) else {
-            let modes = builtIns + ownPresets
-            return Request(system: routingPrompt(modes: modes, forAnotherProgram: false),
-                           modeNames: modes.map(\.name), decidedMode: nil)
+    /// D3 and D8, for the user's stored prompts as the Prompts page keeps them. A prompt
+    /// is told for a built-in by its fixed ID, so a renamed or edited one stays in its
+    /// place: 01 is Clean-up, 03 and 05 are the other built-ins, which a field for another
+    /// program is not offered, and anything else is the user's own, an edited Translate
+    /// left by the migration among them. `defaultPresetID` is the mode marked default, as
+    /// `PromptPresetStore.defaultPreset` resolves it.
+    public static func request(context: FocusContext?, presets: [PromptPreset],
+                               defaultPresetID: UUID? = nil) -> Request {
+        guard context?.takesTextForAnotherProgram == true else {
+            return routing(presets, defaultPresetID: defaultPresetID, forAnotherProgram: false)
         }
-        if ownPresets.isEmpty {
-            return Request(system: cleanUpOnlyPrompt, modeNames: [cleanUp.name], decidedMode: cleanUp.name)
+        let cleanUpID = builtIns[0].id
+        let builtInIDs = Set(builtIns.map(\.id))
+        let offered = presets.filter { $0.id == cleanUpID || !builtInIDs.contains($0.id) }
+        let cleanUp = presets.first { $0.id == cleanUpID } ?? builtIns[0]
+        guard offered.contains(where: { $0.id != cleanUpID }) else {
+            return Request(system: cleanUpOnlyPrompt(cleanUp), modeNames: [cleanUp.name], decidedMode: cleanUp.name)
         }
-        let modes = [cleanUp] + ownPresets
-        return Request(system: routingPrompt(modes: modes, forAnotherProgram: true),
+        return routing(offered, defaultPresetID: defaultPresetID, forAnotherProgram: true)
+    }
+
+    private static func routing(_ modes: [PromptPreset], defaultPresetID: UUID?, forAnotherProgram: Bool) -> Request {
+        let fallback = PromptPresetStore.defaultPreset(in: modes, storedID: defaultPresetID)
+        return Request(system: routingPrompt(modes: modes, defaultID: fallback?.id, forAnotherProgram: forAnotherProgram),
                        modeNames: modes.map(\.name), decidedMode: nil)
+    }
+
+    /// The reply as the paste gets it before `polishedReply`, and the mode to report: the
+    /// one code chose, else the marker's. A model that writes a marker it was not asked
+    /// for still has it taken off.
+    public static func read(_ reply: String, request: Request) -> (text: String, presetName: String?) {
+        let parsed = TextRefinementService.parse(reply, presetNames: request.modeNames)
+        return (parsed.text, request.decidedMode ?? parsed.presetName)
     }
 
     // MARK: - The prompts
@@ -196,9 +184,23 @@ public enum RewriteModes {
         dictated in.
         """
 
-    static func routingPrompt(modes: [PromptPreset], forAnotherProgram: Bool) -> String {
+    /// The same, with the user's Clean-up where they edited it: the measured text for the
+    /// built-in as it ships, else their instructions in its place.
+    static func cleanUpOnlyPrompt(_ cleanUp: PromptPreset) -> String {
+        if cleanUp.instructions == builtIns[0].instructions { return cleanUpOnlyPrompt }
+        return """
+            \(openingForAnotherProgram)
+
+            \(rules)
+            \(anotherProgramRule)
+
+            \(cleanUp.instructions.trimmingCharacters(in: .whitespacesAndNewlines))
+            """
+    }
+
+    static func routingPrompt(modes: [PromptPreset], defaultID: UUID?, forAnotherProgram: Bool) -> String {
         let list = modes.map { mode -> String in
-            let marker = mode.name == cleanUpName ? "  (DEFAULT — use when nothing else clearly fits)" : ""
+            let marker = mode.id == defaultID ? "  (DEFAULT — use when nothing else clearly fits)" : ""
             return """
             ### \(mode.name)\(marker)
             When to use: \(mode.whenToUse.trimmingCharacters(in: .whitespacesAndNewlines))
