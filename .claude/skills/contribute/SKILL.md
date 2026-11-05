@@ -28,13 +28,16 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
    scripts/lint-swift.sh
    ```
    A new Swift file needs the SPDX header the others have.
-7. **Docs in the same change.** `CHANGELOG.md` under `[Unreleased]` if a user will notice
-   it, written for users. `docs/decisions.md` if a decision changed, `AGENTS.md` if a rule did, `docs/settings-keys.md` if a settings key did.
-   The guide in `docs/` the change makes untrue.
+7. **Docs in the same change.** `docs/decisions.md` if a decision changed,
+   `docs/settings-keys.md` if a settings key did, the guide in `docs/` the change makes
+   untrue. Not `CHANGELOG.md`: the maintainer writes that entry after the merge, from the
+   pull request's *Users will notice*. Not `AGENTS.md`: a rule there that no longer holds
+   is named in the pull request, and the maintainer rewrites it.
 8. **Commit.** `git commit -s` on every commit, a message that says what and why. English
    everywhere: code, comments, commits, the pull request.
 9. **Pull request.** Fill `.github/PULL_REQUEST_TEMPLATE.md`: what and why with
-   `Closes #N`, the checklist, *Privacy*, *Needs a real-app run* (what only a person
+   `Closes #N`, the checklist, *Users will notice* (what changes for someone using the app,
+   or "Nothing"), *Privacy*, *Needs a real-app run* (what only a person
    with the running app can check, or "None"), screenshots for UI.
 
 End with a short summary for the user: what changed, what ran and its result, what was

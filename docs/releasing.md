@@ -212,8 +212,11 @@ the catalogues by the model-lifecycle work. Until they land, every model exports
 reaches `main` first, whichever change merges second connects `CatalogueExport.lifecycle`
 to the descriptors.
 
-1. Write what changed under `## [Unreleased]` in `CHANGELOG.md` as the work lands —
-   that section becomes the release notes.
+1. Check `## [Unreleased]` in `CHANGELOG.md` against the pull requests merged since the
+   last tag. Entries are written after each merge, in a pull request of their own, from
+   the merged one's *Users will notice*; every pull request that names a change there has
+   its entry. That section becomes the release notes, so an entry missing now is missing
+   from the release.
 2. `scripts/rebuild.sh --tag X.Y.Z` sets the version, dates the
    CHANGELOG section, commits and tags `vX.Y.Z`. Nothing is pushed.
 3. `git push && git push origin vX.Y.Z`. `main` takes changes only as squash-merged pull

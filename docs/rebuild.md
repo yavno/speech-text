@@ -222,8 +222,9 @@ checks and publishes. That needs the Developer ID secrets, the provisioning prof
 (`DEVELOPER_ID_PROFILE_BASE64`) and the Sparkle key (`SPARKLE_ED_PRIVATE_KEY`); without
 them the workflow fails instead of releasing an unsigned image. See `docs/releasing.md`.
 
-It never writes release notes. What goes under `[Unreleased]` is written by hand as
-the work happens; a generated summary of commit subjects is not a changelog.
+It never writes release notes. What goes under `[Unreleased]` is written after each
+merge, from the pull request's *Users will notice*; a generated summary of commit
+subjects is not a changelog.
 
 ## Reading the result
 

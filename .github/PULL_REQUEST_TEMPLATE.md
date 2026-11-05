@@ -9,8 +9,10 @@ Closes #
 ## Checklist
 
 - [ ] Tests added or updated — or, if none are possible, why not: 
-- [ ] `CHANGELOG.md` has an entry under `[Unreleased]` if users will notice the change
-- [ ] `AGENTS.md`, `docs/decisions.md`, `docs/settings-keys.md` and the docs are updated if a rule, a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers)
+- [ ] `docs/decisions.md`, `docs/settings-keys.md` and the docs are updated if a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers); a rule in `AGENTS.md` that no longer holds is named here, not edited
+
+**Users will notice** — what changes for someone using the app, in a sentence or two, or "Nothing".  
+<!-- Leave CHANGELOG.md alone: the maintainer writes its entry from this after the merge. -->
 
 **Privacy** — does this send, store or log user text or audio anywhere new?  
 <!-- Yes / No. If yes: what, where, and why it is needed. -->
