@@ -209,7 +209,7 @@ struct SettingsView: View {
             SettingsRow(title: "Show in Dock", detail: "Also puts SpeechText in ⌘Tab, so a covered window can be found.") {
                 Picker("Show in Dock", selection: $dockIconRaw) {
                     ForEach(DockIconMode.allCases) { mode in
-                        Text(mode.label).tag(mode.rawValue)
+                        Text(verbatim: mode.label).tag(mode.rawValue)
                     }
                 }
                 .labelsHidden()
@@ -239,7 +239,7 @@ struct SettingsView: View {
             SettingsRow(title: "Follow SpeechText",
                         detail: "What's new, and where it's built.") {
                 HStack(spacing: 8) {
-                    LinkIconButton(image: Image(systemName: "globe"), label: "Website",
+                    LinkIconButton(image: Image(systemName: "globe"), label: String(localized: "Website"),
                                    url: ProjectLinks.website)
                     LinkIconButton(image: Image("GitHubMark"), label: "GitHub",
                                    url: ProjectLinks.repository)
@@ -277,7 +277,7 @@ struct SettingsView: View {
         let records = TranscriptionHistory.shared.records
         let stored = HistoryFormat.storageSummary(count: records.count, since: records.last?.date, bytes: historyBytes)
         return SettingsGroup(title: "History", trailing: AnyView(
-            Text(stored)
+            Text(verbatim: stored)
                 .font(.system(size: 11.5))
                 .foregroundStyle(SetupColor.label2)
                 .monospacedDigit())) {
@@ -303,7 +303,7 @@ struct SettingsView: View {
         .task(id: TranscriptionHistory.shared.records.count) {
             historyBytes = TranscriptionHistory.shared.diskBytes()
         }
-        .confirmationDialog(pendingRetention.map(retentionQuestion) ?? "",
+        .confirmationDialog(pendingRetention.map(retentionQuestion) ?? Text(verbatim: ""),
                             isPresented: Binding(get: { pendingRetention != nil }, set: { if !$0 { pendingRetention = nil } })) {
             Button("Delete", role: .destructive) {
                 if let pending = pendingRetention {
@@ -322,7 +322,7 @@ struct SettingsView: View {
         }
     }
 
-    private func retentionRow(title: String, detail: String, selection: HistoryRetention,
+    private func retentionRow(title: LocalizedStringKey, detail: LocalizedStringKey, selection: HistoryRetention,
                               choose: @escaping (HistoryRetention) -> Void) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
@@ -339,15 +339,12 @@ struct SettingsView: View {
         .padding(.vertical, 14)
     }
 
-    private func retentionQuestion(_ pending: PendingRetention) -> String {
-        let count = HomeFormat.integer(pending.count)
-        if pending.audio {
-            return pending.count == 1 ? "Delete the audio of 1 failed dictation?" : "Delete the audio of \(count) failed dictations?"
-        }
-        return pending.count == 1 ? "Delete 1 dictation?" : "Delete \(count) dictations?"
+    private func retentionQuestion(_ pending: PendingRetention) -> Text {
+        pending.audio ? Text("Delete the audio of \(pending.count) failed dictations?")
+            : Text("Delete \(pending.count) dictations?")
     }
 
-    private var historyRetentionDetail: String {
+    private var historyRetentionDetail: LocalizedStringKey {
         switch historyRetention {
         case .session: "Kept until SpeechText quits. Home and Usage count only this session."
         case .forever: "Kept on this Mac until you delete them."
@@ -355,7 +352,7 @@ struct SettingsView: View {
         }
     }
 
-    private var audioRetentionDetail: String {
+    private var audioRetentionDetail: LocalizedStringKey {
         if audioRetention.outlasts(historyRetention) {
             return "Kept for a retry, and deleted with its dictation."
         }
@@ -470,7 +467,7 @@ struct SettingsView: View {
         .padding(.vertical, 14)
     }
 
-    private var transparencyDetail: String {
+    private var transparencyDetail: LocalizedStringKey {
         if reduceTransparency {
             return "Reduce transparency is on in System Settings — nothing to adjust."
         }
@@ -486,7 +483,7 @@ struct SettingsView: View {
     }
 
     /// Said only when it matters: a colour of the user's own close to AI mode's violet.
-    private var technoColorWarning: String? {
+    private var technoColorWarning: LocalizedStringKey? {
         guard let hex = TechnoPhosphor.customHex(technoRaw), TechnoPalette.isCloseToAI(hex) else { return nil }
         return "Close to AI mode's violet — a plain dictation will be hard to tell from an AI one."
     }
@@ -507,7 +504,7 @@ struct SettingsView: View {
                 }
         }
         .buttonStyle(.plain)
-        .help(option.displayName)
+        .help(Text(verbatim: option.displayName))
     }
 
     private func swatch(_ preset: (name: String, hex: String)) -> some View {
@@ -533,7 +530,7 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
-        .help(preset.name)
+        .help(Text(verbatim: preset.name))
     }
 
     // MARK: - Speech to text
@@ -573,7 +570,7 @@ struct SettingsView: View {
                         detail: "How the long dash speech models write is drawn, in dictations and AI output alike.") {
                 Picker("Dashes", selection: $dashStyle) {
                     ForEach(DashStyle.allCases) { style in
-                        Text(style.displayName).tag(style.rawValue)
+                        Text(verbatim: style.displayName).tag(style.rawValue)
                     }
                 }
                 .labelsHidden()
@@ -637,7 +634,7 @@ struct SettingsView: View {
 
         /// The tags say what the key does; a caption is left for the one case they
         /// don't spell out — a single key serving both steps at once.
-        var uses: String? {
+        var uses: LocalizedStringKey? {
             active.count > 1 ? "One key, used for both." : nil
         }
 
@@ -697,7 +694,7 @@ struct SettingsView: View {
     }
 
     /// The one thing about the Edit shortcut its name does not say.
-    private func shortcutDetail(_ action: ShortcutAction) -> String? {
+    private func shortcutDetail(_ action: ShortcutAction) -> LocalizedStringKey? {
         action == .edit ? "Double-press to just polish it." : nil
     }
 
@@ -707,31 +704,33 @@ struct SettingsView: View {
 
     /// Where a dictation's audio goes with the engine in use — said from the settings,
     /// never assumed, since this group is the disclosure.
-    private var speechSentDetail: String {
+    private var speechSentDetail: Text {
         switch stt {
         case .apple:
             // Apple's recogniser cannot take an archived file, so History retries it
             // through the stored Groq model (`batchUpload: .selectedModel(of: .groq)`).
             let groqKey = Provider.groq.descriptor.apiKey.map { !APIKeyStore.shared.value(for: $0.settingsKey).isEmpty } ?? false
-            return "Stays on this Mac: Apple Dictation runs on-device."
-                + (groqKey ? " A retry from History is sent to Groq, since Apple can't transcribe a saved recording." : "")
+            let local = Text("Stays on this Mac: Apple Dictation runs on-device.")
+            guard groqKey else { return local }
+            return local + Text(verbatim: " ")
+                + Text("A retry from History is sent to Groq, since Apple can't transcribe a saved recording.")
         case .local:
-            return "Stays on this Mac. A model is downloaded once; after that nothing goes online."
+            return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
         case .groq, .elevenlabs, .openai:
             let vendor = stt.vendor.displayName
-            let words = sendVocabulary ? ", with your Dictionary's words where the model takes them" : ""
-            return "Each recording is sent to \(vendor) to be transcribed\(words). A retry from History sends it again."
+            return sendVocabulary
+                ? Text("Each recording is sent to \(vendor) to be transcribed, with your Dictionary's words where the model takes them. A retry from History sends it again.")
+                : Text("Each recording is sent to \(vendor) to be transcribed. A retry from History sends it again.")
         }
     }
 
     /// Where AI Rewrite's text goes, and what is sent with it.
-    private var aiSentDetail: String {
-        let context = "With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read."
-        guard hasLLMKey else { return "AI Rewrite is off, so nothing is sent." }
+    private var aiSentDetail: Text {
+        guard hasLLMKey else { return Text("AI Rewrite is off, so nothing is sent.") }
         if llm == .local {
-            return "Stays on this Mac. A model is downloaded once; after that nothing goes online."
+            return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
         }
-        return "AI dictations and edits are sent to \(llm.vendor.displayName). " + context
+        return Text("AI dictations and edits are sent to \(llm.vendor.displayName). With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
     }
 
     /// What is kept on this Mac, what leaves it, and what macOS allows.
@@ -740,9 +739,9 @@ struct SettingsView: View {
         historyGroup
 
         SettingsGroup(title: "What leaves this Mac") {
-            SettingsRow(title: "Your voice", detail: speechSentDetail)
+            SettingsRow(title: "Your voice", detailText: speechSentDetail)
             SettingsDivider()
-            SettingsRow(title: "Your text", detail: aiSentDetail)
+            SettingsRow(title: "Your text", detailText: aiSentDetail)
         }
 
         SettingsGroup(title: "Permissions") {
@@ -774,7 +773,7 @@ struct SettingsView: View {
         }
     }
 
-    private var micDetail: String {
+    private var micDetail: LocalizedStringKey {
         switch micStatus {
         case .denied: "Microphone is turned off for SpeechText."
         case .restricted: "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac."
@@ -860,7 +859,7 @@ private struct MicrophoneField: View {
     /// Whether a connected device is actually sending sound is not checked: that would
     /// open the microphone — and turn Bluetooth headphones to call quality — for a look
     /// at Settings.
-    private var problem: String? {
+    private var problem: LocalizedStringKey? {
         guard let inUse else { return nil }
         if !microphoneAllowed { return "SpeechText isn't allowed to use the microphone." }
         if !inUse.canHear { return "The lid is closed, so this microphone hears nothing." }
@@ -873,12 +872,12 @@ private struct MicrophoneField: View {
             Text("System Default").tag(MicrophoneChoice.systemDefault.stored)
             Divider()
             ForEach(monitor.devices) { device in
-                Text(device.name).tag(device.uid)
+                Text(verbatim: device.name).tag(device.uid)
             }
             // A picked device that is not connected keeps its row, so the picker
             // never renders blank.
             if case .device(let uid) = choice, !monitor.devices.contains(where: { $0.uid == uid }) {
-                Text("\(storedName.isEmpty ? "Microphone" : storedName) (not connected)").tag(uid)
+                (storedName.isEmpty ? Text("Microphone (not connected)") : Text("\(storedName) (not connected)")).tag(uid)
             }
         }
         .labelsHidden()
@@ -896,7 +895,7 @@ private struct MicrophoneField: View {
 
     /// Why the device above is the one in use; the device itself is drawn apart from it,
     /// so it can be found at a glance rather than read out of a sentence.
-    private var caption: String {
+    private var caption: LocalizedStringKey {
         if let problem { return problem }
         switch choice {
         case .automatic:
@@ -927,7 +926,7 @@ private struct MicrophoneField: View {
 /// does (`problem`); it does not listen for sound.
 private struct InUseMicrophone: View {
     let device: AudioInputDevice?
-    let problem: String?
+    let problem: LocalizedStringKey?
 
     var body: some View {
         if let device {
@@ -938,7 +937,7 @@ private struct InUseMicrophone: View {
                 Image(systemName: symbol(for: device.transport))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(SetupColor.label2)
-                Text(device.name)
+                Text(verbatim: device.name)
                     .font(.system(size: 12.5, weight: .semibold))
                     .foregroundStyle(SetupColor.label)
                     .lineLimit(1)
@@ -950,7 +949,7 @@ private struct InUseMicrophone: View {
             .overlay(Capsule().strokeBorder(SetupColor.panelBorder))
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("In use: \(device.name)")
-            .accessibilityValue(problem ?? "")
+            .accessibilityValue(problem.map { Text($0) } ?? Text(verbatim: ""))
         } else {
             SettingsStatus(text: "No microphone is connected", ok: false)
         }
@@ -1006,7 +1005,7 @@ private struct SpokenLanguagesField: View {
                 if let warning = modelWarning {
                     // Where a language is added, the user is not thinking of the engine.
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text("⚠︎ " + warning)
+                        Text(verbatim: "⚠︎ " + warning)
                             .font(.system(size: 11.5, weight: .semibold))
                             .foregroundStyle(SetupColor.warn)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1057,7 +1056,7 @@ private struct SpokenLanguagesField: View {
         }
     }
 
-    private var caption: String {
+    private var caption: LocalizedStringKey {
         switch selected.count {
         case 0:
             return stt == .apple
@@ -1103,7 +1102,7 @@ struct RecordingModePicker: View {
         segment(hold: true, title: "Hold to talk", caption: "Hold the shortcut while you speak")
     }
 
-    private func segment(hold: Bool, title: String, caption: String) -> some View {
+    private func segment(hold: Bool, title: LocalizedStringKey, caption: LocalizedStringKey) -> some View {
         let selected = holdToTalk == hold
         return Button {
             withAnimation(.easeOut(duration: 0.15)) { holdToTalk = hold }
@@ -1132,7 +1131,7 @@ struct RecordingModePicker: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title): \(caption)")
+        .accessibilityLabel(Text(title) + Text(verbatim: ": ") + Text(caption))
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
@@ -1153,8 +1152,8 @@ private struct GestureDemoList: View {
 
     private struct Demo {
         let gesture: HoldTip.DemoGesture
-        let title: String
-        let detail: String
+        let title: LocalizedStringKey
+        let detail: LocalizedStringKey
     }
 
     var body: some View {
@@ -1191,7 +1190,10 @@ private struct GestureDemoList: View {
         }
         .background(WindowVisibilityReader(isVisible: $windowVisible))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(demos.map { "\($0.title). \($0.detail)" }.joined(separator: " "))
+        .accessibilityLabel(demos.enumerated().reduce(Text(verbatim: "")) { text, item in
+            text + Text(verbatim: item.offset > 0 ? " " : "") + Text(item.element.title) + Text(verbatim: ". ")
+                + Text(item.element.detail)
+        })
     }
 
     private func demos(letter: String, modifiers: String, inline: String, ai: String) -> [Demo] {
@@ -1203,8 +1205,9 @@ private struct GestureDemoList: View {
                         ? "It records while \(letter) is down. Let go of \(letter) to paste."
                         : "Once it records, let go of \(modifiers) — \(letter) alone keeps it going. Let go of \(letter) to paste."),
                 Demo(gesture: .lock, title: "Double-tap to lock",
-                     detail: (modifiers.isEmpty ? "Tap \(letter) twice" : "Hold \(modifiers) and tap \(letter) twice")
-                        + ": it records with nothing held, until you press \(inline) again."),
+                     detail: modifiers.isEmpty
+                        ? "Tap \(letter) twice: it records with nothing held, until you press \(inline) again."
+                        : "Hold \(modifiers) and tap \(letter) twice: it records with nothing held, until you press \(inline) again."),
             ]
             if showsSwitch {
                 demos.append(Demo(gesture: .holdSwitch, title: "Switch to AI Rewrite",
@@ -1223,7 +1226,7 @@ private struct GestureDemoList: View {
         return demos
     }
 
-    private func row(keys: [String], frame: HoldTip.DemoFrame, ai: Bool, title: String, detail: String) -> some View {
+    private func row(keys: [String], frame: HoldTip.DemoFrame, ai: Bool, title: LocalizedStringKey, detail: LocalizedStringKey) -> some View {
         GridRow(alignment: .center) {
             SetupKeycaps(keys: keys, size: 22,
                          litKeys: frame.caps.indexes(of: .down), fadedKeys: frame.caps.indexes(of: .notNeeded),
@@ -1292,7 +1295,7 @@ private struct DemoStatus: View {
 
     var body: some View {
         let green = scheme == .dark ? SetupColor.phosphor : SetupColor.brand
-        let (symbol, title, tint): (String, String, Color) = switch state {
+        let (symbol, title, tint): (String, LocalizedStringKey, Color) = switch state {
         case .idle, .recording: ("mic.fill", "Recording", green)
         case .locked: ("lock.fill", "Locked on", green)
         case .ai: ("sparkles", "AI Rewrite", SetupColor.ai)
@@ -1337,8 +1340,8 @@ private struct LinkIconButton: View {
         }
         .buttonStyle(.plain)
         .pointingHandCursor()
-        .help("\(label) — \(url.host() ?? url.absoluteString)")
-        .accessibilityLabel(label)
+        .help(Text(verbatim: "\(label) — \(url.host() ?? url.absoluteString)"))
+        .accessibilityLabel(Text(verbatim: label))
     }
 }
 
@@ -1357,7 +1360,7 @@ private struct VersionRow: View {
                     .foregroundStyle(SetupColor.label)
                 Button(action: copy) {
                     HStack(spacing: 5) {
-                        Text(AppVersion.displayString)
+                        Text(verbatim: AppVersion.displayString)
                         // Both glyphs stay laid out, one hidden: they are
                         // different heights, and swapping them moved the row.
                         ZStack {

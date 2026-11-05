@@ -26,9 +26,11 @@ struct EnginePlaceCards: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            SetupChoiceCard(glyph: .mac, name: "On this Mac", badge: inUse == .thisMac ? "In use" : nil,
+            SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
+                            badge: inUse == .thisMac ? String(localized: "In use") : nil,
                             facts: macFacts, isSelected: place == .thisMac) { place = .thisMac }
-            SetupChoiceCard(glyph: .cloud, name: "Online service", badge: inUse == .online ? "In use" : nil,
+            SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
+                            badge: inUse == .online ? String(localized: "In use") : nil,
                             facts: onlineFacts, isSelected: place == .online) { place = .online }
         }
         .padding(4)
@@ -118,9 +120,9 @@ struct SpeechEngineSettings: View {
         EnginePlaceCards(
             place: $place, inUse: Self.place(of: engine),
             macFacts: capabilities.isAppleSilicon
-                ? "Private and free. Your voice stays on your Mac, and works offline."
-                : "Private and free, but slow on this Mac.",
-            onlineFacts: "Works on any Mac. Needs internet and an account; your recording is sent to the service.")
+                ? String(localized: "Private and free. Your voice stays on your Mac, and works offline.")
+                : String(localized: "Private and free, but slow on this Mac."),
+            onlineFacts: String(localized: "Works on any Mac. Needs internet and an account; your recording is sent to the service."))
 
         switch place {
         case .thisMac: thisMac
@@ -153,14 +155,14 @@ struct SpeechEngineSettings: View {
             // Once a render, not twice a row: a download renders the page ten times a second.
             let picks = LocalPicks(recommended: recommended?.id, bestQuality: bestQuality?.id)
             ForEach(listing.picks) { localRow($0, picks: picks) }
-            SetupRow(title: "Apple Dictation", subtitle: "Built in",
+            SetupRow(title: "Apple Dictation", subtitle: String(localized: "Built in"),
                      languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
                      detail: appleDictationLine,
                      isSelected: engine == .apple) { sttProvider = STTProviderType.apple.rawValue }
             ForEach(listing.others + listing.lackingLanguage) { localRow($0, picks: picks) }
             if !heavy.isEmpty {
                 Button(showHeavyModels ? "Hide models too heavy for this Mac"
-                                       : "Show \(heavy.count) \(heavy.count == 1 ? "model" : "models") too heavy for this Mac") {
+                                       : "Show \(heavy.count) models too heavy for this Mac") {
                     withAnimation(.easeOut(duration: 0.2)) { showHeavyModels.toggle() }
                 }
                 .buttonStyle(SetupInlineLinkStyle())
@@ -243,11 +245,11 @@ struct SpeechEngineSettings: View {
     private func localRow(_ model: LocalSTTModel, picks: LocalPicks) -> some View {
         let state = store.state(for: model.id)
         let badge: SetupBadge? = if picks.recommended == model.id {
-            SetupBadge(text: "Recommended", kind: .recommended)
+            SetupBadge(text: String(localized: "Recommended"), kind: .recommended)
         } else if picks.bestQuality == model.id {
-            SetupBadge(text: "Best quality", kind: .quality)
+            SetupBadge(text: String(localized: "Best quality"), kind: .quality)
         } else if !localModelFitsMemory(model.memoryFloorBytes, capabilities) {
-            SetupBadge(text: "Too heavy for this Mac", kind: .warn)
+            SetupBadge(text: String(localized: "Too heavy for this Mac"), kind: .warn)
         } else {
             nil
         }
@@ -262,7 +264,8 @@ struct SpeechEngineSettings: View {
                     Text("Not downloaded").rowNote()
                 case .downloading(let fraction):
                     SetupProgressBar(fraction: fraction).frame(maxWidth: 160)
-                    Text("Downloading · \(Int(fraction * 100))%" + (waitingFor == model.id ? " — used once it's ready" : ""))
+                    (waitingFor == model.id ? Text("Downloading · \(Int(fraction * 100))% — used once it's ready")
+                        : Text("Downloading · \(Int(fraction * 100))%"))
                         .rowNote()
                     Button("Cancel") {
                         store.cancelInstall(model)
@@ -285,7 +288,7 @@ struct SpeechEngineSettings: View {
                     }
                     .buttonStyle(SetupInlineLinkStyle())
                 case .failed(let message):
-                    Text(message).rowNote(bad: true).lineLimit(2)
+                    Text(verbatim: message).rowNote(bad: true).lineLimit(2)
                     Button("Retry") { store.install(model) }.buttonStyle(SetupInlineLinkStyle())
                 }
             }
@@ -353,7 +356,7 @@ struct SpeechEngineSettings: View {
         return SetupRow(title: onlineSpeechModelName(model), subtitle: languageCountLabel(model.languages),
                         badge: lifecycleBadge(model.lifecycle, selected: selected)
                             ?? (model.id == card.service.defaultSpeechModel
-                                ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
+                                ? SetupBadge(text: String(localized: "Recommended"), kind: .recommended) : nil),
                         languageBadge: languageBadge(model.languages, spoken: spoken),
                         detail: onlineSpeechModelLine(model, spoken: spoken),
                         isSelected: selected, compact: true) {
@@ -367,7 +370,7 @@ struct SpeechEngineSettings: View {
         let selected = engine == card.engine
         let keyed = hasKey(card.service)
         SetupRow(title: card.title, subtitle: card.subtitle.isEmpty ? nil : card.subtitle,
-                 badge: keyed ? nil : SetupBadge(text: "No key", kind: selected ? .warn : .quality),
+                 badge: keyed ? nil : SetupBadge(text: String(localized: "No key"), kind: selected ? .warn : .quality),
                  detail: onlineSpeechServiceLine(card.service), isSelected: selected) {
             if keyed { sttProvider = card.engine.rawValue } else { opened = card.service }
         }
@@ -393,7 +396,7 @@ struct SpeechEngineSettings: View {
                             sttModel(vendor: card.service, id: storedModel(card.service)).settingsNote]
                     .compactMap { $0 }.joined(separator: " ")
                 if !note.isEmpty {
-                    Text(note).rowNote()
+                    Text(verbatim: note).rowNote()
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 10)
                         .padding(.top, 2)
@@ -447,9 +450,9 @@ struct AIEngineSettings: View {
         EnginePlaceCards(
             place: $place, inUse: pick == .local ? .thisMac : .online,
             macFacts: capabilities.isAppleSilicon
-                ? "Private and free. Your text stays on your Mac, and works offline."
-                : "Private and free, but slow on this Mac.",
-            onlineFacts: "Fast on any Mac. Needs internet and an account; your text is sent to the service.")
+                ? String(localized: "Private and free. Your text stays on your Mac, and works offline.")
+                : String(localized: "Private and free, but slow on this Mac."),
+            onlineFacts: String(localized: "Fast on any Mac. Needs internet and an account; your text is sent to the service."))
 
         switch place {
         case .thisMac: thisMac
@@ -468,7 +471,7 @@ struct AIEngineSettings: View {
                 .font(.system(size: 11.5))
                 .foregroundStyle(SetupColor.label2)), inset: 5) {
             if !capabilities.isAppleSilicon {
-                Text(intelChatWarning).rowNote(bad: true)
+                Text(verbatim: intelChatWarning).rowNote(bad: true)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -479,7 +482,7 @@ struct AIEngineSettings: View {
             ForEach(fitting) { localRow($0, heavy: false, picks: picks) }
             if !heavy.isEmpty {
                 Button(showHeavyModels ? "Hide models too heavy for this Mac"
-                                       : "Show \(heavy.count) \(heavy.count == 1 ? "model" : "models") too heavy for this Mac") {
+                                       : "Show \(heavy.count) models too heavy for this Mac") {
                     withAnimation(.easeOut(duration: 0.2)) { showHeavyModels.toggle() }
                 }
                 .buttonStyle(SetupInlineLinkStyle())
@@ -523,8 +526,8 @@ struct AIEngineSettings: View {
             }
             Button("Cancel", role: .cancel) { removing = nil }
         } message: {
-            Text(fallback.map { "It is the model in use. AI Rewrite switches to \($0.displayName)." }
-                 ?? "It is the model in use. AI Rewrite pastes your words as said until you download another.")
+            fallback.map { Text("It is the model in use. AI Rewrite switches to \($0.displayName).") }
+                ?? Text("It is the model in use. AI Rewrite pastes your words as said until you download another.")
         }
     }
 
@@ -566,11 +569,11 @@ struct AIEngineSettings: View {
     private func localRow(_ model: LocalChatModel, heavy: Bool, picks: LocalPicks) -> some View {
         let state = store.state(for: model)
         let badge: SetupBadge? = if picks.recommended == model.id {
-            SetupBadge(text: "Recommended", kind: .recommended)
+            SetupBadge(text: String(localized: "Recommended"), kind: .recommended)
         } else if picks.bestQuality == model.id {
-            SetupBadge(text: "Best quality", kind: .quality)
+            SetupBadge(text: String(localized: "Best quality"), kind: .quality)
         } else if heavy {
-            SetupBadge(text: "Too heavy for this Mac", kind: .warn)
+            SetupBadge(text: String(localized: "Too heavy for this Mac"), kind: .warn)
         } else {
             nil
         }
@@ -584,7 +587,8 @@ struct AIEngineSettings: View {
                     Text("Not downloaded").rowNote()
                 case .downloading(let fraction):
                     SetupProgressBar(fraction: fraction).frame(maxWidth: 160)
-                    Text("Downloading · \(Int(fraction * 100))%" + (waitingFor == model.id ? " — used once it's ready" : ""))
+                    (waitingFor == model.id ? Text("Downloading · \(Int(fraction * 100))% — used once it's ready")
+                        : Text("Downloading · \(Int(fraction * 100))%"))
                         .rowNote()
                     Button("Cancel") {
                         store.cancelInstall(model)
@@ -601,7 +605,7 @@ struct AIEngineSettings: View {
                     }
                     .buttonStyle(SetupInlineLinkStyle())
                 case .failed(let message):
-                    Text(message).rowNote(bad: true).lineLimit(2)
+                    Text(verbatim: message).rowNote(bad: true).lineLimit(2)
                     Button("Retry") { store.install(model) }.buttonStyle(SetupInlineLinkStyle())
                 }
             }
@@ -644,7 +648,7 @@ struct AIEngineSettings: View {
         return SetupRow(title: chatModelName(model),
                         badge: lifecycleBadge(model.lifecycle, selected: selected)
                             ?? (model.id == card.service.defaultChatModel
-                                ? SetupBadge(text: "Recommended", kind: .recommended) : nil),
+                                ? SetupBadge(text: String(localized: "Recommended"), kind: .recommended) : nil),
                         detail: chatModelLine(model).isEmpty ? nil : chatModelLine(model),
                         isSelected: selected, compact: true) {
             setStoredModel(model.id, for: card.pick)
@@ -657,7 +661,7 @@ struct AIEngineSettings: View {
         let selected = pick == card.pick
         let keyed = hasKey(card.service)
         SetupRow(title: card.title, subtitle: card.subtitle.isEmpty ? nil : card.subtitle,
-                 badge: keyed ? nil : SetupBadge(text: "No key", kind: selected ? .warn : .quality),
+                 badge: keyed ? nil : SetupBadge(text: String(localized: "No key"), kind: selected ? .warn : .quality),
                  detail: onlineAIServiceLine(card.service), isSelected: selected) {
             if keyed { llmProvider = card.pick.rawValue } else { opened = card.service }
         }
@@ -700,7 +704,7 @@ struct AIEngineSettings: View {
 /// "Newer model available", beside the Switch under the list.
 private func lifecycleBadge(_ lifecycle: ModelLifecycle, selected: Bool) -> SetupBadge? {
     if case .superseded = lifecycle {
-        return selected ? SetupBadge(text: "Newer model available", kind: .quality) : nil
+        return selected ? SetupBadge(text: String(localized: "Newer model available"), kind: .quality) : nil
     }
     return lifecycle.status(on: Date()).map { SetupBadge(text: $0, kind: .warn) }
 }
@@ -736,7 +740,7 @@ private struct LegacyModels<Rows: View>: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Legacy models")
-        .accessibilityValue(isOpen ? "Shown, \(count)" : "Hidden, \(count)")
+        .accessibilityValue(isOpen ? Text("Shown, \(count)") : Text("Hidden, \(count)"))
         if isOpen {
             Text("Earlier versions. They still work, but the models above replace them.")
                 .rowNote()

@@ -31,7 +31,7 @@ final class SettingsWindow: NSWindow {
         backgroundColor = .clear
         hasShadow = true
         isMovableByWindowBackground = true
-        title = "SpeechText Settings"
+        title = String(localized: "SpeechText Settings")
         let host = NSHostingView(rootView: SettingsView(window: SetupWindowRef(self), category: category))
         host.frame = NSRect(origin: .zero, size: Self.size)
         contentView = host
@@ -107,7 +107,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         [.privacy, .apiKeys],
     ]
 
-    var title: String {
+    var title: LocalizedStringResource {
         switch self {
         case .general: "General"
         case .appearance: "Appearance"
@@ -133,7 +133,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
     }
 
     /// The line under the page's title.
-    var lead: String {
+    var lead: LocalizedStringResource {
         switch self {
         case .general: "How SpeechText starts, and how it stays up to date."
         case .appearance: "How the recording overlay and the Record Window look."
@@ -238,10 +238,18 @@ private struct SettingsSidebarItem: View {
 /// A run of related settings on a grey panel, the way the setup window groups its rows.
 /// `inset` is smaller for a radio list, whose `SetupRow`s carry their own padding.
 struct SettingsGroup<Content: View>: View {
-    var title: String?
+    var title: LocalizedStringKey?
     var trailing: AnyView?
     var inset: CGFloat = 14
     @ViewBuilder let content: Content
+
+    init(title: LocalizedStringKey? = nil, trailing: AnyView? = nil, inset: CGFloat = 14,
+         @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.trailing = trailing
+        self.inset = inset
+        self.content = content()
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
@@ -269,18 +277,30 @@ struct SettingsGroup<Content: View>: View {
 
 /// One setting: its name and what it does on the left, the control on the right.
 struct SettingsRow<Control: View>: View {
-    let title: String
-    var detail: String?
+    let title: Text
+    var detail: Text?
     @ViewBuilder let control: Control
+
+    /// Words from the String Catalog.
+    init(title: LocalizedStringKey, detail: LocalizedStringKey? = nil, @ViewBuilder control: () -> Control) {
+        self.init(title: title, detailText: detail.map { Text($0) }, control: control)
+    }
+
+    /// A detail built elsewhere, already a `Text`.
+    init(title: LocalizedStringKey, detailText: Text?, @ViewBuilder control: () -> Control) {
+        self.title = Text(title)
+        self.detail = detailText
+        self.control = control()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                title
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(SetupColor.label)
                 if let detail {
-                    Text(detail)
+                    detail
                         .font(.system(size: 11.5))
                         .foregroundStyle(SetupColor.label2)
                         .lineSpacing(1.5)
@@ -295,8 +315,12 @@ struct SettingsRow<Control: View>: View {
 }
 
 extension SettingsRow where Control == EmptyView {
-    init(title: String, detail: String? = nil) {
+    init(title: LocalizedStringKey, detail: LocalizedStringKey? = nil) {
         self.init(title: title, detail: detail, control: { EmptyView() })
+    }
+
+    init(title: LocalizedStringKey, detailText: Text?) {
+        self.init(title: title, detailText: detailText, control: { EmptyView() })
     }
 }
 
@@ -309,7 +333,7 @@ struct SettingsStepSlider<Value: Hashable>: View {
     let selection: Value
     let title: (Value) -> String
     /// What VoiceOver calls the slider; its value is the stop's name.
-    let label: String
+    let label: LocalizedStringKey
     let onChoose: (Value) -> Void
 
     /// Where the knob is while it is being dragged.
@@ -379,7 +403,7 @@ struct SettingsStepSlider<Value: Hashable>: View {
                 let position = x(index, width: width)
                 let last = values.count - 1
                 let knob = knobWidth
-                Text(title(values[index]))
+                Text(verbatim: title(values[index]))
                     .font(.system(size: 11.5, weight: isShown ? .semibold : .regular))
                     .foregroundStyle(isShown ? SetupColor.label : SetupColor.label2)
                     .fixedSize()
@@ -461,10 +485,10 @@ struct SettingsDivider: View {
 
 /// An explanation that belongs to the row above it but is too long to sit beside a control.
 struct SettingsNote: View {
-    let text: String
+    let text: LocalizedStringKey
     var tone: Color = SetupColor.label2
 
-    init(_ text: String, tone: Color = SetupColor.label2) {
+    init(_ text: LocalizedStringKey, tone: Color = SetupColor.label2) {
         self.text = text
         self.tone = tone
     }
@@ -484,7 +508,7 @@ struct SettingsSwitch: View {
     @Binding var isOn: Bool
 
     var body: some View {
-        Toggle("", isOn: $isOn)
+        Toggle(isOn: $isOn) { EmptyView() }
             .toggleStyle(.switch)
             .labelsHidden()
     }
@@ -492,11 +516,11 @@ struct SettingsSwitch: View {
 
 /// "Ready" / "Needs an API key" beside a group's title.
 struct SettingsStatus: View {
-    let text: String
+    let text: LocalizedStringKey
     let ok: Bool
 
     var body: some View {
-        Text(ok ? "✓ \(text)" : "⚠︎ \(text)")
+        (Text(verbatim: ok ? "✓ " : "⚠︎ ") + Text(text))
             .font(.system(size: 11.5, weight: .semibold))
             .foregroundStyle(ok ? SetupColor.ok : SetupColor.warn)
     }
@@ -540,7 +564,8 @@ struct SettingsKeyRoleTag: View {
         .overlay(Capsule().strokeBorder(active ? .clear : SettingsColor.panelBorder, lineWidth: 1))
         .fixedSize()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(active ? "Used for \(role.category.title)" : "Can be used for \(role.category.title)")
+        .accessibilityLabel(active ? "Used for \(String(localized: role.category.title))"
+                            : "Can be used for \(String(localized: role.category.title))")
     }
 }
 
@@ -556,7 +581,7 @@ struct SettingsKeyField: View {
     var roles: [SettingsKeyRole] = []
     /// The roles the current choices use it for.
     var activeRoles: Set<SettingsKeyRole> = []
-    var uses: String?
+    var uses: LocalizedStringKey?
     /// The current choices use this key: its row says whether it is filled in.
     var inUse = false
     @State private var editing = false
@@ -584,7 +609,7 @@ struct SettingsKeyField: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(service.displayName)
+            Text(verbatim: service.displayName)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(inUse ? SetupColor.label : SetupColor.label2)
             ForEach(roles, id: \.self) { role in
@@ -614,7 +639,7 @@ struct SettingsKeyField: View {
             Image(systemName: "key.fill")
                 .font(.system(size: 10))
                 .foregroundStyle(SetupColor.label3)
-            Text(APIKeyDisplay.masked(value, prefix: service.descriptor.apiKey?.prefix))
+            Text(verbatim: APIKeyDisplay.masked(value, prefix: service.descriptor.apiKey?.prefix))
                 .font(.system(size: 12, design: .monospaced))
                 .foregroundStyle(SetupColor.label)
                 .textSelection(.disabled)
@@ -641,7 +666,7 @@ struct SettingsKeyField: View {
     /// leaving the field empty keeps the old one.
     private var field: some View {
         HStack(spacing: 6) {
-            TextField("", text: $draft, prompt: Text("Paste your key here").foregroundStyle(SetupColor.label3))
+            TextField(text: $draft, prompt: Text("Paste your key here").foregroundStyle(SetupColor.label3)) { EmptyView() }
                 .textFieldStyle(.plain)
                 .font(.system(size: 12, design: .monospaced))
                 .focused($focused)
@@ -687,8 +712,8 @@ struct SettingsKeyField: View {
 /// A permission, drawn like the setup window's: an icon that turns green once granted.
 struct SettingsPermissionRow<Control: View>: View {
     let symbol: String
-    let title: String
-    let detail: String
+    let title: LocalizedStringKey
+    let detail: LocalizedStringKey
     let granted: Bool
     @ViewBuilder let control: Control
 
@@ -745,9 +770,9 @@ struct SettingsPreviewRow<Preview: View>: View {
             .frame(width: 16, height: 16)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
+                Text(verbatim: title).font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
                 if let detail {
-                    Text(detail).font(.system(size: 11.5)).foregroundStyle(SetupColor.label2)
+                    Text(verbatim: detail).font(.system(size: 11.5)).foregroundStyle(SetupColor.label2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -900,7 +925,7 @@ struct SkinPreview: View {
             .frame(width: 100, height: 56)
             .clipShape(glass)
             ButtonRail {
-                PlasticButton(systemImage: "xmark", label: "Cancel", action: {})
+                PlasticButton(systemImage: "xmark", label: String(localized: "Cancel"), action: {})
             }
         }
         .frame(width: skin.overlayStripSize.width, height: skin.overlayStripSize.height)
