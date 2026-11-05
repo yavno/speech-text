@@ -9,7 +9,7 @@ Closes #
 ## Checklist
 
 - [ ] Tests added or updated — or, if none are possible, why not: 
-- [ ] `AGENTS.md`, `docs/decisions.md`, `docs/settings-keys.md` and the docs are updated if a rule, a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers)
+- [ ] `docs/decisions.md`, `docs/settings-keys.md` and the docs are updated if a decision, a settings key or a guide changed (`docs/adding-a-provider.md` for anything that touches providers); a rule in `AGENTS.md` that no longer holds is named here, not edited
 
 **Users will notice** — what changes for someone using the app, in a sentence or two, or "Nothing".  
 <!-- Leave CHANGELOG.md alone: the maintainer writes its entry from this after the merge. -->

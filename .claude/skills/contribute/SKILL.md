@@ -28,10 +28,11 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
    scripts/lint-swift.sh
    ```
    A new Swift file needs the SPDX header the others have.
-7. **Docs in the same change.** `docs/decisions.md` if a decision changed, `AGENTS.md` if a
-   rule did, `docs/settings-keys.md` if a settings key did, the guide in `docs/` the change
-   makes untrue. Not `CHANGELOG.md`: the maintainer writes that entry after the merge, from
-   the pull request's *Users will notice*.
+7. **Docs in the same change.** `docs/decisions.md` if a decision changed,
+   `docs/settings-keys.md` if a settings key did, the guide in `docs/` the change makes
+   untrue. Not `CHANGELOG.md`: the maintainer writes that entry after the merge, from the
+   pull request's *Users will notice*. Not `AGENTS.md`: a rule there that no longer holds
+   is named in the pull request, and the maintainer rewrites it.
 8. **Commit.** `git commit -s` on every commit, a message that says what and why. English
    everywhere: code, comments, commits, the pull request.
 9. **Pull request.** Fill `.github/PULL_REQUEST_TEMPLATE.md`: what and why with

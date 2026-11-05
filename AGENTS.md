@@ -157,11 +157,12 @@ walks it), and update that guide in any PR that changes the provider abstraction
   UI change, anything in the recording pipeline — starts as an issue and waits for an
   answer (CONTRIBUTING.md).
 - One concern per PR, based on `main` (a stacked PR is labelled `stacked`).
-- Fill the template: what changed and why, and under *Needs a real-app run* what only a
+- Fill the template: what changed and why, under *Users will notice* what changes for
+  someone using the app (or "Nothing"), and under *Needs a real-app run* what only a
   person can check (or "None"). A UI change carries a before/after screenshot; motion or
   timing, a short video.
-- A user-facing change gets an entry under `## [Unreleased]` in CHANGELOG.md, written for
-  users.
+- Leave CHANGELOG.md alone: the maintainer writes the `## [Unreleased]` entry after the
+  merge, from *Users will notice*.
 - Everything in the repository is in English. A new source file starts with the two-line
   SPDX header.
 
@@ -185,8 +186,8 @@ walks it), and update that guide in any PR that changes the provider abstraction
   that grows a "but now…" every release reads as history, and history is in git.
 - **The code wins.** Where a doc and the code disagree, fix the doc in the same PR.
 - A change to the provider abstractions updates docs/adding-a-provider.md; a settings-key
-  change updates [docs/settings-keys.md](docs/settings-keys.md); a user-facing change
-  updates CHANGELOG.md.
+  change updates [docs/settings-keys.md](docs/settings-keys.md). CHANGELOG.md is written
+  after the merge (Pull requests, above).
 
 ## Plans and work artifacts
 
