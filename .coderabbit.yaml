@@ -81,11 +81,10 @@ reviews:
           notice* says in a sentence or two what changes for someone using the app,
           or "Nothing"; the **Privacy** line says Yes or No (and, for Yes, what is
           sent or stored and where); and the *Needs a real-app run* section lists
-          what to check by hand or says None. Also fail when *Users will notice* says
-          "Nothing" but the diff changes the app's behaviour, its words or UI, a
-          default, or what is sent where. A pull request titled `Changelog:` and a
-          release pull request need not answer *Users will notice*. Fail if a
-          required answer is missing or left empty.
+          what to check by hand or says None. "Nothing" is a valid answer: whether
+          it is right is the reviewer's call, not this check's. A pull request
+          titled `Changelog:` and a release pull request need not answer *Users
+          will notice*. Fail if a required answer is missing or left empty.
 
   finishing_touches:
     docstrings:
