@@ -207,7 +207,8 @@ struct HistoryView: View {
         case .anyTime: break
         case .today: parts.append(String(localized: "today"))
         case .day(let day): parts.append(String(localized: "on \(HistoryFormat.formatter("d MMMM", calendar: .current).string(from: day))"))
-        case let dates: parts.append(String(localized: "in the \(dates.title.lowercased())"))
+        case .last7Days: parts.append(String(localized: "in the last 7 days"))
+        case .last30Days: parts.append(String(localized: "in the last 30 days"))
         }
         return parts.joined(separator: ", ")
     }

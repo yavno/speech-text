@@ -1055,7 +1055,7 @@ final class AppState {
         // Setup's Try it says it in its own panel, with Try again, rather than in a
         // notice in the corner of the screen.
         if isTestDictation {
-            dictationTest.finished(.failed(friendlySTTError(message)), ai: isAIMode)
+            dictationTest.finished(testFailure(message), ai: isAIMode)
             return
         }
         showStatus(
@@ -1261,7 +1261,7 @@ final class AppState {
         let outcome: DictationTest.Outcome
         switch result {
         case .failed:
-            outcome = .failed(friendlySTTError(speechEngine.errorMessage ?? ""))
+            outcome = testFailure(speechEngine.errorMessage ?? "")
         case .noSpeech:
             outcome = .nothingHeard
         case .paste(let text):
@@ -2479,22 +2479,20 @@ final class AppState {
 
     /// Turn a raw provider error into something that tells the user what to actually do.
     private func friendlySTTError(_ raw: String) -> String {
-        if raw.contains("413") || raw.localizedCaseInsensitiveContains("too large") {
-            return String(localized: "That recording was too large for the provider. Try a shorter one.")
+        switch TranscriptionFailureKind(message: raw) {
+        case .tooLarge: String(localized: "That recording was too large for the provider. Try a shorter one.")
+        case .rateLimited: String(localized: "Rate limited by the provider. Wait a moment and retry from History.")
+        case .rejected: String(localized: "The API key was rejected. Check it in Settings.")
+        case .timedOut: String(localized: "The request timed out. Retry from History.")
+        case .offline: String(localized: "No internet connection. Retry from History once you're back online.")
+        case .other: raw
         }
-        if raw.contains("429") {
-            return String(localized: "Rate limited by the provider. Wait a moment and retry from History.")
-        }
-        if raw.contains("401") || raw.contains("403") {
-            return String(localized: "The API key was rejected. Check it in Settings.")
-        }
-        if raw.localizedCaseInsensitiveContains("timed out") || raw.contains("-1001") {
-            return String(localized: "The request timed out. Retry from History.")
-        }
-        if raw.localizedCaseInsensitiveContains("offline") || raw.contains("-1009") {
-            return String(localized: "No internet connection. Retry from History once you're back online.")
-        }
-        return raw
+    }
+
+    /// A failed test dictation for setup's Try it step: the words, and the kind its panel
+    /// is picked by.
+    private func testFailure(_ raw: String) -> DictationTest.Outcome {
+        .failed(friendlySTTError(raw), TranscriptionFailureKind(message: raw))
     }
 
     func toggleOrShowDirectRecordingPanel() {

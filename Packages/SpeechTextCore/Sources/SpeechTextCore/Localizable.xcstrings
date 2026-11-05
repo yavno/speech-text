@@ -310,8 +310,16 @@
     "Could not install the local model: %@" : {
       "comment" : "Error when a model download failed. %@ is the reason, often in English."
     },
-    "Couldn't load the %@ speech model. Add it to Dictation in System Settings › Keyboard." : {
-      "comment" : "Error from Apple's recognizer. %@ is a language's name. 'System Settings › Keyboard' is where macOS keeps it. Two lines at most."
+    "Couldn't load the %@ speech model. Add it to Dictation in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Couldn't load the %1$@ speech model. Add it to Dictation in %2$@."
+          }
+        }
+      },
+      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately."
     },
     "Default" : {
       "comment" : "Settings › Appearance: the middle stop on the glass transparency slider."
@@ -630,6 +638,9 @@
     },
     "Switch to plain text" : {
       "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to plain dictation. One line."
+    },
+    "System Settings › Keyboard" : {
+      "comment" : "The path to the Keyboard pane in macOS System Settings, as macOS names it in your language. Inserted into an error message; setup also looks for it to offer a button to that pane."
     },
     "Text appears when you stop." : {
       "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. The text is pasted when recording stops."

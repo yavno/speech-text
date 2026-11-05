@@ -61,7 +61,7 @@ public struct RecognitionFailure: Equatable, Sendable {
             // Only what the error says — the assets could not be loaded — and where they
             // come from. "Not downloaded yet" is the usual reason, but not one it names.
             let language = languageName(locale)
-            message = localized("Couldn't load the \(language) speech model. Add it to Dictation in System Settings › Keyboard.")
+            message = localized("Couldn't load the \(language) speech model. Add it to Dictation in \(keyboardSettings).")
         } else if domain == localSpeechDomain, code == dictationOffCode {
             message = dictationOffMessage
         } else {
@@ -69,6 +69,11 @@ public struct RecognitionFailure: Equatable, Sendable {
         }
         return RecognitionFailure(message: message, endsRecording: !hasText)
     }
+
+    /// Where macOS keeps Dictation's languages, as System Settings names it. A message of
+    /// its own so that setup can tell a failure that sends the user there by it, not by
+    /// matching words a translation changes.
+    public static let keyboardSettings = localized("System Settings › Keyboard")
 
     /// macOS Dictation is off: Apple's engine is that recogniser, so it works only with it on.
     public static let dictationOffMessage =

@@ -17,7 +17,8 @@ final class DictationTest {
     enum Outcome: Equatable {
         case typed(String)
         case nothingHeard
-        case failed(String)
+        /// The message as the user reads it, and what kind of failure it was.
+        case failed(String, TranscriptionFailureKind)
     }
 
     enum Rewrite: Equatable {
@@ -46,7 +47,7 @@ final class DictationTest {
                 rewrite = .wrote(said: text, text: text)
                 return
             case .nothingHeard: reason = String(localized: "We didn't hear anything.")
-            case .failed(let message): reason = message
+            case .failed(let message, _): reason = message
             }
             rewrite = .failed(said: "", reason: reason)
         } else {

@@ -198,10 +198,10 @@ enum TechnoPhosphor: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .green: return "Green"
-        case .amber: return "Amber"
-        case .cyan: return "Cyan"
-        case .white: return "White"
+        case .green: return String(localized: "Green")
+        case .amber: return String(localized: "Amber")
+        case .cyan: return String(localized: "Cyan")
+        case .white: return String(localized: "White")
         }
     }
 
