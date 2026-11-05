@@ -178,8 +178,8 @@ struct PromptsView: View {
 
     /// A built-in prompt's symbol, by its fixed id; anyone else's by what its name says.
     /// How often History says AI Rewrite chose a prompt, in words.
-    static func usedTimes(_ count: Int) -> String {
-        count == 1 ? "Used once" : "Used \(HomeFormat.integer(count)) times"
+    static func usedTimes(_ count: Int) -> Text {
+        Text("Used \(count) times")
     }
 
     static func symbol(for preset: PromptPreset) -> String {
@@ -212,7 +212,7 @@ struct PromptsView: View {
     }
 
     private func add() {
-        let new = PromptPreset(name: "New prompt", whenToUse: "", instructions: "")
+        let new = PromptPreset(name: String(localized: "New prompt"), whenToUse: "", instructions: "")
         presets.append(new)
         selection = new.id
         persist()
@@ -284,7 +284,7 @@ private struct PromptsBanner: View {
 
     private struct Example {
         let builtIn: String
-        let said: String
+        let said: LocalizedStringKey
     }
 
     /// Keyed by the built-in prompts' fixed ids' last two digits.
@@ -295,7 +295,7 @@ private struct PromptsBanner: View {
         Example(builtIn: "06", said: "fix the bug where the token expires too early"),
     ]
 
-    private var shown: [(said: String, preset: PromptPreset)] {
+    private var shown: [(said: LocalizedStringKey, preset: PromptPreset)] {
         Self.examples.compactMap { example in
             presets.first { $0.id.uuidString.hasSuffix(example.builtIn) }.map { (example.said, $0) }
         }
@@ -365,7 +365,7 @@ private struct PromptsBanner: View {
                 VStack(alignment: .leading, spacing: 10) {
                     MainGlassPill(height: 34) {
                         Image(systemName: "mic").font(.system(size: 11)).foregroundStyle(MainColor.ink2)
-                        Text("“\(example.said)”").italic().foregroundStyle(MainColor.ink2)
+                        Text("“\(Text(example.said))”").italic().foregroundStyle(MainColor.ink2)
                     }
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.turn.down.right").font(.system(size: 11, weight: .bold))
@@ -374,7 +374,7 @@ private struct PromptsBanner: View {
                         MainGlassPill(height: 32) {
                             Image(systemName: PromptsView.symbol(for: example.preset))
                                 .font(.system(size: 11)).foregroundStyle(MainColor.aiInk)
-                            Text(example.preset.name).foregroundStyle(MainColor.aiInk)
+                            Text(verbatim: example.preset.name).foregroundStyle(MainColor.aiInk)
                         }
                     }
                 }
@@ -417,14 +417,14 @@ private struct PromptRow: View {
                     }
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 7) {
-                        Text(preset.name.isEmpty ? "Untitled" : preset.name)
+                        (preset.name.isEmpty ? Text("Untitled") : Text(verbatim: preset.name))
                             .font(.system(size: 13.5, weight: .semibold))
                             .foregroundStyle(MainColor.ink)
                             .lineLimit(1)
                         if isDefault { MainChip(title: "Default", tint: .green) }
                     }
-                    Text(preset.whenToUse.isEmpty ? "No “When to use” yet — AI Rewrite can't tell when it fits."
-                         : preset.whenToUse.trimmingCharacters(in: .whitespacesAndNewlines))
+                    (preset.whenToUse.isEmpty ? Text("No “When to use” yet — AI Rewrite can't tell when it fits.")
+                         : Text(verbatim: preset.whenToUse.trimmingCharacters(in: .whitespacesAndNewlines)))
                         .font(.system(size: 12.5))
                         .foregroundStyle(preset.whenToUse.isEmpty ? MainColor.problem : MainColor.ink2)
                         .lineLimit(2)
@@ -434,20 +434,19 @@ private struct PromptRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 // Said in words: a bare "7×" read as a multiplier, not as a count of uses.
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(use.map { PromptsView.usedTimes($0.count) } ?? "Not used yet")
+                    (use.map { PromptsView.usedTimes($0.count) } ?? Text("Not used yet"))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(use == nil ? MainColor.ink3 : MainColor.ink2)
                         .monospacedDigit()
                     if let last = use?.last {
-                        Text("last " + HomeRecentEntry.relativeDay(last).lowercased())
+                        Text("last \(HomeRecentEntry.relativeDay(last).lowercased())")
                             .font(.system(size: 11))
                             .foregroundStyle(MainColor.ink3)
                     }
                 }
                 .lineLimit(1)
                 .fixedSize()
-                .help(use.map { "Chosen for \($0.count) \($0.count == 1 ? "dictation" : "dictations") in History" }
-                      ?? "Not chosen in History yet")
+                .help(use.map { Text("Chosen for \($0.count) dictations in History") } ?? Text("Not chosen in History yet"))
             }
             .padding(.leading, 11)
             .padding(.trailing, 14)
@@ -499,8 +498,10 @@ private struct PromptEditorCard: View {
                         .textFieldStyle(.plain)
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(MainColor.ink)
-                    Text(use.map { PromptsView.usedTimes($0.count) + " · last \(($0.last.map { HomeRecentEntry.relativeDay($0) } ?? "").lowercased())" }
-                         ?? "Not used yet")
+                    (use.map { use in
+                        PromptsView.usedTimes(use.count) + Text(verbatim: " · ")
+                            + Text("last \((use.last.map { HomeRecentEntry.relativeDay($0) } ?? "").lowercased())")
+                    } ?? Text("Not used yet"))
                         .font(.system(size: 12))
                         .foregroundStyle(MainColor.ink3)
                 }
@@ -593,7 +594,7 @@ private struct PromptRecentCard: View {
         return HStack(alignment: .top, spacing: 12) {
             HomeEntryMark(entry: entry, size: 26)
             VStack(alignment: .leading, spacing: 4) {
-                Text(record.deliveredText)
+                Text(verbatim: record.deliveredText)
                     .font(.system(size: 13))
                     .foregroundStyle(MainColor.ink)
                     .lineLimit(2)
@@ -602,7 +603,7 @@ private struct PromptRecentCard: View {
                     .font(.system(size: 12))
                     .foregroundStyle(MainColor.ink3)
                     .lineLimit(1)
-                Text("\(entry.place) · \(entry.timeText())")
+                Text(verbatim: "\(entry.place) · \(entry.timeText())")
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(MainColor.ink2)
             }
@@ -635,7 +636,7 @@ private struct PromptsToldCard: View {
             }
             cell(title: "Your Dictionary",
                  detail: words.isEmpty ? "Names and terms you add there are spelled exactly as you write them."
-                 : "\(words.count) \(words.count == 1 ? "word" : "words"), spelled exactly as you write them.",
+                 : "\(words.count) words, spelled exactly as you write them.",
                  link: ("Open Dictionary", { go(.dictionary) })) {
                 PromptsWordsPicture(words: words)
             }
@@ -651,7 +652,7 @@ private struct PromptsToldCard: View {
         }
     }
 
-    private func cell<Picture: View>(title: String, detail: String, link: (String, () -> Void)? = nil,
+    private func cell<Picture: View>(title: LocalizedStringKey, detail: LocalizedStringKey, link: (LocalizedStringKey, () -> Void)? = nil,
                                      @ViewBuilder picture: () -> Picture) -> some View {
         let picture = picture()
         return MainTile(padding: EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 18)) {
@@ -754,7 +755,7 @@ private struct PromptsWordsPicture: View {
             ForEach(Array(shown.enumerated()), id: \.offset) { index, word in
                 HStack(spacing: 5) {
                     Image(systemName: "checkmark").font(.system(size: 8.5, weight: .bold)).foregroundStyle(MainColor.okInk)
-                    Text(word).font(.system(size: 12, weight: .medium)).foregroundStyle(MainColor.ink).lineLimit(1)
+                    Text(verbatim: word).font(.system(size: 12, weight: .medium)).foregroundStyle(MainColor.ink).lineLimit(1)
                 }
                 .padding(.horizontal, 10)
                 .frame(height: 24)

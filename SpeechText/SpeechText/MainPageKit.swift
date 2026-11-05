@@ -205,7 +205,7 @@ struct MainEmptyNote<Content: View>: View {
 /// A small capsule label: "Default", "Free", "Speech".
 struct MainChip: View {
     enum Tint { case green, ai, grey, problem }
-    let title: String
+    let title: LocalizedStringKey
     var symbol: String?
     var tint: Tint = .grey
 
@@ -221,7 +221,7 @@ struct MainChip: View {
         .fixedSize()
         // The symbol only decorates the title.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(title)
+        .accessibilityLabel(Text(title))
     }
 
     private var ink: Color {
