@@ -254,7 +254,8 @@ Read the streaming entries in docs/decisions.md › Key patterns first. The rule
   request builders and parsers as pure functions; realtime vendors get a
   `DictationReplay` script with a drop and a `Vendor` case in the realtime contract tests.
 - Docs: docs/privacy.md (engine table and **privacy list**), SECURITY.md,
-  docs/settings-keys.md, CHANGELOG. What only a person can check — a live socket from a
+  docs/settings-keys.md; the new vendor under *Users will notice* in the pull request (its
+  CHANGELOG entry is written after the merge). What only a person can check — a live socket from a
   microphone, a real key against the service — goes under *Needs a real-app run* in the
   pull request.
 
@@ -312,5 +313,4 @@ key      | docs/development.md                                                  
 docs     | docs/privacy.md                                                            | # Where your audio goes                | manual      | the privacy list, the engine table and the AI Rewrite paragraph
 docs     | SECURITY.md                                                                | The privacy practices of               | manual:file | add the vendor
 docs     | docs/settings-keys.md                                                      | # Settings keys                        | manual      | the new keys
-docs     | CHANGELOG.md                                                               | ## [Unreleased]                        | manual:file | an Added entry
 ```

@@ -55,7 +55,8 @@ The pay-as-you-go, standard-tier price, in US dollars:
    `testTheTableSaysWhenItWasChecked`.
 5. Run the tests. A model added to a catalogue without a row in `ListPriceTests` fails
    there.
-6. Add a line to `CHANGELOG.md` under *Changed* if any price moved.
+6. If any price moved, say which under *Users will notice* in the pull request; its
+   CHANGELOG line, under *Changed*, is written after the merge.
 
 A new model gets its price when it is added (docs/adding-a-provider.md, section 3).
 
@@ -75,4 +76,5 @@ catalogue entry's `lifecycle`:
    Never delete it.
 2. Set `UsagePrices.deprecationsChecked` to today, and the date in
    `testTheDeprecationCheckHasItsDate`, even if nothing changed.
-3. Add a line to `CHANGELOG.md` under *Changed* for each model whose users will be moved.
+3. Name each model whose users will be moved under *Users will notice* in the pull
+   request; their CHANGELOG lines, under *Changed*, are written after the merge.

@@ -28,8 +28,9 @@ workflow; a new setting needs an agreed issue first. Then:
 7. **Changing or retiring a key.** Never reuse a key for a different meaning. Move the
    old value once at launch (the `migrate…IfNeeded` functions are the pattern) and say
    in its `docs/settings-keys.md` row when the old key is read and when it is deleted.
-8. **Docs.** A row in `docs/settings-keys.md` (key, purpose, default), its
-   entry in `docs/decisions.md` if a decision changed, `CHANGELOG.md` under `[Unreleased]`.
+8. **Docs.** A row in `docs/settings-keys.md` (key, purpose, default), and its
+   entry in `docs/decisions.md` if a decision changed. The new control goes under
+   *Users will notice* in the pull request; `CHANGELOG.md` is written after the merge.
 
 Tests: the decision function's cases and the `portable` set. In *Needs a real-app run*,
 say what to check by hand: the control, and that the value survives a relaunch.
