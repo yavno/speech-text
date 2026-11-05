@@ -9,21 +9,21 @@ import SpeechTextCore
 struct HotkeyRecorderView: View {
     let action: ShortcutAction
     /// How the shortcut is used, under its name, where that is not obvious.
-    var detail: String?
+    var detail: LocalizedStringKey?
 
     @State private var keyCode: Int
     @State private var modifierFlags: Int
     @State private var isRecording = false
     @State private var localMonitor: Any?
     /// Why the last combination pressed was not taken. Cleared by the next attempt.
-    @State private var refusal: String?
+    @State private var refusal: LocalizedStringResource?
     /// Read when the row appears; the user can change them in System Settings meanwhile,
     /// so a recording re-reads them before checking.
     @State private var systemShortcuts: Set<KeyShortcut> = []
 
     private let registration = HotkeyRegistrationStatus.shared
 
-    init(action: ShortcutAction, detail: String? = nil) {
+    init(action: ShortcutAction, detail: LocalizedStringKey? = nil) {
         self.action = action
         self.detail = detail
         let stored = action.stored(in: .standard)
@@ -35,7 +35,7 @@ struct HotkeyRecorderView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(action.title)
+                    Text(verbatim: action.title)
                     if let detail {
                         Text(detail)
                             .font(.system(size: 11.5))
@@ -58,7 +58,7 @@ struct HotkeyRecorderView: View {
                 }
             }
             if let warning {
-                Label(warning, systemImage: "exclamationmark.triangle.fill")
+                Label { Text(warning) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
@@ -82,7 +82,7 @@ struct HotkeyRecorderView: View {
 
     /// The refusal of a combination just pressed, else a problem with the one in place:
     /// macOS would not register it, or it collides with a shortcut that takes it first.
-    private var warning: String? {
+    private var warning: LocalizedStringResource? {
         if let refusal { return refusal }
         // Before the registration status: one of ours twice fails with the same
         // `eventHotKeyExistsErr` another app's reservation does, and naming the
@@ -95,12 +95,12 @@ struct HotkeyRecorderView: View {
         if let status = registration.failures[action] {
             return status == OSStatus(eventHotKeyExistsErr)
                 ? "\(currentDisplayString) is reserved by another app, so it won't work. Choose another shortcut."
-                : "macOS refused \(currentDisplayString) (error \(status)). Choose another shortcut."
+                : "macOS refused \(currentDisplayString) (error \(Int(status))). Choose another shortcut."
         }
         return nil
     }
 
-    private static func describe(_ conflict: ShortcutConflict, display: String) -> String {
+    private static func describe(_ conflict: ShortcutConflict, display: String) -> LocalizedStringResource {
         switch conflict {
         case .action(let other):
             return "\(display) is already the \(other.title) shortcut. Choose another one."
