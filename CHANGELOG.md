@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **SpeechText can be installed with Homebrew**, as a cask: the command is in the README's Install section. It installs the same signed disk image, and the app still updates itself, so `brew upgrade` leaves it alone unless you pass `--greedy`.
 - **A download link that is always the latest version**: [SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg). Every release now carries the disk image under that name too, beside `SpeechText-X.Y.Z.dmg` — the same signed and notarized file.
 
 ### Changed
 
 - **The disk image says what to do after the drag.** Its window now reads *Drag, then open*: drag SpeechText onto Applications, then double-click it in the same window. That double-click opens the copy you just dragged, with no second question from macOS — before, a drag ended with nothing opening and the window still up.
 - **AI Rewrite's model lists lead with the current models.** Claude Sonnet 5.5 and GPT-6 Luna are the recommended picks, GPT-6.1 Terra is new, and older models — Claude Sonnet 5, Opus 5 and Haiku 4.5, GPT-5.6 Luna, Terra and Sol, GPT-6 Sol — sit folded under *Legacy models* at the foot of each list. They still work: if you use one, the next AI dictation offers a switch to its successor once, and nothing changes until you take it.
+- **Setup shows where to turn on macOS Dictation.** With Apple Dictation chosen, Open Keyboard Settings now brings a helper beside System Settings, as Accessibility already had: it says to scroll down to Dictation and click the switch beside the microphone, then Enable if macOS asks. It closes by itself once Dictation is on, or when you click Done.
+- **History shows an edit's three texts apart.** An opened edit puts the selected text and the instruction you spoke side by side, with the rewritten text across the full width beneath them — before, the instruction was a single line above the other two.
 - **SpeechText is in the Dock and ⌘Tab all the time** by default. Settings › General › Show in Dock still offers *While a window is open* or *Never*; a choice you made there is kept.
 
 ### Fixed
