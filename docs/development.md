@@ -395,6 +395,7 @@ docs/
   development.md       this file
   architecture.md      the map of the code
   decisions.md         the decisions behind the behaviour
+  settings-keys.md     every settings key, its purpose and default
   specs/               design documents for larger features
 scripts/               rebuild, packaging, keychain profile, appcast, trace import
 .githooks/             the sign-off and pre-commit hooks (see Hooks)
@@ -404,7 +405,7 @@ AGENTS.md              the guide for AI coding agents (CLAUDE.md imports it)
 
 ## Architecture
 
-[architecture.md](architecture.md) is the map of the code, [decisions.md](decisions.md) the decisions behind its behaviour, and [`AGENTS.md`](../AGENTS.md) the rules and the settings keys. Before any non-trivial change, read the decisions.md entries on what you touch.
+[architecture.md](architecture.md) is the map of the code, [decisions.md](decisions.md) the decisions behind its behaviour, [`AGENTS.md`](../AGENTS.md) the rules, and [settings-keys.md](settings-keys.md) the settings keys. Before any non-trivial change, read the decisions.md entries on what you touch.
 
 The short version:
 

@@ -29,7 +29,7 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
    ```
    A new Swift file needs the SPDX header the others have.
 7. **Docs in the same change.** `CHANGELOG.md` under `[Unreleased]` if a user will notice
-   it, written for users. `docs/decisions.md` if a decision changed, `AGENTS.md` if a rule or a settings key did.
+   it, written for users. `docs/decisions.md` if a decision changed, `AGENTS.md` if a rule did, `docs/settings-keys.md` if a settings key did.
    The guide in `docs/` the change makes untrue.
 8. **Commit.** `git commit -s` on every commit, a message that says what and why. English
    everywhere: code, comments, commits, the pull request.
