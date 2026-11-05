@@ -6,7 +6,7 @@
 - **Base revision:** `2a7432c`; the code references were checked again at `ece1ed1`
 - **Scope:**
   - **The app:** `Localizable.xcstrings` and `InfoPlist.xcstrings` in `SpeechText/SpeechText/`; every string the user reads, SwiftUI and AppKit, made localizable, with a `comment`; `knownRegions` in `project.pbxproj`.
-  - **The package:** `defaultLocalization` and a processed `Localizable.xcstrings` resource in `Packages/SpeechTextCore/Package.swift`, and `String(localized:bundle:comment:)` in the files that hand words to the UI.
+  - **The package:** `defaultLocalization` and a processed `Localizable.xcstrings` resource in `Packages/SpeechTextCore/Package.swift`, and `localized("…")` — `String(localized:bundle: .module)` — in the files that hand words to the UI.
   - **CI and release:** checks in `ci.yml`, a completeness check in `release.yml`.
   - **Translations:** a scheduled job that keeps one translations pull request up to date, a glossary (`docs/translation-glossary.md`) and an issue template.
   - **Docs:** CONTRIBUTING.md › Language, once the UI is no longer English-only.
@@ -60,7 +60,7 @@ Only literals passed to a SwiftUI initializer that takes a `LocalizedStringKey` 
 
 - **`Text(someVariable)`** with a `String` shows it verbatim and is never translated, for example `Text(title.uppercased())` in `MainPageKit.swift`. Each call either gets a localized value or, when the text is the user's own (a transcript, a prompt they wrote), stays verbatim on purpose, as `Text(verbatim:)`.
 - **AppKit:** `NSAlert` text (`AppInstaller.swift`), menu bar items (`NSMenuItem(title:)` in `App.swift`) and anything else set as a plain `String`.
-- **Words from SpeechTextCore:** the row words (`ModelRowWords`), the setup cards (`SetupCards`), Home's and History's summaries (`HomeSummary`, `HistorySummary`), the catalogs' descriptions, the error descriptions a transcriber or a client shows, and more. `Package.swift` gets `defaultLocalization: "en"` and declares the catalog as a resource, `resources: [.process("Localizable.xcstrings")]`, so that `Bundle.module` exists. This is Foundation, not SwiftUI, so the *Core imports* check is unaffected.
+- **Words from SpeechTextCore:** the row words (`ModelRowWords`), the setup cards (`SetupCards`), Home's and History's summaries (`HomeSummary`, `HistorySummary`), the catalogs' descriptions, the error descriptions a transcriber or a client shows, and more. `Package.swift` gets `defaultLocalization: "en"` and declares the catalog as a resource, `resources: [.process("Localizable.xcstrings")]`, so that `Bundle.module` exists. The package writes them as `localized("…")` (`Localized.swift`), which is `String(localized:bundle: .module, locale:)`: the compiler extracts a literal passed to it as it does for `String(localized:)`, and the locale is the app's language, so a number in a sentence is written the app's way ("1,234" in English) rather than the Mac region's. Its comments are in the package's catalog, as the app's are in the app's. Dates and language names follow the app's language too: in English the pages' own formats (`en_GB` order, the catalogue's language names) are kept exactly; in another language `DateFormatter.setLocalizedDateFormatFromTemplate` orders the same fields and `Locale` names the language. This is Foundation, not SwiftUI, so the *Core imports* check is unaffected.
 - **Case changes** on translated text take the locale: `.textCase(.uppercase)` in SwiftUI, or `uppercased(with: .current)`, never a bare `uppercased()`.
 
 The inventory of these strings, in the app and in the package, is the first step of *build*, and it becomes the file list the CI check reads (see *Checks*).
@@ -98,7 +98,7 @@ The supported languages are the ones in `knownRegions` other than `Base` and `en
 | CI, every pull request | Every entry has a `comment`. | A script over the catalogs. |
 | CI, every pull request | The files in the inventory hand the UI localized strings. | A script with the list of those files, in the manner of `scripts/check-core-imports.sh`. |
 | CI, every pull request, and the job before it pushes | Every translation keeps its source's placeholders (`%lld`, `%@`, positional forms) and its Markdown (links, emphasis) intact. | A script that compares the format specifiers and Markdown of each value with the English source. Valid JSON alone does not catch a dropped `%lld`. |
-| CI | The package still builds and tests on its own, with its catalog. | `swift build` already runs in CI; it must compile the `.xcstrings` resource. See *Open* for `SpeechTextEvaluation`. |
+| CI | The package still builds on its own, with its catalog. | `swift build` already runs in CI and compiles the `.xcstrings` resource; `scripts/sync-strings.sh --check` checks the package's catalog with the app's, from the same test build (`SpeechTextCore-t.build`'s `.stringsdata`). The evaluation tool's build already runs too (see `Bundle.module` below). |
 | Code review | `Text(someString)` with a `String` variable, and UI text that bypasses the catalog. | Review, which catches what a script cannot. Advice, not a gate. |
 | `release.yml` | Every entry has a value in every supported language, including every plural form that language has, except entries marked `shouldTranslate: false`. | A script over the catalogs, before packaging. It names the forms it requires per language, from CLDR: `es` one, many, other; `uk` one, few, many, other. |
 
@@ -136,4 +136,4 @@ A new issue template, `.github/ISSUE_TEMPLATE/translation_error.yml`, labeled `t
 
 ## Open
 
-- **`Bundle.module` in `SpeechTextEvaluation`.** `SpeechTextCore` is linked into the app, the tests and the tool. Once the package has resources, `Bundle.module` traps if the resource bundle is not found next to the binary. *Build* step 3 checks that the tool still runs, and copies the bundle or keeps the tool's code paths off localized strings if it does not.
+- **`Bundle.module` in `SpeechTextEvaluation`** — settled in *build* step 3. `SpeechTextCore` is linked into the app, the tests and the tool, and `Bundle.module` traps when its resource bundle (`SpeechTextCore_SpeechTextCore.bundle`) is not found. Xcode puts the bundle in the app's `Contents/Resources`, and beside the tool's binary in `Build/Products/<configuration>/`, where `scripts/evaluate.sh` and `scripts/check-vendor-models.sh` run it: `--export-catalogue` runs there and exits 0. A copy of the binary moved without the bundle traps on the first localized string, so the tool is run where it is built, with the bundle beside it.

@@ -256,7 +256,7 @@ public let sttModelCatalog: [STTModelDescriptor] = {
             // its own (checked 2026-10-17), so Scribe v2's list stands in for it.
             languages: scribeLanguages, languageNotes: [:],
             vocabulary: .termList(.scribeRealtime),
-            settingsNote: "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, Scribe v2 transcribes the recording instead. Billed per streamed minute."
+            settingsNote: localized("Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, Scribe v2 transcribes the recording instead. Billed per streamed minute.")
         ),
 
         // Checked against `GET /v1/models` on 2026-09-21 rather than against the docs.
@@ -299,7 +299,7 @@ public let sttModelCatalog: [STTModelDescriptor] = {
             price: .listed(SpeechRates(perMinute: 0.017)),
             languages: .unpublished, languageNotes: [:],
             vocabulary: .termList(.openAIKeywords),
-            settingsNote: "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, GPT Transcribe transcribes the recording instead. Billed per streamed minute."
+            settingsNote: localized("Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, GPT Transcribe transcribes the recording instead. Billed per streamed minute.")
         ),
     ]
 

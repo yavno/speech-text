@@ -37,9 +37,9 @@ public enum EditCancelReason: Equatable, Sendable {
     public func notice(textPutBack: Bool) -> (title: String, detail: String) {
         switch self {
         case .tap:
-            return ("Edit canceled", "A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish.")
+            return (localized("Edit canceled"), localized("A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish."))
         case .shortcut, .escape, .closeButton, .otherShortcut, .menu:
-            return ("Edit canceled", textPutBack ? "Nothing was changed. The text was put back." : "Nothing was changed.")
+            return (localized("Edit canceled"), textPutBack ? localized("Nothing was changed. The text was put back.") : localized("Nothing was changed."))
         }
     }
 }

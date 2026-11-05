@@ -80,10 +80,10 @@ public enum ShortcutAction: CaseIterable, Hashable, Sendable {
 
     public var title: String {
         switch self {
-        case .inline: return "Inline Recording"
-        case .ai: return "AI Recording"
-        case .recordWindow: return "Record Window"
-        case .edit: return "Edit Selection with AI"
+        case .inline: return localized("Inline Recording")
+        case .ai: return localized("AI Recording")
+        case .recordWindow: return localized("Record Window")
+        case .edit: return localized("Edit Selection with AI")
         }
     }
 

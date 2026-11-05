@@ -20,11 +20,11 @@ public enum OnboardingStep: String, CaseIterable, Comparable, Sendable {
 
     public var title: String {
         switch self {
-        case .welcome: "Welcome"
-        case .speech: "Speech"
-        case .ai: "AI"
-        case .permissions: "Permissions"
-        case .tryIt, .done: "Try it"
+        case .welcome: localized("Welcome")
+        case .speech: localized("Speech")
+        case .ai: localized("AI")
+        case .permissions: localized("Permissions")
+        case .tryIt, .done: localized("Try it")
         }
     }
 
@@ -105,19 +105,19 @@ public struct AIServiceCard: Sendable {
 /// never have selected anything else falls back to.
 public enum SetupCards {
     public static let speech: [SpeechServiceCard] = [
-        SpeechServiceCard(service: .groq, engine: .groq, title: "Groq", subtitle: "Free plan",
-                          detail: "The same key also turns on AI text polish.", promisesLiveWords: false),
-        SpeechServiceCard(service: .elevenLabs, engine: .elevenlabs, title: "ElevenLabs", subtitle: "Paid",
-                          detail: "Shows your words live as you speak.", promisesLiveWords: true),
-        SpeechServiceCard(service: .openAI, engine: .openai, title: "OpenAI", subtitle: "Paid",
-                          detail: "Shows your words live too. The same key also turns on AI text polish.",
+        SpeechServiceCard(service: .groq, engine: .groq, title: "Groq", subtitle: localized("Free plan"),
+                          detail: localized("The same key also turns on AI text polish."), promisesLiveWords: false),
+        SpeechServiceCard(service: .elevenLabs, engine: .elevenlabs, title: "ElevenLabs", subtitle: localized("Paid"),
+                          detail: localized("Shows your words live as you speak."), promisesLiveWords: true),
+        SpeechServiceCard(service: .openAI, engine: .openai, title: "OpenAI", subtitle: localized("Paid"),
+                          detail: localized("Shows your words live too. The same key also turns on AI text polish."),
                           promisesLiveWords: true),
     ]
 
     public static let ai: [AIServiceCard] = [
-        AIServiceCard(service: .groq, pick: .groq, title: "Groq", subtitle: "Free plan"),
-        AIServiceCard(service: .anthropic, pick: .anthropic, title: "Claude", subtitle: "Anthropic · Paid"),
-        AIServiceCard(service: .openAI, pick: .openai, title: "ChatGPT", subtitle: "OpenAI · Paid"),
+        AIServiceCard(service: .groq, pick: .groq, title: "Groq", subtitle: localized("Free plan")),
+        AIServiceCard(service: .anthropic, pick: .anthropic, title: "Claude", subtitle: localized("Anthropic · Paid")),
+        AIServiceCard(service: .openAI, pick: .openai, title: "ChatGPT", subtitle: localized("OpenAI · Paid")),
     ]
 
     /// The Speech card for a service, else the first.

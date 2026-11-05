@@ -14,15 +14,15 @@ import Foundation
 /// A local speech model's own words, before the notes for the user's languages.
 private func speechModelWords(_ model: LocalSTTModel) -> String {
     switch model.id {
-    case "openai_whisper-large-v3-v20240930": "As accurate as Turbo, about 30% slower. Needs 24 GB of memory."
-    case parakeetUltraModelID: "Parakeet v3 trained further: as accurate on our tests, just as quick."
-    case parakeetV3ModelID: "The quickest to answer."
-    case "parakeet-redux": "Less than half the download of v3, and slower to answer."
-    case "phonon-2": "Parakeet v3 compressed for a single language, as accurate on it."
-    case "openai_whisper-large-v3-v20240930_turbo_632MB": "Slower to answer than Parakeet."
-    case "openai_whisper-small_216MB": "Small and fast."
-    case "openai_whisper-base": "Smaller still, and less accurate."
-    case "openai_whisper-tiny": "Many mistakes. Only for a quick test."
+    case "openai_whisper-large-v3-v20240930": localized("As accurate as Turbo, about 30% slower. Needs 24 GB of memory.")
+    case parakeetUltraModelID: localized("Parakeet v3 trained further: as accurate on our tests, just as quick.")
+    case parakeetV3ModelID: localized("The quickest to answer.")
+    case "parakeet-redux": localized("Less than half the download of v3, and slower to answer.")
+    case "phonon-2": localized("Parakeet v3 compressed for a single language, as accurate on it.")
+    case "openai_whisper-large-v3-v20240930_turbo_632MB": localized("Slower to answer than Parakeet.")
+    case "openai_whisper-small_216MB": localized("Small and fast.")
+    case "openai_whisper-base": localized("Smaller still, and less accurate.")
+    case "openai_whisper-tiny": localized("Many mistakes. Only for a quick test.")
     default: model.summary
     }
 }
@@ -45,10 +45,10 @@ public func speechModelName(_ model: LocalSTTModel) -> String {
 
 /// Apple's recogniser, as a row beside the downloaded models. Which of the user's languages
 /// it takes on this Mac is asked of macOS and said by the row's badge.
-public let appleDictationLine = "Built into macOS, nothing to download. Words appear as you speak."
+public let appleDictationLine = localized("Built into macOS, nothing to download. Words appear as you speak.")
 
 /// Setup's "On this Mac" card on an Intel Mac.
-public let intelSpeechPlaceFacts = "Private and free, but slow on this Mac."
+public let intelSpeechPlaceFacts = localized("Private and free, but slow on this Mac.")
 
 // MARK: - Speech online
 
@@ -60,14 +60,14 @@ public func onlineSpeechModelName(_ model: STTModelDescriptor) -> String {
 
 private func onlineSpeechModelWords(_ model: STTModelDescriptor) -> String {
     switch model.id {
-    case "whisper-large-v3-turbo": "Fast and accurate. Text appears when you stop."
-    case "whisper-large-v3": "A little more careful on hard audio, a little slower."
-    case "scribe_v2": "Text appears when you stop."
-    case elevenLabsRealtimeModel: "Words appear as you speak."
-    case "gpt-transcribe": "Text appears when you stop."
-    case "gpt-4o-mini-transcribe": "Cheaper, a little less accurate."
-    case openAIRealtimeSTTModel: "Words appear as you speak."
-    default: model.isRealtime ? "Words appear as you speak." : "Text appears when you stop."
+    case "whisper-large-v3-turbo": localized("Fast and accurate. Text appears when you stop.")
+    case "whisper-large-v3": localized("A little more careful on hard audio, a little slower.")
+    case "scribe_v2": localized("Text appears when you stop.")
+    case elevenLabsRealtimeModel: localized("Words appear as you speak.")
+    case "gpt-transcribe": localized("Text appears when you stop.")
+    case "gpt-4o-mini-transcribe": localized("Cheaper, a little less accurate.")
+    case openAIRealtimeSTTModel: localized("Words appear as you speak.")
+    default: model.isRealtime ? localized("Words appear as you speak.") : localized("Text appears when you stop.")
     }
 }
 
@@ -78,9 +78,9 @@ public func onlineSpeechModelLine(_ model: STTModelDescriptor, spoken: [String])
 /// What each online speech service is good at.
 public func onlineSpeechServiceLine(_ service: Provider) -> String {
     switch service {
-    case .groq: "Fast Whisper. Text appears when you stop."
-    case .elevenLabs: "Strongest on accents and noise. Can show words as you speak."
-    case .openAI: "Can show words as you speak. Its key works for AI Rewrite too."
+    case .groq: localized("Fast Whisper. Text appears when you stop.")
+    case .elevenLabs: localized("Strongest on accents and noise. Can show words as you speak.")
+    case .openAI: localized("Can show words as you speak. Its key works for AI Rewrite too.")
     default: service.displayName
     }
 }
@@ -96,31 +96,31 @@ public func chatModelName(_ model: ChatModelDescriptor) -> String {
 
 public func chatModelLine(_ model: ChatModelDescriptor) -> String {
     switch model.id {
-    case "openai/gpt-oss-120b": "Clean text in about a second."
-    case "openai/gpt-oss-20b": "The fastest, a little less careful."
-    case "qwen/qwen3.8-27b": "A preview — Groq may withdraw it."
-    case "claude-sonnet-5-5": "Fast, and writes well."
-    case "claude-opus-5-5": "Writes best. Slower, and costs more."
-    case "claude-haiku-5-5": "The cheapest, for short clean-ups."
-    case "claude-sonnet-5": "The previous Sonnet, at the same price."
-    case "claude-opus-5": "The previous Opus. Costs more than Opus 5.5."
-    case "claude-haiku-4-5": "The previous Haiku, at ten times the price."
-    case "gpt-6-luna": "Fast and cheap."
-    case "gpt-6.1-terra": "Balanced."
-    case "gpt-6.1-sol": "The flagship. Slower, and costs more."
-    case "gpt-6-sol": "The previous Sol, at the same price."
-    case "gpt-5.6-luna": "The previous Luna. Costs about twice as much."
-    case "gpt-5.6-terra": "The previous Terra. Costs about twice as much."
-    case "gpt-5.6-sol": "The previous Sol. Costs twice as much."
+    case "openai/gpt-oss-120b": localized("Clean text in about a second.")
+    case "openai/gpt-oss-20b": localized("The fastest, a little less careful.")
+    case "qwen/qwen3.8-27b": localized("A preview — Groq may withdraw it.")
+    case "claude-sonnet-5-5": localized("Fast, and writes well.")
+    case "claude-opus-5-5": localized("Writes best. Slower, and costs more.")
+    case "claude-haiku-5-5": localized("The cheapest, for short clean-ups.")
+    case "claude-sonnet-5": localized("The previous Sonnet, at the same price.")
+    case "claude-opus-5": localized("The previous Opus. Costs more than Opus 5.5.")
+    case "claude-haiku-4-5": localized("The previous Haiku, at ten times the price.")
+    case "gpt-6-luna": localized("Fast and cheap.")
+    case "gpt-6.1-terra": localized("Balanced.")
+    case "gpt-6.1-sol": localized("The flagship. Slower, and costs more.")
+    case "gpt-6-sol": localized("The previous Sol, at the same price.")
+    case "gpt-5.6-luna": localized("The previous Luna. Costs about twice as much.")
+    case "gpt-5.6-terra": localized("The previous Terra. Costs about twice as much.")
+    case "gpt-5.6-sol": localized("The previous Sol. Costs twice as much.")
     default: ""
     }
 }
 
 public func onlineAIServiceLine(_ service: Provider) -> String {
     switch service {
-    case .groq: "Fast, with a free plan. Its key works for speech too."
-    case .anthropic: "Claude. Careful writing, paid."
-    case .openAI: "ChatGPT's models, paid. Its key works for speech too."
+    case .groq: localized("Fast, with a free plan. Its key works for speech too.")
+    case .anthropic: localized("Claude. Careful writing, paid.")
+    case .openAI: localized("ChatGPT's models, paid. Its key works for speech too.")
     default: service.displayName
     }
 }
@@ -129,17 +129,18 @@ public func onlineAIServiceLine(_ service: Provider) -> String {
 /// with what we measured in the user's languages, and the memory a heavy one needs.
 public func aiModelLine(_ model: LocalChatModel, heavy: Bool, spoken: [String]) -> String {
     let words = switch model.id {
-    case "gemma-4-12b-it-qat-q4_0": "The best in our rewrite test. Clean text in 2–4 seconds."
-    case "Qwen3.5-9B-Q4_K_M": "A step behind Gemma 4 12B, a little lighter."
-    case "Qwen3.5-4B-Q4_K_M": "Works, with some mistakes."
-    case "gpt-oss-20b-MXFP4": "OpenAI's open model. Close behind Gemma, and the fastest here."
-    case "Qwen3.8-27B-Q4_K_M": "The largest. About 8 seconds a dictation on an M1 Pro."
+    case "gemma-4-12b-it-qat-q4_0": localized("The best in our rewrite test. Clean text in 2–4 seconds.")
+    case "Qwen3.5-9B-Q4_K_M": localized("A step behind Gemma 4 12B, a little lighter.")
+    case "Qwen3.5-4B-Q4_K_M": localized("Works, with some mistakes.")
+    case "gpt-oss-20b-MXFP4": localized("OpenAI's open model. Close behind Gemma, and the fastest here.")
+    case "Qwen3.8-27B-Q4_K_M": localized("The largest. About 8 seconds a dictation on an M1 Pro.")
     default: model.summary
     }
     let line = lineWithLanguageNotes(words, notes: model.languageNotes, spoken: spoken)
     guard heavy else { return line }
-    return "\(line) Needs \(Int((Double(model.memoryFloorBytes) / 1_073_741_824).rounded())) GB of memory."
+    let gigabytes = Int((Double(model.memoryFloorBytes) / 1_073_741_824).rounded())
+    return line + " " + localized("Needs \(gigabytes) GB of memory.")
 }
 
 /// Under the models on an Intel Mac, which has no GPU llama.cpp can use well.
-public let intelChatWarning = "This Mac has an Intel processor: a model runs on it alone, and a rewrite can take a minute or more. An online service is much faster."
+public let intelChatWarning = localized("This Mac has an Intel processor: a model runs on it alone, and a rewrite can take a minute or more. An online service is much faster.")

@@ -20,7 +20,7 @@ public enum LLMProviderType: String, CaseIterable, Identifiable, Sendable {
         case .groq: "Groq"
         case .anthropic: "Anthropic (Claude)"
         case .openai: "OpenAI"
-        case .local: "On this Mac"
+        case .local: localized("On this Mac")
         }
     }
 
@@ -340,16 +340,17 @@ public enum LLMError: LocalizedError, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .missingAPIKey(let p): "No API key set for \(p.displayName)"
-        case .invalidResponse: "Invalid response from the LLM API"
+        case .missingAPIKey(let p): localized("No API key set for \(p.displayName)")
+        case .invalidResponse: localized("Invalid response from the LLM API")
         case .httpError(let code, let body) where ModelUnavailableReply.matches(body):
-            "The model isn't available: \(providerErrorReason(in: body) ?? "the service no longer serves it.") (HTTP \(code))"
-        case .httpError(let code, let body): "The rewrite failed: \(chatErrorSentence(status: code, body: body)) (HTTP \(code))"
-        case .refused(let why): "The model declined the request\(why.map { ": \($0)" } ?? "")"
-        case .emptyResponse: "The model returned an empty response"
-        case .cutOff: "The model's reply was cut off before it ended."
-        case .noLocalModel: "No model on this Mac is ready — choose or download one in Settings › AI Rewrite"
-        case .noModelChosen(let p): "No model chosen for \(p.displayName) — choose one in Settings"
+            localized("The model isn't available: \(providerErrorReason(in: body) ?? localized("the service no longer serves it.")) (HTTP \(code))")
+        case .httpError(let code, let body): localized("The rewrite failed: \(chatErrorSentence(status: code, body: body)) (HTTP \(code))")
+        case .refused(let why?): localized("The model declined the request: \(why)")
+        case .refused(nil): localized("The model declined the request")
+        case .emptyResponse: localized("The model returned an empty response")
+        case .cutOff: localized("The model's reply was cut off before it ended.")
+        case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › AI Rewrite")
+        case .noModelChosen(let p): localized("No model chosen for \(p.displayName) — choose one in Settings")
         }
     }
 }
@@ -366,11 +367,11 @@ private func chatErrorSentence(status: Int, body: String) -> String {
 /// The transcription errors' `genericReason`, in words about text rather than a recording.
 private func chatErrorReason(forStatus status: Int) -> String {
     switch status {
-    case 401, 403: "the API key was rejected"
-    case 413: "the text is too long for the service"
-    case 429: "too many requests — try again in a moment"
-    case 500...: "the service is having problems"
-    default: "the request was refused"
+    case 401, 403: localized("the API key was rejected")
+    case 413: localized("the text is too long for the service")
+    case 429: localized("too many requests — try again in a moment")
+    case 500...: localized("the service is having problems")
+    default: localized("the request was refused")
     }
 }
 

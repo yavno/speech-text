@@ -50,13 +50,13 @@ public enum DictationCancelReason: Equatable, Sendable {
     public func notice(savedInHistory: Bool) -> (title: String, detail: String) {
         switch self {
         case .tap:
-            return ("Dictation canceled", "A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free.")
+            return (localized("Dictation canceled"), localized("A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free."))
         case .releasedEarly:
-            return ("Dictation canceled", "The shortcut was let go before the microphone opened. Hold it until the overlay listens.")
+            return (localized("Dictation canceled"), localized("The shortcut was let go before the microphone opened. Hold it until the overlay listens."))
         case .shortcut, .escape, .closeButton, .menu:
-            return ("Dictation canceled", savedInHistory
-                    ? "Nothing was pasted. The dictation is saved in History."
-                    : "Nothing was pasted.")
+            return (localized("Dictation canceled"), savedInHistory
+                    ? localized("Nothing was pasted. The dictation is saved in History.")
+                    : localized("Nothing was pasted."))
         }
     }
 }
@@ -287,14 +287,14 @@ public enum HoldTip {
                      other: String, otherIsAI: Bool) -> (title: String, detail: String) {
         switch stage {
         case .switchHint:
-            return (otherIsAI ? "Switch to AI" : "Switch to plain text",
-                    "While holding \(letter), press \(other). Press it again to switch back.")
+            return (otherIsAI ? localized("Switch to AI") : localized("Switch to plain text"),
+                    localized("While holding \(letter), press \(other). Press it again to switch back."))
         case .keepHolding, .none:
             if followed {
-                return ("Just \(letter) — that's it",
-                        isEdit ? "Let go of \(letter) to send the instruction." : "Let go of \(letter) when you're done.")
+                return (localized("Just \(letter) — that's it"),
+                        isEdit ? localized("Let go of \(letter) to send the instruction.") : localized("Let go of \(letter) when you're done."))
             }
-            return ("You can let go of \(modifiers)", "\(letter) alone keeps recording, so clicks and ⌘Tab work as usual.")
+            return (localized("You can let go of \(modifiers)"), localized("\(letter) alone keeps recording, so clicks and ⌘Tab work as usual."))
         }
     }
 

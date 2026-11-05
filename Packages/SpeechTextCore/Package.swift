@@ -25,13 +25,15 @@ let swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "SpeechTextCore",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "SpeechTextCore", targets: ["SpeechTextCore"]),
         .library(name: "ChatTemplates", targets: ["ChatTemplates"]),
     ],
     targets: [
-        .target(name: "SpeechTextCore", dependencies: ["ChatTemplates"], swiftSettings: swiftSettings),
+        .target(name: "SpeechTextCore", dependencies: ["ChatTemplates"],
+                resources: [.process("Localizable.xcstrings")], swiftSettings: swiftSettings),
         .target(name: "ChatTemplates", swiftSettings: swiftSettings),
     ]
 )

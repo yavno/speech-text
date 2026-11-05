@@ -112,7 +112,7 @@ public enum UsagePrices {
 
     /// The line beside every total: an estimate from the list prices the app knows, not the bill.
     /// The date they were checked is on Usage's How this is counted.
-    public static var disclaimer: String { "estimated from known prices" }
+    public static var disclaimer: String { localized("estimated from known prices") }
 
     /// The speech model a ledger entry names.
     static func speech(vendor: Provider, model: String) -> ListPrice<SpeechRates> {
@@ -300,18 +300,19 @@ public struct RecordCost: Equatable, Sendable {
 // MARK: - Formatting
 
 public enum HomeFormat {
-    /// "1,234" — in English whatever the Mac's region, as everything else on the pages is.
+    /// "1,234" — in the app's language whatever the Mac's region, as everything else on the
+    /// pages is.
     public static func integer(_ value: Int) -> String {
         integerFormatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
 
     /// Made once: every filter's count, day and popover row asks for one each time it is
-    /// drawn, and a formatter is costly to build. Its locale is fixed, so nothing the user
-    /// changes can leave it out of date.
+    /// drawn, and a formatter is costly to build. Its locale is the app's language, which
+    /// does not change while the app runs, so nothing can leave it out of date.
     private static let integerFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.locale = uiLocale.language.languageCode == .english ? Locale(identifier: "en_US") : uiLocale
         return formatter
     }()
 
@@ -325,7 +326,12 @@ public enum HomeFormat {
 
     public static func durationText(minutes: Double) -> String {
         let (h, m) = duration(minutes: minutes)
-        return [h.map { "\($0) h" }, m.map { "\($0) min" }].compactMap { $0 }.joined(separator: " ")
+        return switch (h, m) {
+        case (let h?, let m?): localized("\(h) h \(m) min")
+        case (let h?, nil): localized("\(h) h")
+        case (nil, let m?): localized("\(m) min")
+        case (nil, nil): ""
+        }
     }
 
     public static func money(_ value: Double) -> String {
@@ -384,9 +390,9 @@ public struct HomeRecentEntry: Equatable, Identifiable, Sendable {
                 text = record.deliveredText
             }
         case .empty:
-            text = "Nothing was heard."
+            text = localized("Nothing was heard.")
         case .failed:
-            text = record.errorMessage ?? "Transcription failed."
+            text = record.errorMessage ?? localized("Transcription failed.")
         }
         app = Self.app(of: record)
         var tags: [Tag] = []
@@ -444,7 +450,7 @@ public struct HomeRecentEntry: Equatable, Identifiable, Sendable {
         if calendar.isDate(date, inSameDayAs: now) {
             format = "HH:mm"
         } else if calendar.isDateInYesterday(date) {
-            return "Yesterday"
+            return localized("Yesterday")
         } else if let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: date),
                                                      to: calendar.startOfDay(for: now)).day, days < 7 {
             format = "EEEE"
@@ -482,22 +488,22 @@ public struct HomeTalk: Equatable, Sendable {
 
     static let dictate = Script(
         app: "Slack", place: "#design",
-        said: "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet".split(separator: " ").map(String.init),
-        output: "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet.",
+        said: localized("Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet").split(separator: " ").map(String.init),
+        output: localized("Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet."),
         preset: nil)
 
     static let ai = Script(
-        app: "Mail", place: "To: Sarah",
-        said: "uh email to Sarah running late start without me sorry".split(separator: " ").map(String.init),
-        output: "Hi Sarah, I'm running a few minutes late — please start without me. Sorry!",
+        app: "Mail", place: localized("To: Sarah"),
+        said: localized("uh email to Sarah running late start without me sorry").split(separator: " ").map(String.init),
+        output: localized("Hi Sarah, I'm running a few minutes late — please start without me. Sorry!"),
         preset: "Email / Message")
 
     static let edit = Script(
-        app: "Notes", place: "Trip plan",
-        said: "make it sound more sure".split(separator: " ").map(String.init),
-        output: "Let's go on Friday — it works for everyone.",
+        app: "Notes", place: localized("Trip plan"),
+        said: localized("make it sound more sure").split(separator: " ").map(String.init),
+        output: localized("Let's go on Friday — it works for everyone."),
         preset: nil,
-        selection: "i think maybe we could go on friday if thats ok for everyone")
+        selection: localized("i think maybe we could go on friday if thats ok for everyone"))
 
     /// One tick is 100 ms.
     public static let tickSeconds = 0.1

@@ -48,7 +48,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
             ProviderDescriptor(displayName: "Groq", roles: [.speech, .chat], apiKey: APIKeyDescriptor(
                 settingsKey: SettingsKeys.groqAPIKey,
                 keysPage: URL(string: "https://console.groq.com/keys")!, freePlan: true,
-                createButton: "Create API Key", createNote: "Copy the key.",
+                createButton: "Create API Key", createNote: localized("Copy the key."),
                 prefix: "gsk_", sample: "gsk_a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6",
                 verification: KeyVerification(url: URL(string: "https://api.groq.com/openai/v1/models")!,
                                               header: .bearer)),
@@ -63,12 +63,12 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
             ProviderDescriptor(displayName: "ElevenLabs", roles: [.speech], apiKey: APIKeyDescriptor(
                 settingsKey: SettingsKeys.elevenLabsAPIKey,
                 keysPage: URL(string: "https://elevenlabs.io/app/developers/api-keys")!, freePlan: false,
-                createButton: "Create Key", createNote: "Give it **Speech to Text** access, then copy the key.",
+                createButton: "Create Key", createNote: localized("Give it **Speech to Text** access, then copy the key."),
                 prefix: "sk_", sample: "sk_a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6",
                 verification: KeyVerification(url: URL(string: "https://api.elevenlabs.io/v1/models")!,
                                               header: .named("xi-api-key"))),
                 speechModel: ModelSetting(settingsKey: SettingsKeys.elevenLabsModel, defaultID: "scribe_v2",
-                                          caption: "Leaves out fillers, false starts and sound tags like “(laughs)”."),
+                                          caption: localized("Leaves out fillers, false starts and sound tags like “(laughs)”.")),
                 // Its own form (`ElevenLabsTranscriber`): `model_id`, `language_code`, `keyterms`.
                 chatModel: nil, speechUpload: nil)
         case .anthropic:
@@ -76,7 +76,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                 settingsKey: SettingsKeys.anthropicAPIKey,
                 keysPage: URL(string: "https://platform.claude.com/settings/keys")!, freePlan: false,
                 createButton: "Create key",
-                createNote: "Pick a workspace, set expiry to **Never**, then copy the key.",
+                createNote: localized("Pick a workspace, set expiry to **Never**, then copy the key."),
                 prefix: "sk-ant-", sample: "sk-ant-api03-a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6",
                 verification: KeyVerification(url: URL(string: "https://api.anthropic.com/v1/models")!,
                                               header: .named("x-api-key"),
@@ -89,7 +89,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                 settingsKey: SettingsKeys.openAIAPIKey,
                 keysPage: URL(string: "https://platform.openai.com/api-keys")!, freePlan: false,
                 createButton: "Create new secret key",
-                createNote: "Keep permissions on **All**, then copy the key. Needs credit in Billing.",
+                createNote: localized("Keep permissions on **All**, then copy the key. Needs credit in Billing."),
                 prefix: "sk-", sample: "sk-proj-a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6",
                 verification: KeyVerification(url: URL(string: "https://api.openai.com/v1/models")!,
                                               header: .bearer)),
@@ -137,13 +137,16 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
 
     /// What a model is chosen *for* in a notice — "Choose a model for OpenAI", and for
     /// the local tier "for this Mac" — worded so no article depends on the name.
-    public var modelChoiceTarget: String { self == .local ? "this Mac" : displayName }
+    public var modelChoiceTarget: String { self == .local ? localized("this Mac") : displayName }
 
-    /// The phrase the retry notice uses — "a Groq API key", "an OpenAI API key".
+    /// The phrase the retry notice uses in English — "a Groq API key", "an OpenAI API key".
     var apiKeyPhrase: String {
-        let article = "AEIOU".contains(displayName.prefix(1)) ? "an" : "a"
+        let article = takesAn ? "an" : "a"
         return "\(article) \(displayName) API key"
     }
+
+    /// Whether English says "an" before its name.
+    var takesAn: Bool { "AEIOU".contains(displayName.prefix(1)) }
 }
 
 /// What the app knows about a provider. See `Provider.descriptor`.
