@@ -22,13 +22,7 @@
     " faster" : {
 
     },
-    " in everything you dictate." : {
-
-    },
     " instead of " : {
-
-    },
-    " will become " : {
 
     },
     " words a minute and type at " : {
@@ -62,11 +56,28 @@
     "%@ (not connected)" : {
 
     },
+    "%@ charges about %@ an hour more for a transcription that carries them." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ charges about %2$@ an hour more for a transcription that carries them."
+          }
+        }
+      },
+      "comment" : "Dictionary page, What a word does: sentence after the count. The first %@ is the vendor, the second a price (e.g. $0.12)."
+    },
     "%@ dictations" : {
 
     },
+    "%@ is given them" : {
+      "comment" : "Dictionary page, What a word does: row title. %@ is the speech engine's vendor (e.g. OpenAI); 'them' is the user's words."
+    },
     "%@ is newer." : {
 
+    },
+    "%@ isn't given them" : {
+      "comment" : "Dictionary page, What a word does: row title. %@ is the name of the speech model in use."
     },
     "%@ key" : {
 
@@ -83,6 +94,17 @@
     },
     "%@ of models on this Mac" : {
 
+    },
+    "%@ will become %@ in everything you dictate." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ will become %2$@ in everything you dictate."
+          }
+        }
+      },
+      "comment" : "Dictionary page, Add a word: preview under the form. The first %@ is the list of wrong spellings, each in quotes and struck through, separated by commas; the second %@ is the word, in bold."
     },
     "%@ words" : {
 
@@ -138,7 +160,7 @@
       }
     },
     "%lld" : {
-
+      "comment" : "A count shown on its own, e.g. after a section heading."
     },
     "%lld / %lld" : {
       "localizations" : {
@@ -153,6 +175,17 @@
     "%lld entries" : {
 
     },
+    "%lld of %lld go to %@ — it takes no more. The ones you use most, and anything added this week, go first." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld go to %3$@ — it takes no more. The ones you use most, and anything added this week, go first."
+          }
+        }
+      },
+      "comment" : "Dictionary page, What a word does: row text. The first %lld is how many words are sent, the second how many the user has; %@ is the speech model's name."
+    },
     "%lld refused" : {
 
     },
@@ -163,16 +196,13 @@
 
     },
     "%lld×" : {
-
+      "comment" : "Dictionary page: how many times a word was used, e.g. 12×. Keep the × sign."
     },
     "**Not in the list?** Drag SpeechText into it, or click + under the list and choose it in Applications." : {
 
     },
     "+%lld" : {
-
-    },
-    ", " : {
-
+      "comment" : "Dictionary page: on a word's card, how many more wrong spellings there are than the four shown, e.g. +3."
     },
     "." : {
 
@@ -194,6 +224,9 @@
     },
     "AI Rewrite" : {
 
+    },
+    "AI Rewrite keeps them as written" : {
+      "comment" : "Dictionary page, What a word does: row title. AI Rewrite is a feature of the app; 'them' is the user's words."
     },
     "AI Rewrite pastes your words as said until you add a key." : {
 
@@ -217,7 +250,7 @@
 
     },
     "Add" : {
-
+      "comment" : "Dictionary page, Replacements: button that adds the replacement typed in the form."
     },
     "Add a key to use %@." : {
 
@@ -225,14 +258,20 @@
     "Add a language" : {
 
     },
+    "Add a spelling, then Return" : {
+      "comment" : "Dictionary page, editing a word: placeholder in the field that adds a wrong spelling. Return is the key."
+    },
+    "Add a word" : {
+      "comment" : "Dictionary page: section heading over the form that adds a word."
+    },
     "Add the languages you speak to see which models know them." : {
 
     },
     "Add the names and terms SpeechText gets wrong — a colleague's name, your product, a code identifier — and how they come out instead. They're put right after every dictation." : {
-
+      "comment" : "Dictionary page: shown under 'No words yet.' when the list of words is empty. SpeechText is the app's name."
     },
     "Add word" : {
-
+      "comment" : "Dictionary page, Add a word: button that adds the word typed in the form."
     },
     "Add “%@” — used in %lld dictations" : {
       "localizations" : {
@@ -242,10 +281,22 @@
             "value" : "Add “%1$@” — used in %2$lld dictations"
           }
         }
-      }
+      },
+      "comment" : "Dictionary page: tooltip on a suggested word. %@ is the word, %lld how many dictations in History used it."
     },
     "All" : {
 
+    },
+    "All %lld go to %@ with every dictation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All %1$lld go to %2$@ with every dictation."
+          }
+        }
+      },
+      "comment" : "Dictionary page, What a word does: row text. %lld is how many words the user has; all of them are sent. %@ is the speech model's name."
     },
     "Allow" : {
 
@@ -268,6 +319,9 @@
     "Appears when you're done." : {
 
     },
+    "Apple's recognizer listens for them" : {
+      "comment" : "Dictionary page, What a word does: row title when Apple's speech recognizer is in use and is given the user's words."
+    },
     "Auto-scroll" : {
 
     },
@@ -282,6 +336,12 @@
     },
     "Back to Speech" : {
 
+    },
+    "By engine" : {
+      "comment" : "Usage page: section heading over words and cost by speech engine."
+    },
+    "By kind" : {
+      "comment" : "Usage page: section heading over words and cost for each kind of dictation."
     },
     "Can be used for %@" : {
 
@@ -335,6 +395,9 @@
     "Clear History" : {
 
     },
+    "Clear History…" : {
+      "comment" : "History page: button that deletes all of History; asks first."
+    },
     "Clear all of History?" : {
 
     },
@@ -349,6 +412,9 @@
     },
     "Come back here — we'll pick it up automatically." : {
 
+    },
+    "Comes out as" : {
+      "comment" : "Dictionary page, editing a word: small label in capitals over the list of wrong spellings."
     },
     "Connect your %@ account" : {
 
@@ -383,8 +449,11 @@
     "Delete" : {
 
     },
+    "Delete word" : {
+      "comment" : "Dictionary page, editing a word: button that deletes the word."
+    },
     "Delete “%@”" : {
-
+      "comment" : "Dictionary page: context menu item on a word's card. %@ is the word."
     },
     "Dictation" : {
 
@@ -427,7 +496,7 @@
 
     },
     "Each is replaced by the word, as a whole word, whatever its capitals." : {
-
+      "comment" : "Dictionary page, editing a word: text under 'Comes out as'."
     },
     "Earlier versions. They still work, but the models above replace them." : {
 
@@ -435,11 +504,14 @@
     "Edit Prompts…" : {
 
     },
+    "Edit prompt" : {
+      "comment" : "Prompts page: section heading over the editor of the selected prompt."
+    },
     "Editing the selected text — say how to change it" : {
 
     },
     "Edit…" : {
-
+      "comment" : "Dictionary page: context menu item on a word's card; opens its editor."
     },
     "Error" : {
 
@@ -481,13 +553,16 @@
 
     },
     "Given to the engine and AI Rewrite" : {
-
+      "comment" : "Dictionary page: small note on a word's card that has no wrong spellings."
     },
     "Go back and paste your key again." : {
 
     },
     "Grant Access" : {
 
+    },
+    "Groq's Whisper is given them as a hint" : {
+      "comment" : "Dictionary page, What a word does: row title when Groq's Whisper model is in use. Groq and Whisper are names; keep them."
     },
     "Here's the AI version" : {
 
@@ -534,12 +609,28 @@
     "How the shortcut records" : {
 
     },
-    "In %lld %@ History keeps" : {
+    "How this is counted" : {
+      "comment" : "Usage page: section heading over the explanation of how usage is counted."
+    },
+    "In %lld dictations History keeps" : {
+      "comment" : "Dictionary page: tooltip on the number of times a word was used. %lld is how many of the dictations still in History contain it.",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "In %1$lld %2$@ History keeps"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "In %lld dictation History keeps"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "In %lld dictations History keeps"
+                }
+              }
+            }
           }
         }
       }
@@ -556,6 +647,9 @@
     "Installing…" : {
 
     },
+    "Instructions" : {
+      "comment" : "Prompts page, editing a prompt: small label in capitals over the prompt's instructions."
+    },
     "It is the model in use. AI Rewrite pastes your words as said until you download another." : {
 
     },
@@ -565,11 +659,17 @@
     "It is the model in use. Dictation switches to %@ until you pick another." : {
 
     },
+    "It takes no list of words — the replacements still put them right. GPT Transcribe and GPT Live Transcribe do." : {
+      "comment" : "Dictionary page, What a word does: row text when the speech model takes no word list. GPT Transcribe and GPT Live Transcribe are model names; keep them."
+    },
     "It works!" : {
 
     },
+    "It's given your words with every AI dictation and told to spell them your way." : {
+      "comment" : "Dictionary page, What a word does: row text when AI Rewrite is set up."
+    },
     "Its capitals are put back as written" : {
-
+      "comment" : "Dictionary page: small note on a word's card whose only wrong spellings differ in capitals."
     },
     "Its model is still downloading (%lld%%). You can wait here, or try it later." : {
 
@@ -595,14 +695,23 @@
     "Languages I speak" : {
 
     },
+    "Last chosen for" : {
+      "comment" : "Prompts page: small label in capitals over the list of the last dictations this prompt was chosen for."
+    },
     "Legacy models" : {
 
     },
     "Let go of %@ when you're done." : {
 
     },
+    "Limits right now" : {
+      "comment" : "Usage page: section heading over each provider's current rate limits."
+    },
     "Listening…" : {
 
+    },
+    "Local models take no list of words — the replacements still put them right." : {
+      "comment" : "Dictionary page, What a word does: row text when a local speech model is in use."
     },
     "Mark setup as done. Everything it asks is in Settings." : {
 
@@ -656,7 +765,7 @@
 
     },
     "No words yet." : {
-
+      "comment" : "Dictionary page: shown when the list of words is empty."
     },
     "Not chosen in History yet" : {
 
@@ -723,11 +832,17 @@
     "Off" : {
 
     },
+    "Often comes out as" : {
+      "comment" : "Dictionary page, Add a word: label over the field for the ways the word is misheard."
+    },
     "On this Mac or online — you can change it later." : {
 
     },
     "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
 
+    },
+    "Once AI Rewrite has a provider, it's given your words with every AI dictation." : {
+      "comment" : "Dictionary page, What a word does: row text when AI Rewrite has no provider yet."
     },
     "Once you've dictated for a minute or so, this says how much faster speaking is than typing — and how much time it saved you." : {
 
@@ -764,6 +879,9 @@
     },
     "Or set it yourself" : {
 
+    },
+    "Overhead" : {
+      "comment" : "Usage page: section heading over what was paid for without becoming text, and what was never sent."
     },
     "Paste" : {
 
@@ -823,13 +941,28 @@
 
     },
     "Remove “%@”" : {
-
+      "comment" : "Dictionary page: tooltip on the × that removes a wrong spelling or a replacement. %@ is that text."
+    },
+    "Replace" : {
+      "comment" : "Dictionary page, Replacements: placeholder in the field for the text as it is recognized now."
+    },
+    "Replace needs at least one letter or digit." : {
+      "comment" : "Dictionary page, Replacements: error under the form when the Replace field has only punctuation or spaces. Replace is the field's name."
+    },
+    "Replacements" : {
+      "comment" : "Dictionary page: section heading over the list of text replacements (what is said → how it is written). A count follows it."
+    },
+    "Requests" : {
+      "comment" : "Usage page: section heading over the requests sent to each provider."
     },
     "Requests are counted from this update on." : {
 
     },
     "Restore Built-in Prompts" : {
 
+    },
+    "Restore built-in…" : {
+      "comment" : "Prompts page: button that brings back the built-in prompts; asks first."
     },
     "Restore the built-in prompts?" : {
 
@@ -871,7 +1004,7 @@
 
     },
     "Send your words to the speech engine with every dictation" : {
-
+      "comment" : "Dictionary page, What a word does: tooltip on the switch that sends the words to the speech engine."
     },
     "Settings" : {
 
@@ -899,10 +1032,10 @@
 
     },
     "Show all · %lld more" : {
-
+      "comment" : "Dictionary and History pages: button under a list that shows the rest of it. %lld is how many are hidden."
     },
     "Show fewer" : {
-
+      "comment" : "Dictionary and History pages: button under a list that folds it again."
     },
     "Show in Dock" : {
 
@@ -959,11 +1092,14 @@
     "SpeechText needs these to hear you and to type for you." : {
 
     },
+    "Spelled" : {
+      "comment" : "Dictionary page, editing a word: small label in capitals over the word's field."
+    },
     "Start typing here" : {
 
     },
     "Suggested from your dictations" : {
-
+      "comment" : "Dictionary page, Add a word: label over words from the user's dictations that could be added."
     },
     "Switch" : {
 
@@ -987,7 +1123,10 @@
 
     },
     "Tell the speech engine" : {
-
+      "comment" : "Dictionary page, What a word does: label of the switch that sends the words to the speech engine (read by VoiceOver; not shown)."
+    },
+    "That already has a replacement." : {
+      "comment" : "Dictionary page, Replacements: error under the form when the same text is already replaced."
     },
     "That didn't work" : {
 
@@ -1006,6 +1145,18 @@
     },
     "The download stopped. Check your internet connection." : {
 
+    },
+    "The model on this Mac isn't given them" : {
+      "comment" : "Dictionary page, What a word does: row title when a local speech model is in use."
+    },
+    "The situation AI Rewrite recognizes from what you said — distinct from every other prompt's." : {
+      "comment" : "Prompts page, editing a prompt: hint under 'When to use'."
+    },
+    "The speech engine isn't told them" : {
+      "comment" : "Dictionary page, What a word does: row title when sending the words to the speech engine is turned off. 'Them' is the user's words."
+    },
+    "The word, as it should be written" : {
+      "comment" : "Dictionary page, editing a word: placeholder in the word's field."
     },
     "This can't be undone." : {
 
@@ -1052,14 +1203,26 @@
     "Turn on SpeechText" : {
 
     },
+    "Turned off. Wrong spellings are still replaced, and AI Rewrite still keeps them as written." : {
+      "comment" : "Dictionary page, What a word does: row text when sending the words to the speech engine is turned off."
+    },
     "Turning your speech into text…" : {
 
     },
     "Two quick permissions" : {
 
     },
+    "Type how it should be written." : {
+      "comment" : "Dictionary page, Replacements: error under the form when the With field is empty."
+    },
     "Type the sentence below. The clock starts with your first key." : {
 
+    },
+    "Type what is recognized now." : {
+      "comment" : "Dictionary page, Replacements: error under the form when the Replace field is empty."
+    },
+    "Untitled" : {
+      "comment" : "Dictionary page: shown on a word's card when the word itself is empty."
     },
     "Use %@" : {
 
@@ -1094,17 +1257,41 @@
     "We didn't hear anything" : {
 
     },
+    "What a word does" : {
+      "comment" : "Dictionary page: section heading over three rows that say what the user's words do with the current speech engine and AI Rewrite."
+    },
+    "What else AI Rewrite is told" : {
+      "comment" : "Prompts page: section heading over what AI Rewrite is sent besides the prompt."
+    },
+    "What it does to the text once this prompt is picked." : {
+      "comment" : "Prompts page, editing a prompt: hint under 'Instructions'."
+    },
     "What uses it stops working until you add a key again." : {
 
     },
     "What you said, and what AI polish wrote from it — in any app, only the AI version is typed." : {
 
     },
+    "When to use" : {
+      "comment" : "Prompts page, editing a prompt: small label in capitals over the field that says when the prompt fits."
+    },
     "Where should your speech become text?" : {
 
     },
+    "Where your words went" : {
+      "comment" : "Usage page: section heading over the apps the dictated words were pasted into."
+    },
+    "With" : {
+      "comment" : "Dictionary page, Replacements: placeholder in the field for the text it should be written as."
+    },
+    "With the Replacements, in what every engine writes before it's pasted or rewritten, in AI Rewrite's and Edit's replies, and in History." : {
+      "comment" : "Dictionary page, What a word does: row text. Replacements is the section of this page; AI Rewrite and Edit are features of the app; History is a page."
+    },
+    "Word" : {
+      "comment" : "Dictionary page, Add a word: label over the field for the word, as it should be written."
+    },
     "Words are kept on this Mac. One reaches the speech engine or AI Rewrite only with a dictation — never on its own." : {
-
+      "comment" : "Dictionary page: privacy note at the bottom of the page."
     },
     "Words dictated each day this week" : {
 
@@ -1119,10 +1306,13 @@
 
     },
     "Write something your way whenever it is said — “кома” as “,”, “mail sign” as your signature. Whole words, any capitals. Unlike a word above, a replacement isn't sent to the engine or AI Rewrite; it only puts the text right." : {
-
+      "comment" : "Dictionary page, Replacements: text under the heading. “кома” is the Ukrainian word for comma, an example of a spoken word written as a sign; the examples may be adapted to your language."
     },
     "Write the word the way it should appear. If SpeechText spells it wrong, add how it comes out — each of those will be replaced by it." : {
-
+      "comment" : "Dictionary page, Add a word: hint under the form before a word is typed. SpeechText is the app's name."
+    },
+    "Wrong spellings are replaced" : {
+      "comment" : "Dictionary page, What a word does: row title."
     },
     "You can add it again at any time." : {
 
@@ -1157,6 +1347,9 @@
     "Your own prompts and changes are replaced by the six that come with SpeechText." : {
 
     },
+    "Your prompts" : {
+      "comment" : "Prompts page: section heading over the list of prompts. A count follows it."
+    },
     "Your shortcuts" : {
 
     },
@@ -1169,23 +1362,67 @@
     "Your speech model isn't downloaded" : {
 
     },
+    "Your words" : {
+      "comment" : "Dictionary page: section heading over the list of the user's words. A count follows it."
+    },
+    "Your words go to %@ with every dictation." : {
+      "comment" : "Dictionary page, What a word does: row text when there are no words yet. %@ is the speech model's name."
+    },
     "Your words will appear here." : {
 
+    },
+    "besides the prompt, with every AI dictation" : {
+      "comment" : "Prompts page: note after the 'What else AI Rewrite is told' heading."
+    },
+    "beyond one request a dictation" : {
+      "comment" : "Usage page: note after the 'Overhead' heading."
     },
     "choose a provider" : {
 
     },
+    "e.g. %@" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field. %@ is the typed word split into lowercase words (SpeechText → speech text)."
+    },
+    "e.g. SpeechText" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the word field. SpeechText is the app's name; keep it."
+    },
+    "e.g. speech text, спіч текст" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field before a word is typed — examples of how “SpeechText” gets misheard. Commas separate them."
+    },
+    "from each provider's last reply" : {
+      "comment" : "Usage page: note after the 'Limits right now' heading."
+    },
     "from “%@”" : {
 
     },
+    "how it comes out wrong — commas between" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field when there is no example to show. Commas separate several spellings."
+    },
     "optional" : {
-
+      "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty."
+    },
+    "saved as you type" : {
+      "comment" : "Prompts page: note after the 'Edit prompt' heading."
     },
     "sign in, then click **%@**." : {
 
     },
+    "top %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "top %1$lld of %2$lld"
+          }
+        }
+      },
+      "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are."
+    },
     "words a minute" : {
 
+    },
+    "words · ≈ cost" : {
+      "comment" : "Usage page: note after the 'By kind' heading naming its two columns. ≈ means approximately."
     },
     "·" : {
 
@@ -1197,10 +1434,10 @@
 
     },
     "“%@”" : {
-
+      "comment" : "A word the user typed, in quotation marks. Use your language's quotation marks."
     },
     "“%@” will be given to the speech engine and AI Rewrite, so they spell it your way." : {
-
+      "comment" : "Dictionary page, Add a word: preview under the form when only the word is typed. %@ is the word."
     },
     "“uh so um tell John that I'm gonna be like— wait no, ten, ten minutes late I think? cause the traffic is just, ugh. yeah sorry”" : {
 

@@ -46,11 +46,18 @@ struct MainPageTitle<Trailing: View>: View {
 /// A section's name over its content, as Home's are — outside the surface, not in a bar
 /// across it — with a quieter note after it and whatever it keeps on the right.
 struct MainSectionHeader<Trailing: View>: View {
-    let title: String
-    var detail: String?
+    let title: Text
+    var detail: Text?
     @ViewBuilder var trailing: () -> Trailing
 
-    init(_ title: String, detail: String? = nil, @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }) {
+    /// Words from the String Catalog.
+    init(_ title: LocalizedStringKey, detail: LocalizedStringKey? = nil,
+         @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }) {
+        self.init(Text(title), detail: detail.map { Text($0) }, trailing: trailing)
+    }
+
+    /// A title or note built elsewhere, already a `Text`.
+    init(_ title: Text, detail: Text? = nil, @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }) {
         self.title = title
         self.detail = detail
         self.trailing = trailing
@@ -58,13 +65,13 @@ struct MainSectionHeader<Trailing: View>: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            Text(title)
+            title
                 .font(.system(size: 15, weight: .semibold))
                 .tracking(-0.15)
                 .foregroundStyle(MainColor.ink)
                 .layoutPriority(1)
             if let detail {
-                Text(detail)
+                detail
                     .font(.system(size: 12.5))
                     .foregroundStyle(MainColor.ink3)
                     .monospacedDigit()
@@ -137,9 +144,10 @@ struct MainRule: View {
 
 /// A small name over a group of things, in capitals, as a panel's label.
 struct MainKicker: View {
-    let title: String
+    let title: LocalizedStringKey
     var body: some View {
-        Text(title.uppercased())
+        Text(title)
+            .textCase(.uppercase)
             .font(.system(size: 10.5, weight: .semibold))
             .tracking(0.7)
             .foregroundStyle(MainColor.ink3)
@@ -289,7 +297,7 @@ struct MainSwitch<Item: Hashable>: View {
 /// A text field drawn as History's search field is: grey, a hairline, the green ring
 /// while it is typed in.
 struct MainTextField: View {
-    let placeholder: String
+    let placeholder: LocalizedStringKey
     @Binding var text: String
     var symbol: String?
     var height: CGFloat = 34

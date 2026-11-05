@@ -467,7 +467,7 @@ private struct UsageChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            MainSectionHeader(title, detail: detail) {
+            MainSectionHeader(Text(verbatim: title), detail: Text(verbatim: detail)) {
                 MainSwitch(items: [(false, "Words"), (true, "Cost")], selection: $showsCost, height: 22)
             }
             MainPanel(padding: EdgeInsets(top: 22, leading: 22, bottom: 16, trailing: 22)) {
@@ -708,7 +708,7 @@ private struct UsageEngines: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            MainSectionHeader("By engine", detail: "≈ " + UsagePrices.disclaimer)
+            MainSectionHeader(Text("By engine"), detail: Text(verbatim: "≈ " + UsagePrices.disclaimer))
             MainTable {
                 if summary.engines.isEmpty {
                     Text("Nothing dictated in this period.")
@@ -841,7 +841,7 @@ private struct UsageRequests: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            MainSectionHeader("Requests", detail: detail)
+            MainSectionHeader(Text("Requests"), detail: detail.map { Text(verbatim: $0) })
             MainTable {
                 if summary.requests.isEmpty {
                     Text(summary.ledgerSince == nil && summary.dictations > 0

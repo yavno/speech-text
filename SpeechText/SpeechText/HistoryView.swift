@@ -1220,7 +1220,7 @@ private struct HistoryTextPane: View {
 
 /// A button that stays out of the way until pointed at: Delete, Clear History…
 struct HistoryQuietButton: View {
-    let title: String
+    let title: LocalizedStringKey
     let symbol: String
     var destructive = false
     let action: () -> Void
