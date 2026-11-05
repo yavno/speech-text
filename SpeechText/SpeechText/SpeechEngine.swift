@@ -212,7 +212,7 @@ final class SpeechEngine {
         // Every caller is told the same way as for a microphone that would not open; the
         // inline flow asks first, to offer the picker (`AppState.startRecording`).
         guard !configuration.modelChoiceMissing else {
-            let message = "Choose a model for \(configuration.provider.vendor.modelChoiceTarget) in Settings to dictate."
+            let message = String(localized: "Choose a model for \(configuration.provider.vendor.modelChoiceTarget) in Settings to dictate.")
             dlog("Engine", "startRecording: no model chosen for \(configuration.provider.rawValue) — refused", level: .notice)
             errorMessage = message
             onStartFailure?(message)
@@ -439,7 +439,7 @@ final class SpeechEngine {
 
         guard installAudioTap() else {
             // No input device: the same terminal shape as a session that would not open.
-            let message = errorMessage ?? "No audio input device available"
+            let message = errorMessage ?? String(localized: "No audio input device available")
             onStartFailure?(message)
             phase = .idle
             cleanup()
@@ -555,7 +555,7 @@ final class SpeechEngine {
                 DispatchQueue.main.async { [weak self] in
                     guard let self, self.engineStartToken == token else { return }
                     seLog.error("startAudioEngine: audio engine failed to start: \(desc, privacy: .public)")
-                    let message = "Audio engine failed to start: \(desc)"
+                    let message = String(localized: "Audio engine failed to start: \(desc)")
                     guard self.phase == .starting else {
                         // A restart on a new device: the segment is already recording, and
                         // what it holds is ended as a restart with no usable input ends it.
@@ -601,7 +601,7 @@ final class SpeechEngine {
             guard let self, self.engineStartToken == token, self.phase == .starting else { return }
             dlog("Engine", "⚠ the microphone did not start in \(Int(Self.startDeadline)) s — a start failure, on a fresh audio queue", level: .error)
             seLog.error("startAudioEngine: no start in \(Int(Self.startDeadline), privacy: .public) s")
-            let message = "The microphone didn't start. Try again, or quit and reopen SpeechText."
+            let message = String(localized: "The microphone didn't start. Try again, or quit and reopen SpeechText.")
             self.errorMessage = message
             self.onStartFailure?(message)
             self.phase = .idle
@@ -670,12 +670,12 @@ final class SpeechEngine {
             dlog("Engine", "restartAudioEngine: no usable input after the device change — stopping", level: .error)
             if phase == .starting {
                 // `stopRecording` ignores `.starting`: end it as a start failure instead.
-                let message = errorMessage ?? "No audio input device available"
+                let message = errorMessage ?? String(localized: "No audio input device available")
                 onStartFailure?(message)
                 phase = .idle
                 cleanup()
             } else {
-                endRecording(microphoneLost: errorMessage ?? "No audio input device available")
+                endRecording(microphoneLost: errorMessage ?? String(localized: "No audio input device available"))
             }
             return
         }
@@ -937,7 +937,7 @@ final class SpeechEngine {
     private func installAudioTap() -> Bool {
         guard let audioEngine, let writer = audioBufferWriter, let session else {
             seLog.error("installAudioTap: no audio engine")
-            errorMessage = "Audio engine not initialized"
+            errorMessage = String(localized: "Audio engine not initialized")
             return false
         }
 
@@ -946,7 +946,7 @@ final class SpeechEngine {
         // Validate — a 0-channel or 0-sampleRate format means no input device is available
         guard hwFormat.channelCount > 0, hwFormat.sampleRate > 0 else {
             seLog.error("installAudioTap: invalid hardware format (channels=\(hwFormat.channelCount), sampleRate=\(hwFormat.sampleRate))")
-            errorMessage = "No audio input device available"
+            errorMessage = String(localized: "No audio input device available")
             return false
         }
 
@@ -1041,13 +1041,13 @@ final class SpeechEngine {
                 if phase == .starting {
                     // `stopRecording` ignores `.starting`; no audio was taken, so this
                     // ends as a start failure does.
-                    let message = "The microphone kept changing — try again"
+                    let message = String(localized: "The microphone kept changing — try again")
                     errorMessage = message
                     onStartFailure?(message)
                     phase = .idle
                     cleanup()
                 } else {
-                    endRecording(microphoneLost: "The microphone kept changing — try again")
+                    endRecording(microphoneLost: String(localized: "The microphone kept changing — try again"))
                 }
                 return
             }

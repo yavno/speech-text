@@ -32,6 +32,9 @@
         }
       }
     },
+    "%@ didn't come back to the front, so nothing was pasted into it." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. after AI Rewrite in the Record Window. %@ is an app's name, or 'The app'."
+    },
     "%@ faster" : {
       "comment" : "Usage page: the large figure, how much faster speaking is than typing. %@ is e.g. 3.6× (shown larger)."
     },
@@ -47,6 +50,7 @@
       }
     },
     "%@ is already the %@ shortcut. Choose another one." : {
+      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut. The first %@ is the keys (e.g. ⌃⇧Q), the second the name of the other shortcut that already uses them.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,8 +58,7 @@
             "value" : "%1$@ is already the %2$@ shortcut. Choose another one."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut. The first %@ is the keys (e.g. ⌃⇧Q), the second the name of the other shortcut that already uses them."
+      }
     },
     "%@ is given them" : {
       "comment" : "Dictionary page, What a word does: row title. %@ is the speech engine's vendor (e.g. OpenAI); 'them' is the user's words."
@@ -66,13 +69,20 @@
     "%@ is reserved by another app, so it won't work. Choose another shortcut." : {
       "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS would not register. %@ is the keys, e.g. ⌃⇧Q."
     },
+    "%@ isn't downloaded — download it in Settings › AI Rewrite." : {
+      "comment" : "Error when a local AI Rewrite model is missing. %@ is the model's name; Settings › AI Rewrite is a place in Settings."
+    },
     "%@ isn't given them" : {
       "comment" : "Dictionary page, What a word does: row title. %@ is the name of the speech model in use."
+    },
+    "%@ isn't installed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. %@ is a speech model's name."
     },
     "%@ key" : {
       "comment" : "VoiceOver label of an API key field. %@ is the service's name, e.g. Groq."
     },
     "%@ key, ending %@" : {
+      "comment" : "Settings: VoiceOver label of a stored API key. The first %@ is the service's name, the second the key's last four characters.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -80,8 +90,7 @@
             "value" : "%1$@ key, ending %2$@"
           }
         }
-      },
-      "comment" : "Settings: VoiceOver label of a stored API key. The first %@ is the service's name, the second the key's last four characters."
+      }
     },
     "%@ left" : {
       "comment" : "Usage page, Limits: what is left of a rate limit. %@ is a number."
@@ -120,6 +129,29 @@
         }
       }
     },
+    "%@ took it out late, once it wasn't in front. Paste it back with ⌘V." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is an app's name, or 'The app'. ⌘V is the paste shortcut."
+    },
+    "%@ was open and had the keyboard, so nothing was pasted into %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ was open and had the keyboard, so nothing was pasted into %2$@."
+          }
+        }
+      },
+      "comment" : "Notice beside the dictation overlay: text under the title. the first %@ is a menu's name or 'A menu', the second an app's name or 'the app'."
+    },
+    "%@ was open and had the keyboard. The text is in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. %@ is a menu's name, or 'A menu'."
+    },
+    "%@ was open and had the keyboard. The text is still in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. %@ is a menu's name, or 'A menu'."
+    },
+    "%@ wasn't in front when the instruction ended. Nothing was edited." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is an app's name, or 'Its app'."
+    },
     "%@ will become %@ in everything you dictate." : {
       "comment" : "Dictionary page, Add a word: preview under the form. The first %@ is the list of wrong spellings, each in quotes and struck through, separated by commas; the second %@ is the word, in bold.",
       "localizations" : {
@@ -130,6 +162,9 @@
           }
         }
       }
+    },
+    "%@ wouldn't let the selected text be removed. The new version is on the clipboard." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is an app's name, or 'The app'."
     },
     "%@ wpm" : {
       "comment" : "Usage page: under a speed column, the figure and the unit (words per minute). %@ is the figure, shown larger."
@@ -188,6 +223,52 @@
         }
       }
     },
+    "%lld dictations not pasted" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. %lld is how many dictations saved while offline are waiting in History. Sits beside a Show button, so keep it short.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictation not pasted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictations not pasted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld dictations will be transcribed once you're back online." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'No connection — saved to History'. %lld is how many dictations wait; the English 'one' form is 'It will be transcribed once you're back online.'",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "It will be transcribed once you're back online."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictations will be transcribed once you're back online."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld edits" : {
       "comment" : "Usage page: a count of edits (selected text rewritten by voice).",
       "localizations" : {
@@ -212,7 +293,27 @@
       }
     },
     "%lld entries" : {
-
+      "comment" : "Debug Log window: how many log lines are shown.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld entry"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld entries"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld of %lld go to %@ — it takes no more. The ones you use most, and anything added this week, go first." : {
       "comment" : "Dictionary page, What a word does: row text. The first %lld is how many words are sent, the second how many the user has; %@ is the speech model's name.",
@@ -445,17 +546,26 @@
     "A key is like a password that lets SpeechText use your account." : {
       "comment" : "Setup window: under 'Connect your … account', explains what an API key is."
     },
+    "A menu" : {
+      "comment" : "Stands in for a menu's name when it is unknown, at the start of a sentence: 'A menu was open and had the keyboard…'."
+    },
     "A retry from History is sent to Groq, since Apple can't transcribe a saved recording." : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac › Your voice: second sentence when Apple Dictation is in use and a Groq key is stored. Groq is a company name."
     },
     "A typical wait for an answer: half were faster, half slower." : {
       "comment" : "Usage page, Requests: tooltip on the typical wait."
     },
+    "AI" : {
+      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text, when no prompt name is known."
+    },
     "AI POLISH" : {
       "comment" : "Setup window, Try it step: small label in capitals over the AI dictation's result."
     },
+    "AI Recording" : {
+      "comment" : "Menu bar menu item. Starts a dictation that AI Rewrite rewrites before pasting. Title case, as macOS menus are in English."
+    },
     "AI Rewrite" : {
-      "comment" : "The name of the feature that turns a dictation into finished text with an AI model: a Settings page, a role tag on an API key, a status. Translate it the same everywhere."
+      "comment" : "The app's AI Rewrite feature, as a button label or an undo action name ('Undo AI Rewrite')."
     },
     "AI Rewrite is off, so nothing is sent." : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when AI Rewrite has no provider."
@@ -472,14 +582,35 @@
     "AI couldn't answer this time" : {
       "comment" : "Setup window, Try it step: title when the AI dictation failed."
     },
+    "AI cut this to %lld%% of its length — kept what you dictated" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite's reply was refused for being too short. %lld%% is a percentage, e.g. 20%."
+    },
+    "AI dictation" : {
+      "comment" : "Dictation overlay: VoiceOver name of a dictation that AI Rewrite rewrites."
+    },
     "AI dictation — rewritten before it is pasted" : {
-
+      "comment" : "Dictation overlay: tooltip on the mode mark during an AI dictation."
     },
     "AI dictations and edits are sent to %@. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when an online AI service is in use. %@ is the company, e.g. Anthropic. Dictionary is a page of the app."
     },
+    "AI edit failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI provider returned an error, shown as the text."
+    },
+    "AI failed: %@" : {
+      "comment" : "Record Window (the app's floating dictation window): status line. %@ is the error message."
+    },
     "AI is tidying up your text…" : {
       "comment" : "Setup window, Try it step: title while AI polish rewrites what was said."
+    },
+    "AI isn't set up" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "AI mode off — text is inserted as transcribed" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is off."
+    },
+    "AI mode on — dictation is rewritten using your prompt presets" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is on."
     },
     "AI model" : {
       "comment" : "Setup window: what is downloading in the corner pill — the AI model (as opposed to the speech model). Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'."
@@ -493,6 +624,15 @@
     "AI polish is ready — it uses your %@ key." : {
       "comment" : "Setup window, AI step: shown instead of the key form when the key entered on the Speech step works for AI too. %@ is the service, e.g. Groq."
     },
+    "AI processing failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite failed and the dictation was pasted as transcribed."
+    },
+    "AI processing skipped" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite isn't set up, so the dictation was pasted as transcribed."
+    },
+    "AI · %@" : {
+      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text. %@ is the name of the prompt it used."
+    },
     "API Keys" : {
       "comment" : "Settings: name of the page (sidebar entry and page title) that holds every API key."
     },
@@ -500,7 +640,7 @@
       "comment" : "Settings › General: group heading over the version and links, in a build with no automatic updates."
     },
     "About SpeechText" : {
-
+      "comment" : "App menu item that opens the About panel. SpeechText is the app's name."
     },
     "Accent" : {
       "comment" : "Settings › Appearance › Color: row whose swatches set the accent color."
@@ -508,14 +648,20 @@
     "Accessibility" : {
       "comment" : "Settings › Privacy & Data › Permissions: the macOS Accessibility permission, as named in System Settings."
     },
+    "Accessibility access needed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Accessibility is the macOS privacy setting; use its name as macOS shows it in your language."
+    },
     "Accessibility is off, so your text opens in the Record Window instead." : {
       "comment" : "Home page: a problem row. Accessibility is the macOS permission; Record Window is SpeechText's own window."
     },
     "Acknowledgements" : {
-      "comment" : "Settings › General: row that opens the licenses of the open-source code the app includes."
+      "comment" : "About panel: link to the open-source licences the app uses."
     },
     "Add" : {
       "comment" : "Dictionary page, Replacements: button that adds the replacement typed in the form."
+    },
+    "Add a %@ API key in Settings to edit text with AI." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is the AI provider's name, e.g. Groq."
     },
     "Add a key to use %@." : {
       "comment" : "Settings › Speech to text / AI Rewrite › Online services: note under a service that has no API key. %@ is the service's name."
@@ -556,7 +702,7 @@
       "comment" : "Settings › API Keys: status beside a key the current choices use, once it is entered. Shown after a ✓."
     },
     "All" : {
-
+      "comment" : "Debug Log window: level filter option that shows every line."
     },
     "All %lld go to %@ with every dictation." : {
       "comment" : "Dictionary page, What a word does: row text. %lld is how many words the user has; all of them are sent. %@ is the speech model's name.",
@@ -583,6 +729,9 @@
     },
     "Also puts SpeechText in ⌘Tab, so a covered window can be found." : {
       "comment" : "Settings › General › Show in Dock: row text. ⌘Tab is the app switcher shortcut; keep it."
+    },
+    "Always" : {
+      "comment" : "Settings: when the app shows its icon in the Dock — always."
     },
     "Always transcribed as %@ — the most accurate. Speech in another language may come back translated." : {
       "comment" : "Settings › Dictation › Language: caption when one language is listed. %@ is the language's name."
@@ -635,17 +784,43 @@
     "As set in System Settings › Sound." : {
       "comment" : "Settings › Dictation › Microphone: caption when System Default is chosen. System Settings › Sound is the macOS path; use its name in your language."
     },
+    "Audio engine failed to start: %@" : {
+      "comment" : "Error when the microphone can't start. %@ is the system's error message."
+    },
+    "Audio engine not initialized" : {
+      "comment" : "Error when the microphone can't start."
+    },
     "Audio of failed dictations" : {
       "comment" : "Settings › Privacy & Data › History: title of the slider for how long the recording of a failed dictation is kept."
     },
     "Auto-scroll" : {
-
+      "comment" : "Debug Log window: switch that keeps the newest line in view."
     },
     "Automatic" : {
       "comment" : "Settings › Dictation › Microphone: menu item that lets the app choose the microphone."
     },
+    "Automatic update checks are off." : {
+      "comment" : "About panel: the app's update status."
+    },
     "Back" : {
       "comment" : "Setup window: footer button that goes to the previous step."
+    },
+    "Back online — %lld transcribed, %lld couldn't be. All in History." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Back online — %1$lld transcribed, %2$lld couldn't be. All in History."
+          }
+        }
+      },
+      "comment" : "Notice beside the dictation overlay: text under the title. the first %lld is how many offline dictations were transcribed, the second how many failed."
+    },
+    "Back online — transcribed, waiting in History." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. after the dictations saved offline were transcribed."
+    },
+    "Back online, but couldn't transcribe — retry in History." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. after the dictations saved offline failed to transcribe."
     },
     "Back to %@" : {
       "comment" : "Setup window: tooltip on a finished step in the steps bar. %@ is the step's name."
@@ -675,7 +850,22 @@
       "comment" : "Settings › API Keys: VoiceOver label of a grey role tag. %@ is a Settings page name: Speech to text or AI Rewrite."
     },
     "Cancel" : {
-      "comment" : "Button that cancels an action or closes a confirmation without doing anything."
+      "comment" : "Button that cancels the current action, or VoiceOver name of the overlay's × button."
+    },
+    "Cancel (nothing is pasted)" : {
+      "comment" : "Dictation overlay: tooltip on the × button during a dictation."
+    },
+    "Cancel (the selected text is left as it was)" : {
+      "comment" : "Dictation overlay: tooltip on the × button during Edit Selection with AI."
+    },
+    "Cancel AI Recording" : {
+      "comment" : "Menu bar menu item. Cancels an AI dictation that is still starting. Title case."
+    },
+    "Cancel Dictation" : {
+      "comment" : "Menu bar menu item. Cancels a dictation that is being transcribed or rewritten. Title case."
+    },
+    "Cancel Recording" : {
+      "comment" : "Menu bar menu item. Cancels a dictation that is still starting. Title case."
     },
     "Cancel download" : {
       "comment" : "Setup window: button in the download pill's popover that stops a model download."
@@ -688,6 +878,9 @@
     },
     "Check Now…" : {
       "comment" : "Settings › General › Version: button that checks for an update now."
+    },
+    "Check for Updates..." : {
+      "comment" : "Menu bar menu item. Title case; the three dots mean it opens a window."
     },
     "Check for updates automatically" : {
       "comment" : "Settings › General › Updates: row with a switch."
@@ -704,8 +897,23 @@
     "Checking your key…" : {
       "comment" : "Setup window: status under the key field while the key is checked with the service."
     },
+    "Checks for updates once a day." : {
+      "comment" : "About panel: the app's update status."
+    },
+    "Choose" : {
+      "comment" : "Button on a notice that opens Settings to choose a model."
+    },
+    "Choose a %@ model in Settings to edit text with AI." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is the AI provider's name, e.g. Ollama."
+    },
     "Choose a model" : {
       "comment" : "Home page, Engines: shown where a model's name goes when none is chosen."
+    },
+    "Choose a model for %@ in Settings to dictate." : {
+      "comment" : "Error when no speech model is chosen. %@ is the speech provider's name."
+    },
+    "Choose a model in Settings › AI Rewrite to use AI mode" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no model. Settings › AI Rewrite is a place in Settings."
     },
     "Choose a model — the one you had is no longer available, and dictation waits for your pick." : {
       "comment" : "Settings › Speech to text / AI Rewrite: note under a service's models when the stored model was removed by its vendor."
@@ -743,7 +951,7 @@
       }
     },
     "Clear" : {
-      "comment" : "Tooltip or label of a small button that clears what was typed or chosen (History: a search or a filter)."
+      "comment" : "Button that empties a list or a field."
     },
     "Clear History" : {
       "comment" : "History page: destructive button in the confirmation that deletes all of History. Title case, as macOS buttons are in English."
@@ -762,6 +970,12 @@
     },
     "Clicks and ⌘Tab work as usual while you hold it. Let go of %@ when you're done." : {
       "comment" : "Setup window, Try it step: while holding the shortcut's letter alone. %@ is that key, e.g. Q."
+    },
+    "Close" : {
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver name of the close button."
+    },
+    "Close (the transcription is kept in History)" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the close button."
     },
     "Close to AI mode's violet — a plain dictation will be hard to tell from an AI one." : {
       "comment" : "Settings › Appearance › Color › Display: warning when the user's own display color is close to the violet AI Rewrite uses."
@@ -784,11 +998,17 @@
     "Continue Setup" : {
       "comment" : "Home page: button that opens the setup window again. Title case, as macOS buttons are in English."
     },
+    "Continue Setup..." : {
+      "comment" : "Menu bar menu item. Opens the unfinished setup. Title case."
+    },
     "Copied" : {
       "comment" : "Shown after something was copied to the clipboard."
     },
+    "Copied instead of replaced" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
     "Copy" : {
-      "comment" : "Button or menu item that copies text to the clipboard."
+      "comment" : "Button that copies text to the clipboard."
     },
     "Copy Instruction" : {
       "comment" : "History page: context menu item on an edit that copies the spoken instruction. Title case, as macOS menu items are in English."
@@ -802,11 +1022,35 @@
     "Copy this build's version" : {
       "comment" : "Settings › General › Version: tooltip on the version, which copies it when clicked."
     },
+    "Copy to the clipboard" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the Copy button."
+    },
     "Copy what you said" : {
       "comment" : "History page, an open AI dictation: button that copies what was said, before the rewrite."
     },
     "Cost" : {
       "comment" : "Usage page: the chart's switch — show cost."
+    },
+    "Couldn't confirm the selection" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "Couldn't find the selection again" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "Couldn't hear the instruction" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the spoken instruction couldn't be transcribed."
+    },
+    "Couldn't insert into %@" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Record Window (the app's floating dictation window): %@ is an app's name, or 'the app'."
+    },
+    "Couldn't paste into %@" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. %@ is an app's name, or 'the app'."
+    },
+    "Couldn't start recording" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. the microphone or the speech engine couldn't start."
+    },
+    "Couldn't understand the instruction" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
     },
     "Counted from %@, as History keeps them, since %@. Everything stays on your Mac." : {
       "comment" : "Usage page, How this is counted. The first %@ is how much History keeps, e.g. 'the last 30 days of dictations'; the second a date.",
@@ -832,10 +1076,13 @@
       "comment" : "History page: the date filter's button before a date is chosen."
     },
     "Debug Log" : {
-
+      "comment" : "Debug Log window: its heading."
+    },
+    "Debug Log..." : {
+      "comment" : "Menu bar menu item. Opens the Debug Log window. Title case."
     },
     "Debug lines" : {
-
+      "comment" : "Debug Log window: switch that keeps the most detailed lines."
     },
     "Default" : {
       "comment" : "Prompts page: chip on the default prompt — the one used when no other prompt fits."
@@ -907,6 +1154,9 @@
     "Detected every time: this engine can't be limited to a list. Keep one to force it." : {
       "comment" : "Settings › Dictation › Language: caption when several languages are listed and the engine takes only one."
     },
+    "Development build — it does not update itself." : {
+      "comment" : "About panel: the app's update status for a build made by a developer."
+    },
     "Dictate" : {
       "comment" : "Home page: the first tab of the intro card — plain dictation."
     },
@@ -926,7 +1176,7 @@
       "comment" : "Home and Usage: what was dictated — a stat's name, a chart legend, a row; on History, the title over what was said."
     },
     "Dictation" : {
-      "comment" : "The name of the Settings page about how you dictate (sidebar entry and page title), or a dictation in general."
+      "comment" : "A plain dictation (not AI Rewrite), as a label or a VoiceOver name."
     },
     "Dictation window" : {
       "comment" : "Setup window, Done step: what the Record Window shortcut opens."
@@ -990,6 +1240,9 @@
     "Downloading · %lld%% — used once it's ready" : {
       "comment" : "Settings › Speech to text / AI Rewrite: download status of a model the user picked, which is switched to when ready. %lld is the percent done; keep the % sign."
     },
+    "Drag SpeechText onto the Applications folder in the disk image's window, then open it from Applications." : {
+      "comment" : "Alert when the app couldn't move itself to Applications. Applications is the macOS folder; use its name as Finder shows it."
+    },
     "Drag into the Accessibility list" : {
       "comment" : "Setup window: tooltip on the app's row in the helper; it can be dragged into System Settings' Accessibility list."
     },
@@ -1023,6 +1276,9 @@
     "Edit Prompts…" : {
       "comment" : "Settings › AI Rewrite › Prompts: button that opens the Prompts page of the main window."
     },
+    "Edit Selection with AI" : {
+      "comment" : "Menu bar menu item. Rewrites the text selected in the app in front. Title case."
+    },
     "Edit needs a provider" : {
       "comment" : "Home page, intro card: large title on the Edit tab when AI Rewrite has no provider."
     },
@@ -1030,7 +1286,7 @@
       "comment" : "Prompts page: section heading over the editor of the selected prompt."
     },
     "Edit selection" : {
-      "comment" : "The Edit shortcut's name: editing selected text by voice."
+      "comment" : "Dictation overlay: VoiceOver name during Edit Selection with AI."
     },
     "Edit selection · off" : {
       "comment" : "Setup window, Done step: the Edit shortcut when AI is not set up."
@@ -1039,7 +1295,7 @@
       "comment" : "Home page, intro card: tag on the example text after an edit."
     },
     "Editing the selected text — say how to change it" : {
-
+      "comment" : "Dictation overlay: tooltip on the mode mark during Edit Selection with AI."
     },
     "Edit…" : {
       "comment" : "Dictionary page: context menu item on a word's card; opens its editor."
@@ -1048,10 +1304,10 @@
       "comment" : "Home page: section heading over the speech and AI engines in use."
     },
     "Error" : {
-
+      "comment" : "Debug Log window: VoiceOver name of a line's level mark."
     },
     "Errors and faults" : {
-
+      "comment" : "Debug Log window: level filter option."
     },
     "Esc cancels a dictation" : {
       "comment" : "Settings › Dictation › Recording: row with a switch. Esc is the key."
@@ -1081,10 +1337,10 @@
       "comment" : "Settings › AI Rewrite: text on the 'Online service' card."
     },
     "Fault" : {
-
+      "comment" : "Debug Log window: VoiceOver name of a line's level mark."
     },
     "Filter..." : {
-
+      "comment" : "Debug Log window: placeholder of the search field."
     },
     "Find" : {
       "comment" : "History page: a hidden button for ⌘F that moves to the search field; read only by VoiceOver."
@@ -1156,7 +1412,7 @@
       "comment" : "Settings › Speech to text / AI Rewrite: VoiceOver value of the folded Legacy models row. %lld is how many."
     },
     "Hide debug" : {
-
+      "comment" : "Debug Log window: level filter option that hides debug lines."
     },
     "Hide models too heavy for this Mac" : {
       "comment" : "Link that folds the list of local models this Mac does not have the memory for."
@@ -1170,10 +1426,14 @@
     "History settings" : {
       "comment" : "History page: VoiceOver label of the gear button that opens Settings at History."
     },
+    "History..." : {
+      "comment" : "Menu bar menu item. Opens History. Title case."
+    },
     "Hold" : {
       "comment" : "Setup window, welcome animation: label beside the keys, when the shortcut is held while speaking."
     },
     "Hold %@ and tap %@ twice: it records with nothing held, until you press %@ again." : {
+      "comment" : "Settings › Dictation › Recording › Double-tap to lock: gesture text. The first %@ is modifier keys (⌃⇧), the second a letter key, the third the whole shortcut.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1181,8 +1441,7 @@
             "value" : "Hold %1$@ and tap %2$@ twice: it records with nothing held, until you press %3$@ again."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Double-tap to lock: gesture text. The first %@ is modifier keys (⌃⇧), the second a letter key, the third the whole shortcut."
+      }
     },
     "Hold the shortcut and speak, then let go — the text lands wherever your cursor is, in any app." : {
       "comment" : "Home page, intro card: the Dictate tab's text when the shortcut is held down while speaking."
@@ -1267,8 +1526,17 @@
     "In use: %@" : {
       "comment" : "Settings › Dictation › Microphone: VoiceOver label of the microphone in use. %@ is its name."
     },
+    "Insert" : {
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver name of the button that inserts the text into the app you came from."
+    },
+    "Insert at the cursor in the app you came from" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the Insert button."
+    },
     "Install" : {
-      "comment" : "Button that downloads the speech model the settings choose; shown instead of Retry."
+      "comment" : "Button that installs a speech model."
+    },
+    "Install it, then retry from History." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under '%@ isn't installed'."
     },
     "Installing…" : {
       "comment" : "The Install button while the model downloads."
@@ -1279,6 +1547,12 @@
     "Instructions" : {
       "comment" : "Prompts page, editing a prompt: small label in capitals over the prompt's instructions."
     },
+    "It didn't come to the front. The text is in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. 'It' is the app the text was to be pasted into."
+    },
+    "It didn't come to the front. The text is still in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. 'It' is the app the text was to be inserted into."
+    },
     "It is the model in use. AI Rewrite pastes your words as said until you download another." : {
       "comment" : "Settings › AI Rewrite: message of the confirmation before removing the local model in use, when no other is downloaded."
     },
@@ -1288,7 +1562,14 @@
     "It is the model in use. Dictation switches to %@ until you pick another." : {
       "comment" : "Settings › Speech to text: message of the confirmation before removing the local model in use. %@ is the model switched to."
     },
+    "It quit before the text was ready. The text is in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. 'It' is the app the text was to be pasted into."
+    },
+    "It quit. The text is still in the Record Window." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. 'It' is the app the text was to be inserted into."
+    },
     "It records while %@ is down. Let go of %@ to paste." : {
+      "comment" : "Settings › Dictation › Recording › Hold to record: gesture text, for a shortcut with no modifier keys. Both %@ are the same key.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1296,8 +1577,7 @@
             "value" : "It records while %1$@ is down. Let go of %2$@ to paste."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Hold to record: gesture text, for a shortcut with no modifier keys. Both %@ are the same key."
+      }
     },
     "It takes no list of words — the replacements still put them right. GPT Transcribe and GPT Live Transcribe do." : {
       "comment" : "Dictionary page, What a word does: row text when the speech model takes no word list. GPT Transcribe and GPT Live Transcribe are model names; keep them."
@@ -1307,6 +1587,12 @@
     },
     "It's given your words with every AI dictation and told to spell them your way." : {
       "comment" : "Dictionary page, What a word does: row text when AI Rewrite is set up."
+    },
+    "It's in History, ready to copy." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. after a saved dictation was transcribed."
+    },
+    "Its app" : {
+      "comment" : "Stands in for an app's name when it is unknown, at the start of a sentence: 'Its app wasn't in front…'."
     },
     "Its capitals are put back as written" : {
       "comment" : "Dictionary page: small note on a word's card whose only wrong spellings differ in capitals."
@@ -1336,7 +1622,7 @@
       "comment" : "Setup window, Try it step: %@ is the shortcut's letter key, e.g. Q."
     },
     "Keep debug lines — every partial, every key event posted — in this window. They push older lines out of the last 1000. On in a debug build; the system log gets them either way." : {
-
+      "comment" : "Debug Log window: tooltip on the Debug lines switch."
     },
     "Keep it" : {
       "comment" : "Setup window, Speech step: button that keeps the model already downloading, when its name is not known."
@@ -1360,13 +1646,16 @@
       "comment" : "Settings › Privacy & Data › History › Dictations: caption at the 'Don’t keep' stop (kept only until the app quits). Home and Usage are pages of the app."
     },
     "Language" : {
-      "comment" : "The language of speech: a group in Settings › Dictation, a label in the Record Window."
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver name of the language badge."
     },
     "Languages I speak" : {
       "comment" : "Settings › Dictation › Language: title over the user's languages."
     },
     "Last 7 days" : {
       "comment" : "Home page: section heading over the last seven days of dictation."
+    },
+    "Last checked %@." : {
+      "comment" : "About panel: when the app last looked for an update. %@ is a date and time, e.g. 'Today at 09:14'."
     },
     "Last chosen for" : {
       "comment" : "Prompts page: small label in capitals over the list of the last dictations this prompt was chosen for."
@@ -1387,10 +1676,10 @@
       "comment" : "Usage page: section heading over each provider's current rate limits."
     },
     "Listening" : {
-      "comment" : "Setup window, Try it step: small chip while recording."
+      "comment" : "Dictation overlay: VoiceOver state while it records."
     },
     "Listening…" : {
-      "comment" : "Setup window, Try it step: while recording."
+      "comment" : "State while a dictation records."
     },
     "Listens only while you dictate" : {
       "comment" : "Setup window, permissions: a promise, in bold; followed by '— from one press of the shortcut to the next.'"
@@ -1443,8 +1732,14 @@
     "Move Down" : {
       "comment" : "Prompts page: context menu item that moves a prompt one place down the list."
     },
+    "Move SpeechText to Applications?" : {
+      "comment" : "Alert title when the app runs from its downloaded disk image. Applications is the macOS folder."
+    },
     "Move Up" : {
       "comment" : "Prompts page: context menu item that moves a prompt one place up the list."
+    },
+    "Move to Applications" : {
+      "comment" : "Alert button that moves the app to the Applications folder."
     },
     "Name" : {
       "comment" : "Prompts page, editing a prompt: placeholder of the prompt's name field."
@@ -1464,6 +1759,9 @@
     "Needs an AI provider — a key, or a model on this Mac. Until then the shortcut dictates plain text." : {
       "comment" : "Home page, intro card: the AI Rewrite tab's text when it has no provider."
     },
+    "Never" : {
+      "comment" : "Settings: when the app shows its icon in the Dock — never."
+    },
     "New prompt" : {
       "comment" : "Prompts page: button that adds a prompt, and the name the new prompt starts with."
     },
@@ -1476,6 +1774,21 @@
     "Next month" : {
       "comment" : "History page, the date filter's calendar: VoiceOver label of the arrow to the next month."
     },
+    "No %@ model selected. Pasted the raw transcription." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. %@ is the AI provider's name."
+    },
+    "No API key for %@. Pasted the raw transcription." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. %@ is the AI provider's name."
+    },
+    "No app to insert into" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Record Window (the app's floating dictation window): "
+    },
+    "No audio input device available" : {
+      "comment" : "Error when there is no microphone."
+    },
+    "No connection — saved to History" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. a dictation couldn't be transcribed offline; its audio is in History."
+    },
     "No dictations rewritten by AI yet." : {
       "comment" : "History page: shown when the AI filter has nothing."
     },
@@ -1487,6 +1800,9 @@
     },
     "No internet connection" : {
       "comment" : "Setup window, Try it step: title when an online service could not be reached."
+    },
+    "No internet connection. Retry from History once you're back online." : {
+      "comment" : "Error text when the speech provider can't be reached."
     },
     "No key" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Online services: badge on a service with no API key."
@@ -1503,8 +1819,14 @@
     "No requests to a provider in this period." : {
       "comment" : "Usage page, Requests: shown when there are none."
     },
+    "No speech detected" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. "
+    },
     "No text" : {
       "comment" : "History page, an open dictation: shown in a text pane that is empty."
+    },
+    "No text selected" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
     },
     "No words yet." : {
       "comment" : "Dictionary page: shown when the list of words is empty."
@@ -1514,6 +1836,9 @@
     },
     "None — polished" : {
       "comment" : "History page, an open edit: shown as the instruction when nothing was said — the selection was only polished."
+    },
+    "Not checked yet." : {
+      "comment" : "About panel: the app hasn't looked for an update yet."
     },
     "Not chosen in History yet" : {
       "comment" : "Prompts page: tooltip on a prompt that no dictation in History used."
@@ -1530,8 +1855,14 @@
     "Not pasted" : {
       "comment" : "Where a dictation went when it reached no app; a row's place and a note on an AI dictation."
     },
+    "Not pasted — Accessibility is off" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Accessibility is the macOS privacy setting."
+    },
     "Not priced" : {
       "comment" : "Usage page, By engine: in the cost column for a model with no list price."
+    },
+    "Not recording" : {
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver state of the record knob."
     },
     "Not sent" : {
       "comment" : "Usage page, Overhead: tile title — silence not sent to a cloud engine."
@@ -1586,17 +1917,32 @@
     "Nothing rewritten yet" : {
       "comment" : "Usage page: under Rewritten by AI when there is nothing."
     },
+    "Nothing to change" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI kept the text as it was."
+    },
+    "Nothing to edit here" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): no text field is in front."
+    },
     "Nothing to enter" : {
       "comment" : "Settings › API Keys › In use: row title when no chosen engine needs a key."
+    },
+    "Nothing was changed. Try again — or double-press to edit without an instruction." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): 'double-press' means pressing the shortcut twice."
     },
     "Nothing was heard in this recording — a muted microphone, or the shortcut pressed with nothing said." : {
       "comment" : "History page, an open dictation that heard no speech."
     },
+    "Nothing was selected when the instruction ended. Nothing was edited." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "Nothing was transcribed from that recording." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'No speech detected'."
+    },
     "Notice" : {
-
+      "comment" : "Debug Log window: VoiceOver name of a line's level mark."
     },
     "Notices and above" : {
-
+      "comment" : "Debug Log window: level filter option."
     },
     "Now let go of %@" : {
       "comment" : "Setup window, Try it step: %@ is the shortcut's modifier keys, e.g. ⌃⇧."
@@ -1608,7 +1954,7 @@
       "comment" : "Setup window, Try it step: title over the AI shortcut's keys, when the shortcut is pressed."
     },
     "Off" : {
-      "comment" : "Home page, Engines: the AI Rewrite row when it has no provider."
+      "comment" : "State of a switch: off."
     },
     "Offline" : {
       "comment" : "Home and History: a row's tag for a dictation saved offline, when the app isn't known."
@@ -1626,7 +1972,7 @@
       "comment" : "Usage page, By engine: rewrites from before AI Rewrite ran models itself. Ollama is a product name."
     },
     "On" : {
-      "comment" : "Setup window, permissions: shown after ✓ when macOS Dictation is on."
+      "comment" : "State of a switch: on."
     },
     "On this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: title of the card for engines that run on the Mac."
@@ -1656,6 +2002,7 @@
       "comment" : "Settings › General › Updates › Check for updates automatically: caption when on."
     },
     "Once it records, let go of %@ — %@ alone keeps it going. Let go of %@ to paste." : {
+      "comment" : "Settings › Dictation › Recording › Hold to record: gesture text. The first %@ is modifier keys (⌃⇧), the other two the letter key.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1663,8 +2010,7 @@
             "value" : "Once it records, let go of %1$@ — %2$@ alone keeps it going. Let go of %3$@ to paste."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Hold to record: gesture text. The first %@ is modifier keys (⌃⇧), the other two the letter key."
+      }
     },
     "Once you've dictated for a minute or so, this says how much faster speaking is than typing — and how much time it saved you." : {
       "comment" : "Usage page: under 'Speak, and see' before there is enough to compare."
@@ -1705,6 +2051,9 @@
     "Open Sound Settings" : {
       "comment" : "Button that opens System Settings › Sound."
     },
+    "Open SpeechText" : {
+      "comment" : "Menu bar menu item. Opens the app's main window. SpeechText is the app's name."
+    },
     "Open SpeechText yourself after you log in — until then the shortcuts do nothing." : {
       "comment" : "Settings › General › Launch at login: caption when off."
     },
@@ -1721,7 +2070,7 @@
       "comment" : "Setup window, permissions: row title and switch label — start the app when the Mac starts."
     },
     "Opens History" : {
-
+      "comment" : "Dictation overlay: VoiceOver hint on a notice that opens History when clicked."
     },
     "Optional" : {
       "comment" : "Setup window, welcome step: note after 'Your languages, for better accuracy'."
@@ -1762,10 +2111,19 @@
       "comment" : "Placeholder of an API key field."
     },
     "Pasted" : {
-      "comment" : "Settings › Dictation › Recording: small tag in a gesture animation once the text is pasted."
+      "comment" : "Dictation overlay: short confirmation after the text was pasted."
     },
     "Pasted into %@" : {
-      "comment" : "Home page, intro card: the strip's caption after the example is pasted. %@ is an app name."
+      "comment" : "Dictation overlay: short confirmation. %@ is an app's name."
+    },
+    "Pasted the raw transcription." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. follows a reason why AI Rewrite didn't run; the dictation was pasted unrewritten."
+    },
+    "Pause and transcribe" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the record knob while recording."
+    },
+    "Paused" : {
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver state of the record knob."
     },
     "Permissions" : {
       "comment" : "Settings › Privacy & Data: group heading over the macOS permissions."
@@ -1786,6 +2144,7 @@
       "comment" : "Setup window, Try it step: %@ is the shortcut, e.g. ⌃⇧Q."
     },
     "Press %@ and let go — it records with nothing held. Press %@ again to paste." : {
+      "comment" : "Settings › Dictation › Recording › Press to start, again to paste: gesture text. Both %@ are the shortcut, e.g. ⌃⇧Q.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1793,8 +2152,7 @@
             "value" : "Press %1$@ and let go — it records with nothing held. Press %2$@ again to paste."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Press to start, again to paste: gesture text. Both %@ are the shortcut, e.g. ⌃⇧Q."
+      }
     },
     "Press %@ to dictate." : {
       "comment" : "Notification after setup when the speech model is ready. %@ is the dictation shortcut, e.g. ⌃⇧Q."
@@ -1844,8 +2202,17 @@
     "Prompts" : {
       "comment" : "Settings › AI Rewrite: group heading and row title for AI Rewrite's prompts."
     },
+    "Quit" : {
+      "comment" : "Alert button that quits the app."
+    },
+    "Quit SpeechText" : {
+      "comment" : "Menu bar menu item. Title case. SpeechText is the app's name."
+    },
     "RESULT" : {
       "comment" : "Setup window, Try it step: small label in capitals over what was typed."
+    },
+    "Rate limited by the provider. Wait a moment and retry from History." : {
+      "comment" : "Error text when the speech provider refused for too many requests."
     },
     "Ready" : {
       "comment" : "Setup window, AI step: badge on 'Online service' when a key is already connected."
@@ -1869,19 +2236,22 @@
       "comment" : "Setup window, AI step: heading in capitals. %@ is the Mac, e.g. 'M1 Pro, 32 GB'."
     },
     "Record" : {
-
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver name of the record knob."
     },
     "Record Window" : {
-      "comment" : "The name of SpeechText's own window for dictating into; also where a dictation went when it was dictated there."
+      "comment" : "Menu bar menu item. Opens the Record Window, the app's floating dictation window. Title case."
     },
     "Record a conversation you're part of, then read who said what, get a summary and ask questions." : {
       "comment" : "The Notetaker page (not built yet): its lead under the title."
     },
     "Record traces" : {
-
+      "comment" : "Debug Log window: switch that saves dictations for replay as tests."
     },
     "Recording" : {
-      "comment" : "Settings › Dictation: group heading over how a shortcut records; also a small tag in a gesture animation while it records."
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver state of the record knob."
+    },
+    "Recording with %@" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. %@ is a microphone's name, e.g. MacBook Pro Microphone."
     },
     "Reduce transparency is on in System Settings — nothing to adjust." : {
       "comment" : "Settings › Appearance › Transparency: caption when macOS's Reduce transparency is on."
@@ -1919,6 +2289,9 @@
     "Replacements" : {
       "comment" : "Dictionary page: section heading over the list of text replacements (what is said → how it is written). A count follows it."
     },
+    "Report a problem" : {
+      "comment" : "About panel: link to the app's issue tracker."
+    },
     "Requests" : {
       "comment" : "Usage page: section heading over the requests sent to each provider."
     },
@@ -1934,17 +2307,26 @@
     "Restore the built-in prompts?" : {
       "comment" : "Prompts page: title of the confirmation before the built-in prompts are restored."
     },
+    "Resume recording" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the record knob while paused."
+    },
     "Retries" : {
       "comment" : "Usage page, Overhead: tile title — retries from History."
     },
     "Retry" : {
-      "comment" : "Button that tries a failed action again."
+      "comment" : "Button that tries a failed transcription or download again."
     },
     "Retry and continue" : {
       "comment" : "Setup window: footer button when the chosen model's download failed."
     },
+    "Retry failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. retrying a saved dictation failed; the reason follows."
+    },
+    "Retry returned no text" : {
+      "comment" : "Error when retrying a saved dictation produced no text."
+    },
     "Retrying…" : {
-      "comment" : "The Retry button while it runs."
+      "comment" : "Notice beside the dictation overlay: title, one short line. while a saved dictation is retried."
     },
     "Rewrite failed" : {
       "comment" : "Home and History: a row's tag for an AI dictation whose rewrite failed."
@@ -1952,8 +2334,17 @@
     "Rewrite needs a provider" : {
       "comment" : "Home page, intro card: large title on the AI Rewrite tab when it has no provider."
     },
+    "Rewrites the text selected in the app in front. Speak an instruction, or double-press the shortcut to just polish it." : {
+      "comment" : "Menu bar menu: tooltip on Edit Selection with AI."
+    },
     "Rewriting" : {
       "comment" : "Setup window, Try it step: small chip while AI rewrites."
+    },
+    "Rewriting with AI" : {
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver state while AI Rewrite runs."
+    },
+    "Rewriting with AI…" : {
+      "comment" : "Record Window (the app's floating dictation window): status line while AI Rewrite runs."
     },
     "Rewriting…" : {
       "comment" : "Setup window, Try it step: while AI rewrites."
@@ -1971,10 +2362,13 @@
       "comment" : "Setup window, welcome animation: a chat message typed by voice, word by word. Write a natural one in your language."
     },
     "Save each streamed inline dictation to Traces/ so it can be replayed as a test. The words you dictate are saved there in plain text." : {
-
+      "comment" : "Debug Log window: tooltip on Record traces. Traces/ is a folder name; keep it."
     },
     "Saved" : {
       "comment" : "Usage page, typing test: shown after the measured speed is saved."
+    },
+    "Saved audio is no longer available" : {
+      "comment" : "Error when retrying a dictation whose audio was deleted."
     },
     "Say anything — or read this out, then let go." : {
       "comment" : "Setup window, Try it step, hold mode: an example text follows."
@@ -2000,11 +2394,20 @@
     "Select it, say what to change" : {
       "comment" : "Home page, intro card: large title on the Edit tab; one line, shrinks to fit."
     },
+    "Select text in another app, then press the Edit shortcut." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
     "Select text in any app and tell AI how to improve it — “shorter”, “friendlier”, “in Spanish”." : {
       "comment" : "Home page, intro card: the Edit tab's text. The examples in quotes may be adapted to your language."
     },
     "Select text, then tell AI how to improve it." : {
       "comment" : "Home page, More ways to dictate: the Edit tile's text."
+    },
+    "Select the text to rework, then press the Edit shortcut." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "Select up to %@ characters to edit with AI." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is a number of characters."
     },
     "Selected text" : {
       "comment" : "History page, an open edit: title over the text that was selected."
@@ -2013,10 +2416,16 @@
       "comment" : "Home page: VoiceOver label of the animated example of an edit. %@ is an app name."
     },
     "Selection replaced" : {
-      "comment" : "Home page, intro card: the strip's caption after the example edit."
+      "comment" : "Dictation overlay: short confirmation after Edit Selection with AI replaced the text."
+    },
+    "Selection too long" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
     },
     "Send your words to the speech engine with every dictation" : {
       "comment" : "Dictionary page, What a word does: tooltip on the switch that sends the words to the speech engine."
+    },
+    "Set an LLM API key in Settings to use AI mode" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no API key."
     },
     "Set here — Liquid Glass in System Settings no longer changes it." : {
       "comment" : "Settings › Appearance › Transparency: caption at a stop other than the default, on macOS 26. Liquid Glass is Apple's name for the look."
@@ -2024,8 +2433,11 @@
     "Settings" : {
       "comment" : "Settings — the window, and its place in the main window's sidebar."
     },
+    "Settings..." : {
+      "comment" : "Menu bar menu item. Opens Settings. Title case."
+    },
     "Settings…" : {
-
+      "comment" : "App menu item that opens Settings."
     },
     "Shortcut card on Home" : {
       "comment" : "Settings › Appearance › Main window: row with a switch that shows the shortcut card on the Home page."
@@ -2034,7 +2446,7 @@
       "comment" : "The dictation shortcuts: a group in Settings › Dictation, a heading on Home."
     },
     "Show" : {
-      "comment" : "Button that opens a file or shows something."
+      "comment" : "Button that shows something: the dictations in History, or a level picker's label."
     },
     "Show %lld models too heavy for this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: link that unfolds the local models this Mac lacks the memory for. %lld is how many.",
@@ -2078,7 +2490,7 @@
       "comment" : "Setup window, Try it step: folds what was said back to one line."
     },
     "Show levels" : {
-
+      "comment" : "Debug Log window: VoiceOver name of the level filter."
     },
     "Shown, %lld" : {
       "comment" : "Settings › Speech to text / AI Rewrite: VoiceOver value of the unfolded Legacy models row. %lld is how many."
@@ -2094,6 +2506,9 @@
     },
     "Skip test and finish setup" : {
       "comment" : "Setup window, Try it step: skips the test."
+    },
+    "So %@ keeps playing at full quality." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'Recording with %@'. %@ is a Bluetooth headset's name; recording from it would lower its sound quality."
     },
     "So SpeechText can hear you." : {
       "comment" : "Settings › Privacy & Data › Permissions › Microphone: why the permission is needed."
@@ -2151,6 +2566,9 @@
     "Speech to text" : {
       "comment" : "Settings: name of the page (sidebar entry and page title) that picks the speech engine; also a role tag on an API key."
     },
+    "SpeechText Debug Log" : {
+      "comment" : "Debug Log window: window title."
+    },
     "SpeechText Settings" : {
       "comment" : "Title of the Settings window (shown in the Window menu and Mission Control). SpeechText is the app's name."
     },
@@ -2163,17 +2581,26 @@
     "SpeechText can't type for you" : {
       "comment" : "Home page: a problem row's title when the Accessibility permission is off."
     },
+    "SpeechText couldn't move itself to Applications" : {
+      "comment" : "Alert title. Applications is the macOS folder."
+    },
     "SpeechText has no list price for this model, so it isn't counted in Spent." : {
       "comment" : "Usage page, By engine: tooltip on 'Not priced'. Spent is the stat's name."
     },
     "SpeechText is ready" : {
       "comment" : "Notification after setup when the speech model finished preparing."
     },
+    "SpeechText is running from the disk image it was downloaded in, and would stop working once the disk image is closed. It will open again from Applications and walk you through setup." : {
+      "comment" : "Alert text when the app runs from its downloaded disk image."
+    },
     "SpeechText isn't allowed to use the microphone." : {
       "comment" : "Settings › Dictation › Microphone: caption when the microphone permission is not granted."
     },
     "SpeechText lives in your menu bar" : {
       "comment" : "Setup window, Done step."
+    },
+    "SpeechText needs it to read the selected text and replace it." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'Accessibility access needed'. 'It' is Accessibility access."
     },
     "SpeechText needs these to hear you and to type for you." : {
       "comment" : "Setup window, permissions: lead under the title."
@@ -2196,11 +2623,23 @@
     "Spent" : {
       "comment" : "Home and Usage: stat name — the estimated cost."
     },
+    "Start Recording" : {
+      "comment" : "Menu bar menu item. Starts a plain dictation. Title case."
+    },
+    "Start recording" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the record knob."
+    },
     "Start typing here" : {
       "comment" : "Usage page, typing test: placeholder of the field to type in."
     },
     "Start using SpeechText" : {
       "comment" : "Setup window: footer button on the last step; opens the app."
+    },
+    "Starting" : {
+      "comment" : "VoiceOver state while a dictation starts."
+    },
+    "Starting…" : {
+      "comment" : "Record Window (the app's floating dictation window): status line while a dictation starts."
     },
     "Startup" : {
       "comment" : "Settings › General: group heading."
@@ -2210,6 +2649,12 @@
     },
     "Stays on this Mac: Apple Dictation runs on-device." : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac › Your voice: when Apple Dictation is in use. Apple Dictation is a product name."
+    },
+    "Stop AI Recording" : {
+      "comment" : "Menu bar menu item. Stops an AI dictation. Title case."
+    },
+    "Stop Recording" : {
+      "comment" : "Menu bar menu item. Stops a plain dictation. Title case."
     },
     "Style" : {
       "comment" : "Settings › Appearance: group heading over the overlay styles."
@@ -2223,8 +2668,14 @@
     "Switch to %@? The current download will stop." : {
       "comment" : "Setup window, Speech step: %@ is the model's name."
     },
+    "Switch to AI" : {
+      "comment" : "Menu bar menu item. During a plain dictation, switches it to AI Rewrite. Title case."
+    },
     "Switch to AI Rewrite" : {
       "comment" : "Settings › Dictation › Recording: title of a gesture played as an animation, switching a dictation to AI Rewrite."
+    },
+    "Switch to Plain Text" : {
+      "comment" : "Menu bar menu item. During an AI dictation, switches it to plain dictation. Title case."
     },
     "Switch to it" : {
       "comment" : "Settings › Speech to text / AI Rewrite: link after '%@ is newer.' that selects the newer model."
@@ -2265,6 +2716,7 @@
       }
     },
     "Tap %@ twice: it records with nothing held, until you press %@ again." : {
+      "comment" : "Settings › Dictation › Recording › Double-tap to lock: gesture text, for a shortcut with no modifier keys. The first %@ is the key, the second the whole shortcut.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2272,8 +2724,7 @@
             "value" : "Tap %1$@ twice: it records with nothing held, until you press %2$@ again."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Double-tap to lock: gesture text, for a shortcut with no modifier keys. The first %@ is the key, the second the whole shortcut."
+      }
     },
     "Teach SpeechText the words it gets wrong — names, product terms, code identifiers." : {
       "comment" : "The Dictionary page's lead under its title."
@@ -2293,8 +2744,26 @@
     "That didn't work" : {
       "comment" : "Setup window, Try it step: title when the dictation failed; the error follows."
     },
+    "That recording was too large for the provider. Try a shorter one." : {
+      "comment" : "Error text from the speech provider."
+    },
     "That's your voice, typed." : {
       "comment" : "Setup window, Try it step: after the first dictation worked."
+    },
+    "The AI left the selected text as it was." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "The API key was rejected. Check it in Settings." : {
+      "comment" : "Error text from the speech provider."
+    },
+    "The app" : {
+      "comment" : "Stands in for an app's name when it is unknown, at the start of a sentence: 'The app took it out late…'."
+    },
+    "The app it came from is gone." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. the app the text came from has quit."
+    },
+    "The app the Record Window was opened from is gone. Copy the text instead." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Record Window (the app's floating dictation window): "
     },
     "The app, its window and the field — so the same words become a chat message in Slack and a letter in Mail. Never a password manager's." : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile text under 'Where you're dictating'. Slack and Mail are app names."
@@ -2314,8 +2783,14 @@
     "The download didn't finish" : {
       "comment" : "Setup window, Try it step: title when the speech model's download failed."
     },
+    "The download ended early. Try again to continue it." : {
+      "comment" : "Error when a local model's download stopped."
+    },
     "The download stopped. Check your internet connection." : {
       "comment" : "Setup window: download pill's popover when a download failed."
+    },
+    "The download was damaged. Try again." : {
+      "comment" : "Error when a local model's download failed its check."
     },
     "The instructions AI Rewrite follows — one for each kind of text you dictate." : {
       "comment" : "The Prompts page's lead under its title."
@@ -2323,8 +2798,29 @@
     "The lid is closed, so this microphone hears nothing." : {
       "comment" : "Settings › Dictation › Microphone: caption when the MacBook's own microphone is in use with the lid closed."
     },
+    "The local model stopped unexpectedly. The next rewrite starts it again." : {
+      "comment" : "Error from the AI Rewrite model that runs on this Mac."
+    },
+    "The local model took too long to answer." : {
+      "comment" : "Error from the AI Rewrite model that runs on this Mac."
+    },
+    "The microphone didn't start. Try again, or quit and reopen SpeechText." : {
+      "comment" : "Error when the microphone doesn't start."
+    },
     "The microphone is off for SpeechText." : {
       "comment" : "Home page: a problem row's text when the microphone permission is off."
+    },
+    "The microphone kept changing — try again" : {
+      "comment" : "Error when the audio device changed several times during a dictation."
+    },
+    "The microphone offers no input" : {
+      "comment" : "Error when the chosen microphone gives no sound."
+    },
+    "The microphone wasn't ready" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "The model isn't available to your key. Pasted the raw transcription." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'AI processing failed'."
     },
     "The model on this Mac isn't given them" : {
       "comment" : "Dictionary page, What a word does: row title when a local speech model is in use."
@@ -2338,11 +2834,38 @@
     "The quietest rooms are seldom silent; listen carefully and there's a refrigerator humming, a clock ticking, a neighbor's piano." : {
       "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
     },
+    "The request timed out. Retry from History." : {
+      "comment" : "Error text when the speech provider didn't answer in time."
+    },
+    "The selected text is on the clipboard" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "The selected words aren't where they were read. Nothing was edited." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "The selection was in another app" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): "
+    },
+    "The service won't serve it to your key. The recording is in History." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'This model isn't available'."
+    },
     "The situation AI Rewrite recognizes from what you said — distinct from every other prompt's." : {
       "comment" : "Prompts page, editing a prompt: hint under 'When to use'."
     },
     "The speech engine isn't told them" : {
       "comment" : "Dictionary page, What a word does: row title when sending the words to the speech engine is turned off. 'Them' is the user's words."
+    },
+    "The text changed while AI was working — left as it is" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when the text was edited during AI Rewrite."
+    },
+    "The text is on the clipboard" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. "
+    },
+    "The text is too long for the model on this Mac to rewrite in full." : {
+      "comment" : "Error from the AI Rewrite model that runs on this Mac."
+    },
+    "The text was put back." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): added after another sentence: the cut text was restored."
     },
     "The word, as it should be written" : {
       "comment" : "Dictionary page, editing a word: placeholder in the word's field."
@@ -2350,11 +2873,17 @@
     "These headphones drop to call quality while you dictate." : {
       "comment" : "Settings › Dictation › Microphone: caption when picked Bluetooth headphones are the microphone."
     },
+    "This build does not update itself." : {
+      "comment" : "About panel: the app's update status."
+    },
     "This can't be undone." : {
       "comment" : "Settings › Privacy & Data › History: message of the confirmation before deleting kept dictations."
     },
     "This happens only once and takes %@. You can wait here or finish setup now — we'll let you know when it's ready." : {
       "comment" : "Setup window, Try it step. %@ is a duration such as 'a minute or two'."
+    },
+    "This model isn't available" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. the speech provider refused the selected model."
     },
     "This model may be slow on your Mac. We recommend %@." : {
       "comment" : "Setup window, AI step: under a heavy model. %@ is the recommended model's name."
@@ -2381,16 +2910,25 @@
       "comment" : "Settings › Speech to text / AI Rewrite: badge on a local model this Mac lacks the memory for."
     },
     "Traces" : {
-
+      "comment" : "Debug Log window: button that opens the Traces folder."
     },
     "Transcribe the saved audio again, with the settings you have now" : {
       "comment" : "Tooltip on Retry."
     },
+    "Transcribed — not pasted" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. a saved dictation was transcribed into History."
+    },
     "Transcribing" : {
-      "comment" : "Setup window, Try it step: small chip while speech becomes text."
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver state while the recording is transcribed."
+    },
+    "Transcribing…" : {
+      "comment" : "Record Window (the app's floating dictation window): status line while the recording is transcribed."
     },
     "Transcript" : {
-      "comment" : "Record Window, minimal look: VoiceOver label of the text area."
+      "comment" : "Record Window (the app's floating dictation window): VoiceOver name of the text area."
+    },
+    "Transcription failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. the reason follows."
     },
     "Transcription failed." : {
       "comment" : "History page, an open failed dictation, when no error message was kept."
@@ -2411,7 +2949,7 @@
       "comment" : "Setup window, Try it step: title over the shortcut's keys, press mode."
     },
     "Turn On…" : {
-      "comment" : "Home page: button on a problem row that opens the macOS permission."
+      "comment" : "Button that opens the macOS setting to turn on a permission, such as Accessibility."
     },
     "Turn on Dictation" : {
       "comment" : "Setup window: helper title beside System Settings › Keyboard. Dictation is macOS's setting."
@@ -2556,6 +3094,9 @@
     "What uses it stops working until you add a key again." : {
       "comment" : "Settings: message of the confirmation before removing an API key in use."
     },
+    "What was cut wasn't the text that was read, so it was put back. Nothing was edited." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): "
+    },
     "What you dictated, what it cost, and the time it saved you." : {
       "comment" : "The Usage page's lead under its title."
     },
@@ -2580,7 +3121,11 @@
     "Where your words went" : {
       "comment" : "Usage page: section heading over the apps the dictated words were pasted into."
     },
+    "While a window is open" : {
+      "comment" : "Settings: when the app shows its icon in the Dock — while one of its windows is open."
+    },
     "While holding %@, press %@ to switch to AI Rewrite, and again to switch back. Started with %@, %@ switches the other way." : {
+      "comment" : "Settings › Dictation › Recording › Switch to AI Rewrite: gesture text in hold-to-talk mode. The first %@ is the dictation shortcut's letter, the second and third the AI Rewrite shortcut, the fourth the dictation shortcut.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2588,10 +3133,10 @@
             "value" : "While holding %1$@, press %2$@ to switch to AI Rewrite, and again to switch back. Started with %3$@, %4$@ switches the other way."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Switch to AI Rewrite: gesture text in hold-to-talk mode. The first %@ is the dictation shortcut's letter, the second and third the AI Rewrite shortcut, the fourth the dictation shortcut."
+      }
     },
     "While it records, press %@ to switch to AI Rewrite and %@ to switch back. Started with %@, it works the other way round." : {
+      "comment" : "Settings › Dictation › Recording › Switch to AI Rewrite: gesture text in press-to-toggle mode. The first and third %@ are the AI Rewrite shortcut, the second the dictation shortcut.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2599,8 +3144,7 @@
             "value" : "While it records, press %1$@ to switch to AI Rewrite and %2$@ to switch back. Started with %3$@, it works the other way round."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Recording › Switch to AI Rewrite: gesture text in press-to-toggle mode. The first and third %@ are the AI Rewrite shortcut, the second the dictation shortcut."
+      }
     },
     "While the overlay is up, Esc cancels the dictation — and reaches no other app until it is gone." : {
       "comment" : "Settings › Dictation › Recording › Esc cancels a dictation: caption when on."
@@ -2649,6 +3193,12 @@
     },
     "Work in any app. Press once to start, again to stop. Change them any time in %@." : {
       "comment" : "Setup window, Done step, under the shortcuts. %@ is 'Settings', in bold."
+    },
+    "Working" : {
+      "comment" : "Dictation overlay: VoiceOver state while the dictation is transcribed or rewritten."
+    },
+    "Working…" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the record knob while busy."
     },
     "Works as plain Dictate until you %@." : {
       "comment" : "Home page, More ways to dictate: the AI Rewrite tile's text when it has no provider. %@ is the link 'choose a provider'."
@@ -2749,6 +3299,9 @@
     },
     "Your text" : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac: row about the text sent to AI Rewrite."
+    },
+    "Your text is in the Record Window. Turn on Accessibility so SpeechText can type for you." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. under 'Not pasted — Accessibility is off'."
     },
     "Your typing speed" : {
       "comment" : "Usage page, How this is counted: title of the note on typing speed."
@@ -2852,6 +3405,7 @@
       "comment" : "Setup window, Speech step: second sentence of Apple Dictation's description. Speech Recognition is macOS's permission name."
     },
     "macOS refused %@ (error %lld). Choose another shortcut." : {
+      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS refused. %@ is the keys, %lld an error code.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2859,8 +3413,7 @@
             "value" : "macOS refused %1$@ (error %2$lld). Choose another shortcut."
           }
         }
-      },
-      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS refused. %@ is the keys, %lld an error code."
+      }
     },
     "min" : {
       "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min."
@@ -2923,6 +3476,9 @@
     },
     "that wasn't pasted" : {
       "comment" : "History page, part of 'Nothing … .': the filter for dictations that weren't pasted anywhere."
+    },
+    "the app" : {
+      "comment" : "Stands in for an app's name when it is unknown, inside a sentence: 'Couldn't paste into the app'."
     },
     "today" : {
       "comment" : "History page, part of 'Nothing … .': the date filter set to today, lowercase."

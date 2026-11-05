@@ -91,8 +91,8 @@ enum AboutCredits {
         let text = NSMutableAttributedString(string: updateStatus + "\n", attributes: base)
         let links: [(String, URL?)] = [
             ("speech-text.app", ProjectLinks.website),
-            ("Report a problem", ProjectLinks.issues),
-            ("Acknowledgements", Bundle.main.url(forResource: "ThirdPartyNotices", withExtension: "txt")),
+            (String(localized: "Report a problem"), ProjectLinks.issues),
+            (String(localized: "Acknowledgements"), Bundle.main.url(forResource: "ThirdPartyNotices", withExtension: "txt")),
         ]
         for (index, (title, url)) in links.enumerated() where url != nil {
             if index > 0 { text.append(NSAttributedString(string: "  ·  ", attributes: base)) }
@@ -108,18 +108,18 @@ enum AboutCredits {
         let updater = UpdateChecker.shared
         guard updater.isConfigured else {
             return UpdateChecker.isDevelopmentBuild
-                ? "Development build — it does not update itself."
-                : "This build does not update itself."
+                ? String(localized: "Development build — it does not update itself.")
+                : String(localized: "This build does not update itself.")
         }
         let schedule = updater.checksAutomatically
-            ? "Checks for updates once a day."
-            : "Automatic update checks are off."
-        guard let last = updater.lastCheckDate else { return schedule + " Not checked yet." }
+            ? String(localized: "Checks for updates once a day.")
+            : String(localized: "Automatic update checks are off.")
+        guard let last = updater.lastCheckDate else { return schedule + " " + String(localized: "Not checked yet.") }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         formatter.doesRelativeDateFormatting = true
-        return schedule + " Last checked " + formatter.string(from: last) + "."
+        return schedule + " " + String(localized: "Last checked \(formatter.string(from: last)).")
     }
 }
 
@@ -423,16 +423,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let (title, aiTitle): (String, String)
         switch appState.dictationPhase {
         case .idle:
-            (title, aiTitle) = ("Start Recording", "AI Recording")
+            (title, aiTitle) = (String(localized: "Start Recording"), String(localized: "AI Recording"))
         case .busy:
             // Transcribing or rewriting: either item cancels.
-            (title, aiTitle) = ("Cancel Dictation", "Cancel Dictation")
+            (title, aiTitle) = (String(localized: "Cancel Dictation"), String(localized: "Cancel Dictation"))
         case .starting(let ai), .recording(let ai):
             // During a dictation, the other mode's item switches it over rather than stopping it.
-            let own = appState.speechEngine.isRecording ? "Stop" : "Cancel"
+            let stops = appState.speechEngine.isRecording
             (title, aiTitle) = ai
-                ? ("Switch to Plain Text", "\(own) AI Recording")
-                : ("\(own) Recording", "Switch to AI")
+                ? (String(localized: "Switch to Plain Text"),
+                   stops ? String(localized: "Stop AI Recording") : String(localized: "Cancel AI Recording"))
+                : (stops ? String(localized: "Stop Recording") : String(localized: "Cancel Recording"),
+                   String(localized: "Switch to AI"))
         }
         menu.item(withTag: Self.recordingItemTag).map { shortcut.apply(to: $0, title: title) }
         menu.item(withTag: Self.aiItemTag).map { aiShortcut.apply(to: $0, title: aiTitle) }
@@ -466,7 +468,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let menu = NSMenu()
         menu.delegate = self
 
-        let mainItem = NSMenuItem(title: "Open SpeechText", action: #selector(openMainWindow), keyEquivalent: "")
+        let mainItem = NSMenuItem(title: String(localized: "Open SpeechText"), action: #selector(openMainWindow), keyEquivalent: "")
         mainItem.target = self
         menu.addItem(mainItem)
 
@@ -484,51 +486,51 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         updateRecordingItemTitles(in: menu)
 
         let editItem = NSMenuItem(title: "", action: #selector(toggleEdit), keyEquivalent: "")
-        StoredShortcut.edit.apply(to: editItem, title: "Edit Selection with AI")
+        StoredShortcut.edit.apply(to: editItem, title: String(localized: "Edit Selection with AI"))
         editItem.target = self
-        editItem.toolTip = "Rewrites the text selected in the app in front. Speak an instruction, or double-press the shortcut to just polish it."
+        editItem.toolTip = String(localized: "Rewrites the text selected in the app in front. Speak an instruction, or double-press the shortcut to just polish it.")
         menu.addItem(editItem)
 
         menu.addItem(.separator())
 
         let recordItem = NSMenuItem(title: "", action: #selector(openRecordPanel), keyEquivalent: "")
-        StoredShortcut.recordWindow.apply(to: recordItem, title: "Record Window")
+        StoredShortcut.recordWindow.apply(to: recordItem, title: String(localized: "Record Window"))
         recordItem.target = self
         menu.addItem(recordItem)
 
         menu.addItem(.separator())
 
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: String(localized: "Settings..."), action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        let historyItem = NSMenuItem(title: "History...", action: #selector(openHistory), keyEquivalent: "y")
+        let historyItem = NSMenuItem(title: String(localized: "History..."), action: #selector(openHistory), keyEquivalent: "y")
         historyItem.target = self
         menu.addItem(historyItem)
 
         // Setup is a first-run flow: once finished, everything it asks lives in Settings,
         // so the menu offers it only to pick up an unfinished one where it was left.
         if !UserDefaults.standard.bool(forKey: SettingsKeys.onboardingCompleted) {
-            let setupItem = NSMenuItem(title: "Continue Setup...", action: #selector(openSetup), keyEquivalent: "")
+            let setupItem = NSMenuItem(title: String(localized: "Continue Setup..."), action: #selector(openSetup), keyEquivalent: "")
             setupItem.target = self
             menu.addItem(setupItem)
         }
 
-        let debugItem = NSMenuItem(title: "Debug Log...", action: #selector(openDebugLog), keyEquivalent: "")
+        let debugItem = NSMenuItem(title: String(localized: "Debug Log..."), action: #selector(openDebugLog), keyEquivalent: "")
         debugItem.target = self
         menu.addItem(debugItem)
 
         // Only where an update could actually be found: a build with no signing key has
         // no feed to check, and an item that always answers "no updates" is a lie.
         if UpdateChecker.shared.isConfigured {
-            let updateItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+            let updateItem = NSMenuItem(title: String(localized: "Check for Updates..."), action: #selector(checkForUpdates), keyEquivalent: "")
             updateItem.target = self
             menu.addItem(updateItem)
         }
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Quit SpeechText", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: String(localized: "Quit SpeechText"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         statusItem.menu = menu
@@ -1058,7 +1060,7 @@ final class AppState {
         }
         showStatus(
             icon: "exclamationmark.triangle.fill",
-            title: "Couldn't start recording",
+            title: String(localized: "Couldn't start recording"),
             detail: friendlySTTError(message),
             tint: .orange
         )
@@ -1170,11 +1172,11 @@ final class AppState {
                 // once a model is chosen.
                 showStatus(
                     icon: "exclamationmark.triangle.fill",
-                    title: "This model isn't available",
-                    detail: "The service won't serve it to your key. The recording is in History.",
+                    title: String(localized: "This model isn't available"),
+                    detail: String(localized: "The service won't serve it to your key. The recording is in History."),
                     tint: .orange,
                     duration: 10,
-                    action: StatusOverlayAction(title: "Choose") { [weak self] in
+                    action: StatusOverlayAction(title: String(localized: "Choose")) { [weak self] in
                         self?.perform(.openSettings(.speech))
                     }
                 )
@@ -1186,11 +1188,11 @@ final class AppState {
                 // download and opens the page that shows it; the recording waits in History.
                 showStatus(
                     icon: "exclamationmark.triangle.fill",
-                    title: "\(speechModelName(missing)) isn't installed",
-                    detail: "Install it, then retry from History.",
+                    title: String(localized: "\(speechModelName(missing)) isn't installed"),
+                    detail: String(localized: "Install it, then retry from History."),
                     tint: .orange,
                     duration: 10,
-                    action: StatusOverlayAction(title: "Install") { [weak self] in
+                    action: StatusOverlayAction(title: String(localized: "Install")) { [weak self] in
                         LocalModelStore.shared.install(missing)
                         self?.perform(.openSettings(.speech))
                     }
@@ -1198,7 +1200,7 @@ final class AppState {
             } else {
                 showStatus(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Transcription failed",
+                    title: String(localized: "Transcription failed"),
                     detail: friendlySTTError(rawError),
                     tint: .orange
                 )
@@ -1214,8 +1216,8 @@ final class AppState {
             hideOverlay()
             showStatus(
                 icon: "waveform.slash",
-                title: "No speech detected",
-                detail: "Nothing was transcribed from that recording.",
+                title: String(localized: "No speech detected"),
+                detail: String(localized: "Nothing was transcribed from that recording."),
                 tint: .secondary
             )
 
@@ -1290,10 +1292,10 @@ final class AppState {
             let type = LLMConfiguration.providerType
             showStatus(
                 icon: "key.slash",
-                title: "AI processing skipped",
+                title: String(localized: "AI processing skipped"),
                 detail: type.needsAPIKey
-                    ? "No API key for \(type.displayName). Pasted the raw transcription."
-                    : "No \(type.displayName) model selected. Pasted the raw transcription.",
+                    ? String(localized: "No API key for \(type.displayName). Pasted the raw transcription.")
+                    : String(localized: "No \(type.displayName) model selected. Pasted the raw transcription."),
                 tint: .orange
             )
             DictationTraceRecorder.record(.refinement, error: "not configured")
@@ -1350,18 +1352,18 @@ final class AppState {
                    let key = LLMConfiguration.providerType.vendor.descriptor.chatModel?.settingsKey {
                     let notice = modelChoiceNotice(settingsKey: key, role: .chat,
                                                    migrations: storedModelMigrations(in: .standard))
-                    self.show(notice, detail: "\(notice.detail) Pasted the raw transcription.")
+                    self.show(notice, detail: notice.detail + " " + String(localized: "Pasted the raw transcription."))
                 } else {
                     self.showStatus(
                         icon: "sparkles.slash",
-                        title: "AI processing failed",
+                        title: String(localized: "AI processing failed"),
                         detail: (error as? LLMError)?.needsModelChoice == true
-                            ? "The model isn't available to your key. Pasted the raw transcription."
-                            : "\(error.localizedDescription) Pasted the raw transcription.",
+                            ? String(localized: "The model isn't available to your key. Pasted the raw transcription.")
+                            : error.localizedDescription + " " + String(localized: "Pasted the raw transcription."),
                         tint: .orange,
                         duration: (error as? LLMError)?.needsModelChoice == true ? 10 : 5,
                         action: (error as? LLMError)?.needsModelChoice == true
-                            ? StatusOverlayAction(title: "Choose") { [weak self] in self?.perform(.openSettings(.chat)) }
+                            ? StatusOverlayAction(title: String(localized: "Choose")) { [weak self] in self?.perform(.openSettings(.chat)) }
                             : nil
                     )
                 }
@@ -1399,8 +1401,8 @@ final class AppState {
             recordNotPasted()
             dismissOverlayConfirmation()
             showDirectRecordingPanel(withText: text)
-            showStatus(icon: "hand.raised.fill", title: "Not pasted — Accessibility is off",
-                       detail: "Your text is in the Record Window. Turn on Accessibility so SpeechText can type for you.",
+            showStatus(icon: "hand.raised.fill", title: String(localized: "Not pasted — Accessibility is off"),
+                       detail: String(localized: "Your text is in the Record Window. Turn on Accessibility so SpeechText can type for you."),
                        tint: .orange, duration: 8, action: Self.allowAccessibilityAction)
             return
         }
@@ -1432,20 +1434,20 @@ final class AppState {
                 self?.dismissOverlayConfirmation()
                 self?.showDirectRecordingPanel(withText: text)
                 let detail: String? = switch check {
-                case .quit: "It quit before the text was ready. The text is in the Record Window."
-                case .notInFront: "It didn't come to the front. The text is in the Record Window."
-                case .menuOpen: "\(menu ?? "A menu") was open and had the keyboard. The text is in the Record Window."
+                case .quit: String(localized: "It quit before the text was ready. The text is in the Record Window.")
+                case .notInFront: String(localized: "It didn't come to the front. The text is in the Record Window.")
+                case .menuOpen: String(localized: "\(menu ?? String(localized: "A menu")) was open and had the keyboard. The text is in the Record Window.")
                 case .takesNoText, .paste: nil
                 }
                 if let detail {
                     self?.showStatus(icon: "exclamationmark.triangle.fill",
-                                     title: "Couldn't paste into \(app.localizedName ?? "the app")",
+                                     title: String(localized: "Couldn't paste into \(app.localizedName ?? String(localized: "the app"))"),
                                      detail: detail, tint: .orange)
                 }
                 return
             }
             PasteService.pasteAtCursor(text)
-            self?.confirmOverlay(app.localizedName.map { "Pasted into \($0)" } ?? "Pasted")
+            self?.confirmOverlay(app.localizedName.map { String(localized: "Pasted into \($0)") } ?? String(localized: "Pasted"))
         }
 
         if alreadyFocused || app.isTerminated {
@@ -1467,8 +1469,8 @@ final class AppState {
         // app in front — and double its text.
         guard let app = previousApp, !app.isTerminated else {
             dlog("App", "pasteTextToTarget: no app to insert into (\(previousApp == nil ? "none saved" : "it quit"))", level: .notice)
-            showStatus(icon: "exclamationmark.triangle.fill", title: "No app to insert into",
-                       detail: "The app the Record Window was opened from is gone. Copy the text instead.",
+            showStatus(icon: "exclamationmark.triangle.fill", title: String(localized: "No app to insert into"),
+                       detail: String(localized: "The app the Record Window was opened from is gone. Copy the text instead."),
                        tint: .orange)
             return
         }
@@ -1489,12 +1491,12 @@ final class AppState {
             guard check == .paste else {
                 dlog("App", "pasteTextToTarget: not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front)", level: .notice)
                 self?.showStatus(icon: "exclamationmark.triangle.fill",
-                                 title: "Couldn't insert into \(app.localizedName ?? "the app")",
+                                 title: String(localized: "Couldn't insert into \(app.localizedName ?? String(localized: "the app"))"),
                                  detail: check == .quit
-                                     ? "It quit. The text is still in the Record Window."
+                                     ? String(localized: "It quit. The text is still in the Record Window.")
                                      : check == .menuOpen
-                                         ? "\(menu ?? "A menu") was open and had the keyboard. The text is still in the Record Window."
-                                         : "It didn't come to the front. The text is still in the Record Window.",
+                                         ? String(localized: "\(menu ?? String(localized: "A menu")) was open and had the keyboard. The text is still in the Record Window.")
+                                         : String(localized: "It didn't come to the front. The text is still in the Record Window."),
                                  tint: .orange)
                 return
             }
@@ -1641,15 +1643,15 @@ final class AppState {
         let front = NSWorkspace.shared.frontmostApplication
         guard front?.bundleIdentifier != Bundle.main.bundleIdentifier else {
             editGesture.reset()
-            showStatus(icon: "character.cursor.ibeam", title: "Nothing to edit here",
-                       detail: "Select text in another app, then press the Edit shortcut.", tint: .secondary)
+            showStatus(icon: "character.cursor.ibeam", title: String(localized: "Nothing to edit here"),
+                       detail: String(localized: "Select text in another app, then press the Edit shortcut."), tint: .secondary)
             return
         }
         LLMConfiguration.prewarmIfLocal()
         guard PasteService.isAccessibilityGranted else {
             editGesture.reset()
-            showStatus(icon: "hand.raised.fill", title: "Accessibility access needed",
-                       detail: "SpeechText needs it to read the selected text and replace it.", tint: .orange,
+            showStatus(icon: "hand.raised.fill", title: String(localized: "Accessibility access needed"),
+                       detail: String(localized: "SpeechText needs it to read the selected text and replace it."), tint: .orange,
                        duration: 8, action: Self.allowAccessibilityAction)
             return
         }
@@ -1686,7 +1688,7 @@ final class AppState {
         speechEngine.onStartFailure = { [weak self] message in
             guard let self, self.isEditMode, self.editGeneration == generation else { return }
             dlog("Edit", "microphone failed to start: \(message)", level: .error)
-            self.abortEdit(icon: "exclamationmark.triangle.fill", title: "Couldn't start recording",
+            self.abortEdit(icon: "exclamationmark.triangle.fill", title: String(localized: "Couldn't start recording"),
                            detail: self.friendlySTTError(message))
         }
         // The recogniser failed before any of the instruction was heard, and the engine
@@ -1719,7 +1721,7 @@ final class AppState {
             await self.speechEngine.awaitTranscription()
             guard !Task.isCancelled, self.isEditMode, self.editGeneration == generation else { return }
             self.transcriptionWaitTask = nil
-            self.abortEdit(icon: "exclamationmark.triangle.fill", title: "Couldn't hear the instruction",
+            self.abortEdit(icon: "exclamationmark.triangle.fill", title: String(localized: "Couldn't hear the instruction"),
                            detail: self.friendlySTTError(message))
         }
     }
@@ -1731,12 +1733,12 @@ final class AppState {
         selectionIsCurrent = removesSelection
         switch read {
         case .nothingSelected:
-            abortEdit(icon: "character.cursor.ibeam", title: "No text selected",
-                      detail: "Select the text to rework, then press the Edit shortcut.", tint: .secondary)
+            abortEdit(icon: "character.cursor.ibeam", title: String(localized: "No text selected"),
+                      detail: String(localized: "Select the text to rework, then press the Edit shortcut."), tint: .secondary)
         case .selected(let selection):
             guard selection.text.count <= SelectionEdit.maxCharacters else {
-                abortEdit(icon: "text.badge.xmark", title: "Selection too long",
-                          detail: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI.")
+                abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
+                          detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
                 return
             }
             editSelection = selection
@@ -1750,8 +1752,8 @@ final class AppState {
         guard speechEngine.isRecording else {
             // Stopped before the microphone opened: whatever was said went nowhere, and a
             // rewrite without it would not be what was asked for.
-            abortEdit(icon: "mic.slash", title: "The microphone wasn't ready",
-                      detail: "Nothing was changed. Try again — or double-press to edit without an instruction.")
+            abortEdit(icon: "mic.slash", title: String(localized: "The microphone wasn't ready"),
+                      detail: String(localized: "Nothing was changed. Try again — or double-press to edit without an instruction."))
             return
         }
         let generation = editGeneration
@@ -1767,7 +1769,7 @@ final class AppState {
             self.transcriptionWaitTask = nil
             if let error = self.speechEngine.errorMessage {
                 dlog("Edit", "instruction failed: \(error)", level: .error)
-                self.abortEdit(icon: "exclamationmark.triangle.fill", title: "Couldn't understand the instruction",
+                self.abortEdit(icon: "exclamationmark.triangle.fill", title: String(localized: "Couldn't understand the instruction"),
                                detail: self.friendlySTTError(error))
                 return
             }
@@ -1816,12 +1818,12 @@ final class AppState {
                 if case .selected(let now) = read { current = now }
                 switch SelectionEdit.target(read: selection, current: current) {
                 case .nothingSelected:
-                    self.abortEdit(icon: "character.cursor.ibeam", title: "No text selected",
-                                   detail: "Nothing was selected when the instruction ended. Nothing was edited.",
+                    self.abortEdit(icon: "character.cursor.ibeam", title: String(localized: "No text selected"),
+                                   detail: String(localized: "Nothing was selected when the instruction ended. Nothing was edited."),
                                    tint: .secondary)
                 case .tooLong:
-                    self.abortEdit(icon: "text.badge.xmark", title: "Selection too long",
-                                   detail: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI.")
+                    self.abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
+                                   detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
                 case .unchanged(let now):
                     self.editSelection = now
                     self.removeSelection(now)
@@ -1845,8 +1847,8 @@ final class AppState {
         if let record = selection.record, let app = previousApp {
             switch PasteService.select(record, in: app) {
             case .changed:
-                abortEdit(icon: "text.badge.xmark", title: "Couldn't find the selection again",
-                          detail: "The selected words aren't where they were read. Nothing was edited.")
+                abortEdit(icon: "text.badge.xmark", title: String(localized: "Couldn't find the selection again"),
+                          detail: String(localized: "The selected words aren't where they were read. Nothing was edited."))
                 return
             case .selected: confirmed = true
             case .unconfirmed: break
@@ -1872,8 +1874,8 @@ final class AppState {
                 guard SelectionEdit.cutMatches(text, selection: selection.text, selectionConfirmed: confirmed) else {
                     dlog("Edit", "cut \(text.count) chars that are not the selection (read \(selection.record == nil ? "with ⌘C" : "through AX")), read \(selection.text.count) — putting them back", level: .notice)
                     PasteService.pasteItems(items)
-                    self.abortEdit(icon: "text.badge.xmark", title: "Couldn't confirm the selection",
-                                   detail: "What was cut wasn't the text that was read, so it was put back. Nothing was edited.")
+                    self.abortEdit(icon: "text.badge.xmark", title: String(localized: "Couldn't confirm the selection"),
+                                   detail: String(localized: "What was cut wasn't the text that was read, so it was put back. Nothing was edited."))
                     return
                 }
                 let source = SelectionEdit.cutSource(text)
@@ -1906,8 +1908,8 @@ final class AppState {
         }
         dlog("Edit", "the late cut stays on the clipboard — \(app?.localizedName ?? "its app") is not in front")
         PasteService.copyToClipboard(items: items)
-        showStatus(icon: "doc.on.clipboard", title: "The selected text is on the clipboard",
-                   detail: "\(app?.localizedName ?? "The app") took it out late, once it wasn't in front. Paste it back with ⌘V.",
+        showStatus(icon: "doc.on.clipboard", title: String(localized: "The selected text is on the clipboard"),
+                   detail: String(localized: "\(app?.localizedName ?? String(localized: "The app")) took it out late, once it wasn't in front. Paste it back with ⌘V."),
                    tint: .orange, duration: 10)
     }
 
@@ -1919,8 +1921,8 @@ final class AppState {
         guard !SelectionEdit.takesSelection(editing: previousApp?.processIdentifier,
                                             front: front?.processIdentifier) else { return true }
         dlog("Edit", "\(front?.localizedName ?? "nil") is in front, not \(previousApp?.localizedName ?? "nil") — the selection is not taken")
-        abortEdit(icon: "character.cursor.ibeam", title: "The selection was in another app",
-                  detail: "\(previousApp?.localizedName ?? "Its app") wasn't in front when the instruction ended. Nothing was edited.",
+        abortEdit(icon: "character.cursor.ibeam", title: String(localized: "The selection was in another app"),
+                  detail: String(localized: "\(previousApp?.localizedName ?? String(localized: "Its app")) wasn't in front when the instruction ended. Nothing was edited."),
                   tint: .secondary)
         return false
     }
@@ -1929,10 +1931,10 @@ final class AppState {
     private func runEdit(_ selection: CapturedSelection, instruction: String?, recordID: UUID?) {
         guard TextRefinementService.isConfigured else {
             let type = LLMConfiguration.providerType
-            abortEdit(icon: "key.slash", title: "AI isn't set up",
+            abortEdit(icon: "key.slash", title: String(localized: "AI isn't set up"),
                       detail: type.needsAPIKey
-                          ? "Add a \(type.displayName) API key in Settings to edit text with AI."
-                          : "Choose a \(type.displayName) model in Settings to edit text with AI.")
+                          ? String(localized: "Add a \(type.displayName) API key in Settings to edit text with AI.")
+                          : String(localized: "Choose a \(type.displayName) model in Settings to edit text with AI."))
             return
         }
 
@@ -1964,7 +1966,7 @@ final class AppState {
                     context: context)
                 dlog("Edit", "rewrite failed: \(error.localizedDescription)", level: .error)
                 self.refinementTask = nil
-                self.abortEdit(icon: "sparkles", title: "AI edit failed", detail: error.localizedDescription)
+                self.abortEdit(icon: "sparkles", title: String(localized: "AI edit failed"), detail: error.localizedDescription)
             }
         }
     }
@@ -1978,8 +1980,8 @@ final class AppState {
             guard SelectionEdit.changes(selection.text, to: output) else {
                 dismissOverlayConfirmation()
                 putBack(original, in: app)
-                showStatus(icon: "checkmark", title: "Nothing to change",
-                           detail: "The AI left the selected text as it was.", tint: .secondary)
+                showStatus(icon: "checkmark", title: String(localized: "Nothing to change"),
+                           detail: String(localized: "The AI left the selected text as it was."), tint: .secondary)
                 return
             }
             let text = SelectionEdit.preservingEdges(of: cutText, output)
@@ -1989,18 +1991,18 @@ final class AppState {
             }) { [weak self] in
                 dlog("Edit", "pasting the rewrite where the selection was")
                 PasteService.pasteAtCursor(text)
-                self?.confirmOverlay("Selection replaced")
+                self?.confirmOverlay(String(localized: "Selection replaced"))
             }
         case .notRemovable, .inPlace, .removing:
             dismissOverlayConfirmation()
             guard SelectionEdit.changes(selection.text, to: output) else {
-                showStatus(icon: "checkmark", title: "Nothing to change",
-                           detail: "The AI left the selected text as it was.", tint: .secondary)
+                showStatus(icon: "checkmark", title: String(localized: "Nothing to change"),
+                           detail: String(localized: "The AI left the selected text as it was."), tint: .secondary)
                 return
             }
             PasteService.copyToClipboard(output)
-            showStatus(icon: "doc.on.clipboard", title: "Copied instead of replaced",
-                       detail: "\(app?.localizedName ?? "The app") wouldn't let the selected text be removed. The new version is on the clipboard.",
+            showStatus(icon: "doc.on.clipboard", title: String(localized: "Copied instead of replaced"),
+                       detail: String(localized: "\(app?.localizedName ?? String(localized: "The app")) wouldn't let the selected text be removed. The new version is on the clipboard."),
                        tint: .orange, duration: 8)
         }
     }
@@ -2020,8 +2022,8 @@ final class AppState {
                                      paste: @escaping () -> Void) {
         guard let app, !app.isTerminated else {
             fallback()
-            showStatus(icon: "doc.on.clipboard", title: "The text is on the clipboard",
-                       detail: "The app it came from is gone.", tint: .orange, duration: 8)
+            showStatus(icon: "doc.on.clipboard", title: String(localized: "The text is on the clipboard"),
+                       detail: String(localized: "The app it came from is gone."), tint: .orange, duration: 8)
             return
         }
         let tryPaste = { [weak self] in
@@ -2034,12 +2036,12 @@ final class AppState {
             guard check == .paste else {
                 dlog("Edit", "not pasting into \(app.localizedName ?? "?") (\(check), \(front?.localizedName ?? "nil") in front) — the text goes to the clipboard", level: .notice)
                 fallback()
-                self?.showStatus(icon: "doc.on.clipboard", title: "The text is on the clipboard",
+                self?.showStatus(icon: "doc.on.clipboard", title: String(localized: "The text is on the clipboard"),
                                  detail: check == .quit
-                                     ? "The app it came from is gone."
+                                     ? String(localized: "The app it came from is gone.")
                                      : check == .menuOpen
-                                         ? "\(menu ?? "A menu") was open and had the keyboard, so nothing was pasted into \(app.localizedName ?? "the app")."
-                                         : "\(app.localizedName ?? "The app") didn't come back to the front, so nothing was pasted into it.",
+                                         ? String(localized: "\(menu ?? String(localized: "A menu")) was open and had the keyboard, so nothing was pasted into \(app.localizedName ?? String(localized: "the app")).")
+                                         : String(localized: "\(app.localizedName ?? String(localized: "The app")) didn't come back to the front, so nothing was pasted into it."),
                                  tint: .orange, duration: 8)
                 return
             }
@@ -2080,7 +2082,7 @@ final class AppState {
         var detail = detail
         if case .removed(let original, _) = removal {
             putBack(original, in: app)
-            if title != nil, notesPutBack { detail += " The text was put back." }
+            if title != nil, notesPutBack { detail += " " + String(localized: "The text was put back.") }
         }
         if let title {
             showStatus(icon: icon, title: title, detail: detail, tint: tint)
@@ -2304,20 +2306,18 @@ final class AppState {
         let waiting = max(OfflineRetry.shared.pendingCount, 1)
         showStatus(
             icon: "wifi.slash",
-            title: "No connection — saved to History",
-            detail: waiting == 1
-                ? "It will be transcribed once you're back online."
-                : "\(waiting) dictations will be transcribed once you're back online.",
+            title: String(localized: "No connection — saved to History"),
+            detail: String(localized: "\(waiting) dictations will be transcribed once you're back online."),
             tint: .orange,
             duration: 15,
-            action: StatusOverlayAction(title: "Retry") { [weak self] in
+            action: StatusOverlayAction(title: String(localized: "Retry")) { [weak self] in
                 self?.retrySavedOffline(recordID)
             }
         )
     }
 
     private func retrySavedOffline(_ recordID: UUID) {
-        showStatus(icon: "arrow.clockwise", title: "Retrying…", detail: nil, tint: .secondary,
+        showStatus(icon: "arrow.clockwise", title: String(localized: "Retrying…"), detail: nil, tint: .secondary,
                    duration: STTTuning.batchResourceTimeoutSeconds)
         Task { @MainActor [weak self] in
             let result = await HistoryRetry.shared.retry(recordID)
@@ -2331,15 +2331,15 @@ final class AppState {
     private func reportRetry(_ result: HistoryRetry.Result, recordID: UUID) {
         switch result {
         case .succeeded:
-            showStatus(icon: "checkmark.circle", title: "Transcribed — not pasted",
-                       detail: "It's in History, ready to copy.", tint: Semantic.confirmation, duration: 8,
-                       action: StatusOverlayAction(title: "Show") { [weak self] in
+            showStatus(icon: "checkmark.circle", title: String(localized: "Transcribed — not pasted"),
+                       detail: String(localized: "It's in History, ready to copy."), tint: Semantic.confirmation, duration: 8,
+                       action: StatusOverlayAction(title: String(localized: "Show")) { [weak self] in
                            self?.openNotPasted()
                        }, historyPlace: HomeRecentEntry.notPasted)
         case .offline:
             showSavedOffline(recordID)
         case .failed(let error):
-            showStatus(icon: "exclamationmark.triangle.fill", title: "Retry failed",
+            showStatus(icon: "exclamationmark.triangle.fill", title: String(localized: "Retry failed"),
                        detail: friendlySTTError(error), tint: .orange)
         case .alreadyRunning:
             hideStatus()
@@ -2353,18 +2353,18 @@ final class AppState {
     func showNotPastedOnceOnline(transcribed: Int, failed: Int) {
         let total = transcribed + failed
         // The title sits beside Show, so it stays short; "back online" goes in the detail.
-        let title = total == 1 ? "1 dictation not pasted" : "\(total) dictations not pasted"
+        let title = String(localized: "\(total) dictations not pasted")
         let detail: String
         if failed == 0 {
-            detail = "Back online — transcribed, waiting in History."
+            detail = String(localized: "Back online — transcribed, waiting in History.")
         } else if transcribed == 0 {
-            detail = "Back online, but couldn't transcribe — retry in History."
+            detail = String(localized: "Back online, but couldn't transcribe — retry in History.")
         } else {
-            detail = "Back online — \(transcribed) transcribed, \(failed) couldn't be. All in History."
+            detail = String(localized: "Back online — \(transcribed) transcribed, \(failed) couldn't be. All in History.")
         }
         showStatus(icon: "tray.full", title: title, detail: detail,
                    tint: failed == 0 ? Semantic.confirmation : .orange, duration: 15,
-                   action: StatusOverlayAction(title: "Show") { [weak self] in
+                   action: StatusOverlayAction(title: String(localized: "Show")) { [weak self] in
                        self?.openNotPasted()
                    }, historyPlace: HomeRecentEntry.notPasted)
     }
@@ -2422,10 +2422,10 @@ final class AppState {
         guard !isTestDictation, !defaults.bool(forKey: SettingsKeys.microphoneNoticeShown),
               let device = resolution.device, let avoided = resolution.avoided else { return }
         defaults.set(true, forKey: SettingsKeys.microphoneNoticeShown)
-        showStatus(icon: "mic", title: "Recording with \(device.name)",
-                   detail: "So \(avoided.name) keeps playing at full quality.",
+        showStatus(icon: "mic", title: String(localized: "Recording with \(device.name)"),
+                   detail: String(localized: "So \(avoided.name) keeps playing at full quality."),
                    tint: .secondary, duration: 8,
-                   action: StatusOverlayAction(title: "Change") {
+                   action: StatusOverlayAction(title: String(localized: "Change")) {
                        NotificationCenter.default.post(name: .openSettingsPage, object: SettingsCategory.dictation)
                    })
     }
@@ -2434,7 +2434,7 @@ final class AppState {
 
     /// `historyPlace`: what a click on the notice narrows History to, as History's row names it.
     /// A notice's way to Accessibility: the pane and the helper, never macOS's alert.
-    static let allowAccessibilityAction = StatusOverlayAction(title: "Turn On…") {
+    static let allowAccessibilityAction = StatusOverlayAction(title: String(localized: "Turn On…")) {
         SystemSettingsGuide.accessibility.start { _ in }
     }
 
@@ -2480,19 +2480,19 @@ final class AppState {
     /// Turn a raw provider error into something that tells the user what to actually do.
     private func friendlySTTError(_ raw: String) -> String {
         if raw.contains("413") || raw.localizedCaseInsensitiveContains("too large") {
-            return "That recording was too large for the provider. Try a shorter one."
+            return String(localized: "That recording was too large for the provider. Try a shorter one.")
         }
         if raw.contains("429") {
-            return "Rate limited by the provider. Wait a moment and retry from History."
+            return String(localized: "Rate limited by the provider. Wait a moment and retry from History.")
         }
         if raw.contains("401") || raw.contains("403") {
-            return "The API key was rejected. Check it in Settings."
+            return String(localized: "The API key was rejected. Check it in Settings.")
         }
         if raw.localizedCaseInsensitiveContains("timed out") || raw.contains("-1001") {
-            return "The request timed out. Retry from History."
+            return String(localized: "The request timed out. Retry from History.")
         }
         if raw.localizedCaseInsensitiveContains("offline") || raw.contains("-1009") {
-            return "No internet connection. Retry from History once you're back online."
+            return String(localized: "No internet connection. Retry from History once you're back online.")
         }
         return raw
     }

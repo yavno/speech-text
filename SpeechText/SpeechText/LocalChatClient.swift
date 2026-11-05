@@ -59,11 +59,11 @@ enum LocalChatError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .notInstalled(let model): "\(model.displayName) isn't downloaded — download it in Settings › AI Rewrite."
+        case .notInstalled(let model): String(localized: "\(model.displayName) isn't downloaded — download it in Settings › AI Rewrite.")
         case .service(let message): message
-        case .interrupted: "The local model stopped unexpectedly. The next rewrite starts it again."
-        case .timedOut: "The local model took too long to answer."
-        case .tooLong: "The text is too long for the model on this Mac to rewrite in full."
+        case .interrupted: String(localized: "The local model stopped unexpectedly. The next rewrite starts it again.")
+        case .timedOut: String(localized: "The local model took too long to answer.")
+        case .tooLong: String(localized: "The text is too long for the model on this Mac to rewrite in full.")
         }
     }
 }

@@ -62,16 +62,16 @@ struct RecordingOverlayView: View {
     private var accent: Color { isAIMode || isEditMode ? Semantic.ai : AccentColor.meter(accentHex) }
     private var isViolet: Bool { isAIMode || isEditMode }
     private var cancelHelp: String {
-        isEditMode ? "Cancel (the selected text is left as it was)" : "Cancel (nothing is pasted)"
+        isEditMode ? String(localized: "Cancel (the selected text is left as it was)") : String(localized: "Cancel (nothing is pasted)")
     }
     private var isBusy: Bool { isLoading || isPreparing }
     /// VoiceOver reads the meter as one element in both skins: the kind of dictation,
     /// then what it is doing — the mode glyph and the bars say nothing on their own.
     private var meterLabel: String {
-        isEditMode ? "Edit selection" : isAIMode ? "AI dictation" : "Dictation"
+        isEditMode ? String(localized: "Edit selection") : isAIMode ? String(localized: "AI dictation") : String(localized: "Dictation")
     }
     private var meterState: String {
-        isPreparing ? "Starting" : isLoading ? "Working" : "Listening"
+        isPreparing ? String(localized: "Starting") : isLoading ? String(localized: "Working") : String(localized: "Listening")
     }
     private var hasText: Bool { !settledText.isEmpty || !movingText.isEmpty || confirmation != nil }
 
@@ -337,7 +337,7 @@ struct RecordingOverlayView: View {
             ButtonRail {
                 PlasticButton(
                     systemImage: "xmark",
-                    label: "Cancel",
+                    label: String(localized: "Cancel"),
                     help: cancelHelp,
                     action: onCancel
                 )
