@@ -1,14 +1,96 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit reviews every pull request as advice: it is not one of the checks a merge
-# waits for (Tests, Swift lint, Checks). Everything not set here is CodeRabbit's default;
-# the review rules come from AGENTS.md, which it reads on its own.
+# waits for (Tests, Swift lint, Checks), and its pre-merge checks only warn. Everything
+# not set here is CodeRabbit's default; the review rules come from AGENTS.md, which it
+# reads on its own.
 reviews:
+  # Only one maintainer reviews (.github/CODEOWNERS).
+  suggested_reviewers: false
+  in_progress_fortune: false
+
+  merge_risk_instructions: >-
+    Higher risk: .github/workflows/ (release.yml signs and notarizes with the
+    repository's secrets; no pull request may reach a self-hosted runner); the
+    packaging scripts (scripts/package-release.sh, scripts/dmg/, scripts/make-appcast.sh);
+    signing, entitlements and Info.plist (SpeechText/SpeechText/SpeechText.entitlements,
+    the Info.plist files, DEVELOPMENT_TEAM or signing settings in project.pbxproj);
+    API keys (KeychainSecretStorage.swift, APIKeyStore.swift);
+    anything that changes what leaves the Mac (docs/privacy.md: audio to the chosen
+    speech provider, text and focus context to the chosen AI Rewrite provider,
+    FocusContext.swift, the provider clients); migrations of stored settings or models
+    (functions named migrate* in SpeechTextCore), since a mistake there changes an
+    existing user's setup on update.
+    Lower risk: docs/ (docs/specs/ most of all), tests that only add cases, and
+    comments.
+
+  path_instructions:
+    - path: ".github/workflows/**"
+      instructions: >-
+        Every job that a pull request can start must run on a GitHub-hosted runner:
+        `runs-on` is keyed on the repository's visibility (see the header of ci.yml),
+        and a public repository never runs on a self-hosted machine. Flag a hard-coded
+        `self-hosted`, a `pull_request_target` trigger that checks out or runs the pull
+        request's code, a secret or an environment exposed to a job a pull request can
+        start, `permissions` wider than the job needs (the default is none or
+        read-only), and an action not pinned to a full commit SHA with its version in a
+        comment, as the existing steps do.
+    - path: "**/*.xcstrings"
+      instructions: >-
+        A String Catalog. Each new key needs a translator comment that says where the
+        text appears and any length limit. Prompts sent to a model are not
+        translated. Do not comment on the JSON layout.
+
+  labeling_instructions:
+    - label: bug
+      instructions: Fixes behaviour that is wrong in a released build or on main.
+    - label: enhancement
+      instructions: Adds or changes a feature a user can notice.
+    - label: documentation
+      instructions: Changes only Markdown files under docs/, the root guides, or skills.
+    - label: provider
+      instructions: Adds or changes a speech or AI Rewrite provider or its models.
+    - label: dependencies
+      instructions: Updates a dependency (Swift packages, Actions versions).
+    - label: github_actions
+      instructions: Changes files under .github/workflows/.
+    - label: repo-hygiene
+      instructions: Repository, history and process housekeeping with no app change.
+
   pre_merge_checks:
     docstrings:
       # Comments follow the surrounding code (CONTRIBUTING.md › Formatting), so a
       # coverage threshold would warn on most pull requests.
       mode: "off"
+    custom_checks:
+      - name: "Changelog entry"
+        mode: "warning"
+        instructions: >-
+          Pass if the pull request changes nothing a user of the app can notice, or
+          if CHANGELOG.md gains an entry under `## [Unreleased]` for it. A user can
+          notice a change in behaviour, in the app's words or UI, in a default, or in
+          what is sent where. Changes only to docs/, tests, CI, scripts, specs, the
+          evaluation tool or comments need no entry. Fail if the app's behaviour or UI
+          changes and CHANGELOG.md has no entry for it.
+      - name: "PR template answered"
+        mode: "warning"
+        instructions: >-
+          Pass if the pull request description answers both template questions with
+          its own text, not only the template's HTML comments: the **Privacy** line
+          says Yes or No (and, for Yes, what is sent or stored and where), and the
+          *Needs a real-app run* section lists what to check by hand or says None.
+          Fail if either is missing or left empty.
+
   finishing_touches:
     docstrings:
       # For the same reason: no generated doc comments.
       enabled: false
+
+  tools:
+    # Swift is linted by scripts/lint-swift.sh (swift-format's semantic rules, never
+    # layout; CONTRIBUTING.md › Formatting). SwiftLint's defaults would add style
+    # findings that rule refuses.
+    swiftlint:
+      enabled: false
+
+chat:
+  art: false
