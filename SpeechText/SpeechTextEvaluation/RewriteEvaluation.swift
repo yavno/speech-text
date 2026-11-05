@@ -824,7 +824,7 @@ enum RewriteEvaluation {
     }
 
     /// The three modes of the 2026-11 spec, which `variantModes["2026-11"]` names.
-    static let modes202611 = ["Clean-up", "Message", "Document"]
+    static let modes202611 = ["Clean-up", "Message", "Structured"]
     static let formats = ["plain", "list", "markdown"]
 
     /// What in a fixture's routing expectations no router could answer: a mode that is

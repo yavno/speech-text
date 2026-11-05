@@ -411,7 +411,7 @@ final class RewriteModesTests: XCTestCase {
             XCTAssertEqual(prompt.components(separatedBy: rule).count - 1, 1, "said \(rule) other than once")
         }
         // Code decides the fields for another program now (D3), so the routing prompt for
-        // any other field neither names them nor sends an instruction there to Document.
+        // any other field neither names them nor sends an instruction there to Structured.
         XCTAssertFalse(prompt.contains("terminal"))
         XCTAssertFalse(prompt.contains("an AI coding tool"))
     }
@@ -454,11 +454,11 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertFalse(request.system.contains("Format:"))
 
         let elsewhere = RewriteModes.request(context: slack, ownPresets: [bugReport])
-        XCTAssertEqual(elsewhere.modeNames, ["Clean-up", "Message", "Document", "Bug report"])
+        XCTAssertEqual(elsewhere.modeNames, ["Clean-up", "Message", "Structured", "Bug report"])
     }
 
-    /// `isSummarising` lets a summary shrink the text; Document is the built-in that may.
-    func testDocumentIsTheOneSummarisingMode() {
-        XCTAssertEqual(RewriteModes.builtIns.filter(TextRefinementService.isSummarising).map(\.name), ["Document"])
+    /// `isSummarising` lets a summary shrink the text; Structured is the built-in that may.
+    func testStructuredIsTheOneSummarisingMode() {
+        XCTAssertEqual(RewriteModes.builtIns.filter(TextRefinementService.isSummarising).map(\.name), ["Structured"])
     }
 }
