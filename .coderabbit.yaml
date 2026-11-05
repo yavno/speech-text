@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit reviews every pull request as advice: it is not one of the checks a merge
+# waits for (Tests, Swift lint, Checks). Everything not set here is CodeRabbit's default;
+# the review rules come from AGENTS.md, which it reads on its own.
+reviews:
+  pre_merge_checks:
+    docstrings:
+      # Comments follow the surrounding code (CONTRIBUTING.md › Formatting), so a
+      # coverage threshold would warn on most pull requests.
+      mode: "off"
+  finishing_touches:
+    docstrings:
+      # For the same reason: no generated doc comments.
+      enabled: false
