@@ -57,6 +57,7 @@
 
     },
     "%@ charges about %@ an hour more for a transcription that carries them." : {
+      "comment" : "Dictionary page, What a word does: sentence after the count. The first %@ is the vendor, the second a price (e.g. $0.12).",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -64,8 +65,7 @@
             "value" : "%1$@ charges about %2$@ an hour more for a transcription that carries them."
           }
         }
-      },
-      "comment" : "Dictionary page, What a word does: sentence after the count. The first %@ is the vendor, the second a price (e.g. $0.12)."
+      }
     },
     "%@ dictations" : {
 
@@ -96,6 +96,7 @@
 
     },
     "%@ will become %@ in everything you dictate." : {
+      "comment" : "Dictionary page, Add a word: preview under the form. The first %@ is the list of wrong spellings, each in quotes and struck through, separated by commas; the second %@ is the word, in bold.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -103,8 +104,7 @@
             "value" : "%1$@ will become %2$@ in everything you dictate."
           }
         }
-      },
-      "comment" : "Dictionary page, Add a word: preview under the form. The first %@ is the list of wrong spellings, each in quotes and struck through, separated by commas; the second %@ is the word, in bold."
+      }
     },
     "%@ words" : {
 
@@ -176,6 +176,7 @@
 
     },
     "%lld of %lld go to %@ — it takes no more. The ones you use most, and anything added this week, go first." : {
+      "comment" : "Dictionary page, What a word does: row text. The first %lld is how many words are sent, the second how many the user has; %@ is the speech model's name.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -183,11 +184,33 @@
             "value" : "%1$lld of %2$lld go to %3$@ — it takes no more. The ones you use most, and anything added this week, go first."
           }
         }
-      },
-      "comment" : "Dictionary page, What a word does: row text. The first %lld is how many words are sent, the second how many the user has; %@ is the speech model's name."
+      }
     },
     "%lld refused" : {
 
+    },
+    "%lld words, spelled exactly as you write them." : {
+      "comment" : "Prompts page, What else AI Rewrite is told: tile text. %lld is how many words the user's Dictionary has.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld word, spelled exactly as you write them."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld words, spelled exactly as you write them."
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld wpm" : {
 
@@ -274,6 +297,7 @@
       "comment" : "Dictionary page, Add a word: button that adds the word typed in the form."
     },
     "Add “%@” — used in %lld dictations" : {
+      "comment" : "Dictionary page: tooltip on a suggested word. %@ is the word, %lld how many dictations in History used it.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -281,13 +305,13 @@
             "value" : "Add “%1$@” — used in %2$lld dictations"
           }
         }
-      },
-      "comment" : "Dictionary page: tooltip on a suggested word. %@ is the word, %lld how many dictations in History used it."
+      }
     },
     "All" : {
 
     },
     "All %lld go to %@ with every dictation." : {
+      "comment" : "Dictionary page, What a word does: row text. %lld is how many words the user has; all of them are sent. %@ is the speech model's name.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -295,8 +319,7 @@
             "value" : "All %1$lld go to %2$@ with every dictation."
           }
         }
-      },
-      "comment" : "Dictionary page, What a word does: row text. %lld is how many words the user has; all of them are sent. %@ is the speech model's name."
+      }
     },
     "Allow" : {
 
@@ -305,7 +328,7 @@
 
     },
     "An example: what you say, and the prompt it fits" : {
-
+      "comment" : "Prompts page: VoiceOver label of the animated examples at the top (a dictation, then the prompt chosen for it)."
     },
     "Any app, any time" : {
 
@@ -353,7 +376,10 @@
 
     },
     "Change" : {
-
+      "comment" : "Button-like link that opens the setting to change, e.g. on the History page."
+    },
+    "Change shortcuts" : {
+      "comment" : "Home page: link after the 'More ways to dictate' heading; opens the shortcut settings."
     },
     "Check Now…" : {
 
@@ -371,7 +397,7 @@
 
     },
     "Choose a provider" : {
-
+      "comment" : "Button that opens the AI Rewrite provider settings when no provider is set up yet."
     },
     "Choose another model…" : {
 
@@ -379,12 +405,25 @@
     "Choose another option" : {
 
     },
-    "Chosen for %lld %@ in History" : {
+    "Chosen for %lld dictations in History" : {
+      "comment" : "Prompts page: tooltip on a prompt's use count. %lld is how many dictations in History AI Rewrite chose this prompt for.",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Chosen for %1$lld %2$@ in History"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Chosen for %lld dictation in History"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Chosen for %lld dictations in History"
+                }
+              }
+            }
           }
         }
       }
@@ -446,8 +485,11 @@
     "Debug lines" : {
 
     },
+    "Default" : {
+      "comment" : "Prompts page: chip on the default prompt — the one used when no other prompt fits."
+    },
     "Delete" : {
-
+      "comment" : "Button or menu item that deletes the selected item (a prompt, a dictation, …)."
     },
     "Delete word" : {
       "comment" : "Dictionary page, editing a word: button that deletes the word."
@@ -493,7 +535,7 @@
 
     },
     "Duplicate" : {
-
+      "comment" : "Prompts page: context menu item that copies a prompt."
     },
     "Each is replaced by the word, as a whole word, whatever its capitals." : {
       "comment" : "Dictionary page, editing a word: text under 'Comes out as'."
@@ -512,6 +554,9 @@
     },
     "Edit…" : {
       "comment" : "Dictionary page: context menu item on a word's card; opens its editor."
+    },
+    "Engines" : {
+      "comment" : "Home page: section heading over the speech and AI engines in use."
     },
     "Error" : {
 
@@ -542,6 +587,9 @@
     },
     "For your %@" : {
 
+    },
+    "Free on this Mac" : {
+      "comment" : "Usage page: chip on an engine that runs on this Mac and costs nothing."
     },
     "Getting ready for your Mac — first time only" : {
 
@@ -595,7 +643,7 @@
 
     },
     "How AI Rewrite picks a prompt" : {
-
+      "comment" : "Prompts page: small heading at the top of the page. AI Rewrite is a feature of the app."
     },
     "How SpeechText works" : {
 
@@ -695,6 +743,9 @@
     "Languages I speak" : {
 
     },
+    "Last 7 days" : {
+      "comment" : "Home page: section heading over the last seven days of dictation."
+    },
     "Last chosen for" : {
       "comment" : "Prompts page: small label in capitals over the list of the last dictations this prompt was chosen for."
     },
@@ -734,17 +785,23 @@
     "Microphone is turned off for SpeechText." : {
 
     },
+    "More ways to dictate" : {
+      "comment" : "Home page: section heading over the other dictation shortcuts."
+    },
     "Move Down" : {
-
+      "comment" : "Prompts page: context menu item that moves a prompt one place down the list."
     },
     "Move Up" : {
-
+      "comment" : "Prompts page: context menu item that moves a prompt one place up the list."
     },
     "Name" : {
-
+      "comment" : "Prompts page, editing a prompt: placeholder of the prompt's name field."
+    },
+    "Names and terms you add there are spelled exactly as you write them." : {
+      "comment" : "Prompts page, What else AI Rewrite is told: tile text when the Dictionary is empty. 'There' is the Dictionary page."
     },
     "New prompt" : {
-
+      "comment" : "Prompts page: button that adds a prompt, and the name the new prompt starts with."
     },
     "Newer version: %@" : {
 
@@ -767,11 +824,14 @@
     "No words yet." : {
       "comment" : "Dictionary page: shown when the list of words is empty."
     },
+    "No “When to use” yet — AI Rewrite can't tell when it fits." : {
+      "comment" : "Prompts page: shown in a prompt's row when its 'When to use' is empty. “When to use” is the name of a field."
+    },
     "Not chosen in History yet" : {
-
+      "comment" : "Prompts page: tooltip on a prompt that no dictation in History used."
     },
     "Not chosen yet. Say something that fits its “When to use” with %@, and it shows up here." : {
-
+      "comment" : "Prompts page, Last chosen for: shown when no dictation used this prompt. %@ is the AI Rewrite keyboard shortcut, e.g. ⌃⇧Q."
     },
     "Not downloaded" : {
 
@@ -781,6 +841,9 @@
     },
     "Not started" : {
 
+    },
+    "Not used yet" : {
+      "comment" : "Prompts page: in a prompt's row and editor, when no dictation in History used it."
     },
     "Nothing %@%@." : {
       "localizations" : {
@@ -839,7 +902,7 @@
 
     },
     "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
-
+      "comment" : "Prompts page: text at the top when AI Rewrite has no provider. “When to use” is the name of a field."
     },
     "Once AI Rewrite has a provider, it's given your words with every AI dictation." : {
       "comment" : "Dictionary page, What a word does: row text when AI Rewrite has no provider yet."
@@ -853,14 +916,26 @@
     "Open" : {
 
     },
+    "Open Dictionary" : {
+      "comment" : "Prompts page: link that opens the Dictionary page."
+    },
+    "Open History" : {
+      "comment" : "Home page: link after the 'Recent' heading; opens the History page."
+    },
     "Open Keyboard Settings" : {
 
+    },
+    "Open Settings" : {
+      "comment" : "Home page: link after the 'Engines' heading; opens Settings."
     },
     "Open Sound Settings" : {
 
     },
     "Open System Settings" : {
 
+    },
+    "Open Usage" : {
+      "comment" : "Home page: link after the 'Last 7 days' heading; opens the Usage page."
     },
     "Open again" : {
 
@@ -919,6 +994,9 @@
     "Ready." : {
 
     },
+    "Recent" : {
+      "comment" : "Home page: section heading over the latest dictations."
+    },
     "Recommended for your " : {
 
     },
@@ -959,13 +1037,13 @@
 
     },
     "Restore Built-in Prompts" : {
-
+      "comment" : "Prompts page: destructive button in the confirmation that brings back the built-in prompts. Title case, as macOS buttons are in English."
     },
     "Restore built-in…" : {
       "comment" : "Prompts page: button that brings back the built-in prompts; asks first."
     },
     "Restore the built-in prompts?" : {
-
+      "comment" : "Prompts page: title of the confirmation before the built-in prompts are restored."
     },
     "Retry" : {
 
@@ -974,7 +1052,7 @@
 
     },
     "Right-click a prompt to make it the default, duplicate or move it." : {
-
+      "comment" : "Prompts page: hint under the list of prompts."
     },
     "Save each streamed inline dictation to Traces/ so it can be replayed as a test. The words you dictate are saved there in plain text." : {
 
@@ -1117,7 +1195,7 @@
 
     },
     "Talk, or say what you want" : {
-
+      "comment" : "Prompts page: large title at the top of the page; one line, shrinks to fit."
     },
     "Team chat" : {
 
@@ -1133,6 +1211,9 @@
     },
     "That's your voice, typed." : {
 
+    },
+    "The app, its window and the field — so the same words become a chat message in Slack and a letter in Mail. Never a password manager's." : {
+      "comment" : "Prompts page, What else AI Rewrite is told: tile text under 'Where you're dictating'. Slack and Mail are app names."
     },
     "The audio is kept %@, for a retry with the settings you have now." : {
 
@@ -1231,19 +1312,42 @@
 
     },
     "Use as Default" : {
-
+      "comment" : "Prompts page: context menu item that makes a prompt the default. Title case, as macOS menu items are in English."
     },
     "Use as default" : {
-
+      "comment" : "Prompts page, editing a prompt: button that makes it the default."
     },
     "Use the average, 40 wpm" : {
 
+    },
+    "Used %lld times" : {
+      "comment" : "Prompts page: how many dictations in History AI Rewrite chose this prompt for. The English 'one' form is 'Used once'.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Used once"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Used %lld times"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "Used for %@" : {
 
     },
     "Used when nothing else clearly fits what you said" : {
-
+      "comment" : "Prompts page: tooltip on the default prompt's chip and on the 'Use as default' button."
     },
     "Version" : {
 
@@ -1278,6 +1382,9 @@
     "Where should your speech become text?" : {
 
     },
+    "Where you're dictating" : {
+      "comment" : "Prompts page, What else AI Rewrite is told: tile title."
+    },
     "Where your words went" : {
       "comment" : "Usage page: section heading over the apps the dictated words were pasted into."
     },
@@ -1297,7 +1404,7 @@
 
     },
     "Words to tidy up, or a request like “make it a list, in English”: it picks the prompt whose “When to use” fits and does what else you asked. Nothing fits? The Default does." : {
-
+      "comment" : "Prompts page: text at the top. “When to use” is the name of a field; Default is the default prompt."
     },
     "Work in any app. Hold to talk, let go to stop. Change them any time in " : {
 
@@ -1335,6 +1442,9 @@
     "You're all set" : {
 
     },
+    "Your Dictionary" : {
+      "comment" : "Prompts page, What else AI Rewrite is told: tile title. Dictionary is a page of the app."
+    },
     "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac." : {
 
     },
@@ -1345,7 +1455,7 @@
 
     },
     "Your own prompts and changes are replaced by the six that come with SpeechText." : {
-
+      "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name."
     },
     "Your prompts" : {
       "comment" : "Prompts page: section heading over the list of prompts. A count follows it."
@@ -1389,14 +1499,23 @@
     "e.g. speech text, спіч текст" : {
       "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field before a word is typed — examples of how “SpeechText” gets misheard. Commas separate them."
     },
+    "fix the bug where the token expires too early" : {
+      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in coding prompt. Write a natural example in your language."
+    },
     "from each provider's last reply" : {
       "comment" : "Usage page: note after the 'Limits right now' heading."
     },
     "from “%@”" : {
-
+      "comment" : "Prompts page, Last chosen for: under the rewritten text, what was said. %@ is the dictated text."
     },
     "how it comes out wrong — commas between" : {
       "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field when there is no example to show. Commas separate several spellings."
+    },
+    "last %@" : {
+      "comment" : "Prompts page: when a prompt was last chosen, lowercase. %@ is a time today (14:05), 'yesterday', a weekday or a date."
+    },
+    "list for the trip passport charger the blue jacket" : {
+      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in list prompt. Write a natural example in your language."
     },
     "optional" : {
       "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty."
@@ -1408,6 +1527,7 @@
 
     },
     "top %lld of %lld" : {
+      "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1415,8 +1535,13 @@
             "value" : "top %1$lld of %2$lld"
           }
         }
-      },
-      "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are."
+      }
+    },
+    "translate to English дякую що прийшли" : {
+      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in translation prompt: a request to translate, then words in another language (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language."
+    },
+    "uh email to Sarah running late start without me" : {
+      "comment" : "Prompts page: an example of something said, rough as spoken, shown in quotes, for the built-in email prompt. Write a natural example in your language."
     },
     "words a minute" : {
 

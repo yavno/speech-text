@@ -189,8 +189,8 @@ final class HomeAccess {
 
 /// A section's name and, on its right, where its link goes — quieter than the content.
 struct HomeSectionHeader: View {
-    let title: String
-    var link: String?
+    let title: LocalizedStringKey
+    var link: LocalizedStringKey?
     var action: () -> Void = {}
 
     var body: some View {
@@ -209,7 +209,7 @@ struct HomeSectionHeader: View {
 
 /// "Open Models ›": grey until pointed at, then the page's green.
 struct HomeLink: View {
-    let title: String
+    let title: LocalizedStringKey
     let action: () -> Void
     @State private var hovering = false
 
