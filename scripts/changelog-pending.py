@@ -22,6 +22,7 @@ Standard library only, Python 3.9. Exit status: 0 the list was made (empty or no
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -32,9 +33,9 @@ NO_CHANGELOG_LABEL = "no-changelog"
 LIMIT = 400
 
 
-def run(args):
+def run(args, env=None):
     try:
-        return subprocess.run(args, check=True, capture_output=True, text=True).stdout
+        return subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout
     except FileNotFoundError:
         sys.exit(f"{args[0]} is not installed.")
     except subprocess.CalledProcessError as error:
@@ -43,9 +44,11 @@ def run(args):
 
 
 def utc(ref):
-    """The commit date of a tag or commit, as GitHub writes mergedAt."""
+    """The commit date of a tag or commit, as GitHub writes mergedAt. `format-local` prints
+    the time in TZ, so TZ is UTC for it: the machine's own zone would shift the cutoff."""
     return run(["git", "-c", "log.showSignature=false", "log", "-1",
-                "--date=format-local:%Y-%m-%dT%H:%M:%SZ", "--format=%cd", ref]).strip()
+                "--date=format-local:%Y-%m-%dT%H:%M:%SZ", "--format=%cd", ref],
+               env={**os.environ, "TZ": "UTC"}).strip()
 
 
 def since_from(value):
