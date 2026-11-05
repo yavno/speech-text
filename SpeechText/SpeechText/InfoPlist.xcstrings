@@ -10,6 +10,18 @@
             "state" : "new",
             "value" : "SpeechText brings the app you were typing in back to the front so it can paste your dictation there."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText vuelve a poner en primer plano la app en la que escribías para poder pegar allí tu dictado."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText повертає на передній план програму, у якій ви друкували, щоб вставити туди вашу диктовку."
+          }
         }
       }
     },
@@ -21,6 +33,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Copyright © 2026 Vladyslav Husakov. Free software under the GNU GPL v3 or later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2026 Vladyslav Husakov. Software libre bajo la GNU GPL v3 o posterior."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2026 Vladyslav Husakov. Вільне програмне забезпечення за ліцензією GNU GPL v3 або новішою."
           }
         }
       }
@@ -34,6 +58,18 @@
             "state" : "new",
             "value" : "SpeechText needs microphone access for speech recognition"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText necesita acceso al micrófono para el reconocimiento de voz"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText потрібен доступ до мікрофона для розпізнавання мовлення"
+          }
         }
       }
     },
@@ -45,6 +81,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "SpeechText uses on-device speech recognition to convert your voice to text"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText usa el reconocimiento de voz en el dispositivo para convertir tu voz en texto"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText використовує розпізнавання мовлення на пристрої, щоб перетворювати ваш голос на текст"
           }
         }
       }
