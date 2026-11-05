@@ -62,23 +62,30 @@ reviews:
       # coverage threshold would warn on most pull requests.
       mode: "off"
     custom_checks:
-      - name: "Changelog entry"
+      - name: "CHANGELOG left alone"
         mode: "warning"
         instructions: >-
-          Pass if the pull request changes nothing a user of the app can notice, or
-          if CHANGELOG.md gains an entry under `## [Unreleased]` for it. A user can
-          notice a change in behaviour, in the app's words or UI, in a default, or in
-          what is sent where. Changes only to docs/, tests, CI, scripts, specs, the
-          evaluation tool or comments need no entry. Fail if the app's behaviour or UI
-          changes and CHANGELOG.md has no entry for it.
+          CHANGELOG.md entries are written by the maintainer after the merge, from the
+          pull request's *Users will notice* line (CONTRIBUTING.md, the `changelog`
+          skill). Pass if the pull request does not change CHANGELOG.md, or if its
+          title starts with `Changelog:` (the catch-up pull request) or it is a release
+          pull request made by `scripts/rebuild.sh --tag` (it dates the
+          `[Unreleased]` section and sets the version). Fail if any other pull request
+          changes CHANGELOG.md; the fix is to move the wording into *Users will
+          notice* and revert the file.
       - name: "PR template answered"
         mode: "warning"
         instructions: >-
-          Pass if the pull request description answers both template questions with
-          its own text, not only the template's HTML comments: the **Privacy** line
-          says Yes or No (and, for Yes, what is sent or stored and where), and the
-          *Needs a real-app run* section lists what to check by hand or says None.
-          Fail if either is missing or left empty.
+          Pass if the pull request description answers the three template questions
+          with its own text, not only the template's HTML comments: *Users will
+          notice* says in a sentence or two what changes for someone using the app,
+          or "Nothing"; the **Privacy** line says Yes or No (and, for Yes, what is
+          sent or stored and where); and the *Needs a real-app run* section lists
+          what to check by hand or says None. Also fail when *Users will notice* says
+          "Nothing" but the diff changes the app's behaviour, its words or UI, a
+          default, or what is sent where. A pull request titled `Changelog:` and a
+          release pull request need not answer *Users will notice*. Fail if a
+          required answer is missing or left empty.
 
   finishing_touches:
     docstrings:
