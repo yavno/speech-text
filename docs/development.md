@@ -208,7 +208,7 @@ moves the work:
 |---|---|---|---|
 | Tests | `self-hosted` | `xcode-27` | `xcodebuild test`, the String Catalog check (`scripts/sync-strings.sh --check`) and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
 | Swift lint | `self-hosted` | `xcode-27` | `scripts/lint-swift.sh` — swift-format's semantic rules (not layout) on the lines a pull request adds or changes; needs Xcode's `swift-format` |
-| Checks | `self-hosted` | `ubuntu-latest` | the seven checks below, one step each |
+| Checks | `self-hosted` | `ubuntu-latest` | the eight checks below, one step each |
 
 The hosted Mac is GitHub's `xcode-27` image (macOS 27, Xcode 27.1 by default;
 still a preview, actions/runner-images#14404), not `macos-latest`: on 2026-10-29
@@ -225,6 +225,7 @@ took.
 | No development team | greps `project.pbxproj` for a `DEVELOPMENT_TEAM` |
 | SPDX headers | the two-line header on every Swift file |
 | Provider guide | `scripts/check-provider-guide.sh` — docs/adding-a-provider.md still names code that exists |
+| Info.plist strings | `scripts/check-infoplist-strings.sh` — the permission prompts and the copyright line say the same in `Info.plist` and `InfoPlist.xcstrings`, each with a translator comment |
 | Log privacy | `scripts/check-log-privacy.sh` — no `dlog` call interpolates dictated, selected or rewritten text |
 | Core imports | `scripts/check-core-imports.sh` — no file under `Packages/SpeechTextCore/Sources` imports SwiftUI, WhisperKit, FluidAudio, Sparkle or llama |
 | DCO sign-off | a `Signed-off-by` trailer on every commit in the range (pull requests only) |

@@ -1,0 +1,54 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSAppleEventsUsageDescription" : {
+      "comment" : "macOS permission prompt: why the app asks to control other apps (Automation). SpeechText is the app's name.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SpeechText brings the app you were typing in back to the front so it can paste your dictation there."
+          }
+        }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "comment" : "Copyright line in the About window. Keep the name and the year; 'GNU GPL v3' is the license's name.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copyright © 2026 Vladyslav Husakov. Free software under the GNU GPL v3 or later."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "comment" : "macOS permission prompt: why the app asks for the microphone. SpeechText is the app's name.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SpeechText needs microphone access for speech recognition"
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription" : {
+      "comment" : "macOS permission prompt: why the app asks for Apple's speech recognition. SpeechText is the app's name.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SpeechText uses on-device speech recognition to convert your voice to text"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

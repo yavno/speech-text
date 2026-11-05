@@ -35,7 +35,7 @@ Most of the work is in the app's own code, not in the catalog. A large share of 
 ### String Catalogs
 
 - `SpeechText/SpeechText/Localizable.xcstrings` holds the app's strings.
-- `SpeechText/SpeechText/InfoPlist.xcstrings` holds the permission prompts: `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription` and `NSAppleEventsUsageDescription`. Today the first two are set both in `Info.plist` and as `INFOPLIST_KEY_*` build settings (`project.pbxproj`, in both configurations), and the third only in `Info.plist`; *build* keeps each in one place.
+- `SpeechText/SpeechText/InfoPlist.xcstrings` holds the permission prompts (`NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription`, `NSAppleEventsUsageDescription`) and `NSHumanReadableCopyright`. Their English lives in `Info.plist` only; the duplicate `INFOPLIST_KEY_*` build settings for the first two are gone. The catalog repeats that English as each key's `en` value, beside the translations, and `scripts/check-infoplist-strings.sh` (CI, *Checks*) fails when the two differ or a key has no comment: xcodebuild does not sync this catalog either. Xcode compiles only the translations into `<lang>.lproj/InfoPlist.strings`; English comes from `Info.plist` itself.
 - `Packages/SpeechTextCore/Sources/SpeechTextCore/Localizable.xcstrings` holds the package's strings (below).
 
 ### The English text is the key
