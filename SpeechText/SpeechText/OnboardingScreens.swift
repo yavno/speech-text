@@ -69,7 +69,7 @@ struct OnboardingView: View {
     // MARK: Footer
 
     private struct Primary {
-        let title: String
+        let title: LocalizedStringKey
         let enabled: Bool
         let action: () -> Void
     }
@@ -212,7 +212,8 @@ private struct WelcomeLanguages: View {
 /// Rounds take turns between the two ways a shortcut records: held while speaking, then
 /// pressed once to start and once to stop.
 private struct WelcomeDemo: View {
-    private static let sentences = ["Running ten minutes late – start without me.", "Joining now, see you there."]
+    private static let sentences = [String(localized: "Running ten minutes late – start without me."),
+                                    String(localized: "Joining now, see you there.")]
     private var sentence: String { Self.sentences[holdRound ? 0 : 1] }
     private var words: [Substring] { sentence.split(separator: " ") }
     @State private var holdRound = true
@@ -290,7 +291,7 @@ private struct WelcomeDemo: View {
             HStack(spacing: 4) {
                 ForEach(Array(shortcutKeys(shortcutText(for: .inline)).enumerated()), id: \.offset) { index, key in
                     let lit = index < litKeys
-                    Text(key)
+                    Text(verbatim: key)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(lit ? SetupColor.screen : Color(hex: 0x1D1D1F))
                         .frame(minWidth: 26, minHeight: 26)
@@ -322,7 +323,7 @@ private struct WelcomeDemo: View {
 
             VStack(spacing: 6) {
                 Spacer(minLength: 0)
-                bubble("Are you joining the 10:00 call?", mine: false)
+                bubble(String(localized: "Are you joining the 10:00 call?"), mine: false)
                 if let sent { bubble(sent, mine: true) }
             }
             .padding(EdgeInsets(top: 10, leading: 10, bottom: 4, trailing: 10))
@@ -333,7 +334,7 @@ private struct WelcomeDemo: View {
                     Caret()
                     Text("Message").foregroundStyle(Color.gray.opacity(0.8))
                 } else {
-                    (Text(words.prefix(typedWords).joined(separator: " ")) + Text(" "))
+                    Text(verbatim: words.prefix(typedWords).joined(separator: " ") + " ")
                         .fixedSize(horizontal: false, vertical: true)
                         .overlay(alignment: .bottomTrailing) { Caret().offset(x: 2) }
                 }
@@ -477,7 +478,7 @@ private struct DemoStrip: View {
                 .frame(width: 100, height: 56)
                 .clipShape(glass)
                 ButtonRail {
-                    PlasticButton(systemImage: "xmark", label: "Cancel", action: {})
+                    PlasticButton(systemImage: "xmark", label: String(localized: "Cancel"), action: {})
                 }
             }
             .frame(width: skin.overlayStripSize.width, height: skin.overlayStripSize.height)
@@ -536,15 +537,16 @@ private struct SpeechScreen: View {
                 Text("Where should your speech become text?").setupTitle(32).padding(.bottom, 10)
                 Text("On this Mac or online — you can change it later.").setupLead().padding(.bottom, 22)
                 VStack(spacing: 12) {
-                    SetupChoiceCard(glyph: .mac, name: "On this Mac",
-                                    why: appleSilicon && model.recommendedSpeechModel != nil ? "Best choice for your Mac." : nil,
+                    SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
+                                    why: appleSilicon && model.recommendedSpeechModel != nil
+                                        ? String(localized: "Best choice for your Mac.") : nil,
                                     facts: appleSilicon
-                                        ? "Private and free. Your voice stays on your Mac; works offline after one download."
+                                        ? String(localized: "Private and free. Your voice stays on your Mac; works offline after one download.")
                                         : intelSpeechPlaceFacts,
                                     isSelected: model.speechPath == .local) { model.speechPath = .local }
-                    SetupChoiceCard(glyph: .cloud, name: "Online service",
-                                    why: appleSilicon ? nil : "Best choice for your Mac.",
-                                    facts: "Works on any Mac. Needs internet and a free account; your recording is sent to the service.",
+                    SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
+                                    why: appleSilicon ? nil : String(localized: "Best choice for your Mac."),
+                                    facts: String(localized: "Works on any Mac. Needs internet and a free account; your recording is sent to the service."),
                                     isSelected: model.speechPath == .online) { model.speechPath = .online }
                 }
             }
@@ -559,7 +561,7 @@ private struct SpeechScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {
                 if spoken.isEmpty { languagesNudge }
-                (Text("Recommended for your ") + Text(macDescription(model.capabilities)).fontWeight(.semibold).foregroundColor(SetupColor.label))
+                Text("Recommended for your \(Text(verbatim: macDescription(model.capabilities)).fontWeight(.semibold).foregroundColor(SetupColor.label))")
                     .font(.system(size: 11.5))
                     .foregroundStyle(SetupColor.label2)
                     .padding(.leading, 10)
@@ -572,15 +574,14 @@ private struct SpeechScreen: View {
                 }
                 ForEach(listing.picks) { row($0) }
                 // macOS asks for Speech Recognition at the first Apple dictation — Try it, here.
-                SetupRow(title: "Apple Dictation", subtitle: "Built in",
+                SetupRow(title: "Apple Dictation", subtitle: String(localized: "Built in"),
                          languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
-                         detail: appleDictationLine + " macOS asks to allow Speech Recognition the first time.",
+                         detail: appleDictationLine + " " + String(localized: "macOS asks to allow Speech Recognition the first time."),
                          isSelected: model.speechUsesApple) { model.pickAppleDictation() }
                 ForEach(listing.others + listing.lackingLanguage) { row($0) }
                 if !listing.heavy.isEmpty {
                     let count = listing.heavy.count
-                    Button(showHeavyModels ? "Hide models too heavy for this Mac"
-                                           : "Show \(count) \(count == 1 ? "model" : "models") too heavy for this Mac") {
+                    Button(showHeavyModels ? "Hide models too heavy for this Mac" : "Show \(count) models too heavy for this Mac") {
                         withAnimation(.easeOut(duration: 0.2)) { showHeavyModels.toggle() }
                     }
                     .buttonStyle(SetupInlineLinkStyle())
@@ -607,14 +608,14 @@ private struct SpeechScreen: View {
         let state = model.store.state(for: speech.id)
         let caps = model.capabilities
         let badge: SetupBadge? = switch state {
-        case .installed: SetupBadge(text: "✓ Installed", kind: .done)
+        case .installed: SetupBadge(text: String(localized: "✓ Installed"), kind: .done)
         default:
             if model.recommendedSpeechModel?.id == speech.id {
-                SetupBadge(text: "Recommended", kind: .recommended)
+                SetupBadge(text: String(localized: "Recommended"), kind: .recommended)
             } else if model.bestSpeechModel?.id == speech.id {
-                SetupBadge(text: "Best quality", kind: .quality)
+                SetupBadge(text: String(localized: "Best quality"), kind: .quality)
             } else if !localModelFitsMemory(speech.memoryFloorBytes, caps) {
-                SetupBadge(text: "Too heavy for this Mac", kind: .warn)
+                SetupBadge(text: String(localized: "Too heavy for this Mac"), kind: .warn)
             } else {
                 nil
             }
@@ -666,8 +667,14 @@ private struct SpeechScreen: View {
             HStack(spacing: 6) {
                 Button("Switch") { model.confirmSpeechSwitch() }
                     .buttonStyle(SetupButtonStyle(kind: .primary, height: 26))
-                Button("Keep \(current.map(speechModelName)?.replacingOccurrences(of: "Whisper ", with: "") ?? "it")") {
+                Button {
                     model.pendingSpeechSwitch = nil
+                } label: {
+                    if let name = current.map(speechModelName)?.replacingOccurrences(of: "Whisper ", with: "") {
+                        Text("Keep \(name)")
+                    } else {
+                        Text("Keep it")
+                    }
                 }
                 .buttonStyle(SetupButtonStyle(kind: .secondary, height: 26))
             }
@@ -719,19 +726,18 @@ private struct AIScreen: View {
                         .foregroundStyle(tint.glow)
                 }
                 .padding(.bottom, 10)
-                (Text("Optional. Press ") + kbd(shortcutText(for: .ai)) + Text(" instead of ")
-                 + kbd(shortcutText(for: .inline)) + Text(" and AI turns what you say — or what you ask for — into clean text for the app you're in."))
+                Text("Optional. Press \(kbd(shortcutText(for: .ai))) instead of \(kbd(shortcutText(for: .inline))) and AI turns what you say — or what you ask for — into clean text for the app you're in.")
                     .setupLead(14.5)
                     .padding(.bottom, 16)
                 VStack(spacing: 10) {
-                    SetupChoiceCard(glyph: .mac, name: "On this Mac",
+                    SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
                                     facts: model.capabilities.isAppleSilicon
-                                        ? "Private and free. A 3–19 GB download, nothing else to install."
-                                        : "Private and free, but slow on an Intel Mac. A 3–19 GB download.",
+                                        ? String(localized: "Private and free. A 3–19 GB download, nothing else to install.")
+                                        : String(localized: "Private and free, but slow on an Intel Mac. A 3–19 GB download."),
                                     isSelected: model.aiPath == .local) { model.chooseAIPath(.local) }
-                    SetupChoiceCard(glyph: .cloud, name: "Online service",
-                                    badge: Provider.allCases.contains(where: model.keyReadyFromSpeech) ? "Ready" : nil,
-                                    facts: "Fast on any Mac. Needs an account — Groq has a free plan.",
+                    SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
+                                    badge: Provider.allCases.contains(where: model.keyReadyFromSpeech) ? String(localized: "Ready") : nil,
+                                    facts: String(localized: "Fast on any Mac. Needs an account — Groq has a free plan."),
                                     isSelected: model.aiPath == .online) { model.chooseAIPath(.online) }
                 }
                 .padding(.bottom, 36)
@@ -756,7 +762,7 @@ private struct AIScreen: View {
     }
 
     private func kbd(_ text: String) -> Text {
-        Text(" \(text) ").font(.system(size: 12.5, weight: .semibold)).foregroundColor(SetupColor.label)
+        Text(verbatim: " \(text) ").font(.system(size: 12.5, weight: .semibold)).foregroundColor(SetupColor.label)
     }
 
     /// Nothing picked yet: what AI polish does, which is what sells it.
@@ -835,7 +841,8 @@ private struct AIScreen: View {
             ForEach(heavy) { aiRow($0) }
         }
         if let selected = localChatModel(id: model.aiModelID), !localModelFitsMemory(selected.memoryFloorBytes, caps) {
-            Text("This model may be slow on your Mac. We recommend \(model.recommendedAIModel?.displayName ?? "a lighter one").")
+            (model.recommendedAIModel.map { Text("This model may be slow on your Mac. We recommend \($0.displayName).") }
+                ?? Text("This model may be slow on your Mac. We recommend a lighter one."))
                 .font(.system(size: 11.5))
                 .foregroundStyle(SetupColor.warn)
                 .padding(.horizontal, 10)
@@ -843,8 +850,9 @@ private struct AIScreen: View {
         }
     }
 
-    private func heading(_ text: String) -> some View {
-        Text(text.uppercased())
+    private func heading(_ text: LocalizedStringKey) -> some View {
+        Text(text)
+            .textCase(.uppercase)
             .font(.system(size: 11, weight: .semibold))
             .tracking(0.4)
             .foregroundStyle(SetupColor.label3)
@@ -855,10 +863,10 @@ private struct AIScreen: View {
         let heavy = !localModelFitsMemory(llm.memoryFloorBytes, model.capabilities)
         let state = model.chatStore.state(for: llm)
         let selected = model.aiModelID == llm.id
-        let badge: SetupBadge? = if state == .installed { SetupBadge(text: "✓ Downloaded", kind: .done) }
-            else if heavy { SetupBadge(text: "Too heavy for this Mac", kind: .warn) }
-            else if model.recommendedAIModel?.id == llm.id { SetupBadge(text: "Recommended", kind: .recommended) }
-            else if model.bestAIModel?.id == llm.id { SetupBadge(text: "Best quality", kind: .quality) }
+        let badge: SetupBadge? = if state == .installed { SetupBadge(text: String(localized: "✓ Downloaded"), kind: .done) }
+            else if heavy { SetupBadge(text: String(localized: "Too heavy for this Mac"), kind: .warn) }
+            else if model.recommendedAIModel?.id == llm.id { SetupBadge(text: String(localized: "Recommended"), kind: .recommended) }
+            else if model.bestAIModel?.id == llm.id { SetupBadge(text: String(localized: "Best quality"), kind: .quality) }
             else { nil }
         return SetupRow(title: llm.displayName, subtitle: llm.downloadSizeDescription, badge: badge,
                         detail: aiModelLine(llm, heavy: heavy, spoken: storedSpokenLanguages()), isSelected: selected, dimmed: heavy,
@@ -888,7 +896,7 @@ private struct AIScreen: View {
                 // A key from the Speech step (Groq's, OpenAI's) is reused as it is.
                 SetupKeyBlock(model: model, service: model.aiService,
                               collapsedText: model.keyReadyFromSpeech(model.aiService)
-                                  ? "AI polish is ready — it uses your \(model.aiService.displayName) key." : nil,
+                                  ? String(localized: "AI polish is ready — it uses your \(model.aiService.displayName) key.") : nil,
                               compact: true)
                     .padding(.horizontal, 10)
                     .padding(.top, 8)
@@ -940,10 +948,10 @@ private struct PermissionsScreen: View {
         .onAppear { model.refreshPermissions() }
     }
 
-    private func promise(_ bold: String, _ rest: String) -> some View {
+    private func promise(_ bold: LocalizedStringKey, _ rest: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "checkmark.shield").font(.system(size: 16)).foregroundStyle(tint.accent).frame(width: 20)
-            (Text(bold).fontWeight(.semibold).foregroundColor(SetupColor.label) + Text(" \(rest)"))
+            (Text(bold).fontWeight(.semibold).foregroundColor(SetupColor.label) + Text(verbatim: " ") + Text(rest))
                 .font(.system(size: 12.5))
                 .foregroundStyle(SetupColor.label2)
                 .lineSpacing(2)
@@ -1038,8 +1046,8 @@ private struct PermissionsScreen: View {
 
 private struct PermissionRow<State: View, Actions: View, Control: View>: View {
     let icon: String
-    let title: String
-    let detail: String
+    let title: LocalizedStringKey
+    let detail: LocalizedStringKey
     let granted: Bool
     let glowID: Int
     @ViewBuilder let state: State
@@ -1091,9 +1099,9 @@ private struct PermissionState<Content: View>: View {
 }
 
 private struct AllowedLabel: View {
-    var text = "Allowed"
+    var text: LocalizedStringKey = "Allowed"
     var body: some View {
-        Text("✓ \(text)").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(SetupColor.ok).fixedSize()
+        (Text(verbatim: "✓ ") + Text(text)).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(SetupColor.ok).fixedSize()
     }
 }
 
@@ -1271,7 +1279,7 @@ private struct TryItScreen: View {
             if holdToTalk && HeldShortcuts.shared.down.contains(.inline) {
                 // The practice step: the letter alone keeps it going.
                 if appState.holdTipFollowed {
-                    title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("Just \(qLetter) — that's it"))
+                    title(Text(verbatim: "✓ ").foregroundColor(SetupColor.ok) + Text("Just \(qLetter) — that's it"))
                     body(Text("Clicks and ⌘Tab work as usual while you hold it. Let go of \(qLetter) when you're done."))
                 } else {
                     title(Text("Now let go of \(qModifiers)"))
@@ -1291,7 +1299,7 @@ private struct TryItScreen: View {
         case .transcribing:
             title(Text("Turning your speech into text…"))
         case .success:
-            title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("It works!"))
+            title(Text(verbatim: "✓ ").foregroundColor(SetupColor.ok) + Text("It works!"))
             body(Text("That's your voice, typed."))
         case .nothing:
             title(Text("We didn't hear anything"))
@@ -1309,7 +1317,7 @@ private struct TryItScreen: View {
             body(Text("Online services need internet. Connect, then try again."))
         case .failed(let message):
             title(Text("That didn't work"))
-            body(Text(message))
+            body(Text(verbatim: message))
             if let fix = settingsFix(for: message) {
                 Button(fix.title, action: fix.open)
                     .buttonStyle(SetupLinkButtonStyle(height: 32))
@@ -1320,7 +1328,7 @@ private struct TryItScreen: View {
 
     /// A failure whose remedy is a System Settings page gets a button to that page: the
     /// path in the message alone was easy to miss.
-    private func settingsFix(for message: String) -> (title: String, open: () -> Void)? {
+    private func settingsFix(for message: String) -> (title: LocalizedStringKey, open: () -> Void)? {
         if message == RecognitionFailure.dictationOffMessage || message.contains("System Settings › Keyboard") {
             return ("Open Keyboard Settings", { OnboardingModel.openKeyboardSettings() })
         }
@@ -1364,7 +1372,7 @@ private struct TryItScreen: View {
             title(Text("AI is tidying up your text…"))
             body(Text("This takes a few seconds."))
         case .success:
-            title(Text("✓ ").foregroundColor(SetupColor.ok) + Text("Here's the AI version"))
+            title(Text(verbatim: "✓ ").foregroundColor(SetupColor.ok) + Text("Here's the AI version"))
             body(Text("What you said, and what AI polish wrote from it — in any app, only the AI version is typed."))
         case .failed:
             title(Text("AI couldn't answer this time"))
@@ -1374,11 +1382,11 @@ private struct TryItScreen: View {
 
     /// What to say, kept on screen while the shortcut is down, so there is something to
     /// read from: a short email for the plain dictation, a sentence to tidy for AI polish.
-    private static let plainExample = "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."
-    private static let aiExample = "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too."
+    private static let plainExample: LocalizedStringKey = "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."
+    private static let aiExample: LocalizedStringKey = "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too."
 
-    private func example(_ words: String, ai: Bool = false) -> some View {
-        Text("“\(words)”")
+    private func example(_ words: LocalizedStringKey, ai: Bool = false) -> some View {
+        Text("“\(Text(words))”")
             .font(.system(size: 13.5).italic())
             .foregroundStyle(SetupColor.label)
             .lineSpacing(2)
@@ -1395,7 +1403,7 @@ private struct TryItScreen: View {
 
     private func title(_ text: Text) -> some View { text.setupTitle(32).padding(.bottom, 10) }
     private func body(_ text: Text) -> some View { text.setupLead(14.5) }
-    private func hint(_ text: String) -> some View {
+    private func hint(_ text: LocalizedStringKey) -> some View {
         Text(text).font(.system(size: 12)).foregroundStyle(SetupColor.label2).padding(.top, 8)
             .fixedSize(horizontal: false, vertical: true)
     }
@@ -1461,11 +1469,11 @@ private struct TryItScreen: View {
     private var resultText: some View {
         if listening && !inAI {
             let live = liveText
-            Text(live.isEmpty ? "Listening…" : live).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
+            (live.isEmpty ? Text("Listening…") : Text(verbatim: live)).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
         } else if engine.isTranscribing && !inAI {
             HStack(spacing: 8) { SetupSpinner(); Text("Turning your speech into text…").foregroundStyle(SetupColor.label2) }
         } else if case .typed(let text)? = test.outcome {
-            Text(text).foregroundStyle(SetupColor.label).textSelection(.enabled)
+            Text(verbatim: text).foregroundStyle(SetupColor.label).textSelection(.enabled)
         } else {
             Text("Your words will appear here.").foregroundStyle(SetupColor.label3)
         }
@@ -1524,20 +1532,20 @@ private struct TryItScreen: View {
         switch aiPhase {
         case .listening:
             let live = liveText
-            Text(live.isEmpty ? "Listening…" : live).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
+            (live.isEmpty ? Text("Listening…") : Text(verbatim: live)).foregroundStyle(live.isEmpty ? SetupColor.label3 : SetupColor.label2)
         case .polishing:
             let said = engine.spanLayer.text.trimmingCharacters(in: .whitespacesAndNewlines)
             if said.isEmpty {
                 HStack(spacing: 8) { SetupSpinner(); Text("Turning your speech into text…").foregroundStyle(SetupColor.label2) }
             } else {
-                Text(said).foregroundStyle(SetupColor.label)
+                Text(verbatim: said).foregroundStyle(SetupColor.label)
             }
         case .success(let said, _), .failed(let said, _):
             // Once the AI has written, what was said gives it the room: one line, the
             // rest a click away.
             let long = said.count > 40
             VStack(alignment: .leading, spacing: 4) {
-                Text(said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label2).textSelection(.enabled)
+                Text(verbatim: said.isEmpty ? "—" : said).foregroundStyle(SetupColor.label2).textSelection(.enabled)
                     .lineLimit(long && !saidExpanded ? 1 : nil)
                     .truncationMode(.tail)
                 if long {
@@ -1561,9 +1569,9 @@ private struct TryItScreen: View {
         case .polishing:
             HStack(spacing: 8) { SetupSpinner().environment(\.setupTint, .violet); Text("Rewriting…").foregroundStyle(SetupColor.label2) }
         case .success(_, let wrote):
-            Text(wrote).foregroundStyle(SetupColor.label).textSelection(.enabled)
+            Text(verbatim: wrote).foregroundStyle(SetupColor.label).textSelection(.enabled)
         case .failed(_, let reason):
-            Text(reason).foregroundStyle(SetupColor.danger)
+            Text(verbatim: reason).foregroundStyle(SetupColor.danger)
         case .ready:
             EmptyView()
         }
@@ -1579,7 +1587,7 @@ private struct TryItScreen: View {
         }
     }
 
-    private func column<Content: View>(_ label: String, highlighted: Bool, @ViewBuilder _ content: () -> Content) -> some View {
+    private func column<Content: View>(_ label: LocalizedStringKey, highlighted: Bool, @ViewBuilder _ content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(label).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(SetupColor.label3)
             content()
@@ -1597,7 +1605,7 @@ private struct TryItScreen: View {
         let accent = inAI ? SetupColor.ai : tint.accent
         return HStack(spacing: 8) {
             Image(systemName: "mic.fill").font(.system(size: 10)).foregroundStyle(hot ? accent : SetupColor.label3)
-            Text(AVCaptureDevice.default(for: .audio)?.localizedName ?? "Microphone")
+            (AVCaptureDevice.default(for: .audio).map { Text(verbatim: $0.localizedName) } ?? Text("Microphone"))
                 .lineLimit(1).truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 2) {
@@ -1691,7 +1699,7 @@ private struct TryItScreen: View {
 }
 
 private struct ChipView: View {
-    let text: String
+    let text: LocalizedStringKey
     let on: Bool
     var dot = false
     var spinner = false
@@ -1725,7 +1733,7 @@ private struct DoneScreen: View {
     var body: some View {
         StepColumns(copyWidth: 310, insets: EdgeInsets(top: 44, leading: 36, bottom: 24, trailing: 32), copyAlignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
-                Text("🎉").font(.system(size: 40)).padding(.bottom, 14)
+                Text(verbatim: "🎉").font(.system(size: 40)).padding(.bottom, 14)
                 Text("You're all set").setupTitle(32).padding(.bottom, 10)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SpeechText lives in your menu bar").font(.system(size: 14, weight: .semibold)).foregroundStyle(SetupColor.label)
@@ -1757,8 +1765,9 @@ private struct DoneScreen: View {
             .padding(.vertical, 8)
             .background(RoundedRectangle(cornerRadius: 12).fill(.black.opacity(0.26)))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.white.opacity(0.1), lineWidth: 1))
-            (Text(holdToTalk ? "Work in any app. Hold to talk, let go to stop. Change them any time in " : "Work in any app. Press once to start, again to stop. Change them any time in ")
-             + Text("Settings").fontWeight(.semibold).foregroundColor(.white) + Text("."))
+            let settings = Text("Settings").fontWeight(.semibold).foregroundColor(.white)
+            (holdToTalk ? Text("Work in any app. Hold to talk, let go to stop. Change them any time in \(settings).")
+             : Text("Work in any app. Press once to start, again to stop. Change them any time in \(settings)."))
                 .font(.system(size: 12.5))
                 .foregroundStyle(.white.opacity(0.72))
                 .fixedSize(horizontal: false, vertical: true)
@@ -1783,11 +1792,11 @@ private struct DoneScreen: View {
         }
     }
 
-    private func shortcut(_ action: ShortcutAction, _ title: String, on: Bool) -> some View {
+    private func shortcut(_ action: ShortcutAction, _ title: LocalizedStringKey, on: Bool) -> some View {
         HStack(spacing: 10) {
             HStack(spacing: 4) {
                 ForEach(Array(shortcutKeys(shortcutText(for: action)).enumerated()), id: \.offset) { _, key in
-                    Text(key)
+                    Text(verbatim: key)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(SetupColor.phosphor)
                         .frame(minWidth: 22, minHeight: 22)
