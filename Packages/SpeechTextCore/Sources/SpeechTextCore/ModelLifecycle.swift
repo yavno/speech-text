@@ -46,8 +46,8 @@ public enum ModelLifecycle: Hashable, Sendable {
     public func status(on day: Date) -> String? {
         guard let deprecation else { return nil }
         // An archived model's dates are not kept: it is past them by definition.
-        guard let shutdown = deprecation.shutdown.date else { return "Retired" }
-        return day < shutdown ? "Retiring on \(ModelRetirement.dayText(shutdown))" : "Retired"
+        guard let shutdown = deprecation.shutdown.date else { return localized("Retired") }
+        return day < shutdown ? localized("Retiring on \(ModelRetirement.dayText(shutdown))") : localized("Retired")
     }
 }
 
@@ -105,10 +105,15 @@ enum ModelRetirement {
     /// "26 Feb 2027".
     static func dayText(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_GB")
         formatter.calendar = calendar
         formatter.timeZone = TimeZone(identifier: "UTC")
-        formatter.dateFormat = "d MMM yyyy"
+        if uiLocale.language.languageCode == .english {
+            formatter.locale = Locale(identifier: "en_GB")
+            formatter.dateFormat = "d MMM yyyy"
+        } else {
+            formatter.locale = uiLocale
+            formatter.setLocalizedDateFormatFromTemplate("d MMM yyyy")
+        }
         return formatter.string(from: date)
     }
 }
@@ -443,10 +448,10 @@ public func modelChoiceNotice(settingsKey key: String, role: ModelNotice.Role, m
     let old = migrations.last { $0.settingsKey == key && $0.to == nil }.map { naming.name(of: $0.from) }
     return ModelNotice(
         id: "choose:\(key)",
-        title: "Choose a model for \(naming.target)",
-        detail: old.map { "\($0) is no longer available." }
-            ?? (role == .speech ? "Dictation waits for your pick." : "AI Rewrite waits for your pick."),
-        actionTitle: "Choose",
+        title: naming.isLocal ? localized("Choose a model for this Mac") : localized("Choose a model for \(naming.target)"),
+        detail: old.map { localized("\($0) is no longer available.") }
+            ?? (role == .speech ? localized("Dictation waits for your pick.") : localized("AI Rewrite waits for your pick.")),
+        actionTitle: localized("Choose"),
         action: .openSettings(role))
 }
 
@@ -458,13 +463,15 @@ extension ModelMigration {
 private func movedNotice(_ move: ModelMigration, role: ModelNotice.Role) -> ModelNotice {
     let naming = ModelNaming(key: move.settingsKey)
     let new = move.to ?? ""
-    let when = naming.shutdown(of: move.from).map { "retires on \(ModelRetirement.dayText($0))" } ?? "is retiring"
+    let old = naming.name(of: move.from)
+    let when = naming.shutdown(of: move.from).map { localized("\(old) retires on \(ModelRetirement.dayText($0)).") }
+        ?? localized("\(old) is retiring.")
     let price = naming.priceChange(from: move.from, to: new).map { " \($0)" } ?? ""
     return ModelNotice(
         id: move.noticeID,
-        title: "Now using \(naming.name(of: new))",
-        detail: "\(naming.name(of: move.from)) \(when).\(price)",
-        actionTitle: "Settings",
+        title: localized("Now using \(naming.name(of: new))"),
+        detail: when + price,
+        actionTitle: localized("Settings"),
         action: .openSettings(role))
 }
 
@@ -477,17 +484,17 @@ private func supersededNotice(key: String, id: String, role: ModelNotice.Role) -
         // Settings downloads it when they choose it.
         return ModelNotice(
             id: noticeID,
-            title: "Newer: \(naming.name(of: next))",
-            detail: "We recommend updating from \(naming.name(of: id)). Download it in Settings.",
-            actionTitle: "Settings",
+            title: localized("Newer: \(naming.name(of: next))"),
+            detail: localized("We recommend updating from \(naming.name(of: id)). Download it in Settings."),
+            actionTitle: localized("Settings"),
             action: .openSettings(role))
     }
     let price = naming.priceChange(from: id, to: next).map { " \($0)" } ?? ""
     return ModelNotice(
         id: noticeID,
-        title: "Newer: \(naming.name(of: next))",
-        detail: "It supersedes \(naming.name(of: id)).\(price)",
-        actionTitle: "Switch",
+        title: localized("Newer: \(naming.name(of: next))"),
+        detail: localized("It supersedes \(naming.name(of: id)).") + price,
+        actionTitle: localized("Switch"),
         action: .switchModel(settingsKey: key, to: next))
 }
 
@@ -503,6 +510,9 @@ private struct ModelNaming {
             ? LLMProviderType.allCases.first { $0.vendor.descriptor.chatModel?.settingsKey == key }
             : nil
     }
+
+    /// The local tier's, which a notice names as "this Mac".
+    var isLocal: Bool { (vendor ?? chat?.vendor) == .local }
 
     /// "this Mac" or the vendor's name (`Provider.modelChoiceTarget`).
     var target: String {
@@ -540,16 +550,18 @@ private struct ModelNaming {
             guard case .listed(let was) = sttModel(vendor: vendor, id: old).price,
                   case .listed(let now) = sttModel(vendor: vendor, id: new).price else { return nil }
             let difference = now.perMinute - was.perMinute
-            if abs(difference) < 0.000_000_5 { return "Same price." }
-            return "\(difference > 0 ? "+" : "−")\(dollars(abs(difference)))/min."
+            if abs(difference) < 0.000_000_5 { return localized("Same price.") }
+            let change = (difference > 0 ? "+" : "−") + dollars(abs(difference))
+            return localized("\(change)/min.")
         }
         if let chat {
             guard case .listed(let was) = chatModel(provider: chat, id: old).price,
                   case .listed(let now) = chatModel(provider: chat, id: new).price else { return nil }
             let ratio = (now.inputPerToken + now.outputPerToken) / (was.inputPerToken + was.outputPerToken)
-            if abs(ratio - 1) < 0.05 { return "Same price." }
-            return ratio > 1 ? "About \(String(format: "%.2g", ratio))× the price."
-                             : "About \(Int((ratio * 100).rounded()))% of the price."
+            if abs(ratio - 1) < 0.05 { return localized("Same price.") }
+            let times = String(format: "%.2g", ratio)
+            return ratio > 1 ? localized("About \(times)× the price.")
+                             : localized("About \(Int((ratio * 100).rounded()))% of the price.")
         }
         return nil
     }

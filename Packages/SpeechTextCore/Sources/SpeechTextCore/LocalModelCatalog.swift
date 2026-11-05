@@ -204,7 +204,7 @@ public let localSTTModels: [LocalSTTModel] = [
         memoryFloorBytes: 8 * gigabyte,
         summary: "Parakeet v3 in less than half the download, from moondream: the same languages, but it took about a second to answer where v3 takes a quarter. For a full disk.",
         languages: parakeetLanguages(repository: "FluidInference/parakeet-redux-coreml"),
-        languageNotes: ["uk": LanguageNote(text: "More mistakes in Ukrainian than Parakeet v3.",
+        languageNotes: ["uk": LanguageNote(text: localized("More mistakes in Ukrainian than Parakeet v3."),
                                            measured: "audio corpus, 2026-10-16, M1 Pro: mean WER 0.226 against v3's 0.180")],
         parakeetVersion: .redux,
         minimumSystemVersion: 15
@@ -217,7 +217,7 @@ public let localSTTModels: [LocalSTTModel] = [
         memoryFloorBytes: 4 * gigabyte,
         summary: "Small and quick.",
         languages: whisperLanguages,
-        languageNotes: ["uk": LanguageNote(text: "Makes mistakes in Ukrainian.",
+        languageNotes: ["uk": LanguageNote(text: localized("Makes mistakes in Ukrainian."),
                                            measured: "2026-09-17, M1 Pro: answered Ukrainian in Russian spelling, 38–100% WER")]
     ),
     LocalSTTModel(
@@ -228,7 +228,7 @@ public let localSTTModels: [LocalSTTModel] = [
         memoryFloorBytes: 2 * gigabyte,
         summary: "Smaller still. The default on Intel Macs, which have no Neural Engine.",
         languages: whisperLanguages,
-        languageNotes: ["uk": LanguageNote(text: "Makes mistakes in Ukrainian.",
+        languageNotes: ["uk": LanguageNote(text: localized("Makes mistakes in Ukrainian."),
                                            measured: "2026-09-17, M1 Pro: answered Ukrainian in Russian spelling, 38–100% WER")]
     ),
     LocalSTTModel(
@@ -390,16 +390,16 @@ public func localModelFitsMemory(_ floorBytes: UInt64, _ capabilities: SystemCap
 /// A recommendation the user cannot interrogate is one they have to take on faith.
 func localSTTRecommendationReason(for capabilities: SystemCapabilities, languages: [String] = []) -> String {
     guard let model = recommendedLocalSTTModel(for: capabilities, languages: languages) else {
-        return "Not enough free disk space to install any local model."
+        return localized("Not enough free disk space to install any local model.")
     }
     let tier = MacTier(capabilities)
     if tier == .intel {
-        return "\(model.displayName) — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation."
+        return localized("\(model.displayName) — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation.")
     }
     if model.engine == .whisperKit, localSTTModel(id: parakeetV3ModelID)?.knows(languages) == false, !languages.isEmpty {
-        return "\(model.displayName) — Parakeet does not know every language you speak."
+        return localized("\(model.displayName) — Parakeet does not know every language you speak.")
     }
-    return "\(model.displayName) for a \(tier.displayName) Mac."
+    return localized("\(model.displayName) for a \(tier.displayName) Mac.")
 }
 
 public enum LocalModelError: LocalizedError, Equatable, Sendable {
@@ -410,10 +410,10 @@ public enum LocalModelError: LocalizedError, Equatable, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .notInstalled(let name): "The local model \"\(name)\" is not installed yet"
-        case .downloadFailed(let why): "Could not install the local model: \(why)"
+        case .notInstalled(let name): localized("The local model \"\(name)\" is not installed yet")
+        case .downloadFailed(let why): localized("Could not install the local model: \(why)")
         case .insufficientDisk(let needed, let free):
-            "Not enough disk space: the download needs \(Self.size(needed)) free, and \(Self.size(free)) is."
+            localized("Not enough disk space: the download needs \(Self.size(needed)) free, and \(Self.size(free)) is.")
         }
     }
 

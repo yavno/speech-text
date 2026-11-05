@@ -153,9 +153,9 @@ public enum DashStyle: String, CaseIterable, Identifiable, Codable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .enDash: "Short dash ( – )"
-        case .hyphen: "Hyphen ( - )"
-        case .emDash: "Long dash ( — ), unchanged"
+        case .enDash: localized("Short dash ( – )")
+        case .hyphen: localized("Hyphen ( - )")
+        case .emDash: localized("Long dash ( — ), unchanged")
         }
     }
 

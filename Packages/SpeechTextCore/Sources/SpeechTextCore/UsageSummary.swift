@@ -19,10 +19,10 @@ public enum UsagePeriod: String, CaseIterable, Identifiable, Sendable {
 
     public var title: String {
         switch self {
-        case .week: "7 days"
-        case .month: "30 days"
-        case .quarter: "90 days"
-        case .all: "All"
+        case .week: localized("7 days")
+        case .month: localized("30 days")
+        case .quarter: localized("90 days")
+        case .all: localized("All")
         }
     }
 
@@ -442,7 +442,7 @@ public enum UsageFormat {
     public static func title(_ start: Date, granularity: UsageSummary.Granularity, calendar: Calendar = .current) -> String {
         switch granularity {
         case .day: HistoryFormat.formatter("EEEE d MMMM", calendar: calendar).string(from: start)
-        case .week: "Week of " + HistoryFormat.formatter("d MMMM", calendar: calendar).string(from: start)
+        case .week: localized("Week of \(HistoryFormat.formatter("d MMMM", calendar: calendar).string(from: start))")
         case .month: HistoryFormat.formatter("MMMM yyyy", calendar: calendar).string(from: start)
         }
     }

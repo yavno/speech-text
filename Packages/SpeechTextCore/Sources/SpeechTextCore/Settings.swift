@@ -255,11 +255,22 @@ public let openAIRealtimeSTTModel = "gpt-live-transcribe"
 /// locale Apple's recogniser needs, since it takes nothing else.
 public struct SpokenLanguage: Identifiable, Hashable, Sendable {
     public let id: String
-    public let displayName: String
+    /// The name in English, as the list below is written.
+    let englishName: String
     public let localeIdentifier: String
     /// What the language is written in — what `HallucinationFilter` lets through once the
     /// user has stated it (Latin is let through for every language).
     let scripts: [WritingScript]
+
+    init(id: String, displayName: String, localeIdentifier: String, scripts: [WritingScript]) {
+        self.id = id
+        englishName = displayName
+        self.localeIdentifier = localeIdentifier
+        self.scripts = scripts
+    }
+
+    /// Its name in the app's language: the English one while the app is in English.
+    public var displayName: String { languageName(id, english: englishName) }
 }
 
 /// Special value meaning "no language was requested" — what History records when the

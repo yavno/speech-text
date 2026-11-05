@@ -61,7 +61,7 @@ public struct RecognitionFailure: Equatable, Sendable {
             // Only what the error says — the assets could not be loaded — and where they
             // come from. "Not downloaded yet" is the usual reason, but not one it names.
             let language = languageName(locale)
-            message = "Couldn't load the \(language) speech model. Add it to Dictation in System Settings › Keyboard."
+            message = localized("Couldn't load the \(language) speech model. Add it to Dictation in System Settings › Keyboard.")
         } else if domain == localSpeechDomain, code == dictationOffCode {
             message = dictationOffMessage
         } else {
@@ -72,17 +72,17 @@ public struct RecognitionFailure: Equatable, Sendable {
 
     /// macOS Dictation is off: Apple's engine is that recogniser, so it works only with it on.
     public static let dictationOffMessage =
-        "Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation."
+        localized("Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation.")
 
     /// Also the start failure when the permission is already known to be off.
     public static let speechPermissionMessage =
-        "Speech Recognition is off for SpeechText. Turn it on in System Settings › Privacy & Security."
+        localized("Speech Recognition is off for SpeechText. Turn it on in System Settings › Privacy & Security.")
 
-    /// "English" for "en", "en-US" or "en_US" — named in English, as the rest of the UI
-    /// is, rather than in whatever language the Mac runs in.
+    /// "English" for "en", "en-US" or "en_US" — named in the app's language, as the rest of
+    /// the UI is, rather than in whatever language the Mac runs in.
     static func languageName(_ locale: String) -> String {
         let code = Locale(identifier: locale).language.languageCode?.identifier ?? locale
-        return Locale(identifier: "en").localizedString(forLanguageCode: code) ?? locale
+        return uiLocale.localizedString(forLanguageCode: code) ?? locale
     }
 }
 
@@ -178,7 +178,7 @@ public enum RecognitionSessionError: LocalizedError, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .recognizerUnavailable(let locale): return "Speech recognizer not available for \(locale)"
+        case .recognizerUnavailable(let locale): return localized("Speech recognizer not available for \(locale)")
         case .speechPermissionDenied: return RecognitionFailure.speechPermissionMessage
         }
     }

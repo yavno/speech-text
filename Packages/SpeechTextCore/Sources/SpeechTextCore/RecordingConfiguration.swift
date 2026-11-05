@@ -198,17 +198,22 @@ public struct RecordingConfiguration: Sendable {
     public func batchUnavailableReason(modelInstalled: (String) -> Bool = { isLocalModelInstalled($0) }) -> String? {
         let batch = batchDescriptor
         if models[batch.vendor] == clearedModelChoice {
-            return "Choose a model for \(batch.vendor.modelChoiceTarget) in Settings."
+            return batch.vendor == .local
+                ? localized("Choose a model for this Mac in Settings.")
+                : localized("Choose a model for \(batch.vendor.displayName) in Settings.")
         }
         switch batch.requirement {
         case .none:
             return nil
         case .installedModel:
             guard !modelInstalled(batch.id) else { return nil }
-            return "\(batch.displayName) isn't installed — download it in Settings."
+            return localized("\(batch.displayName) isn't installed — download it in Settings.")
         case .apiKey:
             guard apiKey(for: batch.vendor).isEmpty else { return nil }
-            return "Retry needs \(batch.vendor.apiKeyPhrase) — add one in Settings."
+            let vendor = batch.vendor.displayName
+            return batch.vendor.takesAn
+                ? localized("Retry needs an \(vendor) API key — add one in Settings.")
+                : localized("Retry needs a \(vendor) API key — add one in Settings.")
         }
     }
 

@@ -206,7 +206,7 @@ moves the work:
 
 | Job | While private | Once public | What it does |
 |---|---|---|---|
-| Tests | `self-hosted` | `xcode-27` | `xcodebuild test`, the String Catalog check (`scripts/sync-strings.sh --check`) and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
+| Tests | `self-hosted` | `xcode-27` | `xcodebuild test`, the String Catalogs check (`scripts/sync-strings.sh --check`, the app's and SpeechTextCore's) and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
 | Swift lint | `self-hosted` | `xcode-27` | `scripts/lint-swift.sh` — swift-format's semantic rules (not layout) on the lines a pull request adds or changes; needs Xcode's `swift-format` |
 | Checks | `self-hosted` | `ubuntu-latest` | the eight checks below, one step each |
 

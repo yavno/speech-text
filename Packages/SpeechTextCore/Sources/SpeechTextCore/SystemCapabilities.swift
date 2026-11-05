@@ -160,13 +160,13 @@ public enum MacTier: Int, CaseIterable, Comparable, Sendable {
     /// MacBook Neo.
     public var displayName: String {
         switch self {
-        case .intel: "Intel Mac"
-        case .entry: "8 GB class"
-        case .standard: "16 GB class"
-        case .plus: "24–32 GB class"
-        case .pro: "36–64 GB class"
-        case .max: "96–128 GB class"
-        case .ultra: "256 GB+ class"
+        case .intel: localized("Intel Mac")
+        case .entry: localized("8 GB class")
+        case .standard: localized("16 GB class")
+        case .plus: localized("24–32 GB class")
+        case .pro: localized("36–64 GB class")
+        case .max: localized("96–128 GB class")
+        case .ultra: localized("256 GB+ class")
         }
     }
 }

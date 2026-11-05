@@ -213,12 +213,14 @@ When the user names something, the word may be one they coined rather than the a
 
 Words the user reads — titles, captions, notices, VoiceOver labels — are spelled in American English ("color", "canceled", "recognize"), as macOS's own windows are, which the app shows beside its own (the color panel, System Settings). Comments, logs and these docs are not held to it.
 
-Those words live in the String Catalog, `SpeechText/SpeechText/Localizable.xcstrings`, keyed
-by the English text:
+Those words live in the String Catalogs, keyed by the English text:
+`SpeechText/SpeechText/Localizable.xcstrings` for the app, and
+`Packages/SpeechTextCore/Sources/SpeechTextCore/Localizable.xcstrings` for the words the
+package hands to the UI, which it writes as `localized("…")` (`Localized.swift`).
 
 - After adding or changing a string literal passed to SwiftUI (`Text("…")`, `Button("…")`,
-  …), run `scripts/sync-strings.sh` and commit the catalog with the code; CI fails when
-  the two are out of step.
+  …) or to `localized(_:)`, run `scripts/sync-strings.sh` and commit the catalogs with the
+  code; CI fails when the two are out of step.
 - The permission prompts and the copyright line are in `Info.plist` and again, as
   their English source, in `InfoPlist.xcstrings`; change both together
   (`scripts/check-infoplist-strings.sh`).

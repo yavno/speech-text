@@ -32,11 +32,11 @@ public enum GlassTransparency: String, CaseIterable, Sendable {
     /// The stop's name under the slider and to VoiceOver.
     public var title: String {
         switch self {
-        case .most: "Most"
-        case .more: "More"
-        case .standard: "Default"
-        case .less: "Less"
-        case .least: "Least"
+        case .most: localized("Most")
+        case .more: localized("More")
+        case .standard: localized("Default")
+        case .less: localized("Less")
+        case .least: localized("Least")
         }
     }
 

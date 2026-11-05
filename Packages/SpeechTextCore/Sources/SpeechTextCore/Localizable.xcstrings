@@ -1,0 +1,846 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ alone keeps recording, so clicks and ⌘Tab work as usual." : {
+      "comment" : "Tip text. %@ is the shortcut's letter key, e.g. Q. Two lines at most."
+    },
+    "%@ can't take %@ on this Mac." : {
+      "comment" : "Warning under 'Languages I speak' for Apple's recognizer. The first %@ is the model's name, the second one or more languages.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ can't take %2$@ on this Mac."
+          }
+        }
+      }
+    },
+    "%@ can't take %@." : {
+      "comment" : "Warning under 'Languages I speak'. The first %@ is the selected model's name, the second one or more languages.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ can't take %2$@."
+          }
+        }
+      }
+    },
+    "%@ couldn't transcribe the recording: %@ (HTTP %lld)" : {
+      "comment" : "Dictation error. The first %@ is the vendor, the second why (the service's own words, often English, or one of the reasons), %lld the HTTP status code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ couldn't transcribe the recording: %2$@ (HTTP %3$lld)"
+          }
+        }
+      }
+    },
+    "%@ for a %@ Mac." : {
+      "comment" : "Settings › Speech to text: why a local model is recommended. The first %@ is the model's name, the second this Mac's class (e.g. '16 GB class').",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ for a %2$@ Mac."
+          }
+        }
+      }
+    },
+    "%@ is no longer available." : {
+      "comment" : "Notice text: the model that was in use is gone. %@ is its name."
+    },
+    "%@ is retiring." : {
+      "comment" : "Notice text after the app moved to a new model. %@ is the old model's name."
+    },
+    "%@ isn't installed — download it in Settings." : {
+      "comment" : "History: why a failed dictation can't be retried. %@ is a local model's name."
+    },
+    "%@ only" : {
+      "comment" : "A model row's subtitle when the model knows one language: e.g. 'English only'. %@ is the language's name."
+    },
+    "%@ or %@" : {
+      "comment" : "Joins the last two languages of a list in the warning '… can't take %@.' The first %@ is the list so far (comma-separated), the second the last language.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ or %2$@"
+          }
+        }
+      }
+    },
+    "%@ retires on %@." : {
+      "comment" : "Notice text after the app moved to a new model. The first %@ is the old model's name, the second the date it is switched off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ retires on %2$@."
+          }
+        }
+      }
+    },
+    "%@ — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation." : {
+      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name."
+    },
+    "%@ — Parakeet does not know every language you speak." : {
+      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name; Parakeet is another model's name."
+    },
+    "%@/min." : {
+      "comment" : "After a model-change notice: the price difference per minute of audio. %@ is a signed amount, e.g. +$0.0015."
+    },
+    "%lld dictations since %@ · %@" : {
+      "comment" : "Settings › History: what History holds. %lld is the number of dictations, the first %@ the day of the oldest (e.g. 14 September), the second their size on disk.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictation since %@ · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictations since %@ · %@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld dictations · %@" : {
+      "comment" : "Settings › History: what History holds. %lld is the number of dictations, %@ their size on disk (e.g. 70 KB).",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictation · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictations · %@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld h" : {
+      "comment" : "A duration in whole hours, e.g. 2 h."
+    },
+    "%lld h %lld min" : {
+      "comment" : "A duration, e.g. 1 h 5 min. Use your language's abbreviations for hours and minutes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld h %2$lld min"
+          }
+        }
+      }
+    },
+    "%lld languages" : {
+      "comment" : "A model row's subtitle: how many languages the model knows (always two or more)."
+    },
+    "%lld min" : {
+      "comment" : "A duration in minutes, e.g. 52 min."
+    },
+    "%lld s" : {
+      "comment" : "A short length in seconds, e.g. a recording's '8 s'. Use your language's abbreviation."
+    },
+    "%lld+ languages" : {
+      "comment" : "A model row's subtitle when the vendor says 'at least': e.g. 90+ languages."
+    },
+    "1 year" : {
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+    },
+    "16 GB class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "24–32 GB class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "256 GB+ class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "3 months" : {
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+    },
+    "30 days" : {
+      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page."
+    },
+    "36–64 GB class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "6 months" : {
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+    },
+    "7 days" : {
+      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page."
+    },
+    "8 GB class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "90 days" : {
+      "comment" : "Usage page: a period to count over."
+    },
+    "96–128 GB class" : {
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+    },
+    "A failed one's audio is kept as long as the dictation, for a retry." : {
+      "comment" : "History page, at the foot: a failed dictation's recording is kept as long as the dictation itself."
+    },
+    "A failed one's audio is kept for 3 months, for a retry." : {
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A failed one's audio is kept for 30 days, for a retry." : {
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A failed one's audio is kept for 6 months, for a retry." : {
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A failed one's audio is kept for 7 days, for a retry." : {
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A failed one's audio is kept for a year, for a retry." : {
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A failed one's audio is kept until SpeechText quits, for a retry." : {
+      "comment" : "History page, at the foot, after what History keeps: how long a failed dictation's recording is kept so it can be retried."
+    },
+    "A little more careful on hard audio, a little slower." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "A preview — Groq may withdraw it." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Groq is the vendor."
+    },
+    "A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish." : {
+      "comment" : "Notice after a quick tap on the edit shortcut canceled it. Two lines at most."
+    },
+    "A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free." : {
+      "comment" : "Notice after a quick tap on the dictation shortcut canceled it. Two lines at most."
+    },
+    "A step behind Gemma 4 12B, a little lighter." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma 4 12B is a model's name."
+    },
+    "AI" : {
+      "comment" : "Setup: the AI Rewrite step's name in the step bar."
+    },
+    "AI Recording" : {
+      "comment" : "A dictation shortcut's name: dictation rewritten by AI Rewrite."
+    },
+    "AI Rewrite" : {
+      "comment" : "History: filter for dictations AI Rewrite rewrote. AI Rewrite is the feature's name."
+    },
+    "AI Rewrite waits for your pick." : {
+      "comment" : "Notice text when AI Rewrite has no model chosen."
+    },
+    "About %@× the price." : {
+      "comment" : "After a model-change notice: the new model's price as a multiple of the old one's. %@ is the factor, e.g. 2."
+    },
+    "About %lld%% of the price." : {
+      "comment" : "After a model-change notice: the new model's price as a percentage of the old one's."
+    },
+    "All" : {
+      "comment" : "A filter that shows everything: on History (all dictations) and on Usage (the whole period)."
+    },
+    "Anthropic · Paid" : {
+      "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name."
+    },
+    "Any time" : {
+      "comment" : "History: date filter, no limit."
+    },
+    "As accurate as Turbo, about 30% slower. Needs 24 GB of memory." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Turbo is another model."
+    },
+    "Audio conversion failed: %@" : {
+      "comment" : "Error shown on a failed dictation when the recording could not be converted. %@ is a technical reason, in English."
+    },
+    "Balanced." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Built into macOS, nothing to download. Words appear as you speak." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. For Apple's recognizer."
+    },
+    "Can show words as you speak. Its key works for AI Rewrite too." : {
+      "comment" : "Settings and setup: what the OpenAI speech service is good at."
+    },
+    "ChatGPT's models, paid. Its key works for speech too." : {
+      "comment" : "Settings and setup: what the OpenAI AI service is. ChatGPT is a name."
+    },
+    "Cheaper, a little less accurate." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "Choose" : {
+      "comment" : "Notice button that opens the model picker."
+    },
+    "Choose a model for %@" : {
+      "comment" : "Notice title when a dictation or AI Rewrite needs a model to be picked. %@ is the vendor's name."
+    },
+    "Choose a model for %@ in Settings." : {
+      "comment" : "History: why a failed dictation can't be retried. %@ is the vendor's name."
+    },
+    "Choose a model for this Mac" : {
+      "comment" : "Notice title when the local engine needs a model to be picked."
+    },
+    "Choose a model for this Mac in Settings." : {
+      "comment" : "History: why a failed dictation can't be retried — the local engine has no model."
+    },
+    "Claude. Careful writing, paid." : {
+      "comment" : "Settings and setup: what the Anthropic AI service is. Claude is its name."
+    },
+    "Clean text in about a second." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Copy the key." : {
+      "comment" : "Setup and Settings, getting an API key: the step after pressing the vendor's 'Create' button on its website."
+    },
+    "Could not install the local model: %@" : {
+      "comment" : "Error when a model download failed. %@ is the reason, often in English."
+    },
+    "Couldn't load the %@ speech model. Add it to Dictation in System Settings › Keyboard." : {
+      "comment" : "Error from Apple's recognizer. %@ is a language's name. 'System Settings › Keyboard' is where macOS keeps it. Two lines at most."
+    },
+    "Default" : {
+      "comment" : "Settings › Appearance: the middle stop on the glass transparency slider."
+    },
+    "Dictation canceled" : {
+      "comment" : "Title of the notice after a dictation was canceled."
+    },
+    "Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation." : {
+      "comment" : "Error when macOS Dictation is off. Use macOS's own names for System Settings › Keyboard › Dictation. Two lines at most."
+    },
+    "Dictation waits for your pick." : {
+      "comment" : "Notice text when dictation has no model chosen."
+    },
+    "Don't keep" : {
+      "comment" : "Settings › History: the first stop on the slider for how long History keeps dictations — only until the app quits."
+    },
+    "Edit Selection with AI" : {
+      "comment" : "A shortcut's name: edit the selected text by voice."
+    },
+    "Edit canceled" : {
+      "comment" : "Title of the notice after a selection edit was canceled."
+    },
+    "Edits" : {
+      "comment" : "History: filter for selection edits."
+    },
+    "Failed" : {
+      "comment" : "History: filter for failed dictations."
+    },
+    "Fast Whisper. Text appears when you stop." : {
+      "comment" : "Settings and setup: what the Groq speech service is good at. Whisper is a model's name."
+    },
+    "Fast and accurate. Text appears when you stop." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "Fast and cheap." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Fast, and writes well." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Fast, with a free plan. Its key works for speech too." : {
+      "comment" : "Settings and setup: what the Groq AI service is good at."
+    },
+    "Forever" : {
+      "comment" : "Settings › History: the last stop on the slider for how long History keeps dictations."
+    },
+    "Free plan" : {
+      "comment" : "Setup: under an online service's name on its card — it has a free plan."
+    },
+    "Give it **Speech to Text** access, then copy the key." : {
+      "comment" : "Setup, getting an ElevenLabs API key. **Speech to Text** is the permission's name on the vendor's English website; keep it in English and in bold."
+    },
+    "Hi Sarah, I'm running a few minutes late — please start without me. Sorry!" : {
+      "comment" : "Home: the intro animation's AI example: the email AI Rewrite writes from what was said."
+    },
+    "History keeps every dictation on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps the last 3 months of dictations on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps the last 30 days of dictations on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps the last 6 months of dictations on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps the last 7 days of dictations on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps the last year of dictations on this Mac." : {
+      "comment" : "History page, at the foot: what History keeps."
+    },
+    "History keeps this session's dictations, until SpeechText quits." : {
+      "comment" : "History page, at the foot: what History keeps. Followed by a sentence about failed dictations' audio."
+    },
+    "Hyphen ( - )" : {
+      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets."
+    },
+    "Inline Recording" : {
+      "comment" : "A dictation shortcut's name in Settings › Shortcuts and the overlay's menu: dictation pasted where you type."
+    },
+    "Intel Mac" : {
+      "comment" : "Settings › Speech to text: which class of Mac a recommendation was made for."
+    },
+    "Invalid response from %@ API" : {
+      "comment" : "Dictation error: the speech service's reply could not be read. %@ is the vendor's name."
+    },
+    "Invalid response from the LLM API" : {
+      "comment" : "AI Rewrite error (notice and History): the AI service's reply could not be read."
+    },
+    "It supersedes %@." : {
+      "comment" : "Notice text for a newer online model. %@ is the model in use. A price change may follow."
+    },
+    "Just %@ — that's it" : {
+      "comment" : "Tip title once only the letter key is held. %@ is that key, e.g. Q. One line."
+    },
+    "Keep permissions on **All**, then copy the key. Needs credit in Billing." : {
+      "comment" : "Setup, getting an OpenAI API key. **All** and Billing are names on the vendor's English website; keep them in English."
+    },
+    "Last 30 days" : {
+      "comment" : "History: date filter."
+    },
+    "Last 7 days" : {
+      "comment" : "History: date filter."
+    },
+    "Least" : {
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the least see-through."
+    },
+    "Leaves out fillers, false starts and sound tags like “(laughs)”." : {
+      "comment" : "Settings › Speech to text: a note on the ElevenLabs Scribe model."
+    },
+    "Less" : {
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider."
+    },
+    "Less than half the download of v3, and slower to answer." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. v3 is Parakeet v3, a model."
+    },
+    "Let go of %@ to send the instruction." : {
+      "comment" : "Tip text while editing a selection. %@ is the held key."
+    },
+    "Let go of %@ when you're done." : {
+      "comment" : "Tip text while dictating. %@ is the held key."
+    },
+    "Let's go on Friday — it works for everyone." : {
+      "comment" : "Home: the intro animation's edit example: the selected text after the edit."
+    },
+    "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet" : {
+      "comment" : "Home: the intro animation's example dictation, as said (no final full stop), shown word by word. Write a natural sentence in your language."
+    },
+    "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet." : {
+      "comment" : "Home: the intro animation's example — the same sentence as pasted, with the full stop. Must match the spoken one above."
+    },
+    "Long dash ( — ), unchanged" : {
+      "comment" : "Settings: an option for how a dash in dictated text is written — left as the long dash. Keep the sign in brackets."
+    },
+    "Makes mistakes in Ukrainian." : {
+      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian."
+    },
+    "Many mistakes. Only for a quick test." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "More" : {
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider."
+    },
+    "More mistakes in Ukrainian than Parakeet v3." : {
+      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian. Parakeet v3 is a model's name."
+    },
+    "Most" : {
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the most see-through."
+    },
+    "Needs %lld GB of memory." : {
+      "comment" : "Added to a model row's line for a heavy model: the memory it needs, e.g. 16."
+    },
+    "Newer: %@" : {
+      "comment" : "Notice title: a newer model is out. %@ is its name."
+    },
+    "No %@" : {
+      "comment" : "A warning badge on a model row: the model can't take one of the user's languages. %@ is the language's name. Short."
+    },
+    "No %@ +%lld" : {
+      "comment" : "A warning badge on a model row: it can't take %@ and %lld more of the user's languages. Short.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No %1$@ +%2$lld"
+          }
+        }
+      }
+    },
+    "No %@ on-device" : {
+      "comment" : "A warning badge on Apple's row: macOS can't recognize one of the user's languages on this Mac. %@ is the language. Short."
+    },
+    "No %@ on-device +%lld" : {
+      "comment" : "A warning badge on Apple's row: no on-device recognition for %@ and %lld more of the user's languages. Short.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No %1$@ on-device +%2$lld"
+          }
+        }
+      }
+    },
+    "No API key set for %@" : {
+      "comment" : "AI Rewrite error (notice and History). %@ is the AI provider's name, e.g. Groq."
+    },
+    "No audio was recorded" : {
+      "comment" : "Error shown on a failed dictation (notice and History) when the recording held no audio."
+    },
+    "No dictations kept yet." : {
+      "comment" : "Settings › History: what History holds, when it is empty."
+    },
+    "No model chosen for %@ — choose one in Settings" : {
+      "comment" : "AI Rewrite error. %@ is the AI provider's name."
+    },
+    "No model on this Mac is ready — choose or download one in Settings › AI Rewrite" : {
+      "comment" : "AI Rewrite error when the local AI provider has no model. 'Settings › AI Rewrite' is a place in the app."
+    },
+    "Not enough disk space: the download needs %@ free, and %@ is." : {
+      "comment" : "Error before a model download. The first %@ is the space needed, the second the space free (e.g. 1.2 GB).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not enough disk space: the download needs %1$@ free, and %2$@ is."
+          }
+        }
+      }
+    },
+    "Not enough free disk space to install any local model." : {
+      "comment" : "Settings › Speech to text: why no local model is recommended."
+    },
+    "Nothing was changed." : {
+      "comment" : "Notice after a canceled selection edit."
+    },
+    "Nothing was changed. The text was put back." : {
+      "comment" : "Notice after a canceled selection edit whose text had been cut and was put back."
+    },
+    "Nothing was heard." : {
+      "comment" : "Home, History and Prompts: the text of a dictation in which nothing was heard."
+    },
+    "Nothing was pasted." : {
+      "comment" : "Notice after a canceled dictation."
+    },
+    "Nothing was pasted. The dictation is saved in History." : {
+      "comment" : "Notice after a canceled dictation whose text is in History. Two lines at most."
+    },
+    "Now using %@" : {
+      "comment" : "Notice title after the app moved to a new model. %@ is the new model's name."
+    },
+    "On this Mac" : {
+      "comment" : "Where an engine runs when it is a model on this Mac rather than an online service: names the local AI provider and the local speech engine in Settings, History and Usage."
+    },
+    "OpenAI · Paid" : {
+      "comment" : "Setup: under 'ChatGPT' on the AI card. OpenAI is the vendor's name."
+    },
+    "OpenAI's open model. Close behind Gemma, and the fastest here." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma is a model's name."
+    },
+    "Paid" : {
+      "comment" : "Setup: under an online service's name on its card — it is paid."
+    },
+    "Parakeet v3 compressed for a single language, as accurate on it." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "Parakeet v3 trained further: as accurate on our tests, just as quick." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet v3 is a model's name."
+    },
+    "Permissions" : {
+      "comment" : "Setup: the permissions step's name in the step bar."
+    },
+    "Pick a workspace, set expiry to **Never**, then copy the key." : {
+      "comment" : "Setup, getting an Anthropic API key. **Never** is an option on the vendor's English website; keep it in English and in bold."
+    },
+    "Private and free, but slow on this Mac." : {
+      "comment" : "Setup, on an Intel Mac: the 'On this Mac' card's line."
+    },
+    "Record Window" : {
+      "comment" : "The app's Record Window, a window to dictate into: a shortcut's name in Settings › Shortcuts and the overlay's menu. Use the same term everywhere it appears."
+    },
+    "Retired" : {
+      "comment" : "A model picker row: the vendor has switched this model off."
+    },
+    "Retiring on %@" : {
+      "comment" : "A model picker row: the vendor switches this model off on a day. %@ is the date, e.g. 26 Feb 2027."
+    },
+    "Retry needs a %@ API key — add one in Settings." : {
+      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor's name (Groq)."
+    },
+    "Retry needs an %@ API key — add one in Settings." : {
+      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor whose name starts with a vowel (OpenAI, ElevenLabs)."
+    },
+    "Same price." : {
+      "comment" : "After a model-change notice: the new model costs the same."
+    },
+    "Settings" : {
+      "comment" : "Notice button that opens Settings."
+    },
+    "Short dash ( – )" : {
+      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets."
+    },
+    "Shows your words live as you speak." : {
+      "comment" : "Setup: the ElevenLabs speech card's line."
+    },
+    "Shows your words live too. The same key also turns on AI text polish." : {
+      "comment" : "Setup: the OpenAI speech card's line."
+    },
+    "Slower to answer than Parakeet." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet is a model's name."
+    },
+    "Small and fast." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "Smaller still, and less accurate." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "Speech" : {
+      "comment" : "Setup: the speech-engine step's name in the step bar."
+    },
+    "Speech Recognition is off for SpeechText. Turn it on in System Settings › Privacy & Security." : {
+      "comment" : "Error when the Speech Recognition permission is off. Use macOS's own names. Two lines at most."
+    },
+    "Speech recognizer not available for %@" : {
+      "comment" : "Error when Apple's recognizer has no model for a language. %@ is a locale code, e.g. uk-UA."
+    },
+    "Strongest on accents and noise. Can show words as you speak." : {
+      "comment" : "Settings and setup: what the ElevenLabs speech service is good at."
+    },
+    "Switch" : {
+      "comment" : "Notice button that switches to the newer model."
+    },
+    "Switch to AI" : {
+      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to AI Rewrite. One line."
+    },
+    "Switch to plain text" : {
+      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to plain dictation. One line."
+    },
+    "Text appears when you stop." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. The text is pasted when recording stops."
+    },
+    "The best in our rewrite test. Clean text in 2–4 seconds." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. A model on this Mac."
+    },
+    "The cheapest, for short clean-ups." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "The fastest, a little less careful." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "The flagship. Slower, and costs more." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "The largest. About 8 seconds a dictation on an M1 Pro." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. M1 Pro is a Mac's chip."
+    },
+    "The local model \"%@\" is not installed yet" : {
+      "comment" : "Error when a dictation needs a local model that is not downloaded. %@ is the model's name."
+    },
+    "The model declined the request" : {
+      "comment" : "AI Rewrite error when the model refused without a reason."
+    },
+    "The model declined the request: %@" : {
+      "comment" : "AI Rewrite error when the model refused. %@ is the model's own reason, usually in English."
+    },
+    "The model isn't available: %@ (HTTP %lld)" : {
+      "comment" : "AI Rewrite error. %@ is the service's own reason (often English) or 'the service no longer serves it.'; %lld is the HTTP status code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The model isn't available: %1$@ (HTTP %2$lld)"
+          }
+        }
+      }
+    },
+    "The model returned an empty response" : {
+      "comment" : "AI Rewrite error: the model answered with no text."
+    },
+    "The model's reply was cut off before it ended." : {
+      "comment" : "AI Rewrite error: the model's answer was cut short."
+    },
+    "The previous Haiku, at ten times the price." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Haiku is a model's name."
+    },
+    "The previous Luna. Costs about twice as much." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Luna is a model's name."
+    },
+    "The previous Opus. Costs more than Opus 5.5." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Opus is a model's name."
+    },
+    "The previous Sol, at the same price." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name."
+    },
+    "The previous Sol. Costs twice as much." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name."
+    },
+    "The previous Sonnet, at the same price." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sonnet is a model's name."
+    },
+    "The previous Terra. Costs about twice as much." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Terra is a model's name."
+    },
+    "The quickest to answer." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+    },
+    "The rewrite failed: %@ (HTTP %lld)" : {
+      "comment" : "AI Rewrite error. %@ is a sentence saying why (the service's own words, or one of the reasons below); %lld is the HTTP status code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The rewrite failed: %1$@ (HTTP %2$lld)"
+          }
+        }
+      }
+    },
+    "The same key also turns on AI text polish." : {
+      "comment" : "Setup: the Groq speech card's line."
+    },
+    "The shortcut was let go before the microphone opened. Hold it until the overlay listens." : {
+      "comment" : "Notice when the shortcut was released before recording started. The overlay is the small recording window. Two lines at most."
+    },
+    "This Mac has an Intel processor: a model runs on it alone, and a rewrite can take a minute or more. An online service is much faster." : {
+      "comment" : "Settings › AI Rewrite and setup, on an Intel Mac: the warning under the local models."
+    },
+    "To: Sarah" : {
+      "comment" : "Home: the intro animation's AI example: the email's recipient line in Mail."
+    },
+    "Today" : {
+      "comment" : "History: date filter, and the heading over today's dictations."
+    },
+    "Transcription failed." : {
+      "comment" : "Home, History and Prompts: the text of a failed dictation with no error message."
+    },
+    "Trip plan" : {
+      "comment" : "Home: the intro animation's edit example: the note's title in Notes."
+    },
+    "Try it" : {
+      "comment" : "Setup: the last step's name in the step bar."
+    },
+    "We recommend updating from %@. Download it in Settings." : {
+      "comment" : "Notice text for a newer local model. %@ is the model in use."
+    },
+    "Week of %@" : {
+      "comment" : "Usage page: a chart bar's tooltip for a week. %@ is its first day, e.g. 28 September."
+    },
+    "Welcome" : {
+      "comment" : "Setup: the first step's name in the step bar."
+    },
+    "While holding %@, press %@. Press it again to switch back." : {
+      "comment" : "Tip text. The first %@ is the held key (e.g. Q), the second the other shortcut (e.g. ⌃⇧W). Two lines at most.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "While holding %1$@, press %2$@. Press it again to switch back."
+          }
+        }
+      }
+    },
+    "Words appear as you speak." : {
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Live text while recording."
+    },
+    "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, GPT Transcribe transcribes the recording instead. Billed per streamed minute." : {
+      "comment" : "Settings › Speech to text: a note on OpenAI's live model. GPT Transcribe is a model's name."
+    },
+    "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, Scribe v2 transcribes the recording instead. Billed per streamed minute." : {
+      "comment" : "Settings › Speech to text: a note on ElevenLabs' live model. Scribe v2 is a model's name."
+    },
+    "Works, with some mistakes." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Writes best. Slower, and costs more." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+    },
+    "Yesterday" : {
+      "comment" : "When something happened: a History heading, and the time on a dictation's row on Home, History and Prompts."
+    },
+    "You can let go of %@" : {
+      "comment" : "Tip title. %@ is the shortcut's modifier keys, e.g. ⌃⇧. One line."
+    },
+    "estimated from known prices" : {
+      "comment" : "Usage and Home: the note beside every cost — it is an estimate from list prices, not the bill. Lowercase; the app capitalizes it where it starts a line."
+    },
+    "every dictation" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps everything."
+    },
+    "for as long as History keeps it" : {
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'."
+    },
+    "i think maybe we could go on friday if thats ok for everyone" : {
+      "comment" : "Home: the intro animation's edit example: the selected text before the edit, deliberately lowercase and unpunctuated."
+    },
+    "make it sound more sure" : {
+      "comment" : "Home: the intro animation's edit example: the instruction said about the selected text. Lowercase, as spoken."
+    },
+    "the API key was rejected" : {
+      "comment" : "Why a request to an online service failed; fills the %@ in 'The rewrite failed: %@' or '… couldn't transcribe the recording: %@'. Lowercase."
+    },
+    "the last 3 months of dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+    },
+    "the last 30 days of dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+    },
+    "the last 6 months of dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+    },
+    "the last 7 days of dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+    },
+    "the last year of dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+    },
+    "the recording is too large" : {
+      "comment" : "Why a transcription failed (HTTP 413); fills the reason in '… couldn't transcribe the recording: %@'. Lowercase."
+    },
+    "the request was refused" : {
+      "comment" : "Why a request to an online service failed (any other HTTP error); fills the reason in an error sentence. Lowercase."
+    },
+    "the service is having problems" : {
+      "comment" : "Why a request to an online service failed (HTTP 5xx); fills the reason in an error sentence. Lowercase."
+    },
+    "the service no longer serves it." : {
+      "comment" : "Ends 'The model isn't available: …' when the service gives no reason. Lowercase, a sentence's end."
+    },
+    "the text is too long for the service" : {
+      "comment" : "Why an AI Rewrite request failed (HTTP 413); fills 'The rewrite failed: %@'. Lowercase."
+    },
+    "this Mac" : {
+      "comment" : "Completes 'Choose a model for %@ in Settings to dictate.' when the local engine needs a model."
+    },
+    "this session's dictations" : {
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps only this session."
+    },
+    "too many requests — try again in a moment" : {
+      "comment" : "Why a request to an online service failed (HTTP 429); fills the reason in an error sentence. Lowercase."
+    },
+    "uh email to Sarah running late start without me sorry" : {
+      "comment" : "Home: the intro animation's AI example, as said: rough, unpunctuated speech. Write it the way someone would say it in your language."
+    },
+    "until %@" : {
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. %@ is a day, e.g. Thursday 8 October."
+    },
+    "until SpeechText quits" : {
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. SpeechText is the app's name."
+    }
+  },
+  "version" : "1.0"
+}

@@ -18,10 +18,10 @@ public enum HistoryFilter: String, CaseIterable, Identifiable, Sendable {
 
     public var title: String {
         switch self {
-        case .all: "All"
-        case .rewritten: "AI Rewrite"
-        case .edits: "Edits"
-        case .failed: "Failed"
+        case .all: localized("All")
+        case .rewritten: localized("AI Rewrite")
+        case .edits: localized("Edits")
+        case .failed: localized("Failed")
         }
     }
 
@@ -217,10 +217,10 @@ public enum HistoryDates: Equatable, Hashable, Sendable {
 
     public var title: String {
         switch self {
-        case .anyTime: "Any time"
-        case .today: "Today"
-        case .last7Days: "Last 7 days"
-        case .last30Days: "Last 30 days"
+        case .anyTime: localized("Any time")
+        case .today: localized("Today")
+        case .last7Days: localized("Last 7 days")
+        case .last30Days: localized("Last 30 days")
         case .day(let day): HistoryFormat.formatter("d MMM yyyy", calendar: .current).string(from: day)
         }
     }
@@ -357,26 +357,26 @@ public enum HistoryRetention: String, CaseIterable, Identifiable, Sendable {
     /// The slider's label.
     public var title: String {
         switch self {
-        case .session: "Don't keep"
-        case .days7: "7 days"
-        case .days30: "30 days"
-        case .months3: "3 months"
-        case .months6: "6 months"
-        case .year: "1 year"
-        case .forever: "Forever"
+        case .session: localized("Don't keep")
+        case .days7: localized("7 days")
+        case .days30: localized("30 days")
+        case .months3: localized("3 months")
+        case .months6: localized("6 months")
+        case .year: localized("1 year")
+        case .forever: localized("Forever")
         }
     }
 
     /// The end of "History keeps …" / "Counted from …".
     public var phrase: String {
         switch self {
-        case .session: "this session's dictations"
-        case .days7: "the last 7 days of dictations"
-        case .days30: "the last 30 days of dictations"
-        case .months3: "the last 3 months of dictations"
-        case .months6: "the last 6 months of dictations"
-        case .year: "the last year of dictations"
-        case .forever: "every dictation"
+        case .session: localized("this session's dictations")
+        case .days7: localized("the last 7 days of dictations")
+        case .days30: localized("the last 30 days of dictations")
+        case .months3: localized("the last 3 months of dictations")
+        case .months6: localized("the last 6 months of dictations")
+        case .year: localized("the last year of dictations")
+        case .forever: localized("every dictation")
         }
     }
 
@@ -458,8 +458,8 @@ public struct HistoryDay: Identifiable, Equatable, Sendable {
     public func title(now: Date = Date(), calendar: Calendar = .current) -> String {
         let today = calendar.startOfDay(for: now)
         let days = calendar.dateComponents([.day], from: start, to: today).day ?? 0
-        if days == 0 { return "Today" }
-        if days == 1 { return "Yesterday" }
+        if days == 0 { return localized("Today") }
+        if days == 1 { return localized("Yesterday") }
         let sameYear = calendar.component(.year, from: start) == calendar.component(.year, from: now)
         let format = days > 1 && days < 7 ? "EEEE" : sameYear ? "d MMMM" : "d MMMM yyyy"
         return HistoryFormat.formatter(format, calendar: calendar).string(from: start)
@@ -608,10 +608,17 @@ public enum HistoryFormat {
         defer { formattersLock.unlock() }
         if let known = formatters[key] { return known }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_GB")
         formatter.calendar = calendar
         formatter.timeZone = calendar.timeZone
-        formatter.dateFormat = format
+        // English keeps the pages' own day-month order; another language orders the same
+        // fields its own way.
+        if uiLocale.language.languageCode == .english {
+            formatter.locale = Locale(identifier: "en_GB")
+            formatter.dateFormat = format
+        } else {
+            formatter.locale = uiLocale
+            formatter.setLocalizedDateFormatFromTemplate(format)
+        }
         formatters[key] = formatter
         return formatter
     }
@@ -630,7 +637,7 @@ public enum HistoryFormat {
     public static func length(_ seconds: TimeInterval) -> String? {
         guard seconds > 0 else { return nil }
         let total = max(1, Int(seconds.rounded()))
-        return total < 60 ? "\(total) s" : String(format: "%d:%02d", total / 60, total % 60)
+        return total < 60 ? localized("\(total) s") : String(format: "%d:%02d", total / 60, total % 60)
     }
 
     /// How long a failed dictation's audio is kept for a retry, as the end of "The audio is
@@ -639,40 +646,52 @@ public enum HistoryFormat {
     public static func audioKept(_ record: TranscriptionRecord, audio: HistoryRetention, history: HistoryRetention,
                           calendar: Calendar = .current) -> String {
         let rule = audio.outlasts(history) ? history : audio
-        if rule == .session { return "until SpeechText quits" }
-        guard let until = rule.keptUntil(record.date, calendar: calendar) else { return "for as long as History keeps it" }
-        return "until " + formatter("EEEE d MMMM", calendar: calendar).string(from: until)
+        if rule == .session { return localized("until SpeechText quits") }
+        guard let until = rule.keptUntil(record.date, calendar: calendar) else {
+            return localized("for as long as History keeps it")
+        }
+        let day = formatter("EEEE d MMMM", calendar: calendar).string(from: until)
+        return localized("until \(day)")
     }
 
     /// What History holds now, under its settings: "125 dictations since 14 September · 70 KB".
     public static func storageSummary(count: Int, since: Date?, bytes: Int64, calendar: Calendar = .current) -> String {
-        guard count > 0 else { return "No dictations kept yet." }
-        let dictations = count == 1 ? "1 dictation" : "\(HomeFormat.integer(count)) dictations"
-        let start = since.map { " since " + formatter("d MMMM", calendar: calendar).string(from: $0) } ?? ""
+        guard count > 0 else { return localized("No dictations kept yet.") }
         let size = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
-        return dictations + start + " · " + size
+        guard let since else { return localized("\(count) dictations · \(size)") }
+        let start = formatter("d MMMM", calendar: calendar).string(from: since)
+        return localized("\(count) dictations since \(start) · \(size)")
     }
 
     /// What History keeps, in a sentence or two — History's foot.
     public static func retentionSummary(history: HistoryRetention, audio: HistoryRetention) -> String {
-        let kept = history == .session
-            ? "History keeps this session's dictations, until SpeechText quits."
-            : "History keeps \(history.phrase) on this Mac."
-        let rule = audio.outlasts(history) ? history : audio
-        let audioKept: String = switch rule {
-        case .session: "until SpeechText quits"
-        case .forever: "as long as the dictation"
-        case .year: "for a year"
-        default: "for " + rule.title
+        // Whole sentences, one for each setting, so each language can say them its own way.
+        let kept = switch history {
+        case .session: localized("History keeps this session's dictations, until SpeechText quits.")
+        case .days7: localized("History keeps the last 7 days of dictations on this Mac.")
+        case .days30: localized("History keeps the last 30 days of dictations on this Mac.")
+        case .months3: localized("History keeps the last 3 months of dictations on this Mac.")
+        case .months6: localized("History keeps the last 6 months of dictations on this Mac.")
+        case .year: localized("History keeps the last year of dictations on this Mac.")
+        case .forever: localized("History keeps every dictation on this Mac.")
         }
-        return kept + " A failed one's audio is kept \(audioKept), for a retry."
+        let audioKept = switch audio.outlasts(history) ? history : audio {
+        case .session: localized("A failed one's audio is kept until SpeechText quits, for a retry.")
+        case .days7: localized("A failed one's audio is kept for 7 days, for a retry.")
+        case .days30: localized("A failed one's audio is kept for 30 days, for a retry.")
+        case .months3: localized("A failed one's audio is kept for 3 months, for a retry.")
+        case .months6: localized("A failed one's audio is kept for 6 months, for a retry.")
+        case .year: localized("A failed one's audio is kept for a year, for a retry.")
+        case .forever: localized("A failed one's audio is kept as long as the dictation, for a retry.")
+        }
+        return kept + " " + audioKept
     }
 
     /// The speech engine a record names, as a person would: "Groq", "On this Mac".
     public static func engine(_ provider: String) -> String {
         switch STTProviderType(rawValue: provider) {
         case .apple: "Apple"
-        case .local: "On this Mac"
+        case .local: localized("On this Mac")
         case .some(let type): type.vendor.displayName
         case nil: provider
         }

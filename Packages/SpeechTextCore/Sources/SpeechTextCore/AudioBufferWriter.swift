@@ -501,8 +501,8 @@ public final class AudioBufferWriter: @unchecked Sendable {
 
         var errorDescription: String? {
             switch self {
-            case .noAudio: "No audio was recorded"
-            case .conversionFailed(let reason): "Audio conversion failed: \(reason)"
+            case .noAudio: localized("No audio was recorded")
+            case .conversionFailed(let reason): localized("Audio conversion failed: \(reason)")
             }
         }
     }

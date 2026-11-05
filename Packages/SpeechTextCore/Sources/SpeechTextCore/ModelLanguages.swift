@@ -78,13 +78,13 @@ func missingLanguages(spoken: [String], coverage: LanguageCoverage,
     return spoken.filter { match[$0] == .unsupported }
 }
 
-/// A language's name in English, the app's language: the catalogue's name for one the user
-/// can state, else Foundation's, else the code itself.
+/// A language's name in the app's language: the catalogue's name for one the user can
+/// state, else Foundation's, else the code itself.
 func languageDisplayName(_ code: String) -> String {
     if let stated = spokenLanguageCatalog.first(where: { $0.id == languageSubtag(code) }) {
         return stated.displayName
     }
-    return Locale(identifier: "en").localizedString(forLanguageCode: code) ?? code
+    return languageName(code, english: nil)
 }
 
 /// The row's subtitle count: "25 languages", "90+ languages", "English only" — nil when the
@@ -92,9 +92,9 @@ func languageDisplayName(_ code: String) -> String {
 public func languageCountLabel(_ coverage: LanguageCoverage) -> String? {
     guard case .listed(let list) = coverage else { return nil }
     let count = Set(list.codes.map(languageSubtag)).count
-    if count == 1 { return "\(languageDisplayName(list.codes[0])) only" }
-    if let floor = list.vendorSaysAtLeast { return "\(floor)+ languages" }
-    return "\(count) languages"
+    if count == 1 { return localized("\(languageDisplayName(list.codes[0])) only") }
+    if let floor = list.vendorSaysAtLeast { return localized("\(floor)+ languages") }
+    return localized("\(count) languages")
 }
 
 /// The warning badge for a row whose model lacks one of the user's languages: "No Spanish",
@@ -103,9 +103,14 @@ public func missingLanguageBadgeText(spoken: [String], coverage: LanguageCoverag
                               onDevice: (String) -> Bool? = { _ in nil }) -> String? {
     let missing = missingLanguages(spoken: spoken, coverage: coverage, onDevice: onDevice)
     guard let first = missing.first else { return nil }
-    let onThisMac = coverage == .decidedBySystem ? " on-device" : ""
-    let more = missing.count > 1 ? " +\(missing.count - 1)" : ""
-    return "No \(languageDisplayName(first))\(onThisMac)\(more)"
+    let name = languageDisplayName(first)
+    let more = missing.count - 1
+    switch (coverage == .decidedBySystem, more > 0) {
+    case (false, false): return localized("No \(name)")
+    case (true, false): return localized("No \(name) on-device")
+    case (false, true): return localized("No \(name) +\(more)")
+    case (true, true): return localized("No \(name) on-device +\(more)")
+    }
 }
 
 /// A row's line with the measured notes for the user's own languages added, in their order.
@@ -126,8 +131,10 @@ public func spokenLanguagesWarning(modelName: String, spoken: [String], coverage
     let missing = missingLanguages(spoken: spoken, coverage: coverage, onDevice: onDevice)
     guard !missing.isEmpty else { return nil }
     let names = missing.map(languageDisplayName)
-    let list = names.count > 1 ? names.dropLast().joined(separator: ", ") + " or " + names.last! : names[0]
-    return "\(modelName) can't take \(list)\(coverage == .decidedBySystem ? " on this Mac" : "")."
+    let list = names.count > 1 ? localized("\(names.dropLast().joined(separator: ", ")) or \(names.last!)") : names[0]
+    return coverage == .decidedBySystem
+        ? localized("\(modelName) can't take \(list) on this Mac.")
+        : localized("\(modelName) can't take \(list).")
 }
 
 // MARK: - Published lists

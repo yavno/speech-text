@@ -462,7 +462,7 @@ public enum TranscriptionError: LocalizedError, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidResponse(let provider): "Invalid response from \(provider.displayName) API"
+        case .invalidResponse(let provider): localized("Invalid response from \(provider.displayName) API")
         case .httpError(let provider, let code, let body):
             providerErrorMessage(vendor: provider.displayName, status: code, body: body)
         case .realtime(let provider, let code, let detail): "\(provider.displayName) realtime \(code): \(detail)"
@@ -583,7 +583,7 @@ extension ElevenLabsTranscriber {
 func providerErrorMessage(vendor: String, status: Int, body: String) -> String {
     let reason = providerErrorReason(in: body) ?? genericReason(forStatus: status)
     let sentence = reason.last.map { ".!?".contains($0) } == true ? reason : reason + "."
-    return "\(vendor) couldn't transcribe the recording: \(sentence) (HTTP \(status))"
+    return localized("\(vendor) couldn't transcribe the recording: \(sentence) (HTTP \(status))")
 }
 
 /// The provider's own message in an error reply, or nil when the body has none.
@@ -608,11 +608,11 @@ func providerErrorReason(in body: String) -> String? {
 
 private func genericReason(forStatus status: Int) -> String {
     switch status {
-    case 401, 403: "the API key was rejected"
-    case 413: "the recording is too large"
-    case 429: "too many requests — try again in a moment"
-    case 500...: "the service is having problems"
-    default: "the request was refused"
+    case 401, 403: localized("the API key was rejected")
+    case 413: localized("the recording is too large")
+    case 429: localized("too many requests — try again in a moment")
+    case 500...: localized("the service is having problems")
+    default: localized("the request was refused")
     }
 }
 
