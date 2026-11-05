@@ -535,7 +535,7 @@ private struct PromptEditorCard: View {
         .overlay(shape.strokeBorder(MainColor.panelBorder, lineWidth: 1))
     }
 
-    private func section<Content: View>(_ title: String, hint: String, @ViewBuilder content: () -> Content) -> some View {
+    private func section<Content: View>(_ title: LocalizedStringKey, hint: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 3) {
                 MainKicker(title: title)

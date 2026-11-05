@@ -124,7 +124,7 @@ struct DictionaryView: View {
         }
     }
 
-    private func field<Content: View>(_ title: String, optional: Bool, @ViewBuilder content: () -> Content) -> some View {
+    private func field<Content: View>(_ title: LocalizedStringKey, optional: Bool, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 5) {
                 Text(title).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(MainColor.ink)
@@ -148,11 +148,11 @@ struct DictionaryView: View {
                 } else if spellings.isEmpty {
                     Text("“\(term)” will be given to the speech engine and AI Rewrite, so they spell it your way.")
                 } else {
-                    spellings.map { Text("“\($0)”").strikethrough(color: MainColor.ink3) }
+                    let wrong = spellings.map { Text("“\($0)”").strikethrough(color: MainColor.ink3) }
                         .enumerated()
-                        .reduce(Text(verbatim: "")) { text, item in text + (item.offset > 0 ? Text(", ") : Text(verbatim: "")) + item.element }
-                        + Text(" will become ") + Text(term).fontWeight(.semibold).foregroundColor(MainColor.ink)
-                        + Text(" in everything you dictate.")
+                        .reduce(Text(verbatim: "")) { text, item in text + Text(verbatim: item.offset > 0 ? ", " : "") + item.element }
+                    let right = Text(verbatim: term).fontWeight(.semibold).foregroundColor(MainColor.ink)
+                    Text("\(wrong) will become \(right) in everything you dictate.")
                 }
             }
             .font(.system(size: 12.5))
@@ -170,11 +170,11 @@ struct DictionaryView: View {
     /// The word's own split into halves is the usual mishearing of a compound. Any other word has
     /// no mishearing to guess, and an invented one ("Man" → "mans") would be a real word replaced
     /// everywhere if copied, so the field only says what goes in it.
-    private var example: String {
+    private var example: LocalizedStringKey {
         let term = newTerm.trimmingCharacters(in: .whitespaces)
         guard !term.isEmpty else { return "e.g. speech text, спіч текст" }
         let split = term.replacingOccurrences(of: #"(?<=\p{Ll})(?=\p{Lu})"#, with: " ", options: .regularExpression)
-        return split != term ? "e.g. " + split.lowercased() : "how it comes out wrong — commas between"
+        return split != term ? "e.g. \(split.lowercased())" : "how it comes out wrong — commas between"
     }
 
     private func add(term raw: String? = nil) {
@@ -283,7 +283,7 @@ private struct DictionaryWordTile: View {
         Button { isEditing = true } label: {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(entry.trimmedTerm.isEmpty ? "Untitled" : entry.trimmedTerm)
+                    (entry.trimmedTerm.isEmpty ? Text("Untitled") : Text(verbatim: entry.trimmedTerm))
                         .font(.system(size: 15, weight: .semibold))
                         .tracking(-0.2)
                         .foregroundStyle(MainColor.ink)
@@ -295,7 +295,7 @@ private struct DictionaryWordTile: View {
                             .font(.system(size: 11.5, weight: .medium))
                             .foregroundStyle(MainColor.ink2)
                             .monospacedDigit()
-                            .help("In \(uses) \(uses == 1 ? "dictation" : "dictations") History keeps")
+                            .help("In \(uses) dictations History keeps")
                     }
                 }
                 spellings
@@ -331,7 +331,7 @@ private struct DictionaryWordTile: View {
         } else {
             FlowLayout(spacing: 5) {
                 ForEach(replacements.prefix(4), id: \.self) { spelling in
-                    Text(spelling)
+                    Text(verbatim: spelling)
                         .font(.system(size: 11.5))
                         .strikethrough(color: MainColor.ink3)
                         .foregroundStyle(MainColor.ink2)
@@ -371,7 +371,7 @@ private struct DictionaryWordEditor: View {
                     FlowLayout(spacing: 6) {
                         ForEach(Array(entry.misheard.enumerated()), id: \.offset) { index, spelling in
                             HStack(spacing: 4) {
-                                Text(spelling).font(.system(size: 12, weight: .medium)).foregroundStyle(MainColor.ink)
+                                Text(verbatim: spelling).font(.system(size: 12, weight: .medium)).foregroundStyle(MainColor.ink)
                                 Button {
                                     entry.misheard.remove(at: index)
                                 } label: {
@@ -472,14 +472,14 @@ private struct DictionaryReplacements: View {
 
     private func row(_ pair: TextReplacementPair) -> some View {
         HStack(spacing: 10) {
-            Text(pair.replace)
+            Text(verbatim: pair.replace)
                 .strikethrough(color: MainColor.ink3)
                 .foregroundStyle(MainColor.ink2)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Image(systemName: "arrow.right")
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(MainColor.ink3)
-            Text(pair.with)
+            Text(verbatim: pair.with)
                 .fontWeight(.medium)
                 .foregroundStyle(MainColor.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -516,7 +516,7 @@ private struct DictionaryReplacements: View {
         TextReplacements.save(pairs)
     }
 
-    private func message(for problem: TextReplacements.EntryProblem) -> String {
+    private func message(for problem: TextReplacements.EntryProblem) -> LocalizedStringKey {
         switch problem {
         case .emptyReplace: "Type what is recognized now."
         case .emptyWith: "Type how it should be written."
@@ -556,12 +556,12 @@ private struct DictionaryEffects: View {
                         .help("Send your words to the speech engine with every dictation")
                 }
                 MainRule()
-                row(symbol: "arrow.left.arrow.right", title: "Wrong spellings are replaced",
-                    detail: "With the Replacements, in what every engine writes before it's pasted or rewritten, in AI Rewrite's and Edit's replies, and in History.", on: true)
+                row(symbol: "arrow.left.arrow.right", title: Text("Wrong spellings are replaced"),
+                    detail: Text("With the Replacements, in what every engine writes before it's pasted or rewritten, in AI Rewrite's and Edit's replies, and in History."), on: true)
                 MainRule()
-                row(symbol: "sparkles", title: "AI Rewrite keeps them as written",
-                    detail: aiReady ? "It's given your words with every AI dictation and told to spell them your way."
-                    : "Once AI Rewrite has a provider, it's given your words with every AI dictation.",
+                row(symbol: "sparkles", title: Text("AI Rewrite keeps them as written"),
+                    detail: aiReady ? Text("It's given your words with every AI dictation and told to spell them your way.")
+                    : Text("Once AI Rewrite has a provider, it's given your words with every AI dictation."),
                     on: aiReady, ai: true)
             }
         }
@@ -586,48 +586,50 @@ private struct DictionaryEffects: View {
         return sttModel(vendor: provider.vendor, id: id)
     }
 
-    private var engine: (title: String, detail: String, on: Bool) {
+    private var engine: (title: Text, detail: Text, on: Bool) {
         let terms = CustomVocabulary.ranked(entries, now: Date(), rankByUse: false, historyTexts: { [] })
         let vendor = model.vendor.displayName
         guard sends else {
-            return ("The speech engine isn't told them",
-                    "Turned off. Wrong spellings are still replaced, and AI Rewrite still keeps them as written.", false)
+            return (Text("The speech engine isn't told them"),
+                    Text("Turned off. Wrong spellings are still replaced, and AI Rewrite still keeps them as written."), false)
         }
         if let limits = model.vocabulary.limits {
-            let title = provider == .apple ? "Apple's recognizer listens for them" : "\(vendor) is given them"
+            let title = provider == .apple ? Text("Apple's recognizer listens for them") : Text("\(vendor) is given them")
             var detail = Self.count(sent: CustomVocabulary.selected(terms, limits: limits).count,
                                     of: terms.count, model: model.displayName)
             if let surcharge = model.price.listed?.keytermSurchargePerMinute, surcharge > 0 {
-                detail += " \(vendor) charges about \(HomeFormat.money(surcharge * 60)) an hour more for a transcription that carries them."
+                let price = HomeFormat.money(surcharge * 60)
+                detail = detail + Text(verbatim: " ")
+                    + Text("\(vendor) charges about \(price) an hour more for a transcription that carries them.")
             }
             return (title, detail, true)
         }
         switch provider {
         case .groq:
-            return ("Groq's Whisper is given them as a hint",
-                    Self.count(sent: Vocabulary.whisperPromptTerms(terms).count, of: terms.count, model: model.displayName)
-, true)
+            return (Text("Groq's Whisper is given them as a hint"),
+                    Self.count(sent: Vocabulary.whisperPromptTerms(terms).count, of: terms.count, model: model.displayName),
+                    true)
         case .local:
-            return ("The model on this Mac isn't given them",
-                    "Local models take no list of words — the replacements still put them right.", false)
+            return (Text("The model on this Mac isn't given them"),
+                    Text("Local models take no list of words — the replacements still put them right."), false)
         default:
-            return ("\(model.displayName) isn't given them",
-                    "It takes no list of words — the replacements still put them right. GPT Transcribe and GPT Live Transcribe do.", false)
+            return (Text("\(model.displayName) isn't given them"),
+                    Text("It takes no list of words — the replacements still put them right. GPT Transcribe and GPT Live Transcribe do."), false)
         }
     }
 
     /// "All 12 go to GPT Transcribe…" or "50 of 73 …", with what decides which.
-    private static func count(sent: Int, of total: Int, model: String) -> String {
-        if total == 0 { return "Your words go to \(model) with every dictation." }
-        if sent == total { return "All \(total) go to \(model) with every dictation." }
-        return "\(sent) of \(total) go to \(model) — it takes no more. The ones you use most, and anything added this week, go first."
+    private static func count(sent: Int, of total: Int, model: String) -> Text {
+        if total == 0 { return Text("Your words go to \(model) with every dictation.") }
+        if sent == total { return Text("All \(total) go to \(model) with every dictation.") }
+        return Text("\(sent) of \(total) go to \(model) — it takes no more. The ones you use most, and anything added this week, go first.")
     }
 
-    private func row(symbol: String, title: String, detail: String, on: Bool, ai: Bool = false) -> some View {
+    private func row(symbol: String, title: Text, detail: Text, on: Bool, ai: Bool = false) -> some View {
         row(symbol: symbol, title: title, detail: detail, on: on, ai: ai) { EmptyView() }
     }
 
-    private func row<Control: View>(symbol: String, title: String, detail: String, on: Bool, ai: Bool = false,
+    private func row<Control: View>(symbol: String, title: Text, detail: Text, on: Bool, ai: Bool = false,
                                     @ViewBuilder control: () -> Control) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
@@ -636,8 +638,8 @@ private struct DictionaryEffects: View {
                 .frame(width: 18)
                 .padding(.top, 1)
             VStack(alignment: .leading, spacing: 3) {
-                Text(title).font(.system(size: 13.5, weight: .medium)).foregroundStyle(on ? MainColor.ink : MainColor.ink2)
-                Text(detail)
+                title.font(.system(size: 13.5, weight: .medium)).foregroundStyle(on ? MainColor.ink : MainColor.ink2)
+                detail
                     .font(.system(size: 12.5))
                     .foregroundStyle(MainColor.ink2)
                     .lineSpacing(2)
@@ -664,7 +666,7 @@ private struct DictionarySuggestionChip: View {
             HStack(spacing: 6) {
                 Image(systemName: "plus").font(.system(size: 9, weight: .bold))
                     .foregroundStyle(hovering ? MainColor.okInk : MainColor.ink3)
-                Text(term).font(.system(size: 12.5, weight: .medium)).foregroundStyle(MainColor.ink)
+                Text(verbatim: term).font(.system(size: 12.5, weight: .medium)).foregroundStyle(MainColor.ink)
                 Text("\(count)×").font(.system(size: 11)).foregroundStyle(MainColor.ink3).monospacedDigit()
             }
             .padding(.horizontal, 10)
