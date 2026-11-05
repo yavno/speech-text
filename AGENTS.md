@@ -220,7 +220,7 @@ package hands to the UI, which it writes as `localized("…")` (`Localized.swift
 
 - After adding or changing a string literal passed to SwiftUI (`Text("…")`, `Button("…")`,
   …) or to `localized(_:)`, run `scripts/sync-strings.sh` and commit the catalogs with the
-  code; CI fails when the two are out of step.
+  code; CI fails when either catalog is out of step with the code.
 - The permission prompts and the copyright line are in `Info.plist` and again, as
   their English source, in `InfoPlist.xcstrings`; change both together
   (`scripts/check-infoplist-strings.sh`).
