@@ -38,7 +38,7 @@ PLURAL_FORMS = {
     "uk": {"one", "few", "many", "other"},
 }
 
-SPECIFIER = re.compile(r"%(?:(\d+)\$)?([-+ 0#]*\d*(?:\.\d+)?(?:hh|h|ll|l|q|z|t|j)?[@dDiuUxXoOfeEgGcCsSpaA]|#@[A-Za-z0-9_]+@)")
+SPECIFIER = re.compile(r"%(?:(\d+)\$)?([-+0#]*\d*(?:\.\d+)?(?:hh|h|ll|l|q|z|t|j)?[@dDiuUxXoOfeEgGcCsSpaA]|#@[A-Za-z0-9_]+@)")
 LINK = re.compile(r"\]\(([^)]*)\)")
 URL = re.compile(r"https?://\S+")
 MARKS = ("**", "__", "`", "~~")

@@ -91,6 +91,11 @@ class TranslationsTest(CatalogTest):
         paths = self.catalog({"Press **Return**": {"localizations": {"es": unit("Pulsa Return")}}})
         self.assertEqual(len(check.check_translations(paths)), 1)
 
+    def test_a_percentage_before_a_word_is_not_a_specifier(self):
+        # "30% slower" is not "% s": the space flag is left out of the pattern on purpose.
+        paths = self.catalog({"About 30% slower.": {"localizations": {"uk": unit("Приблизно на 30% повільніша.")}}})
+        self.assertEqual(check.check_translations(paths), [])
+
     def test_percent_sign_is_not_a_specifier(self):
         paths = self.catalog({"100%% local": {"localizations": {"uk": unit("100%% локально")}}})
         self.assertEqual(check.check_translations(paths), [])
