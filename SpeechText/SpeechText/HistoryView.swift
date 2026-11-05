@@ -101,7 +101,7 @@ struct HistoryView: View {
                     .foregroundStyle(MainColor.ink)
                 Spacer(minLength: 12)
                 if !records.isEmpty {
-                    Text(records.count == 1 ? "1 dictation" : "\(HomeFormat.integer(records.count)) dictations")
+                    Text("\(records.count) dictations")
                         .font(.system(size: 13))
                         .foregroundStyle(MainColor.ink3)
                         .monospacedDigit()
@@ -154,11 +154,14 @@ struct HistoryView: View {
             if nothingAtAll {
                 Text("Nothing dictated yet. Press \(shortcutText(for: .inline)) in any app, speak, and press it again — every dictation is kept here.")
             } else if query.isEmpty && narrowing.isEmpty {
-                Text("No \(filter == .edits ? "edits" : filter == .failed ? "failed dictations" : "dictations rewritten by AI") yet.")
+                filter == .edits ? Text("No edits yet.")
+                    : filter == .failed ? Text("No failed dictations yet.") : Text("No dictations rewritten by AI yet.")
             } else if query.isEmpty {
-                Text("Nothing \(filter == .all ? "" : "in \(filter.title) ")\(narrowingPhrase).")
+                Text("Nothing \(conditions).")
+            } else if conditions.isEmpty {
+                Text("Nothing matches “\(query)”.")
             } else {
-                Text("Nothing matches “\(query)”\(filter == .all ? "" : " in \(filter.title)")\(narrowing.isEmpty ? "" : " " + narrowingPhrase).")
+                Text("Nothing matches “\(query)” \(conditions).")
             }
             if !nothingAtAll {
                 HStack(spacing: 8) {
@@ -188,15 +191,23 @@ struct HistoryView: View {
         }
     }
 
+    /// "in Edits in Slack, in the last 7 days": the filter, then the narrowing.
+    private var conditions: String {
+        [filter == .all ? nil : String(localized: "in \(filter.title)"), narrowing.isEmpty ? nil : narrowingPhrase]
+            .compactMap { $0 }.joined(separator: " ")
+    }
+
     /// "in Slack, in the last 7 days".
     private var narrowingPhrase: String {
         var parts: [String] = []
-        if let app = narrowing.app { parts.append(app == "Not pasted" ? "that wasn't pasted" : "in \(app)") }
+        if let app = narrowing.app {
+            parts.append(app == HomeRecentEntry.notPasted ? String(localized: "that wasn't pasted") : String(localized: "in \(app)"))
+        }
         switch narrowing.dates {
         case .anyTime: break
-        case .today: parts.append("today")
-        case .day(let day): parts.append("on " + HistoryFormat.formatter("d MMMM", calendar: .current).string(from: day))
-        case let dates: parts.append("in the " + dates.title.lowercased())
+        case .today: parts.append(String(localized: "today"))
+        case .day(let day): parts.append(String(localized: "on \(HistoryFormat.formatter("d MMMM", calendar: .current).string(from: day))"))
+        case let dates: parts.append(String(localized: "in the \(dates.title.lowercased())"))
         }
         return parts.joined(separator: ", ")
     }
@@ -205,7 +216,7 @@ struct HistoryView: View {
 
     private var footer: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(HistoryFormat.retentionSummary(history: HistoryRetention.stored(retentionRaw),
+            Text(verbatim: HistoryFormat.retentionSummary(history: HistoryRetention.stored(retentionRaw),
                                                 audio: HistoryRetention.stored(audioRetentionRaw, default: .defaultAudio)))
                 .font(.system(size: 12.5))
                 .foregroundStyle(MainColor.ink3)
@@ -258,7 +269,7 @@ private struct HistorySearchField: View {
 /// set to — then on the soft green, with an ✕ to clear it. Opens a popover to choose.
 private struct HistoryNarrowButton<Choices: View>: View {
     let symbol: String
-    let title: String
+    let title: Text
     let isSet: Bool
     let clear: () -> Void
     @ViewBuilder var choices: (_ dismiss: @escaping () -> Void) -> Choices
@@ -272,7 +283,7 @@ private struct HistoryNarrowButton<Choices: View>: View {
                 HStack(spacing: 6) {
                     Image(systemName: symbol).font(.system(size: 11.5, weight: .medium))
                         .foregroundStyle(isSet ? MainColor.okInk : MainColor.ink3)
-                    Text(title)
+                    title
                         .font(.system(size: 13, weight: isSet ? .medium : .regular))
                         .foregroundStyle(isSet ? MainColor.ink : MainColor.ink2)
                         .lineLimit(1)
@@ -305,7 +316,7 @@ private struct HistoryNarrowButton<Choices: View>: View {
 
 /// One choice in a narrowing's popover: a mark, its name, how many, and a tick when set.
 private struct HistoryChoiceRow<Mark: View>: View {
-    let title: String
+    let title: Text
     var count: Int?
     let selected: Bool
     let action: () -> Void
@@ -316,10 +327,10 @@ private struct HistoryChoiceRow<Mark: View>: View {
         Button(action: action) {
             HStack(spacing: 9) {
                 mark()
-                Text(title).font(.system(size: 13)).foregroundStyle(MainColor.ink).lineLimit(1)
+                title.font(.system(size: 13)).foregroundStyle(MainColor.ink).lineLimit(1)
                 Spacer(minLength: 12)
                 if let count {
-                    Text(HomeFormat.integer(count)).font(.system(size: 12)).foregroundStyle(MainColor.ink3).monospacedDigit()
+                    Text(verbatim: HomeFormat.integer(count)).font(.system(size: 12)).foregroundStyle(MainColor.ink3).monospacedDigit()
                 }
                 Image(systemName: "checkmark").font(.system(size: 10, weight: .bold))
                     .foregroundStyle(MainColor.okInk)
@@ -341,17 +352,17 @@ private struct HistoryAppMenu: View {
     let records: [TranscriptionRecord]
 
     var body: some View {
-        HistoryNarrowButton(symbol: "app.dashed", title: app ?? "App", isSet: app != nil, clear: { app = nil }) { dismiss in
+        HistoryNarrowButton(symbol: "app.dashed", title: app.map(HomePlace.text) ?? Text("App"), isSet: app != nil, clear: { app = nil }, choices: { dismiss in
             // Counted only while the popover is open, not on every key typed in the search.
             let apps = HistoryNarrowing.apps(in: records)
             ScrollView {
                 VStack(alignment: .leading, spacing: 1) {
-                    HistoryChoiceRow(title: "Any app", selected: app == nil, action: { app = nil; dismiss() }) {
+                    HistoryChoiceRow(title: Text("Any app"), selected: app == nil, action: { app = nil; dismiss() }) {
                         Image(systemName: "square.grid.2x2").font(.system(size: 12)).foregroundStyle(MainColor.ink3)
                             .frame(width: 20, height: 20)
                     }
                     ForEach(apps, id: \.app) { item in
-                        HistoryChoiceRow(title: item.app, count: item.count, selected: app == item.app,
+                        HistoryChoiceRow(title: HomePlace.text(item.app), count: item.count, selected: app == item.app,
                                          action: { app = item.app; dismiss() }) {
                             HomeAppMark(app: item.app, size: 20, radius: 6)
                         }
@@ -362,7 +373,7 @@ private struct HistoryAppMenu: View {
             .frame(width: 250)
             .frame(maxHeight: 360)
             .fixedSize(horizontal: false, vertical: true)
-        }
+        })
     }
 }
 
@@ -372,11 +383,11 @@ private struct HistoryDatesMenu: View {
     let records: [TranscriptionRecord]
 
     var body: some View {
-        HistoryNarrowButton(symbol: "calendar", title: dates == .anyTime ? "Date" : dates.title,
-                            isSet: dates != .anyTime, clear: { dates = .anyTime }) { dismiss in
+        HistoryNarrowButton(symbol: "calendar", title: dates == .anyTime ? Text("Date") : Text(verbatim: dates.title),
+                            isSet: dates != .anyTime, clear: { dates = .anyTime }, choices: { dismiss in
             VStack(alignment: .leading, spacing: 1) {
                 ForEach(HistoryDates.presets, id: \.self) { preset in
-                    HistoryChoiceRow(title: preset.title, selected: dates == preset, action: { dates = preset; dismiss() }) {
+                    HistoryChoiceRow(title: Text(verbatim: preset.title), selected: dates == preset, action: { dates = preset; dismiss() }) {
                         EmptyView()
                     }
                 }
@@ -390,7 +401,7 @@ private struct HistoryDatesMenu: View {
             }
             .padding(6)
             .frame(width: 250)
-        }
+        })
     }
 
     private var selectedDay: Date? {
@@ -418,7 +429,7 @@ private struct HistoryCalendar: View {
         let days = Set(records.map { calendar.startOfDay(for: $0.date) })
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 2) {
-                Text(HistoryFormat.formatter("LLLL yyyy", calendar: calendar).string(from: shown))
+                Text(verbatim: HistoryFormat.formatter("LLLL yyyy", calendar: calendar).string(from: shown))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(MainColor.ink)
                     .padding(.leading, 6)
@@ -435,16 +446,16 @@ private struct HistoryCalendar: View {
         month = calendar.date(byAdding: .month, value: months, to: shown)
     }
 
-    private func arrow(_ symbol: String, label: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+    private func arrow(_ symbol: String, label: LocalizedStringKey, enabled: Bool, action: @escaping () -> Void) -> some View {
         HistoryCalendarArrow(symbol: symbol, enabled: enabled, action: action)
             .accessibilityLabel(label)
     }
 
     private func grid(month: Date, days: Set<Date>) -> some View {
-        // In English, as the rest of History, two letters each: "Mo Tu We".
-        var english = calendar
-        english.locale = Locale(identifier: "en_GB")
-        let symbols = english.shortStandaloneWeekdaySymbols.map { String($0.prefix(2)) }
+        // In the app's language, two letters each: "Mo Tu We".
+        var named = calendar
+        named.locale = .appLanguage
+        let symbols = named.shortStandaloneWeekdaySymbols.map { String($0.prefix(2)) }
         let first = calendar.firstWeekday - 1
         let weekdays = Array(symbols[first...] + symbols[..<first])
         let lead = (calendar.component(.weekday, from: month) - calendar.firstWeekday + 7) % 7
@@ -456,7 +467,7 @@ private struct HistoryCalendar: View {
         return VStack(spacing: 2) {
             HStack(spacing: 2) {
                 ForEach(Array(weekdays.enumerated()), id: \.offset) { _, symbol in
-                    Text(symbol)
+                    Text(verbatim: symbol)
                         .font(.system(size: 10.5, weight: .medium))
                         .foregroundStyle(MainColor.ink3)
                         .frame(width: Self.cell, height: 20)
@@ -600,9 +611,9 @@ private struct HistoryFilterSwitch: View {
         let count = counts[item] ?? 0
         return Button { filter = item } label: {
             HStack(spacing: 5) {
-                Text(item.title)
+                Text(verbatim: item.title)
                     .foregroundStyle(selected ? MainColor.ink : MainColor.ink2)
-                Text(HomeFormat.integer(count))
+                Text(verbatim: HomeFormat.integer(count))
                     .monospacedDigit()
                     .foregroundStyle(item == .failed && count > 0 ? MainColor.problem : MainColor.ink3)
             }
@@ -650,17 +661,17 @@ private struct HistoryDaySection: View {
         let records = records
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(day.title())
+                Text(verbatim: day.title())
                     .font(.system(size: 15, weight: .semibold))
                     .tracking(-0.15)
                     .foregroundStyle(MainColor.ink)
                 if let subtitle = day.subtitle() {
-                    Text(subtitle)
+                    Text(verbatim: subtitle)
                         .font(.system(size: 13))
                         .foregroundStyle(MainColor.ink3)
                 }
                 Spacer(minLength: 12)
-                Text(summary)
+                summary
                     .font(.system(size: 12.5))
                     .foregroundStyle(MainColor.ink3)
                     .monospacedDigit()
@@ -686,11 +697,10 @@ private struct HistoryDaySection: View {
         }
     }
 
-    private var summary: String {
-        let count = day.records.count
+    private var summary: Text {
         let words = day.words
-        return (count == 1 ? "1 dictation" : "\(count) dictations")
-            + (words > 0 ? " · \(HomeFormat.integer(words)) \(words == 1 ? "word" : "words")" : "")
+        return Text("\(day.records.count) dictations")
+            + (words > 0 ? Text(verbatim: " · ") + Text("\(words) words") : Text(verbatim: ""))
     }
 }
 
@@ -769,7 +779,7 @@ private struct HistoryRow: View {
                         VStack(alignment: .leading, spacing: 5) {
                             // Closed, the row is the preview on one run of lines; open, a
                             // plain dictation's whole text with its line breaks.
-                            Text(isOpen && showsWholeText ? entry.text : entry.preview)
+                            Text(verbatim: isOpen && showsWholeText ? entry.text : entry.preview)
                                 .font(textFont)
                                 .foregroundStyle(entry.status == .success ? MainColor.ink : MainColor.ink2)
                                 // Open, a plain dictation's row is its whole text: there is no
@@ -793,12 +803,12 @@ private struct HistoryRow: View {
                                     }
                                 }
                             HStack(spacing: 6) {
-                                Text(entry.place).fontWeight(.medium).foregroundStyle(MainColor.ink)
-                                Text("·")
-                                Text(HistoryFormat.clock(record.date)).monospacedDigit()
+                                HomePlace.text(entry.place).fontWeight(.medium).foregroundStyle(MainColor.ink)
+                                Text(verbatim: "·")
+                                Text(verbatim: HistoryFormat.clock(record.date)).monospacedDigit()
                                 if let length = HistoryFormat.length(record.duration) {
-                                    Text("·")
-                                    Text(length).monospacedDigit()
+                                    Text(verbatim: "·")
+                                    Text(verbatim: length).monospacedDigit()
                                 }
                                 HomeEntryTags(tags: entry.tags)
                             }
@@ -812,7 +822,7 @@ private struct HistoryRow: View {
                 }
                 .buttonStyle(.plain)
                 .modifier(HistoryFactsTip(facts: canExpand ? nil : { facts }))
-                .accessibilityHint(canExpand ? (isOpen ? "Hides the details" : "Shows the details") : "")
+                .accessibilityHint(canExpand ? (isOpen ? Text("Hides the details") : Text("Shows the details")) : Text(verbatim: ""))
 
                 HStack(spacing: 6) {
                     quickAction(entry)
@@ -877,7 +887,7 @@ private struct HistoryRow: View {
     /// The whole text measured unseen, as the open row shows it, beside the closed row's
     /// two lines — so the row knows whether opening it would show anything more.
     private func textMeasure(_ entry: HomeRecentEntry) -> some View {
-        Text(entry.text).font(textFont)
+        Text(verbatim: entry.text).font(textFont)
             .fixedSize(horizontal: false, vertical: true)
             .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in
                 fullTextHeight = height
@@ -901,10 +911,11 @@ private struct HistoryRow: View {
         let engine = historyEngine(record)
         if !engine.isEmpty { parts.append(engine) }
         if let origin = record.originApp, let destination = record.destinationApp, origin != destination {
-            parts.append("started in \(origin), pasted into \(destination)")
+            parts.append(String(localized: "started in \(origin), pasted into \(destination)"))
         }
         if let undelivered = record.undelivered {
-            parts.append(undelivered.app.map { "no connection, so not pasted into \($0)" } ?? "no connection, so not pasted")
+            parts.append(undelivered.app.map { String(localized: "no connection, so not pasted into \($0)") }
+                         ?? String(localized: "no connection, so not pasted"))
         }
         return parts.joined(separator: "  ·  ")
     }
@@ -1001,8 +1012,8 @@ private struct HistoryDetail: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             switch record.status {
-            case .failed: problem(record.errorMessage ?? "Transcription failed.", danger: true)
-            case .empty: problem("Nothing was heard in this recording — a muted microphone, or the shortcut pressed with nothing said.",
+            case .failed: problem(record.errorMessage.map { Text(verbatim: $0) } ?? Text("Transcription failed."), danger: true)
+            case .empty: problem(Text("Nothing was heard in this recording — a muted microphone, or the shortcut pressed with nothing said."),
                                  danger: false)
             case .success: texts
             }
@@ -1033,10 +1044,10 @@ private struct HistoryDetail: View {
                                   model: modelName(refinement))
                 : HistoryTextPane(title: edit ? "Rewritten" : "AI output", symbol: "sparkles",
                                   text: "", ai: true, model: modelName(refinement),
-                                  failure: (edit ? "Didn't work — the selection was left as it was."
-                                             : notPasted ? "Didn't work — the dictated text was kept instead."
-                                             : "Didn't work — the dictated text was pasted instead.")
-                                      + (refinement.errorMessage.map { "\n\($0)" } ?? ""))
+                                  failure: (edit ? Text("Didn't work — the selection was left as it was.")
+                                             : notPasted ? Text("Didn't work — the dictated text was kept instead.")
+                                             : Text("Didn't work — the dictated text was pasted instead."))
+                                      + Text(verbatim: refinement.errorMessage.map { "\n\($0)" } ?? ""))
             if edit {
                 // An edit has three texts: the selection and the instruction said about it side
                 // by side, and the rewrite under both, across the whole width.
@@ -1076,10 +1087,10 @@ private struct HistoryDetail: View {
 
     // MARK: A failure
 
-    private func problem(_ message: String, danger: Bool) -> some View {
+    private func problem(_ message: Text, danger: Bool) -> some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(message)
+                message
                     .font(.system(size: 13))
                     .foregroundStyle(danger ? MainColor.problem : MainColor.ink2)
                     .textSelection(.enabled)
@@ -1114,16 +1125,17 @@ private struct HistoryDetail: View {
             parts.append(engine)
         }
         if let origin = record.originApp, let destination = record.destinationApp, origin != destination {
-            parts.append("started in \(origin), pasted into \(destination)")
+            parts.append(String(localized: "started in \(origin), pasted into \(destination)"))
         }
         if let undelivered = record.undelivered {
-            parts.append(undelivered.app.map { "no connection, so not pasted into \($0)" } ?? "no connection, so not pasted")
+            parts.append(undelivered.app.map { String(localized: "no connection, so not pasted into \($0)") }
+                         ?? String(localized: "no connection, so not pasted"))
         }
         let context = record.refinement?.context?.summary
         return VStack(alignment: .leading, spacing: 4) {
-            Text(parts.joined(separator: "  ·  "))
+            Text(verbatim: parts.joined(separator: "  ·  "))
             if let context, !context.isEmpty {
-                (Text("AI Rewrite was told it was for ") + Text(context).foregroundStyle(MainColor.ink2))
+                Text("AI Rewrite was told it was for \(Text(verbatim: context).foregroundStyle(MainColor.ink2))")
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .help(record.refinement?.context?.promptBlock ?? "")
@@ -1160,15 +1172,15 @@ private struct HistoryDetail: View {
 /// the engine that heard it, AI Rewrite's on its violet with the model that ran it — the
 /// prompt it chose is the row's tag, just above.
 private struct HistoryTextPane: View {
-    let title: String
+    let title: LocalizedStringKey
     let symbol: String
     let text: String
     let ai: Bool
-    var note: String?
+    var note: LocalizedStringKey?
     /// What an empty text reads as.
-    var placeholder = "No text"
+    var placeholder: LocalizedStringKey = "No text"
     var model: String?
-    var failure: String?
+    var failure: Text?
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -1188,14 +1200,14 @@ private struct HistoryTextPane: View {
                 Spacer(minLength: 6)
             }
             if let failure {
-                Text(failure)
+                failure
                     .font(.system(size: 12.5))
                     .foregroundStyle(MainColor.problem)
                     .lineSpacing(2)
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text(text.isEmpty ? placeholder : text)
+                (text.isEmpty ? Text(placeholder) : Text(verbatim: text))
                     .font(.system(size: 13.5))
                     .foregroundStyle(text.isEmpty ? MainColor.ink3 : MainColor.ink)
                     .lineSpacing(3.5)
@@ -1204,7 +1216,7 @@ private struct HistoryTextPane: View {
             }
             Spacer(minLength: 0)
             if let model {
-                Text(model)
+                Text(verbatim: model)
                     .font(.system(size: 11.5))
                     .foregroundStyle(MainColor.ink3)
             }

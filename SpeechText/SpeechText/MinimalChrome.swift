@@ -186,13 +186,42 @@ struct MinimalIconButton: View {
     let systemImage: String
     /// What VoiceOver calls the button, and the state it reads after the name — see
     /// `PlasticButton`.
-    let label: String
-    var value = ""
+    let label: Text
+    var value = Text(verbatim: "")
     var isOn = false
     var accent: Color = .accentColor
     var isEnabled = true
-    var help: String = ""
+    var help = Text(verbatim: "")
     let action: () -> Void
+
+    /// Words from the String Catalog.
+    init(systemImage: String, label: LocalizedStringKey, value: LocalizedStringKey? = nil, isOn: Bool = false,
+         accent: Color = .accentColor, isEnabled: Bool = true, help: LocalizedStringKey? = nil,
+         action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(label), value: value.map { Text($0) } ?? Text(verbatim: ""),
+                  isOn: isOn, accent: accent, isEnabled: isEnabled, help: help.map { Text($0) } ?? Text(verbatim: ""),
+                  action: action)
+    }
+
+    /// Words already made, shown as they are.
+    @_disfavoredOverload
+    init(systemImage: String, label: String, value: String = "", isOn: Bool = false,
+         accent: Color = .accentColor, isEnabled: Bool = true, help: String = "", action: @escaping () -> Void) {
+        self.init(systemImage: systemImage, label: Text(verbatim: label), value: Text(verbatim: value),
+                  isOn: isOn, accent: accent, isEnabled: isEnabled, help: Text(verbatim: help), action: action)
+    }
+
+    init(systemImage: String, label: Text, value: Text, isOn: Bool, accent: Color, isEnabled: Bool, help: Text,
+         action: @escaping () -> Void) {
+        self.systemImage = systemImage
+        self.label = label
+        self.value = value
+        self.isOn = isOn
+        self.accent = accent
+        self.isEnabled = isEnabled
+        self.help = help
+        self.action = action
+    }
 
     @State private var isHovering = false
 
@@ -274,7 +303,7 @@ struct PlainTextEditor: NSViewRepresentable {
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.allowsUndo = true
         textView.textColor = .labelColor
-        textView.setAccessibilityLabel("Transcript")
+        textView.setAccessibilityLabel(String(localized: "Transcript"))
         insertionHandler.textView = textView
         scrollView.drawsBackground = false
         scrollView.hasVerticalScroller = true

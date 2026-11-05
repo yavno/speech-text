@@ -4,42 +4,22 @@
     "" : {
       "comment" : "An empty label (a text field whose placeholder is given separately). Leave it empty."
     },
-    " In this period that's " : {
+    "%@ (not connected)" : {
 
     },
-    " faster" : {
-
+    "%@ billed" : {
+      "comment" : "Usage page, Requests: audio a vendor billed. %@ is a duration, e.g. 12 min."
     },
-    " words a minute and type at " : {
-
-    },
-    " wpm" : {
-
-    },
-    " you didn't spend typing." : {
-
-    },
-    " · " : {
-
-    },
-    " — an average, until you set yours." : {
-
-    },
-    "$0" : {
-
-    },
-    "%@ %@" : {
+    "%@ billed (%lld of %lld reported)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ %2$@"
+            "value" : "%1$@ billed (%2$lld of %3$lld reported)"
           }
         }
-      }
-    },
-    "%@ (not connected)" : {
-
+      },
+      "comment" : "Usage page, Requests: audio billed, when only some requests reported it. %@ is a duration; the numbers are requests."
     },
     "%@ charges about %@ an hour more for a transcription that carries them." : {
       "comment" : "Dictionary page, What a word does: sentence after the count. The first %@ is the vendor, the second a price (e.g. $0.12).",
@@ -52,8 +32,19 @@
         }
       }
     },
-    "%@ dictations" : {
-
+    "%@ faster" : {
+      "comment" : "Usage page: the large figure, how much faster speaking is than typing. %@ is e.g. 3.6× (shown larger)."
+    },
+    "%@ in all · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ in all · %2$@"
+          }
+        }
+      },
+      "comment" : "Usage page, the chart's note: the period's total cost. The first %@ is a cost, e.g. ≈ $1.20; the second says it is estimated from known prices."
     },
     "%@ is given them" : {
       "comment" : "Dictionary page, What a word does: row title. %@ is the speech engine's vendor (e.g. OpenAI); 'them' is the user's words."
@@ -77,8 +68,42 @@
         }
       }
     },
+    "%@ left" : {
+      "comment" : "Usage page, Limits: what is left of a rate limit. %@ is a number."
+    },
+    "%@ of %@ left" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ left"
+          }
+        }
+      },
+      "comment" : "Usage page, Limits: what is left of a rate limit, e.g. 13,999 of 14,400 left."
+    },
+    "%@ of audio" : {
+      "comment" : "Usage page, By engine: how much audio a speech engine heard. %@ is a duration, e.g. 12 min."
+    },
     "%@ of models on this Mac" : {
 
+    },
+    "%@ sent" : {
+      "comment" : "Usage page, Requests: audio sent to a vendor. %@ is a duration."
+    },
+    "%@ sent again from History" : {
+      "comment" : "Usage page, Overhead: audio sent again by retries. %@ is a duration."
+    },
+    "%@ tokens in · %@ out" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ tokens in · %2$@ out"
+          }
+        }
+      },
+      "comment" : "Usage page, Requests: tokens sent and received, e.g. 48.2k tokens in · 3.1k out."
     },
     "%@ will become %@ in everything you dictate." : {
       "comment" : "Dictionary page, Add a word: preview under the form. The first %@ is the list of wrong spellings, each in quotes and struck through, separated by commas; the second %@ is the word, in bold.",
@@ -91,20 +116,11 @@
         }
       }
     },
-    "%@ words" : {
-
-    },
-    "%@ · %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ · %2$@"
-          }
-        }
-      }
+    "%@ wpm" : {
+      "comment" : "Usage page: under a speed column, the figure and the unit (words per minute). %@ is the figure, shown larger."
     },
     "%@ · %lld%%" : {
+      "comment" : "Setup window: a download in progress. %@ is what is downloading (e.g. Speech model, or a model's name), %lld the percent done. Keep %%.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -112,8 +128,10 @@
             "value" : "%1$@ · %2$lld%%"
           }
         }
-      },
-      "comment" : "Setup window: a download in progress. %@ is what is downloading (e.g. Speech model, or a model's name), %lld the percent done. Keep %%."
+      }
+    },
+    "%@ · Choose a model" : {
+      "comment" : "Home page, Engines: the speech engine row when its vendor has no model chosen. %@ is the vendor, e.g. OpenAI."
     },
     "%@ — %@" : {
       "localizations" : {
@@ -124,6 +142,20 @@
           }
         }
       }
+    },
+    "%@ — coming soon" : {
+      "comment" : "The window's sidebar: tooltip on a page not built yet. %@ is its name."
+    },
+    "%@, and %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, and %2$@"
+          }
+        }
+      },
+      "comment" : "Usage page, Rewritten by AI: two counts joined, e.g. '1,200 words written, and 4 selections edited'."
     },
     "%@: %@" : {
       "localizations" : {
@@ -138,12 +170,48 @@
     "%lld" : {
       "comment" : "A count shown on its own, e.g. after a section heading."
     },
-    "%lld / %lld" : {
+    "%lld dictations" : {
+      "comment" : "A count of dictations — also Usage's large Rewritten by AI figure (the number drawn large, the word small).",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld / %2$lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictation"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld dictations"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld edits" : {
+      "comment" : "Usage page: a count of edits (selected text rewritten by voice).",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld edit"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld edits"
+                }
+              }
+            }
           }
         }
       }
@@ -162,8 +230,172 @@
         }
       }
     },
+    "%lld older rewrites are estimated from their words." : {
+      "comment" : "Usage page, How this is counted: rewrites from before the vendors reported tokens. The English 'one' form is 'One older rewrite is estimated from its words.'",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "One older rewrite is estimated from its words."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld older rewrites are estimated from their words."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld refused" : {
-
+      "comment" : "Usage page, Requests: how many requests a provider refused."
+    },
+    "%lld requests" : {
+      "comment" : "Usage page, Requests: a count of requests to a provider.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld request"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld requests"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld rewrites" : {
+      "comment" : "Usage page, By engine: a count of dictations AI Rewrite rewrote.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld rewrite"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld rewrites"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld s" : {
+      "comment" : "A duration in seconds, short, e.g. 45 s."
+    },
+    "%lld selections edited" : {
+      "comment" : "Usage page, Rewritten by AI: a count of selected texts edited by voice.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld selection edited"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld selections edited"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words" : {
+      "comment" : "A count of words — in a tooltip, after a count of dictations, or as Home's large figure (the number drawn large, the word small).",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld word"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld words"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words in all" : {
+      "comment" : "Usage page, the chart's note: the period's total words.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld word in all"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld words in all"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words written" : {
+      "comment" : "Usage page, Rewritten by AI: words AI Rewrite delivered.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld word written"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld words written"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld words, spelled exactly as you write them." : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile text. %lld is how many words the user's Dictionary has.",
@@ -189,10 +421,13 @@
       }
     },
     "%lld wpm" : {
-
+      "comment" : "Usage page: a typing speed in words per minute."
+    },
+    "%lld wpm. Time saved is typing the words less saying them." : {
+      "comment" : "Usage page, How this is counted: the user's measured typing speed, then how time saved is worked out."
     },
     "%llds" : {
-
+      "comment" : "Usage page, typing test: seconds since the first key, short, e.g. 12s."
     },
     "%lld×" : {
       "comment" : "Dictionary page: how many times a word was used, e.g. 12×. Keep the × sign."
@@ -203,26 +438,26 @@
     "+%lld" : {
       "comment" : "Dictionary page: on a word's card, how many more wrong spellings there are than the four shown, e.g. +3."
     },
-    "." : {
-
-    },
-    "1 dictation" : {
-
+    "40 wpm, an average. Measure yours for a fair comparison." : {
+      "comment" : "Usage page, How this is counted: when the user hasn't measured their typing speed."
     },
     "A dictation being typed into %@" : {
-
+      "comment" : "Home page: VoiceOver label of the animated example of a dictation. %@ is an app name."
+    },
+    "A good explanation feels obvious afterwards, as if the idea had been waiting patiently for someone to say it out loud." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
     },
     "A key is like a password that lets SpeechText use your account." : {
       "comment" : "Setup window: under 'Connect your … account', explains what an API key is."
     },
     "A typical wait for an answer: half were faster, half slower." : {
-
+      "comment" : "Usage page, Requests: tooltip on the typical wait."
     },
     "AI POLISH" : {
       "comment" : "Setup window, Try it step: small label in capitals over the AI dictation's result."
     },
     "AI Rewrite" : {
-
+      "comment" : "The name of the app's AI feature that rewrites dictated text; also a section and step name. Translate as the feature's name, the same everywhere."
     },
     "AI Rewrite keeps them as written" : {
       "comment" : "Dictionary page, What a word does: row title. AI Rewrite is a feature of the app; 'them' is the user's words."
@@ -230,8 +465,8 @@
     "AI Rewrite pastes your words as said until you add a key." : {
 
     },
-    "AI Rewrite was told it was for " : {
-
+    "AI Rewrite was told it was for %@" : {
+      "comment" : "History page, an open AI dictation: what AI Rewrite was told about where the text was going. %@ is that place, e.g. 'a message in Slack'."
     },
     "AI couldn't answer this time" : {
       "comment" : "Setup window, Try it step: title when the AI dictation failed."
@@ -245,6 +480,9 @@
     "AI model" : {
       "comment" : "Setup window: what is downloading in the corner pill — the AI model (as opposed to the speech model). Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'."
     },
+    "AI output" : {
+      "comment" : "History page, an open AI dictation: title over the text AI Rewrite wrote."
+    },
     "AI polish is almost ready" : {
       "comment" : "Setup window, Try it step: title while the AI model is still downloading. AI polish is the setup's name for AI Rewrite."
     },
@@ -253,6 +491,9 @@
     },
     "About SpeechText" : {
 
+    },
+    "Accessibility is off, so your text opens in the Record Window instead." : {
+      "comment" : "Home page: a problem row. Accessibility is the macOS permission; Record Window is SpeechText's own window."
     },
     "Add" : {
       "comment" : "Dictionary page, Replacements: button that adds the replacement typed in the form."
@@ -318,11 +559,17 @@
     "Almost ready…" : {
       "comment" : "Setup window, Try it step: title while the speech model is still downloading."
     },
+    "An estimate, not your bill" : {
+      "comment" : "Usage page, How this is counted: title of the note on cost."
+    },
     "An example: what you say, and the prompt it fits" : {
       "comment" : "Prompts page: VoiceOver label of the animated examples at the top (a dictation, then the prompt chosen for it)."
     },
+    "Any app" : {
+      "comment" : "History page, the app filter: the choice that shows dictations from every app."
+    },
     "Any app, any time" : {
-
+      "comment" : "History page: button that clears the app and date filters, shown when nothing matches them."
     },
     "Any color" : {
 
@@ -331,13 +578,19 @@
 
     },
     "Any language" : {
-      "comment" : "Language chips: shown while no language is stated — every language is detected. Clicking it adds one."
+      "comment" : "Home page, Engines: the languages the speech engine listens for, when none are chosen."
+    },
+    "App" : {
+      "comment" : "History page: the app filter's button before an app is chosen."
     },
     "Appears when you're done." : {
       "comment" : "Setup window, Try it step: placeholder for what AI wrote, while the user is still speaking."
     },
     "Apple Dictation needs it on." : {
       "comment" : "Setup window, permissions: under the Dictation row — macOS Dictation must be on for Apple Dictation to work."
+    },
+    "Apple · On-device" : {
+      "comment" : "Home page, Engines: the speech engine row for Apple's recognizer."
     },
     "Apple's recognizer listens for them" : {
       "comment" : "Dictionary page, What a word does: row title when Apple's speech recognizer is in use and is given the user's words."
@@ -405,6 +658,9 @@
     "Checking your key…" : {
       "comment" : "Setup window: status under the key field while the key is checked with the service."
     },
+    "Choose a model" : {
+      "comment" : "Home page, Engines: shown where a model's name goes when none is chosen."
+    },
     "Choose a model — the one you had is no longer available, and dictation waits for your pick." : {
 
     },
@@ -441,19 +697,19 @@
       }
     },
     "Clear" : {
-
+      "comment" : "Tooltip or label of a small button that clears what was typed or chosen (History: a search or a filter)."
     },
     "Clear History" : {
-
+      "comment" : "History page: destructive button in the confirmation that deletes all of History. Title case, as macOS buttons are in English."
     },
     "Clear History…" : {
       "comment" : "History page: button that deletes all of History; asks first."
     },
     "Clear all of History?" : {
-
+      "comment" : "History page: title of the confirmation before all of History is deleted."
     },
     "Clear search" : {
-
+      "comment" : "History page: button (and tooltip) that empties the search field."
     },
     "Clicks and ⌘Tab work as usual while you hold it. Let go of %@ when you're done." : {
       "comment" : "Setup window, Try it step: while holding the shortcut's letter alone. %@ is that key, e.g. Q."
@@ -474,25 +730,54 @@
       "comment" : "Setup window: footer button that goes to the next step."
     },
     "Continue Setup" : {
-
+      "comment" : "Home page: button that opens the setup window again. Title case, as macOS buttons are in English."
     },
     "Copied" : {
-
+      "comment" : "A Copy button for a moment after it copied."
     },
     "Copy" : {
-
+      "comment" : "Button or menu item that copies text to the clipboard."
     },
     "Copy Instruction" : {
-
+      "comment" : "History page: context menu item on an edit that copies the spoken instruction. Title case, as macOS menu items are in English."
     },
     "Copy What You Said" : {
-
+      "comment" : "History page: context menu item on an AI dictation that copies what was said, before the rewrite. Title case, as macOS menu items are in English."
+    },
+    "Copy instruction" : {
+      "comment" : "History page, an open edit: button that copies the spoken instruction."
     },
     "Copy this build's version" : {
 
     },
+    "Copy what you said" : {
+      "comment" : "History page, an open AI dictation: button that copies what was said, before the rewrite."
+    },
+    "Cost" : {
+      "comment" : "Usage page: the chart's switch — show cost."
+    },
+    "Counted from %@, as History keeps them, since %@. Everything stays on your Mac." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Counted from %1$@, as History keeps them, since %2$@. Everything stays on your Mac."
+          }
+        }
+      },
+      "comment" : "Usage page, How this is counted. The first %@ is how much History keeps, e.g. 'the last 30 days of dictations'; the second a date."
+    },
+    "Counted from %@, as History keeps them. Everything stays on your Mac." : {
+      "comment" : "Usage page, How this is counted. %@ is how much History keeps, e.g. 'the last 30 days of dictations'."
+    },
+    "Curiosity rarely arrives on schedule; it tends to show up halfway through something else, uninvited and oddly persistent." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
+    },
     "Dashes" : {
 
+    },
+    "Date" : {
+      "comment" : "History page: the date filter's button before a date is chosen."
     },
     "Debug Log" : {
 
@@ -513,13 +798,22 @@
       "comment" : "Dictionary page: context menu item on a word's card. %@ is the word."
     },
     "Dictate" : {
-      "comment" : "Setup window, Done step: what the dictation shortcut does."
+      "comment" : "Home page: the first tab of the intro card — plain dictation."
+    },
+    "Dictate into a window of its own, then copy or insert." : {
+      "comment" : "Home page, More ways to dictate: the Record Window tile's text."
     },
     "Dictate with AI" : {
       "comment" : "Setup window, Done step: what the AI shortcut does."
     },
+    "Dictate with AI Rewrite" : {
+      "comment" : "Home page, More ways to dictate: tile title."
+    },
     "Dictate with AI · off" : {
       "comment" : "Setup window, Done step: the AI shortcut when AI is not set up."
+    },
+    "Dictated" : {
+      "comment" : "Home and Usage: what was dictated — a stat's name, a chart legend, a row; on History, the title over what was said."
     },
     "Dictation" : {
       "comment" : "The word Dictation. In the Setup window's helper it names macOS's own Dictation setting in System Settings › Keyboard: use the name macOS shows in your language."
@@ -529,6 +823,18 @@
     },
     "Dictations fail until you add a key." : {
 
+    },
+    "Dictionary" : {
+      "comment" : "The Dictionary page's name — in the window's sidebar and as its title."
+    },
+    "Didn't work — the dictated text was kept instead." : {
+      "comment" : "History page, an open AI dictation: AI Rewrite failed while offline; the plain dictated text was kept."
+    },
+    "Didn't work — the dictated text was pasted instead." : {
+      "comment" : "History page, an open AI dictation: AI Rewrite failed; the plain dictated text was pasted instead."
+    },
+    "Didn't work — the selection was left as it was." : {
+      "comment" : "History page, an open edit: the edit failed; the selected text was not changed."
     },
     "Done" : {
       "comment" : "Setup window: button that closes the helper panel beside System Settings."
@@ -541,7 +847,8 @@
             "value" : "Download %1$@ (%2$@) and show it in Settings — then retry"
           }
         }
-      }
+      },
+      "comment" : "Tooltip on Install, shown instead of Retry when the speech model isn't on this Mac. The first %@ is the model, the second its size, e.g. 1.6 GB."
     },
     "Download and continue" : {
       "comment" : "Setup window: footer button when the chosen local model is not downloaded yet."
@@ -570,20 +877,32 @@
     "Each is replaced by the word, as a whole word, whatever its capitals." : {
       "comment" : "Dictionary page, editing a word: text under 'Comes out as'."
     },
+    "Each vendor's pay-as-you-go list price as of %@, applied to the minutes and tokens their replies reported. Free tiers, plans and price changes since then change what you pay — your provider's billing page has the real figure. Models on this Mac cost nothing." : {
+      "comment" : "Usage page, How this is counted: the note on cost. %@ is when the prices were checked, e.g. November 2026."
+    },
     "Earlier versions. They still work, but the models above replace them." : {
 
     },
+    "Edit" : {
+      "comment" : "Home page: the intro card's third tab — editing selected text by voice; also a row's tag for an edit."
+    },
     "Edit Prompts…" : {
 
+    },
+    "Edit needs a provider" : {
+      "comment" : "Home page, intro card: large title on the Edit tab when AI Rewrite has no provider."
     },
     "Edit prompt" : {
       "comment" : "Prompts page: section heading over the editor of the selected prompt."
     },
     "Edit selection" : {
-      "comment" : "Setup window, Done step: what the Edit shortcut does (AI edits the selected text)."
+      "comment" : "The Edit shortcut's name: editing selected text by voice."
     },
     "Edit selection · off" : {
       "comment" : "Setup window, Done step: the Edit shortcut when AI is not set up."
+    },
+    "Edited" : {
+      "comment" : "Home page, intro card: tag on the example text after an edit."
     },
     "Editing the selected text — say how to change it" : {
 
@@ -601,10 +920,13 @@
 
     },
     "Every dictation and the audio kept for a retry are deleted. This can't be undone." : {
-
+      "comment" : "History page: message in the confirmation before all of History is deleted."
     },
     "FOR EXAMPLE" : {
       "comment" : "Setup window, AI step: small label in capitals over an example of what AI polish does."
+    },
+    "Failed" : {
+      "comment" : "Home and History: a row's tag for a failed dictation."
     },
     "Fast on any Mac. Needs an account — Groq has a free plan." : {
       "comment" : "Setup window, AI step: facts about online AI. Groq is a company name."
@@ -616,13 +938,16 @@
 
     },
     "Find" : {
-
+      "comment" : "History page: a hidden button for ⌘F that moves to the search field; read only by VoiceOver."
     },
     "Find **SpeechText** in the list and click its switch. You may need to enter your Mac password." : {
       "comment" : "Setup window: helper beside System Settings › Accessibility. ** marks bold."
     },
     "Finish setting up SpeechText" : {
-
+      "comment" : "Home page: title of the card shown until setup is done. SpeechText is the app's name."
+    },
+    "For %@" : {
+      "comment" : "Home and History: a row's tag for a dictation saved offline. %@ is the app it was for."
     },
     "For your %@" : {
 
@@ -679,31 +1004,37 @@
       "comment" : "Link that hides the models too heavy for this Mac again."
     },
     "Hides the details" : {
-
+      "comment" : "History page: VoiceOver hint on an open row."
     },
     "History" : {
-
+      "comment" : "The History page's name — in the window's sidebar and as its title."
     },
     "History settings" : {
-
+      "comment" : "History page: VoiceOver label of the gear button that opens Settings at History."
     },
     "Hold" : {
       "comment" : "Setup window, welcome animation: label beside the keys, when the shortcut is held while speaking."
     },
+    "Hold the shortcut and speak, then let go — the text lands wherever your cursor is, in any app." : {
+      "comment" : "Home page, intro card: the Dictate tab's text when the shortcut is held down while speaking."
+    },
     "Home" : {
-
+      "comment" : "The Home page's name — in the window's sidebar."
     },
     "How AI Rewrite picks a prompt" : {
       "comment" : "Prompts page: small heading at the top of the page. AI Rewrite is a feature of the app."
+    },
+    "How SpeechText behaves — shortcuts, the look of its windows, formatting and permissions." : {
+      "comment" : "The Settings page's lead under its title."
     },
     "How SpeechText works" : {
       "comment" : "Setup window: VoiceOver label of the welcome animation."
     },
     "How fast do you type?" : {
-
+      "comment" : "Usage page, typing test popover: title."
     },
     "How much History keeps" : {
-
+      "comment" : "History page: tooltip on the gear button that opens Settings at History."
     },
     "How the shortcut records" : {
       "comment" : "Setup window, Try it step: label over the choice between hold and press."
@@ -741,10 +1072,13 @@
 
     },
     "Install" : {
-
+      "comment" : "Button that downloads the speech model the settings choose; shown instead of Retry."
     },
     "Installing…" : {
-
+      "comment" : "The Install button while the model downloads."
+    },
+    "Instruction" : {
+      "comment" : "History page, an open edit: title over what the user said to do to the selected text."
     },
     "Instructions" : {
       "comment" : "Prompts page, editing a prompt: small label in capitals over the prompt's instructions."
@@ -782,6 +1116,12 @@
     "Just %@ — that's it" : {
       "comment" : "Setup window, Try it step: title when the user holds only the letter key. %@ is that key, e.g. Q."
     },
+    "Just talk, or say what you want — AI pastes the finished text." : {
+      "comment" : "Home page, More ways to dictate: the AI Rewrite tile's text."
+    },
+    "Just talk, or say what you want — “a polite reply, in English” — and AI Rewrite pastes the finished text." : {
+      "comment" : "Home page, intro card: the AI Rewrite tab's text. The example in quotes may be adapted to your language."
+    },
     "Keep %@" : {
       "comment" : "Setup window, Speech step: button that keeps the model already downloading. %@ is its name."
     },
@@ -806,6 +1146,9 @@
     "Last chosen for" : {
       "comment" : "Prompts page: small label in capitals over the list of the last dictations this prompt was chosen for."
     },
+    "Leave yourself a quick note — by voice or by keyboard — and SpeechText sorts it into categories for you." : {
+      "comment" : "The Notepad page (not built yet): its lead under the title."
+    },
     "Legacy models" : {
 
     },
@@ -828,25 +1171,31 @@
       "comment" : "Dictionary page, What a word does: row text when a local speech model is in use."
     },
     "Mark setup as done. Everything it asks is in Settings." : {
-
+      "comment" : "Home page: tooltip on Skip in the setup card."
     },
     "Measure again…" : {
-
+      "comment" : "Usage page, How this is counted: button that opens the typing test again."
     },
     "Measure your typing speed" : {
-
+      "comment" : "Usage page: button that opens the typing test."
     },
     "Measure…" : {
-
+      "comment" : "Usage page, How this is counted: button that opens the typing test."
     },
     "Message" : {
       "comment" : "Setup window, welcome animation: placeholder of a made-up chat's message field."
     },
     "Microphone" : {
-      "comment" : "The microphone: a permission's name, or the input shown when the device's name is unknown."
+      "comment" : "The microphone permission, as a step or a setting."
     },
     "Microphone is turned off for SpeechText." : {
       "comment" : "Setup window, permissions: the user denied microphone access."
+    },
+    "Model on this Mac" : {
+      "comment" : "Usage page, By engine: where a speech model ran."
+    },
+    "Models on this Mac cost nothing" : {
+      "comment" : "Home and Usage: under Spent, when only models on this Mac were used."
     },
     "More ways to dictate" : {
       "comment" : "Home page: section heading over the other dictation shortcuts."
@@ -863,14 +1212,32 @@
     "Names and terms you add there are spelled exactly as you write them." : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile text when the Dictionary is empty. 'There' is the Dictionary page."
     },
+    "Needs AI Rewrite — %@." : {
+      "comment" : "Home page, More ways to dictate: the Edit tile's text when AI Rewrite has no provider. %@ is the link 'choose a provider'."
+    },
+    "Needs an AI provider — a key, or a model on this Mac — to rewrite the text you select." : {
+      "comment" : "Home page, intro card: the Edit tab's text when AI Rewrite has no provider."
+    },
+    "Needs an AI provider — a key, or a model on this Mac. Until then the shortcut dictates plain text." : {
+      "comment" : "Home page, intro card: the AI Rewrite tab's text when it has no provider."
+    },
     "New prompt" : {
       "comment" : "Prompts page: button that adds a prompt, and the name the new prompt starts with."
     },
     "Newer version: %@" : {
 
     },
-    "No %@ yet." : {
-
+    "Next month" : {
+      "comment" : "History page, the date filter's calendar: VoiceOver label of the arrow to the next month."
+    },
+    "No dictations rewritten by AI yet." : {
+      "comment" : "History page: shown when the AI filter has nothing."
+    },
+    "No edits yet." : {
+      "comment" : "History page: shown when the Edits filter has nothing."
+    },
+    "No failed dictations yet." : {
+      "comment" : "History page: shown when the Failed filter has nothing."
     },
     "No internet connection" : {
       "comment" : "Setup window, Try it step: title when an online service could not be reached."
@@ -882,7 +1249,10 @@
 
     },
     "No requests to a provider in this period." : {
-
+      "comment" : "Usage page, Requests: shown when there are none."
+    },
+    "No text" : {
+      "comment" : "History page, an open dictation: shown in a text pane that is empty."
     },
     "No words yet." : {
       "comment" : "Dictionary page: shown when the list of words is empty."
@@ -890,55 +1260,82 @@
     "No “When to use” yet — AI Rewrite can't tell when it fits." : {
       "comment" : "Prompts page: shown in a prompt's row when its 'When to use' is empty. “When to use” is the name of a field."
     },
+    "None — polished" : {
+      "comment" : "History page, an open edit: shown as the instruction when nothing was said — the selection was only polished."
+    },
     "Not chosen in History yet" : {
       "comment" : "Prompts page: tooltip on a prompt that no dictation in History used."
     },
     "Not chosen yet. Say something that fits its “When to use” with %@, and it shows up here." : {
       "comment" : "Prompts page, Last chosen for: shown when no dictation used this prompt. %@ is the AI Rewrite keyboard shortcut, e.g. ⌃⇧Q."
     },
+    "Not counting %@" : {
+      "comment" : "Usage page: under Spent, when nothing was priced. %@ is a list of model names with no list price."
+    },
     "Not downloaded" : {
 
     },
+    "Not pasted" : {
+      "comment" : "Where a dictation went when it reached no app; a row's place and a note on an AI dictation."
+    },
     "Not priced" : {
-
+      "comment" : "Usage page, By engine: in the cost column for a model with no list price."
+    },
+    "Not sent" : {
+      "comment" : "Usage page, Overhead: tile title — silence not sent to a cloud engine."
     },
     "Not started" : {
-
+      "comment" : "Usage page, typing test: the clock before the first key."
     },
     "Not used yet" : {
       "comment" : "Prompts page: in a prompt's row and editor, when no dictation in History used it."
     },
-    "Nothing %@%@." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Nothing %1$@%2$@."
-          }
-        }
-      }
+    "Notepad" : {
+      "comment" : "The Notepad page's name (not built yet) — in the window's sidebar."
+    },
+    "Notetaker" : {
+      "comment" : "The Notetaker page's name (not built yet) — in the window's sidebar."
+    },
+    "Nothing %@." : {
+      "comment" : "History page: shown when nothing matches the filters. %@ is the conditions, e.g. 'in Edits in Slack, in the last 7 days'."
     },
     "Nothing dictated in this period." : {
-
+      "comment" : "Usage page, By engine: shown when there is nothing."
+    },
+    "Nothing dictated yet" : {
+      "comment" : "Home and Usage: under a stat when nothing was dictated in the period."
     },
     "Nothing dictated yet. Press %@ in any app, speak, and press it again — every dictation is kept here." : {
-
+      "comment" : "History page: shown before the first dictation. %@ is the dictation keyboard shortcut, e.g. ⌃⇧Space."
     },
     "Nothing dictated yet. Press %@ in any app, speak, and press it again." : {
-
+      "comment" : "Home page, Recent: shown before the first dictation. %@ is the dictation keyboard shortcut."
     },
-    "Nothing matches “%@”%@%@." : {
+    "Nothing matches “%@” %@." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Nothing matches “%1$@”%2$@%3$@."
+            "value" : "Nothing matches “%1$@” %2$@."
           }
         }
-      }
+      },
+      "comment" : "History page: shown when the search finds nothing. The first %@ is what was searched for, the second the filters, e.g. 'in Edits in Slack'."
+    },
+    "Nothing matches “%@”." : {
+      "comment" : "History page: shown when the search finds nothing. %@ is what was searched for."
     },
     "Nothing pasted in this period." : {
-
+      "comment" : "Usage page, Where your words went: shown when there is nothing."
+    },
+    "Nothing priced yet" : {
+      "comment" : "Home page, Last 7 days: under Spent, when the dictations used only models with no list price."
+    },
+    "Nothing rewritten yet" : {
+      "comment" : "Usage page: under Rewritten by AI when there is nothing."
+    },
+    "Nothing was heard in this recording — a muted microphone, or the shortcut pressed with nothing said." : {
+      "comment" : "History page, an open dictation that heard no speech."
     },
     "Notice" : {
 
@@ -956,22 +1353,40 @@
       "comment" : "Setup window, Try it step: title over the AI shortcut's keys, when the shortcut is pressed."
     },
     "Off" : {
-
+      "comment" : "Home page, Engines: the AI Rewrite row when it has no provider."
+    },
+    "Offline" : {
+      "comment" : "Home and History: a row's tag for a dictation saved offline, when the app isn't known."
     },
     "Often comes out as" : {
       "comment" : "Dictionary page, Add a word: label over the field for the ways the word is misheard."
+    },
+    "Old maps were confident about coastlines and vague about interiors, which is roughly how most of us describe our own plans." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
+    },
+    "Ollama · on this Mac" : {
+      "comment" : "Usage page, By engine: rewrites from before AI Rewrite ran models itself. Ollama is a product name."
     },
     "On" : {
       "comment" : "Setup window, permissions: shown after ✓ when macOS Dictation is on."
     },
     "On this Mac" : {
-      "comment" : "Setup window: answer card — speech or AI runs on this Mac."
+      "comment" : "Where a model runs: on the user's Mac, not in the cloud."
     },
     "On this Mac or online — you can change it later." : {
       "comment" : "Setup window, Speech step: lead under the question."
     },
+    "On this Mac · %@" : {
+      "comment" : "Home page, Engines: the speech engine row for a model on this Mac. %@ is the model's name."
+    },
+    "On this Mac · Choose a model" : {
+      "comment" : "Home page, Engines: the speech engine row for a model on this Mac when none is chosen."
+    },
     "On your keyboards" : {
       "comment" : "Language picker: section heading over the languages of this Mac's keyboards."
+    },
+    "On-device recognizer" : {
+      "comment" : "Usage page, By engine: where Apple's speech recognizer ran."
     },
     "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
       "comment" : "Prompts page: text at the top when AI Rewrite has no provider. “When to use” is the name of a field."
@@ -980,7 +1395,7 @@
       "comment" : "Dictionary page, What a word does: row text when AI Rewrite has no provider yet."
     },
     "Once you've dictated for a minute or so, this says how much faster speaking is than typing — and how much time it saved you." : {
-
+      "comment" : "Usage page: under 'Speak, and see' before there is enough to compare."
     },
     "Online service" : {
       "comment" : "Setup window: answer card — speech or AI runs on an online service."
@@ -989,7 +1404,7 @@
       "comment" : "Setup window, Try it step: when offline."
     },
     "Open" : {
-
+      "comment" : "The window's sidebar: VoiceOver value of a page whose window is open (Settings)."
     },
     "Open Dictionary" : {
       "comment" : "Prompts page: link that opens the Dictionary page."
@@ -1028,6 +1443,7 @@
       "comment" : "Setup window, welcome step: note after 'Your languages, for better accuracy'."
     },
     "Optional. Press %@ instead of %@ and AI turns what you say — or what you ask for — into clean text for the app you're in." : {
+      "comment" : "Setup window, AI step. The first %@ is the AI shortcut, the second the dictation shortcut, both shown as keys.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1035,11 +1451,10 @@
             "value" : "Optional. Press %1$@ instead of %2$@ and AI turns what you say — or what you ask for — into clean text for the app you're in."
           }
         }
-      },
-      "comment" : "Setup window, AI step. The first %@ is the AI shortcut, the second the dictation shortcut, both shown as keys."
+      }
     },
     "Or set it yourself" : {
-
+      "comment" : "Usage page, typing test popover: label beside the − and + buttons."
     },
     "Other models" : {
       "comment" : "Setup window, AI step: heading in capitals over the remaining models."
@@ -1047,11 +1462,20 @@
     "Overhead" : {
       "comment" : "Usage page: section heading over what was paid for without becoming text, and what was never sent."
     },
+    "Paid twice" : {
+      "comment" : "Usage page, Overhead: tile title — audio streamed, then uploaded again."
+    },
     "Paste" : {
       "comment" : "Button that pastes the key from the clipboard."
     },
     "Paste your key here" : {
       "comment" : "Placeholder of the API key field."
+    },
+    "Pasted" : {
+      "comment" : "History page, an open AI dictation: note after 'AI output' — the text was pasted into the app."
+    },
+    "Pasted into %@" : {
+      "comment" : "Home page, intro card: the strip's caption after the example is pasted. %@ is an app name."
     },
     "Preparing %@ for your Mac…" : {
       "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name."
@@ -1077,6 +1501,12 @@
     "Press shortcut..." : {
 
     },
+    "Press the shortcut, speak, press it again — the text lands wherever your cursor is, in any app." : {
+      "comment" : "Home page, intro card: the Dictate tab's text when the shortcut is pressed to start and again to stop."
+    },
+    "Previous month" : {
+      "comment" : "History page, the date filter's calendar: VoiceOver label of the arrow to the previous month."
+    },
     "Private and free, but slow on an Intel Mac. A 3–19 GB download." : {
       "comment" : "Setup window, AI step: facts about local AI on an Intel Mac."
     },
@@ -1086,6 +1516,9 @@
     "Private and free. Your voice stays on your Mac; works offline after one download." : {
       "comment" : "Setup window, Speech step: facts about local speech."
     },
+    "Prompts" : {
+      "comment" : "The Prompts page's name — in the window's sidebar and as its title."
+    },
     "RESULT" : {
       "comment" : "Setup window, Try it step: small label in capitals over what was typed."
     },
@@ -1093,7 +1526,7 @@
       "comment" : "Setup window, AI step: badge on 'Online service' when a key is already connected."
     },
     "Ready to use" : {
-
+      "comment" : "Home page: chip on the intro card when the microphone and Accessibility are allowed."
     },
     "Ready." : {
       "comment" : "Setup window: download pill's popover when the download finished."
@@ -1113,8 +1546,17 @@
     "Record" : {
 
     },
+    "Record Window" : {
+      "comment" : "The name of SpeechText's own window for dictating into; also where a dictation went when it was dictated there."
+    },
+    "Record a conversation you're part of, then read who said what, get a summary and ask questions." : {
+      "comment" : "The Notetaker page (not built yet): its lead under the title."
+    },
     "Record traces" : {
 
+    },
+    "Refused" : {
+      "comment" : "Usage page, Overhead: tile title — requests refused or broken off."
     },
     "Remove" : {
 
@@ -1137,6 +1579,9 @@
     "Replace needs at least one letter or digit." : {
       "comment" : "Dictionary page, Replacements: error under the form when the Replace field has only punctuation or spaces. Replace is the field's name."
     },
+    "Replaced the selection" : {
+      "comment" : "History page, an open edit: note after 'Rewritten' — the text replaced what was selected."
+    },
     "Replacements" : {
       "comment" : "Dictionary page: section heading over the list of text replacements (what is said → how it is written). A count follows it."
     },
@@ -1144,7 +1589,7 @@
       "comment" : "Usage page: section heading over the requests sent to each provider."
     },
     "Requests are counted from this update on." : {
-
+      "comment" : "Usage page, Requests: shown for a period from before the app counted requests."
     },
     "Restore Built-in Prompts" : {
       "comment" : "Prompts page: destructive button in the confirmation that brings back the built-in prompts. Title case, as macOS buttons are in English."
@@ -1155,17 +1600,35 @@
     "Restore the built-in prompts?" : {
       "comment" : "Prompts page: title of the confirmation before the built-in prompts are restored."
     },
+    "Retries" : {
+      "comment" : "Usage page, Overhead: tile title — retries from History."
+    },
     "Retry" : {
-      "comment" : "Button that tries a failed download or request again."
+      "comment" : "Button that transcribes or tries something again."
     },
     "Retry and continue" : {
       "comment" : "Setup window: footer button when the chosen model's download failed."
+    },
+    "Retrying…" : {
+      "comment" : "The Retry button while it runs."
+    },
+    "Rewrite failed" : {
+      "comment" : "Home and History: a row's tag for an AI dictation whose rewrite failed."
+    },
+    "Rewrite needs a provider" : {
+      "comment" : "Home page, intro card: large title on the AI Rewrite tab when it has no provider."
     },
     "Rewriting" : {
       "comment" : "Setup window, Try it step: small chip while AI rewrites."
     },
     "Rewriting…" : {
       "comment" : "Setup window, Try it step: while AI rewrites."
+    },
+    "Rewritten" : {
+      "comment" : "History page, an open edit: title over the rewritten text."
+    },
+    "Rewritten by AI" : {
+      "comment" : "Usage: dictations AI Rewrite rewrote — a stat's name, a chart legend, a row."
     },
     "Right-click a prompt to make it the default, duplicate or move it." : {
       "comment" : "Prompts page: hint under the list of prompts."
@@ -1177,7 +1640,7 @@
 
     },
     "Saved" : {
-
+      "comment" : "Usage page, typing test: shown after the measured speed is saved."
     },
     "Say anything — or read this out, then let go." : {
       "comment" : "Setup window, Try it step, hold mode: an example text follows."
@@ -1195,25 +1658,40 @@
       "comment" : "Language picker: placeholder of the search field."
     },
     "Search what you said" : {
-
+      "comment" : "History page: placeholder of the search field."
     },
     "See the small bar at the bottom of your screen? That's SpeechText listening." : {
       "comment" : "Setup window, Try it step: hint while recording."
     },
+    "Select it, say what to change" : {
+      "comment" : "Home page, intro card: large title on the Edit tab; one line, shrinks to fit."
+    },
+    "Select text in any app and tell AI how to improve it — “shorter”, “friendlier”, “in Spanish”." : {
+      "comment" : "Home page, intro card: the Edit tab's text. The examples in quotes may be adapted to your language."
+    },
+    "Select text, then tell AI how to improve it." : {
+      "comment" : "Home page, More ways to dictate: the Edit tile's text."
+    },
+    "Selected text" : {
+      "comment" : "History page, an open edit: title over the text that was selected."
+    },
     "Selected text in %@ being rewritten" : {
-
+      "comment" : "Home page: VoiceOver label of the animated example of an edit. %@ is an app name."
+    },
+    "Selection replaced" : {
+      "comment" : "Home page, intro card: the strip's caption after the example edit."
     },
     "Send your words to the speech engine with every dictation" : {
       "comment" : "Dictionary page, What a word does: tooltip on the switch that sends the words to the speech engine."
     },
     "Settings" : {
-      "comment" : "The app's Settings window. In the Setup window's Done step it is bold, inside 'Change them any time in %@.'"
+      "comment" : "Settings — the window, and its place in the main window's sidebar."
     },
     "Settings…" : {
 
     },
     "Shortcuts" : {
-
+      "comment" : "Home page, intro card: button that opens the shortcut settings."
     },
     "Show" : {
 
@@ -1252,7 +1730,7 @@
       }
     },
     "Show all" : {
-      "comment" : "Button that shows the whole text."
+      "comment" : "Button that shows everything again (History: clears the filter)."
     },
     "Show all · %lld more" : {
       "comment" : "Dictionary and History pages: button under a list that shows the rest of it. %lld is how many are hidden."
@@ -1276,10 +1754,10 @@
 
     },
     "Shows the details" : {
-
+      "comment" : "History page: VoiceOver hint on a closed row that can open."
     },
     "Skip" : {
-
+      "comment" : "Home page: button in the setup card that marks setup as done."
     },
     "Skip for now" : {
       "comment" : "Setup window, AI step: skips setting up AI."
@@ -1296,11 +1774,23 @@
     "So your words appear where your cursor is." : {
       "comment" : "Setup window, permissions: why 'Type for you' (Accessibility) is needed."
     },
+    "Somewhere between the third draft and the fourth, the original question quietly changed, and nobody noticed until much later." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
+    },
     "Soon" : {
-
+      "comment" : "A page not built yet: small badge after its title."
+    },
+    "Speak it, get it polished" : {
+      "comment" : "Home page, intro card: large title on the AI Rewrite tab; one line, shrinks to fit."
+    },
+    "Speak, and it's typed" : {
+      "comment" : "Home page, intro card: large title on the Dictate tab; one line, shrinks to fit."
     },
     "Speak, and see" : {
-
+      "comment" : "Usage page: large title before there is enough to compare speaking with typing."
+    },
+    "Speaking" : {
+      "comment" : "Usage page: label under the speaking-speed column."
     },
     "Speaking %lld words a minute, typing %lld" : {
       "localizations" : {
@@ -1310,22 +1800,38 @@
             "value" : "Speaking %1$lld words a minute, typing %2$lld"
           }
         }
-      }
+      },
+      "comment" : "Usage page: VoiceOver label of the two speed columns."
+    },
+    "Speaking is timed from your first word to your last; a pause to think counts." : {
+      "comment" : "Usage page, How this is counted: how speaking time is measured."
     },
     "Speaking vs typing" : {
-
+      "comment" : "Usage page: small heading of the speed card."
     },
     "Speech" : {
-
+      "comment" : "Home and Usage: the speech-to-text step, in an engine row."
+    },
+    "Speech engine" : {
+      "comment" : "Home page, the setup card: a step — choosing a speech engine."
     },
     "Speech model" : {
       "comment" : "Setup window: what is downloading in the corner pill — the speech model. Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'."
     },
+    "Speech to text" : {
+      "comment" : "Usage page: the chart's legend for speech engines' cost."
+    },
     "SpeechText Setup" : {
       "comment" : "Setup window: the window's title (in the Window menu and Mission Control)."
     },
+    "SpeechText can't hear you" : {
+      "comment" : "Home page: a problem row's title when the microphone permission is off."
+    },
+    "SpeechText can't type for you" : {
+      "comment" : "Home page: a problem row's title when the Accessibility permission is off."
+    },
     "SpeechText has no list price for this model, so it isn't counted in Spent." : {
-
+      "comment" : "Usage page, By engine: tooltip on 'Not priced'. Spent is the stat's name."
     },
     "SpeechText is ready" : {
       "comment" : "Notification after setup when the speech model finished preparing."
@@ -1339,8 +1845,20 @@
     "Spelled" : {
       "comment" : "Dictionary page, editing a word: small label in capitals over the word's field."
     },
+    "Spending by day" : {
+      "comment" : "Usage page: the chart's heading when it shows cost, day by day."
+    },
+    "Spending by month" : {
+      "comment" : "Usage page: the chart's heading when it shows cost, month by month."
+    },
+    "Spending by week" : {
+      "comment" : "Usage page: the chart's heading when it shows cost, week by week."
+    },
+    "Spent" : {
+      "comment" : "Home and Usage: stat name — the estimated cost."
+    },
     "Start typing here" : {
-
+      "comment" : "Usage page, typing test: placeholder of the field to type in."
     },
     "Start using SpeechText" : {
       "comment" : "Setup window: footer button on the last step; opens the app."
@@ -1366,6 +1884,35 @@
     "Talk, or say what you want" : {
       "comment" : "Prompts page: large title at the top of the page; one line, shrinks to fit."
     },
+    "Tallest: %@" : {
+      "comment" : "Usage page: under the chart, the tallest column's cost, e.g. ≈ $0.40."
+    },
+    "Tallest: %lld words" : {
+      "comment" : "Usage page: under the chart, the tallest column's words.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Tallest: %lld word"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Tallest: %lld words"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Teach SpeechText the words it gets wrong — names, product terms, code identifiers." : {
+      "comment" : "The Dictionary page's lead under its title."
+    },
     "Team chat" : {
       "comment" : "Setup window, welcome animation: the title of a made-up chat window."
     },
@@ -1385,10 +1932,10 @@
       "comment" : "Prompts page, What else AI Rewrite is told: tile text under 'Where you're dictating'. Slack and Mail are app names."
     },
     "The audio is kept %@, for a retry with the settings you have now." : {
-
+      "comment" : "History page, an open failed dictation. %@ says for how long, e.g. 'until 12 November' or 'until SpeechText quits'."
     },
     "The audio is no longer kept, so this one can't be retried." : {
-
+      "comment" : "History page, an open failed dictation whose audio was deleted."
     },
     "The download didn't finish" : {
       "comment" : "Setup window, Try it step: title when the speech model's download failed."
@@ -1396,8 +1943,17 @@
     "The download stopped. Check your internet connection." : {
       "comment" : "Setup window: download pill's popover when a download failed."
     },
+    "The instructions AI Rewrite follows — one for each kind of text you dictate." : {
+      "comment" : "The Prompts page's lead under its title."
+    },
+    "The microphone is off for SpeechText." : {
+      "comment" : "Home page: a problem row's text when the microphone permission is off."
+    },
     "The model on this Mac isn't given them" : {
       "comment" : "Dictionary page, What a word does: row title when a local speech model is in use."
+    },
+    "The quietest rooms are seldom silent; listen carefully and there's a refrigerator humming, a clock ticking, a neighbor's piano." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
     },
     "The situation AI Rewrite recognizes from what you said — distinct from every other prompt's." : {
       "comment" : "Prompts page, editing a prompt: hint under 'When to use'."
@@ -1421,13 +1977,19 @@
       "comment" : "Setup window, AI step: under a heavy model when there is no recommendation."
     },
     "This part of SpeechText is on its way." : {
-
+      "comment" : "A page not built yet: shown in its empty frame."
     },
     "This takes a few seconds." : {
       "comment" : "Setup window, Try it step: while AI rewrites."
     },
     "Three quick settings" : {
       "comment" : "Setup window, permissions: title when Dictation must be turned on too."
+    },
+    "Time saved" : {
+      "comment" : "Home and Usage: stat name — time saved by speaking instead of typing."
+    },
+    "Today" : {
+      "comment" : "Home page, Last 7 days: the label under today's column."
     },
     "Too heavy for this Mac" : {
       "comment" : "Badge on a model that needs more memory than this Mac has."
@@ -1436,16 +1998,22 @@
 
     },
     "Transcribe the saved audio again, with the settings you have now" : {
-
+      "comment" : "Tooltip on Retry."
     },
     "Transcribing" : {
       "comment" : "Setup window, Try it step: small chip while speech becomes text."
+    },
+    "Transcript" : {
+      "comment" : "Record Window, minimal look: VoiceOver label of the text area."
+    },
+    "Transcription failed." : {
+      "comment" : "History page, an open failed dictation, when no error message was kept."
     },
     "Transparency" : {
 
     },
     "Try again" : {
-      "comment" : "Button that tries again."
+      "comment" : "Button that starts something over."
     },
     "Try it: hold" : {
       "comment" : "Setup window, Try it step: title over the shortcut's keys, hold mode."
@@ -1454,7 +2022,7 @@
       "comment" : "Setup window, Try it step: title over the shortcut's keys, press mode."
     },
     "Turn On…" : {
-
+      "comment" : "Home page: button on a problem row that opens the macOS permission."
     },
     "Turn on Dictation" : {
       "comment" : "Setup window: helper title beside System Settings › Keyboard. Dictation is macOS's setting."
@@ -1472,13 +2040,13 @@
       "comment" : "Setup window, permissions: title."
     },
     "Type for you" : {
-      "comment" : "Setup window, permissions: row title for Accessibility access, which lets the app type."
+      "comment" : "Home page, the setup card: a step — the Accessibility permission, so SpeechText can type into apps."
     },
     "Type how it should be written." : {
       "comment" : "Dictionary page, Replacements: error under the form when the With field is empty."
     },
     "Type the sentence below. The clock starts with your first key." : {
-
+      "comment" : "Usage page, typing test popover: instructions."
     },
     "Type what is recognized now." : {
       "comment" : "Dictionary page, Replacements: error under the form when the Replace field is empty."
@@ -1486,17 +2054,23 @@
     "Types only what you said" : {
       "comment" : "Setup window, permissions: a promise, in bold; followed by '— right where your cursor is.'"
     },
+    "Typing" : {
+      "comment" : "Usage page: label under the typing-speed column."
+    },
     "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too." : {
       "comment" : "Setup window, Try it step: rough speech for the user to read out, for AI polish to tidy. Keep the hesitations and the correction."
     },
     "Untitled" : {
       "comment" : "Dictionary page: shown on a word's card when the word itself is empty."
     },
+    "Usage" : {
+      "comment" : "The Usage page's name — in the window's sidebar and as its title."
+    },
     "Use %@" : {
 
     },
     "Use %lld wpm" : {
-
+      "comment" : "Usage page, typing test: button that saves the measured speed."
     },
     "Use as Default" : {
       "comment" : "Prompts page: context menu item that makes a prompt the default. Title case, as macOS menu items are in English."
@@ -1505,7 +2079,7 @@
       "comment" : "Prompts page, editing a prompt: button that makes it the default."
     },
     "Use the average, 40 wpm" : {
-
+      "comment" : "Usage page, typing test popover: button that drops the user's own speed."
     },
     "Used %lld times" : {
       "comment" : "Prompts page: how many dictations in History AI Rewrite chose this prompt for. The English 'one' form is 'Used once'.",
@@ -1557,6 +2131,9 @@
     "We didn't hear anything." : {
       "comment" : "Setup window, Try it step: shown as the AI result when the AI dictation was silent."
     },
+    "Weather, traffic and the price of coffee: three things everyone discusses, few understand, and nobody can change before Tuesday." : {
+      "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
+    },
     "What a word does" : {
       "comment" : "Dictionary page: section heading over three rows that say what the user's words do with the current speech engine and AI Rewrite."
     },
@@ -1569,8 +2146,14 @@
     "What uses it stops working until you add a key again." : {
 
     },
+    "What you dictated, what it cost, and the time it saved you." : {
+      "comment" : "The Usage page's lead under its title."
+    },
     "What you said, and what AI polish wrote from it — in any app, only the AI version is typed." : {
       "comment" : "Setup window, Try it step: after AI polish worked."
+    },
+    "What you said, and what SpeechText did with it." : {
+      "comment" : "The History page's lead under its title."
     },
     "When to use" : {
       "comment" : "Prompts page, editing a prompt: small label in capitals over the field that says when the prompt fits."
@@ -1593,11 +2176,26 @@
     "Word" : {
       "comment" : "Dictionary page, Add a word: label over the field for the word, as it should be written."
     },
+    "Words" : {
+      "comment" : "Usage page: the chart's switch — show words."
+    },
     "Words are kept on this Mac. One reaches the speech engine or AI Rewrite only with a dictation — never on its own." : {
       "comment" : "Dictionary page: privacy note at the bottom of the page."
     },
+    "Words by day" : {
+      "comment" : "Usage page: the chart's heading when it shows words, day by day."
+    },
+    "Words by month" : {
+      "comment" : "Usage page: the chart's heading when it shows words, month by month."
+    },
+    "Words by week" : {
+      "comment" : "Usage page: the chart's heading when it shows words, week by week."
+    },
+    "Words dictated" : {
+      "comment" : "Usage page: stat name."
+    },
     "Words dictated each day this week" : {
-
+      "comment" : "Home page, Last 7 days: VoiceOver label of the week's columns."
     },
     "Words to tidy up, or a request like “make it a list, in English”: it picks the prompt whose “When to use” fits and does what else you asked. Nothing fits? The Default does." : {
       "comment" : "Prompts page: text at the top. “When to use” is the name of a field; Default is the default prompt."
@@ -1607,6 +2205,9 @@
     },
     "Work in any app. Press once to start, again to stop. Change them any time in %@." : {
       "comment" : "Setup window, Done step, under the shortcuts. %@ is 'Settings', in bold."
+    },
+    "Works as plain Dictate until you %@." : {
+      "comment" : "Home page, More ways to dictate: the AI Rewrite tile's text when it has no provider. %@ is the link 'choose a provider'."
     },
     "Works on any Mac. Needs internet and a free account; your recording is sent to the service." : {
       "comment" : "Setup window, Speech step: facts about online speech."
@@ -1635,11 +2236,30 @@
     "You say" : {
       "comment" : "Setup window, AI step: label over the example of rough speech."
     },
-    "You speak at " : {
-
+    "You speak at %@ words a minute and type at %@ — an average, until you set yours. In this period that's %@ you didn't spend typing." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You speak at %1$@ words a minute and type at %2$@ — an average, until you set yours. In this period that's %3$@ you didn't spend typing."
+          }
+        }
+      },
+      "comment" : "Usage page, the speed card. The first two %@ are speeds (bold numbers); the third a duration, e.g. ≈ 1 h 20 min."
+    },
+    "You speak at %@ words a minute and type at %@. In this period that's %@ you didn't spend typing." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You speak at %1$@ words a minute and type at %2$@. In this period that's %3$@ you didn't spend typing."
+          }
+        }
+      },
+      "comment" : "Usage page, the speed card. The first two %@ are speeds (bold numbers); the third a duration, e.g. ≈ 1 h 20 min."
     },
     "You type at %lld wpm" : {
-
+      "comment" : "Usage page: button that opens the typing test, once a speed is measured."
     },
     "You're all set" : {
       "comment" : "Setup window, Done step: the title."
@@ -1677,6 +2297,9 @@
     "Your speech model isn't downloaded" : {
       "comment" : "Setup window, Try it step: title."
     },
+    "Your typing speed" : {
+      "comment" : "Usage page, How this is counted: title of the note on typing speed."
+    },
     "Your words" : {
       "comment" : "Dictionary page: section heading over the list of the user's words. A count follows it."
     },
@@ -1692,6 +2315,9 @@
     "a minute or two" : {
       "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar."
     },
+    "as the providers' replies count them" : {
+      "comment" : "Usage page: note after the 'Requests' heading."
+    },
     "besides the prompt, with every AI dictation" : {
       "comment" : "Prompts page: note after the 'What else AI Rewrite is told' heading."
     },
@@ -1699,7 +2325,10 @@
       "comment" : "Usage page: note after the 'Overhead' heading."
     },
     "choose a provider" : {
-
+      "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase."
+    },
+    "counted since %@" : {
+      "comment" : "Usage page: note after the 'Requests' heading. %@ is a date."
     },
     "e.g. %@" : {
       "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field. %@ is the typed word split into lowercase words (SpeechText → speech text)."
@@ -1719,8 +2348,40 @@
     "from “%@”" : {
       "comment" : "Prompts page, Last chosen for: under the rewritten text, what was said. %@ is the dictated text."
     },
+    "h" : {
+      "comment" : "Home and Usage: the unit after a number of hours, small, e.g. ≈ 1 h 20 min."
+    },
     "how it comes out wrong — commas between" : {
       "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field when there is no example to show. Commas separate several spellings."
+    },
+    "in %@" : {
+      "comment" : "History page, part of 'Nothing … .': a filter or an app the dictations are narrowed to, e.g. 'in Edits' or 'in Slack'."
+    },
+    "in %lld dictations" : {
+      "comment" : "Home and Usage: under the number of words dictated.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "in %lld dictation"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "in %lld dictations"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "in the %@" : {
+      "comment" : "History page, part of 'Nothing … .': a range of days, lowercase, e.g. 'in the last 7 days'."
     },
     "last %@" : {
       "comment" : "Prompts page: when a prompt was last chosen, lowercase. %@ is a time today (14:05), 'yesterday', a weekday or a date."
@@ -1731,14 +2392,70 @@
     "macOS asks to allow Speech Recognition the first time." : {
       "comment" : "Setup window, Speech step: second sentence of Apple Dictation's description. Speech Recognition is macOS's permission name."
     },
+    "min" : {
+      "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min."
+    },
+    "model not recorded" : {
+      "comment" : "Usage page, By engine: for dictations from before History kept the model."
+    },
+    "no connection, so not pasted" : {
+      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted."
+    },
+    "no connection, so not pasted into %@" : {
+      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted. %@ is the app."
+    },
+    "no token counts reported" : {
+      "comment" : "Usage page, Requests: an AI model whose replies had no token counts."
+    },
+    "none from History" : {
+      "comment" : "Usage page, Overhead: under Retries when there were none."
+    },
+    "not counting %@" : {
+      "comment" : "Home and Usage: under Spent, after the estimate. %@ is a list of model names with no list price."
+    },
+    "of silence a cloud engine was never sent" : {
+      "comment" : "Usage page, Overhead: under the Not sent figure (a duration)."
+    },
+    "on %@" : {
+      "comment" : "History page, part of 'Nothing … .': one day, e.g. 'on 3 November'."
+    },
     "optional" : {
       "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty."
+    },
+    "requests a provider refused or that broke off" : {
+      "comment" : "Usage page, Overhead: under the Refused figure."
+    },
+    "resets in %@" : {
+      "comment" : "Usage page, Limits: when a rate limit resets. %@ is a duration, e.g. 3 min."
     },
     "saved as you type" : {
       "comment" : "Prompts page: note after the 'Edit prompt' heading."
     },
     "sign in, then click **%@**." : {
       "comment" : "Setup window: first step of getting a key, after a link to the service's website. %@ is the website's button name, in English as the website shows it; ** marks bold."
+    },
+    "since %@, when History starts" : {
+      "comment" : "Usage page, the chart's note. %@ is a date."
+    },
+    "started in %@, pasted into %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "started in %1$@, pasted into %2$@"
+          }
+        }
+      },
+      "comment" : "History page: part of a dictation's facts line. The two %@ are app names."
+    },
+    "streamed, then uploaded again when the stream broke or came back empty" : {
+      "comment" : "Usage page, Overhead: under the Paid twice figure (a duration)."
+    },
+    "that wasn't pasted" : {
+      "comment" : "History page, part of 'Nothing … .': the filter for dictations that weren't pasted anywhere."
+    },
+    "today" : {
+      "comment" : "History page, part of 'Nothing … .': the date filter set to today, lowercase."
     },
     "top %lld of %lld" : {
       "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are.",
@@ -1760,17 +2477,17 @@
     "up to 10 minutes" : {
       "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar."
     },
+    "vs an average typist (%lld wpm)" : {
+      "comment" : "Home page, Last 7 days: under Time saved, when the user hasn't measured their typing. wpm is words per minute."
+    },
+    "vs typing at %lld wpm" : {
+      "comment" : "Home and Usage: under Time saved. wpm is words per minute."
+    },
     "words a minute" : {
-
+      "comment" : "Usage page, typing test: after the measured speed (a large number)."
     },
     "words · ≈ cost" : {
       "comment" : "Usage page: note after the 'By kind' heading naming its two columns. ≈ means approximately."
-    },
-    "·" : {
-
-    },
-    "—" : {
-
     },
     "— from one press of the shortcut to the next." : {
       "comment" : "Setup window, permissions: continues 'Listens only while you dictate'."
@@ -1786,9 +2503,6 @@
     },
     "“uh so um tell John that I'm gonna be like— wait no, ten, ten minutes late I think? cause the traffic is just, ugh. yeah sorry”" : {
       "comment" : "Setup window, AI step: an example of rough speech, in quotes. Translate together with its tidied result ('Hi John, …')."
-    },
-    "≈ %@" : {
-
     },
     "⚠︎ %@" : {
 
