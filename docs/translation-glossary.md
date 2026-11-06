@@ -91,7 +91,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Instructions (a prompt's field) | Інструкції |
 | Default (the default prompt) | Типовий |
 | Replacements | Заміни |
-| Settings (the app's window) | Налаштування |
+| Settings (the app's window) | Параметри, as macOS names an app's settings; *setup* stays налаштування |
 | Setup (the first-run window) | Початкове налаштування |
 | speech engine | рушій мовлення |
 | speech model | модель мовлення |
@@ -102,7 +102,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | transcription · transcribe | транскрипція · транскрибувати |
 | on this Mac | на цьому Mac |
 | skin · Techno · Minimal | оформлення · Techno · Minimal |
-| System Settings | Системні параметри |
+| System Settings | Системні параметри; a path after a preposition takes the locative: «у Системних параметрах › Звук» |
 | Privacy & Security | Приватність і безпека |
 | Keyboard · Dictation (macOS) | Клавіатура · Диктування |
 | Accessibility | Універсальний доступ |
@@ -110,3 +110,21 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Sound | Звук |
 | Login Items | Елементи входу |
 | menu bar · Dock · Control Center | смуга меню · Dock · Центр керування |
+
+## Adding a language
+
+A new language is not done when every string has a value. Before it is turned on:
+
+1. **Every window is looked at and compared with English.** Run
+   `scripts/window-snapshots.sh --languages "en <code>"` and go through every screen in
+   `index.html` beside its English: text cut off or clipped, a word broken across lines,
+   a button pushed out of its window, English left over, a sentence that reads wrong.
+   Write the assessment down in the pull request that turns the language on, screen by
+   screen, with what was fixed.
+2. **Every term is right and the same everywhere.** Each row of this glossary gets the
+   language's word, the macOS names the ones macOS itself uses in that language (Settings
+   is *Параметри* in Ukrainian, not *Налаштування*), and every string that names a page,
+   a feature or a setting uses that word — in the window itself, in the notices that send
+   the user there, and in the paths (*Settings › AI Rewrite*). Grammar around a name
+   follows the language (Ukrainian puts a path after «у» in the locative).
+
