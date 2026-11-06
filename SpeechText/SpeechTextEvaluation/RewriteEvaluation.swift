@@ -778,7 +778,11 @@ enum RewriteEvaluation {
             guard row.status == "ok" || row.status == "failed", let raw = row.raw, let fixture = byID[row.fixture] else { return row }
             var row = row
             let modes = row.variant == Variant.modes2026.rawValue && !fixture.isEdit ? modesRequest(fixture) : nil
-            let names = (Variant(rawValue: row.variant) ?? .current).presets.map(\.name)
+            // A `2026-11` edit made before #109 shipped was sent the October names, so an edit
+            // is read against both.
+            let variant = Variant(rawValue: row.variant) ?? .current
+            let names = (fixture.isEdit ? Array(Set(variant.presets.map(\.name) + Variant.current.presets.map(\.name))).sorted()
+                         : variant.presets.map(\.name))
             let read = RewriteChecks.read(raw, fixture: fixture, presetNames: modes?.modeNames
                 ?? names + (fixture.isEdit ? editModeNames : []))
             row.reply = read.text

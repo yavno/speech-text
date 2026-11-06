@@ -16700,19 +16700,19 @@
         }
       }
     },
-    "Your own prompts and changes are replaced by the six that come with SpeechText." : {
+    "Your own prompts and changes are replaced by the three that come with SpeechText." : {
       "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus propios prompts y cambios se sustituyen por los seis que incluye SpeechText."
+            "value" : "Tus propios prompts y cambios se sustituyen por los tres que incluye SpeechText."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваші власні промпти та зміни буде замінено шістьма, що постачаються з SpeechText."
+            "value" : "Ваші власні промпти та зміни буде замінено трьома, що постачаються з SpeechText."
           }
         }
       }
@@ -17091,19 +17091,19 @@
         }
       }
     },
-    "fix the bug where the token expires too early" : {
-      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in coding prompt. Write a natural example in your language.",
+    "commit message fix the token expiring too early" : {
+      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in Structured prompt: a request for a commit message, then what it should say. Write a natural example in your language.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "arregla el error por el que el token caduca demasiado pronto"
+            "value" : "mensaje de commit arregla que el token caduque demasiado pronto"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "виправ баг де токен спливає зарано"
+            "value" : "коміт меседж виправ що токен спливає зарано"
           }
         }
       }
@@ -17764,19 +17764,19 @@
         }
       }
     },
-    "translate to English дякую що прийшли" : {
-      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in translation prompt: a request to translate, then words in another language (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
+    "reply to Oleh in English дякую що прийшли" : {
+      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in Message prompt: a reply asked for in another language, then the words (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "traduce al inglés дякую що прийшли"
+            "value" : "responde a Oleh en inglés дякую що прийшли"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "переклади англійською дякую що прийшли"
+            "value" : "відповідь Олегу англійською дякую що прийшли"
           }
         }
       }

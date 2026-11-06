@@ -46,7 +46,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
     - and, always: no preamble, no leaked marker, no reasoning, not wrapped in quotes.
   - **Modes**: `modes` for the `current` baseline (the first is the expected one), `variantModes` for another set of modes, since a variant may rename or merge them. `variantModes["2026-11"]` holds the three modes the app has (Clean-up, Message, Structured), Clean-up alone in an editor, a terminal or an AI's field, and the fixture's own `presets` by name.
   - **The route**, for the variants that pick a mode and its modifiers first: `askedLanguage`, an ISO 639-1 code (absent when the dictation asks for no language), and `format`, the formats a right answer may pick (`plain`, `list`, `markdown`; absent means plain). An edit is not routed and has neither.
-- **The user's own prompts:** `presets` (name, when to use, instructions), for a variant that sends them beside the built-ins. `current` sends its built-ins alone.
+- **The user's own prompts:** `presets` (name, when to use, instructions), for a variant that sends them beside the built-ins. `current` sends its built-ins alone, and an edit is sent the built-ins alone under either variant, where the app's Edit prompt lists the user's prompts too.
 - **Examples:** `examples`, replies written by hand that the checks must pass or fail.
 
 `--self-check` runs the checks on every example, holds every routing expectation to what a router can answer, and asks no model. The script runs it first and stops on a mismatch.
