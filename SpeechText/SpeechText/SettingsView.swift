@@ -1119,7 +1119,9 @@ struct RecordingModePicker: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12)
+            // Setup's column is narrow: a little less inset keeps a longer title, such as
+            // «Затисніть і говоріть», on one line at full size.
+            .padding(.horizontal, compact ? 9 : 12)
             .padding(.vertical, compact ? 7 : 9)
             .background {
                 if selected {

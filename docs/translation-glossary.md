@@ -79,11 +79,11 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 |---|---|
 | dictation (a recording turned into text) | диктування; counted: диктовка (1 диктовка, 3 диктовки, 5 диктовок) |
 | dictate | диктувати |
-| AI Rewrite | Переписування з ШІ |
+| AI Rewrite | ШІ-переписування (ШІ-переписуванню, ШІ-переписуванням…) |
 | AI | ШІ |
 | AI mode | режим ШІ |
 | Edit (rewriting selected text by voice) | Редагувати; the feature: Редагування |
-| Hold to talk | Утримуйте, щоб говорити |
+| Hold to talk | Затисніть і говоріть |
 | double tap (a shortcut) | подвійне натискання |
 | Record Window | Вікно запису |
 | Home · History · Usage · Prompts · Dictionary | Головна · Історія · Облік · Промпти · Словник |

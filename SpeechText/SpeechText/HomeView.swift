@@ -1108,7 +1108,8 @@ private struct HomeEngineRow: View {
                     Text(title).font(.system(size: 14)).foregroundStyle(MainColor.ink2)
                 }
                 .padding(.horizontal, 16)
-                .frame(width: 170, alignment: .leading)
+                // Room for «ШІ-переписування» on one line, as for "AI Rewrite".
+                .frame(width: 188, alignment: .leading)
                 .frame(maxHeight: .infinity)
                 .overlay(alignment: .trailing) { Rectangle().fill(MainColor.separator).frame(width: 1) }
 
