@@ -23,7 +23,8 @@ final class DictationTest {
 
     enum Rewrite: Equatable {
         case wrote(said: String, text: String)
-        case failed(said: String, reason: String)
+        /// `offline`: it failed for want of a network, which setup says in its own words.
+        case failed(said: String, reason: String, offline: Bool)
     }
 
     /// The Try it step is on screen.
@@ -42,14 +43,17 @@ final class DictationTest {
     func finished(_ result: Outcome, ai: Bool) {
         if ai {
             let reason: String
+            var offline = false
             switch result {
             case .typed(let text):
                 rewrite = .wrote(said: text, text: text)
                 return
             case .nothingHeard: reason = String(localized: "We didn't hear anything.")
-            case .failed(let message, _): reason = message
+            case .failed(let message, let kind):
+                reason = message
+                offline = kind == .offline
             }
-            rewrite = .failed(said: "", reason: reason)
+            rewrite = .failed(said: "", reason: reason, offline: offline)
         } else {
             outcome = result
         }
@@ -58,7 +62,9 @@ final class DictationTest {
     func rewritten(said: String, result: Result<String, Error>) {
         switch result {
         case .success(let text): rewrite = .wrote(said: said, text: text)
-        case .failure(let error): rewrite = .failed(said: said, reason: error.localizedDescription)
+        case .failure(let error):
+            rewrite = .failed(said: said, reason: error.localizedDescription,
+                              offline: NetworkFailure.isOffline(error))
         }
         // An AI dictation is also a dictation that worked.
         if outcome == nil || outcome == .nothingHeard { outcome = .typed(said) }

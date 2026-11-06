@@ -2478,8 +2478,9 @@ final class AppState {
     }
 
     /// Turn a raw provider error into something that tells the user what to actually do.
-    private func friendlySTTError(_ raw: String) -> String {
-        switch TranscriptionFailureKind(message: raw) {
+    private func friendlySTTError(_ raw: String,
+                                  kind: TranscriptionFailureKind? = nil) -> String {
+        switch kind ?? TranscriptionFailureKind(message: raw) {
         case .tooLarge: String(localized: "That recording was too large for the provider. Try a shorter one.")
         case .rateLimited: String(localized: "Rate limited by the provider. Wait a moment and retry from History.")
         case .rejected: String(localized: "The API key was rejected. Check it in Settings.")
@@ -2492,7 +2493,8 @@ final class AppState {
     /// A failed test dictation for setup's Try it step: the words, and the kind its panel
     /// is picked by.
     private func testFailure(_ raw: String, offline: Bool = false) -> DictationTest.Outcome {
-        .failed(friendlySTTError(raw), offline ? .offline : TranscriptionFailureKind(message: raw))
+        let kind = offline ? .offline : TranscriptionFailureKind(message: raw)
+        return .failed(friendlySTTError(raw, kind: kind), kind)
     }
 
     func toggleOrShowDirectRecordingPanel() {

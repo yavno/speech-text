@@ -49,6 +49,8 @@ SINGLE_EMPHASIS = {
     "_": re.compile(r"(?<![_\w])_(?![\s_])[^_\n]+?(?<![\s_])_(?![_\w])"),
 }
 INTEGER = ("d", "D", "i", "u", "U")
+# The plural forms that may leave the count out: every CLDR category but "other".
+PLURAL_CATEGORIES = {"zero", "one", "two", "few", "many"}
 
 
 def catalogs():
@@ -111,14 +113,16 @@ def markdown(text):
 
 def units(localization):
     """Every (form, value) of one language's localization: a plain string unit as form
-    None, plural or device variations by their form, substitutions by name/form."""
+    None, a plural variation by its form ("one"), any other variation by kind and form
+    ("device:mac"), substitutions by name and form ("count:one")."""
     found = []
     if "stringUnit" in localization:
         found.append((None, localization["stringUnit"].get("value", "")))
     for kind, forms in localization.get("variations", {}).items():
         for form, inner in forms.items():
+            name = form if kind == "plural" else f"{kind}:{form}"
             for sub_form, value in units(inner):
-                found.append((sub_form or form, value))
+                found.append((sub_form or name, value))
     for name, sub in localization.get("substitutions", {}).items():
         for form, inner in sub.get("variations", {}).get("plural", {}).items():
             for _, value in units(inner):
@@ -164,7 +168,9 @@ def check_translations(paths):
                     # A plural form other than 'other' may leave the count out ("once"),
                     # and nothing else.
                     count = count_specifier(want_specs)
-                    plural = form is not None and not form.endswith("other")
+                    # Only a plural form: a device variation ("device:mac") keeps every argument.
+                    kind, _, category = (form or "").rpartition(":")
+                    plural = category in PLURAL_CATEGORIES and kind not in ("device", "width")
                     without_count = [s for s in want_specs if s != count]
                     if got != want_specs and not (plural and count and got == without_count):
                         problems.append(f"{where}: specifiers {got} where the source has {want_specs}")

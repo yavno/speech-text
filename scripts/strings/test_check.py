@@ -92,6 +92,11 @@ class TranslationsTest(CatalogTest):
             "es": plural(one="%lld dictado", many="%lld dictados · %@", other="%lld dictados · %@")}}})
         self.assertEqual(len(check.check_translations(paths)), 1)
 
+    def test_a_device_variation_keeps_the_count(self):
+        paths = self.catalog({"Used %lld times": {"localizations": {
+            "es": {"variations": {"device": {"mac": unit("Usado"), "other": unit("Usado %lld veces")}}}}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+
     def test_lost_single_emphasis_fails(self):
         paths = self.catalog({"Read *this* first": {"localizations": {"es": unit("Lee esto primero")}}})
         self.assertEqual(len(check.check_translations(paths)), 1)

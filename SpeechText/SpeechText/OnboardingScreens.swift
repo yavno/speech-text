@@ -1142,7 +1142,7 @@ private struct TryItScreen: View {
     private var aLetter: String { shortcutKeys(a).last ?? a }
 
     private enum Phase { case ready, listening, transcribing, success, nothing, rejected, offline, failed(String) }
-    private enum AIPhase { case ready, listening, polishing, success(said: String, wrote: String), failed(said: String, reason: String) }
+    private enum AIPhase { case ready, listening, polishing, success(said: String, wrote: String), failed(said: String, reason: String, offline: Bool) }
 
     private var inAI: Bool { appState.isAIMode && !appState.isEditMode }
     private var listening: Bool { engine.isRecording || engine.isStartingEngine }
@@ -1165,7 +1165,7 @@ private struct TryItScreen: View {
         if inAI && (engine.isTranscribing || appState.isRefining) { return .polishing }
         switch test.rewrite {
         case .wrote(let said, let text)?: return .success(said: said, wrote: text)
-        case .failed(let said, let reason)?: return .failed(said: said, reason: reason)
+        case .failed(let said, let reason, let offline)?: return .failed(said: said, reason: reason, offline: offline)
         case nil: return .ready
         }
     }
@@ -1373,6 +1373,9 @@ private struct TryItScreen: View {
         case .success:
             title(Text(verbatim: "✓ ").foregroundColor(SetupColor.ok) + Text("Here's the AI version"))
             body(Text("What you said, and what AI polish wrote from it — in any app, only the AI version is typed."))
+        case .failed(_, _, true):
+            title(Text("No internet connection"))
+            body(Text("Online services need internet. Connect, then try again."))
         case .failed:
             title(Text("AI couldn't answer this time"))
             body(Text("In any app, your words would be typed as you said them."))
@@ -1539,7 +1542,7 @@ private struct TryItScreen: View {
             } else {
                 Text(verbatim: said).foregroundStyle(SetupColor.label)
             }
-        case .success(let said, _), .failed(let said, _):
+        case .success(let said, _), .failed(let said, _, _):
             // Once the AI has written, what was said gives it the room: one line, the
             // rest a click away.
             let long = said.count > 40
@@ -1569,7 +1572,7 @@ private struct TryItScreen: View {
             HStack(spacing: 8) { SetupSpinner().environment(\.setupTint, .violet); Text("Rewriting…").foregroundStyle(SetupColor.label2) }
         case .success(_, let wrote):
             Text(verbatim: wrote).foregroundStyle(SetupColor.label).textSelection(.enabled)
-        case .failed(_, let reason):
+        case .failed(_, let reason, _):
             Text(verbatim: reason).foregroundStyle(SetupColor.danger)
         case .ready:
             EmptyView()
