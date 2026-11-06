@@ -2,7 +2,7 @@
 # CodeRabbit reviews every pull request as advice: it is not one of the checks a merge
 # waits for (Tests, Swift lint, Checks), and its pre-merge checks only warn. Everything
 # not set here is CodeRabbit's default; the review rules come from AGENTS.md, which it
-# reads on its own.
+# reads on its own, and docs/decisions.md (knowledge_base below).
 reviews:
   # Only one maintainer reviews (.github/CODEOWNERS).
   suggested_reviewers: false
@@ -39,6 +39,15 @@ reviews:
         A String Catalog. Each new key needs a translator comment that says where the
         text appears and any length limit. Prompts sent to a model are not
         translated. Do not comment on the JSON layout.
+    - path: "**/*.swift"
+      instructions: >-
+        Many things here that look like oversights are decisions: a parameter sent with
+        its default value, an audio file written and then not uploaded, settings read
+        once per recording, an AI Rewrite failure that pastes the transcript instead of
+        reporting an error. Before calling one redundant or wrong, look for its entry in
+        docs/decisions.md or the comment above the code (which may sit on the type, not
+        the call), and name that entry when the change contradicts it. Do not suggest
+        an abstraction, a dependency or a setting the change does not need.
 
   labeling_instructions:
     - label: bug
@@ -97,6 +106,12 @@ reviews:
     # findings that rule refuses.
     swiftlint:
       enabled: false
+
+knowledge_base:
+  code_guidelines:
+    # AGENTS.md is read by default; the decisions behind the code are not.
+    filePatterns:
+      - "docs/decisions.md"
 
 chat:
   art: false

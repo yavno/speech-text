@@ -39,6 +39,13 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
    `Closes #N`, the checklist, *Users will notice* (what changes for someone using the app,
    or "Nothing"), *Privacy*, *Needs a real-app run* (what only a person
    with the running app can check, or "None"), screenshots for UI.
+10. **Review comments.** CodeRabbit reviews every pull request; its comments, like a
+    person's, are suggestions. Before acting on one, look for its entry in
+    `docs/decisions.md` or the comment above the code. Then fix it, or answer in the
+    thread why not, naming the entry, and resolve the thread. A suggestion that grows the
+    change (a new abstraction, setting or dependency) is declined the same way. One
+    session follows a pull request's comments: a second one answers the same comment
+    again and pushes to the same branch.
 
 End with a short summary for the user: what changed, what ran and its result, what was
 not run, and anything left for the maintainer to decide.
