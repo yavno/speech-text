@@ -113,7 +113,7 @@ Everything else is checked for you. CI runs the test suite (which compiles the a
 
 - CI must be green before a merge. GitHub refuses a merge while Tests, Swift lint or Checks is red, and *DCO sign-off* is a step of Checks, so an unsigned commit blocks the merge too.
 - A pull request that lists something under *Needs a real-app run* is not blocked on you: the maintainer checks those items in a real build, with a real microphone and the apps the e2e run cannot read back. Say as precisely as you can what to check.
-- Review comments are about the change, not you. If the answer to a comment is "that was on purpose", say so and why; the code is full of decisions that look like oversights.
+- Review comments are about the change, not you. If the answer to a comment is "that was on purpose", say so and why; the code is full of decisions that look like oversights. The same goes for CodeRabbit, which reviews every pull request automatically: it reads AGENTS.md and docs/decisions.md, but a comment of its that contradicts a decision is answered, not followed.
 
 ## Issue and pull request numbers
 
