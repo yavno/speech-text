@@ -217,6 +217,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         registerLocalSTT()
         registerLocalChat()
+        // Before the prewarm, which reads the prompts.
+        PromptPresetStore.migrateIfNeeded()
         prewarmSelectedLocalModel()
         registerSpellCheckedJoins()
         registerVocabularyHistory()

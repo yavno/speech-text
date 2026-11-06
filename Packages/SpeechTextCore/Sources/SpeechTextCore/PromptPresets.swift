@@ -36,14 +36,21 @@ public enum PromptPresetStore {
 
     static let cleanupPresetID = fixedID("01")
 
-    /// Each one says what it is for and what to do, and stops there. They go out in full
-    /// on every AI dictation and every edit, they are more than half the prompt, and the
-    /// model fills in the obvious — so a built-in prompt that explains itself is spending
-    /// the user's rate limit to say what the model already knows. The user's own prompts
-    /// may of course be as long as they like.
-    public static let builtInDefaults: [PromptPreset] = [
+    /// The three modes of docs/specs/2026-11-03-rewrite-modes-and-router.md, kept in
+    /// `RewriteModes` with the prompt that carries them. Each says what it is for and what
+    /// to do, and stops there: they go out in full on every AI dictation and every edit,
+    /// and the model fills in the obvious. The user's own prompts may be as long as they
+    /// like.
+    public static var builtInDefaults: [PromptPreset] { RewriteModes.builtIns }
+
+    // MARK: - Built-ins that shipped before
+
+    /// The six built-ins v0.10.0 shipped, as `53b1287` (2026-10-18) left them and as they
+    /// stood from `1ead0ee` (2026-10-06). The harness's `current` variant measures them,
+    /// the baseline #109 was held to, and the migration knows them as shipped.
+    public static let october2026: [PromptPreset] = [
         PromptPreset(
-            id: cleanupPresetID,
+            id: fixedID("01"),
             name: "Clean-up",
             whenToUse: "Plain content, with no instruction about style, format or language.",
             instructions: """
@@ -107,6 +114,69 @@ public enum PromptPresetStore {
             """
         ),
     ]
+
+    /// The six as they first shipped, from `71edce8` (2026-08-26) until `1ead0ee`: a
+    /// stored copy may hold these. Git history holds no other text for them, across the
+    /// file's three paths (VoicePeter/, SpeechText/SpeechText/, here).
+    static let august2026: [PromptPreset] = [
+        PromptPreset(id: fixedID("01"), name: "Clean-up",
+                     whenToUse: "The dictation is plain content with no instruction about style, format or language — the user just wants what they said, written down properly.",
+                     instructions: "Rewrite the dictation as clean written text. Fix speech-recognition errors, misheard words, punctuation, capitalization and paragraph breaks. Remove filler words, stutters, repetitions and false starts. Keep the user's own wording, tone and language — do not translate, do not summarise, do not add anything that was not said."),
+        PromptPreset(id: fixedID("02"), name: "Rewrite / Draft",
+                     whenToUse: "The user dictated a rough draft and asked to write, rewrite, polish, expand or shorten it, or asked for a particular style or tone.",
+                     instructions: "Turn the draft into well-written prose that follows whatever style, tone, length or audience the user described. Keep every fact and intent from the draft; invent nothing. If no style was named, write clear, natural prose."),
+        PromptPreset(id: fixedID("03"), name: "Email / Message",
+                     whenToUse: "The user asked for an email, letter, Slack or chat message, a reply, or any text addressed to another person.",
+                     instructions: "Write the message. Match the register the user asked for (formal, friendly, terse…); default to polite and professional. Include a greeting and sign-off only if the format calls for it. Do not invent names, dates or facts — leave an obvious placeholder such as [name] when something is genuinely missing."),
+        PromptPreset(id: fixedID("04"), name: "Translate",
+                     whenToUse: "The user asked to translate, or asked for the text in a specific language different from the one they dictated in.",
+                     instructions: "Produce the text in the requested target language. Translate meaning, not words — the result must read as if it were written natively. Preserve tone and formatting. Output only the translation."),
+        PromptPreset(id: fixedID("05"), name: "Notes / Bullets",
+                     whenToUse: "The user asked for a summary, notes, bullet points, a list, a to-do list, or for their rambling to be structured.",
+                     instructions: "Structure the content as compact bullet points or a short list, grouped by topic, in the order the user raised them. Use plain \"- \" bullets. One idea per line, no padding, no closing commentary."),
+        PromptPreset(id: fixedID("06"), name: "Technical / Prompt",
+                     whenToUse: "The user dictated something technical: a commit message, a PR or ticket description, a bug report, or an instruction meant for an AI coding tool.",
+                     instructions: "Write it in the conventional format for that artefact — imperative mood for commit messages, problem/steps/expected for bug reports, an explicit step-by-step task description for an AI coding instruction. Keep identifiers, paths, commands and code fragments exactly as dictated; correct only obvious speech-recognition mangling of them."),
+    ]
+
+    /// Bumped when the built-ins change in a way stored prompts must follow.
+    static let presetsVersion = 1
+
+    /// D9: a stored list moved onto the three modes, once. A built-in left as it shipped
+    /// — equal in name, *When to use* and instructions to any text it ever had — becomes
+    /// the new one (01, 03, 05) or goes (02 Rewrite, 04 Translate, 06 Technical); one the
+    /// user edited stays exactly as they left it, and their own prompts are not touched.
+    /// The new texts match no old one, so a second pass changes nothing. `clearsDefault`:
+    /// the stored default pointed at a prompt that went.
+    static func migrated(_ stored: [PromptPreset], defaultID: UUID?) -> (presets: [PromptPreset], clearsDefault: Bool) {
+        let shipped = october2026 + august2026
+        let replacements = Dictionary(uniqueKeysWithValues: builtInDefaults.map { ($0.id, $0) })
+        var removed: Set<UUID> = []
+        let presets = stored.compactMap { preset -> PromptPreset? in
+            guard shipped.contains(where: { $0.id == preset.id && $0.name == preset.name
+                && $0.whenToUse == preset.whenToUse && $0.instructions == preset.instructions }) else { return preset }
+            if let replacement = replacements[preset.id] { return replacement }
+            removed.insert(preset.id)
+            return nil
+        }
+        return (presets, defaultID.map(removed.contains) ?? false)
+    }
+
+    /// `migrated` on the stored list, at launch, once: before anything reads the prompts.
+    /// A list never saved is the built-ins already, and only the marker is written.
+    public static func migrateIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard defaults.integer(forKey: SettingsKeys.promptPresetsVersion) < presetsVersion else { return }
+        defaults.set(presetsVersion, forKey: SettingsKeys.promptPresetsVersion)
+        guard let data = defaults.data(forKey: SettingsKeys.promptPresets),
+              let stored = try? JSONDecoder().decode([PromptPreset].self, from: data), !stored.isEmpty else { return }
+        let result = migrated(stored, defaultID: storedDefaultPresetID())
+        if result.presets != stored {
+            if result.presets.isEmpty { defaults.removeObject(forKey: SettingsKeys.promptPresets) } else { save(result.presets) }
+        }
+        if result.clearsDefault { defaults.removeObject(forKey: SettingsKeys.defaultPresetID) }
+        dlog("Prompts", "moved \(stored.count) stored prompt(s) to \(result.presets.count) on the 2026-11 modes")
+    }
 
     public static func load() -> [PromptPreset] {
         guard let data = UserDefaults.standard.data(forKey: SettingsKeys.promptPresets),

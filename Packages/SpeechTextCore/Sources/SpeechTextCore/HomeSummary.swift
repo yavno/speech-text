@@ -496,7 +496,7 @@ public struct HomeTalk: Equatable, Sendable {
         app: "Mail", place: localized("To: Sarah"),
         said: localized("uh email to Sarah running late start without me sorry").split(separator: " ").map(String.init),
         output: localized("Hi Sarah, I'm running a few minutes late — please start without me. Sorry!"),
-        preset: "Email / Message")
+        preset: "Message")
 
     static let edit = Script(
         app: "Notes", place: localized("Trip plan"),

@@ -143,17 +143,22 @@ final class LocalChatConnection: @unchecked Sendable {
         }
     }
 
-    /// Loads the model and reads both system prompts in the service: the user is speaking
+    /// Loads the model and reads the system prompts in the service: the user is speaking
     /// meanwhile, and the rewrite at the stop then starts from them (14 s cold for Gemma 4
-    /// 12B on an M1 Pro, 3 s warm). Fire and forget — a failure here is the request's own.
+    /// 12B on an M1 Pro, 3 s warm). A dictation is sent one of two prompts, by where it
+    /// goes (`RewriteModes.request`); the one for an editor, a terminal or an AI's field
+    /// is read first, since most dictations go there, then the Edit shortcut's. Fire and
+    /// forget — a failure here is the request's own.
     func prewarm(_ model: LocalChatModel) {
         let path = localChatModelFile(for: model)
         guard FileManager.default.fileExists(atPath: path.path) else { return }
         let presets = PromptPresetStore.load()
+        let defaultID = PromptPresetStore.storedDefaultPresetID()
         var request = LocalChatRequest.rewrite(model: model, path: path, system: "", user: "")
         request.prefixes = [
-            TextRefinementService.buildSystemPrompt(presets: presets,
-                                                    defaultPresetID: PromptPresetStore.storedDefaultPresetID()),
+            RewriteModes.request(context: FocusContext(bundleID: "com.apple.Terminal"), presets: presets,
+                                 defaultPresetID: defaultID).system,
+            RewriteModes.request(context: nil, presets: presets, defaultPresetID: defaultID).system,
             TextRefinementService.buildEditSystemPrompt(presets: presets),
         ]
         guard let body = try? JSONEncoder().encode(request) else { return }
@@ -226,8 +231,7 @@ enum LocalChatSmoke {
         guard let flag = arguments.firstIndex(of: "-SPTLocalChatSmoke"), arguments.count > flag + 2,
               let family = ChatTemplateFamily(rawValue: arguments[flag + 2]) else { return false }
         let path = arguments[flag + 1]
-        let system = TextRefinementService.buildSystemPrompt(presets: PromptPresetStore.builtInDefaults,
-                                                             defaultPresetID: nil)
+        let system = RewriteModes.request(context: nil, presets: PromptPresetStore.builtInDefaults).system
         let transcripts = ["е-е ну завтра зустріч переноситься на третю годину бо Олена ще не повернулась",
                            "напиши лист Андрію що звіт я надішлю в понеділок"]
         Task {

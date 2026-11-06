@@ -71,13 +71,17 @@ public struct FocusContext: Codable, Equatable, Sendable {
     }
 
     /// What kind of text the field takes, where the app or the field's label says so
-    /// plainly. Only one kind is told apart today: a prompt box for an AI. An app such as
-    /// T3 Code is newer than any model's training, so its name alone said nothing, and a
+    /// plainly: a prompt box for an AI, a code editor or a terminal. Text dictated into any
+    /// of them is for that program, so AI Rewrite writes it down and never carries it out
+    /// (`RewriteModes`, docs/specs/2026-11-03-rewrite-modes-and-router.md D3). An app such
+    /// as T3 Code is newer than any model's training, so its name alone said nothing, and a
     /// dictation into it came out as a chat message, or carried out, rather than as the
-    /// prompt it was. Cursor and VS Code are left out on purpose: their agent pane and their
-    /// editor are one app, and only the field could tell them apart.
+    /// prompt it was. Cursor's and VS Code's agent pane and editor are one app, which once
+    /// kept them off the AI list; as editors they now get the same answer either way.
     enum Kind: Equatable {
         case aiPrompt
+        case codeEditor
+        case terminal
     }
 
     /// Apps whose text fields are prompts to an AI, by bundle identifier prefix, so every
@@ -89,8 +93,35 @@ public struct FocusContext: Codable, Equatable, Sendable {
         "com.openai.codex",
     ]
 
+    /// Editors, by bundle identifier prefix. Read off the installed apps (Xcode, VS Code,
+    /// PyCharm for JetBrains), else off each app's Homebrew cask (2026-11-05). Cursor's is
+    /// the ID its packager gave it.
+    static let codeEditorBundleIDPrefixes = [
+        "com.apple.dt.Xcode",
+        "com.microsoft.VSCode",             // and VSCodeInsiders
+        "com.todesktop.230313mzl4w4u92",    // Cursor
+        "com.jetbrains.",
+        "dev.zed.Zed",                      // and Zed-Preview
+        "com.sublimetext.",
+        "com.panic.Nova",
+    ]
+
+    /// Terminals, by bundle identifier prefix, checked the same way (Terminal, iTerm2 and
+    /// cmux installed; the rest from their casks, 2026-11-05).
+    static let terminalBundleIDPrefixes = [
+        "com.apple.Terminal",
+        "com.googlecode.iterm2",
+        "com.cmuxterm.app",
+        "com.mitchellh.ghostty",
+        "dev.warp.Warp",                    // Warp-Stable, Warp-Preview
+        "com.github.wez.wezterm",
+        "net.kovidgoyal.kitty",
+        "org.alacritty",
+    ]
+
     /// Derived, never stored: `Refinement.context` is kept in History, and a record from
-    /// before the kind existed reads the same as one after.
+    /// before the kind existed reads the same as one after. An AI's prompt box is told
+    /// apart first, so an agent pane labelled as one stays a prompt in `promptBlock`.
     var kind: Kind? {
         if let bundleID, Self.aiPromptBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) {
             return .aiPrompt
@@ -101,8 +132,15 @@ public struct FocusContext: Codable, Equatable, Sendable {
            label.contains("prompt") || label.hasPrefix("ask anything") {
             return .aiPrompt
         }
+        guard let bundleID else { return nil }
+        if Self.codeEditorBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) { return .codeEditor }
+        if Self.terminalBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) { return .terminal }
         return nil
     }
+
+    /// A field whose text is for another program — an editor, a terminal, an AI's prompt
+    /// box — so an instruction in it is written down, never carried out (D3).
+    public var takesTextForAnotherProgram: Bool { kind != nil }
 
     public var isEmpty: Bool {
         appName == nil && bundleID == nil && windowTitle == nil && fieldLabel == nil

@@ -213,13 +213,11 @@ The marker stays in the one-step prompt, because the mode is still the model's c
 `load()` returns the stored list as it is. A user who ever saved a prompt therefore keeps the old built-ins, and the new ones would reach only users who never edited anything. A one-time migration runs at launch (`promptPresetsVersion`):
 
 - **A built-in left as it shipped** is replaced by the new text and name: 01 Clean-up, 03 Message, 05 Structured.
-  - "As it shipped" means equal to *any* text that built-in ever had. The stored copy holds whatever text was current when the user saved. Git history holds four distinct texts of the built-ins, across the file's three paths (`VoicePeter/`, `SpeechText/SpeechText/`, `Packages/SpeechTextCore/`):
-    - `71edce8` (2026-08-26), the one v0.9.x shipped from the archived repository;
-    - `545f058` (2026-10-01);
-    - `1ead0ee` (2026-10-06);
-    - `53b1287` (2026-10-18), today's, which v0.10.0 shipped.
+  - "As it shipped" means equal to *any* text that built-in ever had. The stored copy holds whatever text was current when the user saved. Git history holds two distinct texts of the built-ins, across the file's three paths (`VoicePeter/`, `SpeechText/SpeechText/`, `Packages/SpeechTextCore/`), each under the same fixed IDs:
+    - from `71edce8` (2026-08-26), the one v0.9.x shipped from the archived repository, until `545f058` (2026-10-01);
+    - from `1ead0ee` (2026-10-06), unchanged through `53b1287` (2026-10-18), which v0.10.0 shipped.
 
-    All four are kept in the migration as a table.
+    Both are kept in the migration as a table, compared on name, *When to use* and instructions together. (An earlier draft counted four, from commits that touched the file but not these texts; checked 2026-11-05.)
   - A built-in that was **edited** stays exactly as the user left it.
 - **02 Rewrite / Draft, 04 Translate and 06 Technical / Prompt,** if left as shipped, are removed. If edited, they stay as the user's own prompts.
   - An edited Translate then competes with the language modifier. That is the user's choice, and the Prompts page shows it like any other prompt.
