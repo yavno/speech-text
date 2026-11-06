@@ -4,13 +4,14 @@
 #
 # Draws the app's windows in every language it has, to look the translations over.
 #
-#   scripts/window-snapshots.sh [--no-build] [--languages "en es uk"]
+#   scripts/window-snapshots.sh [--no-build] [--languages "en es uk"] [--double-length]
 #
 # Builds Debug, stamps a copy as the end-to-end build (app.speech-text.SpeechText.e2e: its
 # own preferences and data folder, never the user's — see E2EMode), and launches it once
-# per language with -AppleLanguages and -SPTSnapshots, plus once in the double-length
-# pseudolanguage (-NSDoubleLocalizedStrings), which shows where English longer by half
-# would not fit. Each launch opens Setup's steps, the main window's pages, Settings'
+# per language with -AppleLanguages and -SPTSnapshots. With --double-length, once more in
+# English with every string doubled (-NSDoubleLocalizedStrings), a stress test for room
+# that a longer language would need; its windows show each text twice on purpose, so it
+# is not part of the usual run. Each launch opens Setup's steps, the main window's pages, Settings'
 # categories and the Record Window, and this script captures each window by its number
 # (screencapture -l: that window alone, never the rest of the screen), so the terminal
 # needs the Screen Recording grant; without it the app draws them itself, and the main
@@ -28,12 +29,14 @@ DD="${SPT_SNAPSHOTS_DERIVED_DATA:-/tmp/st-dd-snapshots}"
 OUT="${SPT_SNAPSHOTS_OUT:-/tmp/speechtext-snapshots/$(date +%Y-%m-%d_%H-%M-%S)}"
 LANGUAGES="en es uk"
 BUILD=1
+DOUBLE=0
 
 while [ $# -gt 0 ]; do
   case $1 in
     --no-build) BUILD=0 ;;
+    --double-length) DOUBLE=1 ;;
     --languages) LANGUAGES=$2; shift ;;
-    -h|--help) sed -n '4,19p' "$0"; exit 0 ;;
+    -h|--help) sed -n '4,22p' "$0"; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
   shift
@@ -79,8 +82,10 @@ for lang in $LANGUAGES; do
   run "$lang" -AppleLanguages "($lang)"
   columns="$columns $lang"
 done
-run double-length -AppleLanguages "(en)" -NSDoubleLocalizedStrings YES
-columns="$columns double-length"
+if [ "$DOUBLE" -eq 1 ]; then
+  run double-length -AppleLanguages "(en)" -NSDoubleLocalizedStrings YES
+  columns="$columns double-length"
+fi
 defaults delete "$DOMAIN" >/dev/null 2>&1 || true
 
 # One row per window, one column per language.
