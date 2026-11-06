@@ -269,6 +269,19 @@ jobs:
         if: ${{ !cancelled() }}
         run: scripts/check-infoplist-strings.sh
 
+      # The String Catalogs, beyond what the sync in Tests checks: every entry has a
+      # comment for the translator, and every translation keeps its source's format
+      # specifiers and Markdown (scripts/strings/check.py, with its tests).
+      - name: String Catalog comments
+        if: ${{ !cancelled() }}
+        run: python3 -B scripts/strings/check.py comments
+
+      - name: Translations keep placeholders and Markdown
+        if: ${{ !cancelled() }}
+        run: |
+          python3 -B -m unittest discover -s scripts/strings -p 'test_*.py'
+          python3 -B scripts/strings/check.py translations
+
       # Packages/SpeechTextCore is the logic the tests reach without the app,
       # so no file there may import SwiftUI — a system framework its manifest cannot
       # refuse. The engines are a build error there already and are checked anyway.
