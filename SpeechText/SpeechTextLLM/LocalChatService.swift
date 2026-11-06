@@ -26,7 +26,7 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
 
     func complete(_ request: Data, reply: @escaping @Sendable (Data?, String?) -> Void) {
         guard let request = try? JSONDecoder().decode(LocalChatRequest.self, from: request) else {
-            reply(nil, "The request could not be read."); return
+            reply(nil, LocalChatFailure.badRequest.wire); return
         }
         let id = request.id
         begin()
@@ -53,14 +53,14 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
                     finished: completion.finished)
                 reply(try JSONEncoder().encode(response), nil)
             } catch {
-                reply(nil, error.localizedDescription)
+                reply(nil, Self.wire(error))
             }
         }
     }
 
     func prewarm(_ request: Data, reply: @escaping @Sendable (String?) -> Void) {
         guard let request = try? JSONDecoder().decode(LocalChatRequest.self, from: request) else {
-            reply("The request could not be read."); return
+            reply(LocalChatFailure.badRequest.wire); return
         }
         begin()
         Task {
@@ -70,9 +70,24 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
                 try await runtime.cache(systems: request.prefixes ?? [])
                 reply(nil)
             } catch {
-                reply(error.localizedDescription)
+                reply(Self.wire(error))
             }
         }
+    }
+
+    /// A runtime failure by name, for the app to word in its own language
+    /// (`LocalChatFailure`); anything else by its message.
+    private static func wire(_ error: Error) -> String {
+        guard let error = error as? LlamaError else { return error.localizedDescription }
+        let failure: LocalChatFailure = switch error {
+        case .loadFailed(let path): .loadFailed(file: (path as NSString).lastPathComponent)
+        case .contextFailed: .contextFailed
+        case .tokenizeFailed: .tokenizeFailed
+        case .promptTooLong: .promptTooLong
+        case .decodeFailed(let code): .decodeFailed(code: code)
+        case .cancelled: .cancelled
+        }
+        return failure.wire
     }
 
     func cancel(_ requestID: String) { lock.withLock { activity.cancel(requestID) } }

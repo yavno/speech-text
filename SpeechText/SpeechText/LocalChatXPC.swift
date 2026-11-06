@@ -59,3 +59,45 @@ struct LocalChatResponse: Codable, Equatable {
     /// did not is cut off, and the app does not paste it.
     var finished: Bool
 }
+
+/// A failure the service reports by name rather than by message. The service has no
+/// String Catalog and runs in its own process, so a message it wrote would reach the user
+/// in English whatever the app's language; the app words the failure itself
+/// (`LocalChatError.service`). A reply that is not one of these is shown as it is.
+enum LocalChatFailure: Codable, Equatable {
+    case badRequest
+    case loadFailed(file: String)
+    case contextFailed
+    case tokenizeFailed
+    case promptTooLong
+    case decodeFailed(code: Int32)
+    case cancelled
+
+    private static let prefix = "local-chat-failure:"
+
+    /// What the service sends as the error string.
+    var wire: String {
+        let json = (try? JSONEncoder().encode(self)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        return Self.prefix + json
+    }
+
+    init?(wire: String) {
+        guard wire.hasPrefix(Self.prefix),
+              let data = wire.dropFirst(Self.prefix.count).data(using: .utf8),
+              let failure = try? JSONDecoder().decode(Self.self, from: data) else { return nil }
+        self = failure
+    }
+
+    /// In the app's language.
+    var message: String {
+        switch self {
+        case .badRequest: String(localized: "The local model couldn't read the request.")
+        case .loadFailed(let file): String(localized: "The local model couldn't be loaded (\(file)).")
+        case .contextFailed: String(localized: "The local model couldn't start: not enough memory for its context.")
+        case .tokenizeFailed: String(localized: "The local model couldn't read the prompt.")
+        case .promptTooLong: String(localized: "The text is too long for the model on this Mac.")
+        case .decodeFailed(let code): String(localized: "The local model stopped with an error (\(code)).")
+        case .cancelled: String(localized: "The local rewrite was canceled.")
+        }
+    }
+}
