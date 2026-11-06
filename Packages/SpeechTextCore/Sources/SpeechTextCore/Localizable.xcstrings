@@ -299,16 +299,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado desde el %@ · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados desde el %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado desde el %@ · %@"
                 }
               },
               "other" : {
@@ -323,12 +323,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка з %@ · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -339,6 +333,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок з %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка з %@ · %@"
                 }
               },
               "other" : {
@@ -376,16 +376,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado · %@"
                 }
               },
               "other" : {
@@ -400,12 +400,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -416,6 +410,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка · %@"
                 }
               },
               "other" : {
@@ -475,16 +475,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld idioma"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld idiomas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idioma"
                 }
               },
               "other" : {
@@ -499,12 +499,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld мова"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -515,6 +509,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld мов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мова"
                 }
               },
               "other" : {
@@ -1146,7 +1146,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tan preciso como Turbo, con un tiempo un 30% superior. Necesita 24 GB de memoria."
+            "value" : "Tan preciso como Turbo, pero un 30% más lento. Necesita 24 GB de memoria."
           }
         },
         "uk" : {
@@ -1413,6 +1413,7 @@
       }
     },
     "Couldn't load the %@ speech model. Add it to Dictation in %@." : {
+      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1432,8 +1433,7 @@
             "value" : "Не вдалося завантажити модель мовлення (%1$@). Додайте її до Диктування в розділі %2$@."
           }
         }
-      },
-      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately."
+      }
     },
     "Default" : {
       "comment" : "Settings › Appearance: the middle stop on the glass transparency slider.",
@@ -1509,7 +1509,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No conservar"
+            "value" : "No guardar"
           }
         },
         "uk" : {
@@ -1707,6 +1707,40 @@
         }
       }
     },
+    "Get your free key ↗" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigue tu clave gratis ↗"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отримати безкоштовний ключ ↗"
+          }
+        }
+      },
+      "comment" : "Setup and Settings: link that opens the provider's page for an API key; the provider has a free plan. Keep the ↗."
+    },
+    "Get your key ↗" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigue tu clave ↗"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отримати ключ ↗"
+          }
+        }
+      },
+      "comment" : "Setup and Settings: link that opens the provider's page for an API key. Keep the ↗."
+    },
     "Give it **Speech to Text** access, then copy the key." : {
       "comment" : "Setup, getting an ElevenLabs API key. **Speech to Text** is the permission's name on the vendor's English website; keep it in English and in bold.",
       "localizations" : {
@@ -1883,7 +1917,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grabación en línea"
+            "value" : "Grabación en el cursor"
           }
         },
         "uk" : {

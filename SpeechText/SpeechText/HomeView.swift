@@ -421,7 +421,7 @@ struct HomeIntroCard: View {
                 .tracking(compact ? -0.8 : -0.9)
                 .foregroundStyle(MainColor.ink)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.65)
                 .padding(.bottom, compact ? 8 : 10)
             Text(text)
                 .font(.system(size: compact ? 14 : 15))
