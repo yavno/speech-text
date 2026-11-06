@@ -45,6 +45,7 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | double tap (a shortcut) | doble pulsación |
 | Record Window | Ventana de grabación |
 | Home · History · Usage · Prompts · Dictionary | Inicio · Historial · Uso · Prompts · Diccionario |
+| Notepad · Notetaker (pages) | Notas · Reuniones |
 | prompt | prompt (m.) |
 | When to use (a prompt's field) | Cuándo usarlo |
 | Instructions (a prompt's field) | Instrucciones |
@@ -85,7 +86,8 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Hold to talk | Утримуйте, щоб говорити |
 | double tap (a shortcut) | подвійне натискання |
 | Record Window | Вікно запису |
-| Home · History · Usage · Prompts · Dictionary | Головна · Історія · Використання · Промпти · Словник |
+| Home · History · Usage · Prompts · Dictionary | Головна · Історія · Облік · Промпти · Словник |
+| Notepad · Notetaker (pages) | Нотатник · Зустрічі |
 | prompt | промпт |
 | When to use (a prompt's field) | Коли використовувати |
 | Instructions (a prompt's field) | Інструкції |
@@ -123,7 +125,8 @@ A new language is not done when every string has a value. Before it is turned on
    screen, with what was fixed.
 2. **Every term is right and the same everywhere.** Each row of this glossary gets the
    language's word, the macOS names the ones macOS itself uses in that language (Settings
-   is *Параметри* in Ukrainian, not *Налаштування*), and every string that names a page,
+   is *Параметри* in Ukrainian, not *Налаштування*), a page's name in the sidebar fits it
+   at full size (*Облік*, not *Використання*; the rail is 68 pt wide at 11.5 pt), and every string that names a page,
    a feature or a setting uses that word — in the window itself, in the notices that send
    the user there, and in the paths (*Settings › AI Rewrite*). Grammar around a name
    follows the language (Ukrainian puts a path after «у» in the locative).

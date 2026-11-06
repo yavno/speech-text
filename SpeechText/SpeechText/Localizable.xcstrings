@@ -7819,7 +7819,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зберігаються, доки SpeechText не закриється. Головна й Використання рахують лише цей сеанс."
+            "value" : "Зберігаються, доки SpeechText не закриється. Головна й Облік рахують лише цей сеанс."
           }
         }
       }
@@ -9156,7 +9156,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloc de notas"
+            "value" : "Notas"
           }
         },
         "uk" : {
@@ -9173,7 +9173,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toma de notas"
+            "value" : "Reuniones"
           }
         },
         "uk" : {
@@ -10143,7 +10143,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрити Використання"
+            "value" : "Відкрити Облік"
           }
         }
       }
@@ -15387,7 +15387,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Використання"
+            "value" : "Облік"
           }
         }
       }
