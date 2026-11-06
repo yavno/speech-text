@@ -109,9 +109,11 @@ reviews:
 
 knowledge_base:
   code_guidelines:
-    # AGENTS.md is read by default; the decisions behind the code are not.
+    # AGENTS.md is read by default; the decisions behind the code are not. A plain
+    # string would scope the file to docs/, where it lives; it governs every path.
     filePatterns:
-      - "docs/decisions.md"
+      - files: "docs/decisions.md"
+        applyTo: "**"
 
 chat:
   art: false
