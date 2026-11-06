@@ -1261,7 +1261,7 @@ final class AppState {
         let outcome: DictationTest.Outcome
         switch result {
         case .failed:
-            outcome = testFailure(speechEngine.errorMessage ?? "")
+            outcome = testFailure(speechEngine.errorMessage ?? "", offline: speechEngine.failedOffline)
         case .noSpeech:
             outcome = .nothingHeard
         case .paste(let text):
@@ -2491,8 +2491,8 @@ final class AppState {
 
     /// A failed test dictation for setup's Try it step: the words, and the kind its panel
     /// is picked by.
-    private func testFailure(_ raw: String) -> DictationTest.Outcome {
-        .failed(friendlySTTError(raw), TranscriptionFailureKind(message: raw))
+    private func testFailure(_ raw: String, offline: Bool = false) -> DictationTest.Outcome {
+        .failed(friendlySTTError(raw), offline ? .offline : TranscriptionFailureKind(message: raw))
     }
 
     func toggleOrShowDirectRecordingPanel() {
