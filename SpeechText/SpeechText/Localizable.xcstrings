@@ -720,16 +720,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld dictados"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado"
                 }
               },
               "other" : {
@@ -744,12 +744,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -760,6 +754,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка"
                 }
               },
               "other" : {
@@ -797,16 +797,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado sin pegar"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld dictados sin pegar"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado sin pegar"
                 }
               },
               "other" : {
@@ -821,12 +821,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовку не вставлено"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -837,6 +831,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок не вставлено"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовку не вставлено"
                 }
               },
               "other" : {
@@ -874,16 +874,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Se transcribirá cuando vuelvas a tener conexión."
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld dictados se transcribirán cuando vuelvas a tener conexión."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Se transcribirá cuando vuelvas a tener conexión."
                 }
               },
               "other" : {
@@ -898,12 +898,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Її буде транскрибовано, щойно ви повернетеся в мережу."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -914,6 +908,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок буде транскрибовано, щойно ви повернетеся в мережу."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Її буде транскрибовано, щойно ви повернетеся в мережу."
                 }
               },
               "other" : {
@@ -951,16 +951,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld edición"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld ediciones"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld edición"
                 }
               },
               "other" : {
@@ -975,12 +975,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld редагування"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -991,6 +985,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld редагувань"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld редагування"
                 }
               },
               "other" : {
@@ -1028,16 +1028,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld entrada"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld entradas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld entrada"
                 }
               },
               "other" : {
@@ -1052,12 +1052,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld запис"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1068,6 +1062,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld записів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld запис"
                 }
               },
               "other" : {
@@ -1128,16 +1128,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Una reescritura antigua se estima a partir de sus palabras."
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld reescrituras antiguas se estiman a partir de sus palabras."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Una reescritura antigua se estima a partir de sus palabras."
                 }
               },
               "other" : {
@@ -1152,12 +1152,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Одне давніше переписування оцінено за його словами."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1168,6 +1162,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld давніших переписувань оцінено за їхніми словами."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Одне давніше переписування оцінено за його словами."
                 }
               },
               "other" : {
@@ -1222,16 +1222,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld solicitud"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld solicitudes"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld solicitud"
                 }
               },
               "other" : {
@@ -1246,12 +1246,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld запит"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1262,6 +1256,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld запитів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld запит"
                 }
               },
               "other" : {
@@ -1299,16 +1299,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld reescritura"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld reescrituras"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reescritura"
                 }
               },
               "other" : {
@@ -1323,12 +1323,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld переписування"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1339,6 +1333,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld переписувань"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld переписування"
                 }
               },
               "other" : {
@@ -1393,16 +1393,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld selección editada"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld selecciones editadas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld selección editada"
                 }
               },
               "other" : {
@@ -1417,12 +1417,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld виділення відредаговано"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1433,6 +1427,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld виділень відредаговано"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld виділення відредаговано"
                 }
               },
               "other" : {
@@ -1470,16 +1470,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld palabra"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld palabras"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabra"
                 }
               },
               "other" : {
@@ -1494,12 +1494,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld слово"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1510,6 +1504,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld слів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld слово"
                 }
               },
               "other" : {
@@ -1547,16 +1547,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld palabra en total"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld palabras en total"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabra en total"
                 }
               },
               "other" : {
@@ -1571,12 +1571,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Усього %lld слово"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1587,6 +1581,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Усього %lld слів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Усього %lld слово"
                 }
               },
               "other" : {
@@ -1624,16 +1624,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld palabra escrita"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld palabras escritas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabra escrita"
                 }
               },
               "other" : {
@@ -1648,12 +1648,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Написано %lld слово"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1664,6 +1658,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Написано %lld слів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Написано %lld слово"
                 }
               },
               "other" : {
@@ -1701,16 +1701,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld palabra, escrita tal como la escribes."
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld palabras, escritas tal como las escribes."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld palabra, escrita tal como la escribes."
                 }
               },
               "other" : {
@@ -1725,12 +1725,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld слово, написане саме так, як ви його пишете."
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1741,6 +1735,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld слів, написаних саме так, як ви їх пишете."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld слово, написане саме так, як ви його пишете."
                 }
               },
               "other" : {
@@ -2752,16 +2752,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Añadir “%1$@”: usada en %2$lld dictado"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Añadir “%1$@”: usada en %2$lld dictados"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Añadir “%1$@”: usada en %2$lld dictado"
                 }
               },
               "other" : {
@@ -2776,12 +2776,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Додати «%1$@» — є в %2$lld диктовці"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -2792,6 +2786,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Додати «%1$@» — є в %2$lld диктовках"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Додати «%1$@» — є в %2$lld диктовці"
                 }
               },
               "other" : {
@@ -4082,16 +4082,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Elegido para %lld dictado del Historial"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Elegido para %lld dictados del Historial"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Elegido para %lld dictado del Historial"
                 }
               },
               "other" : {
@@ -4106,12 +4106,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Вибрано для %lld диктовки в Історії"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -4122,6 +4116,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Вибрано для %lld диктовок в Історії"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Вибрано для %lld диктовки в Історії"
                 }
               },
               "other" : {
@@ -4981,16 +4981,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "¿Eliminar %lld dictado?"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "¿Eliminar %lld dictados?"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Eliminar %lld dictado?"
                 }
               },
               "other" : {
@@ -5005,12 +5005,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Видалити %lld диктовку?"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -5021,6 +5015,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Видалити %lld диктовок?"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Видалити %lld диктовку?"
                 }
               },
               "other" : {
@@ -5058,16 +5058,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "¿Eliminar el audio de %lld dictado fallido?"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "¿Eliminar el audio de %lld dictados fallidos?"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Eliminar el audio de %lld dictado fallido?"
                 }
               },
               "other" : {
@@ -5082,12 +5082,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Видалити аудіо %lld невдалої диктовки?"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -5098,6 +5092,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Видалити аудіо %lld невдалих диктовок?"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Видалити аудіо %lld невдалої диктовки?"
                 }
               },
               "other" : {
@@ -7085,16 +7085,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "En %lld dictado que guarda el Historial"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "En %lld dictados que guarda el Historial"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "En %lld dictado que guarda el Historial"
                 }
               },
               "other" : {
@@ -7109,12 +7109,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "У %lld диктовці, що зберігає Історія"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -7125,6 +7119,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "У %lld диктовках, що зберігає Історія"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "У %lld диктовці, що зберігає Історія"
                 }
               },
               "other" : {
@@ -12343,16 +12343,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Mostrar %lld modelo demasiado pesado para este Mac"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Mostrar %lld de modelos demasiado pesados para este Mac"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mostrar %lld modelo demasiado pesado para este Mac"
                 }
               },
               "other" : {
@@ -12367,12 +12367,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Показати %lld модель, заважку для цього Mac"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -12383,6 +12377,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Показати %lld моделей, заважких для цього Mac"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Показати %lld модель, заважку для цього Mac"
                 }
               },
               "other" : {
@@ -13633,16 +13633,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Máximo: %lld palabra"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Máximo: %lld de palabras"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Máximo: %lld palabra"
                 }
               },
               "other" : {
@@ -13657,12 +13657,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Найвищий: %lld слово"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -13673,6 +13667,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Найвищий: %lld слів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Найвищий: %lld слово"
                 }
               },
               "other" : {
@@ -14151,6 +14151,74 @@
         }
       }
     },
+    "The local model couldn't be loaded (%@)." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails. %@ is the model's file name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar el modelo local (%@)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося завантажити локальну модель (%@)."
+          }
+        }
+      }
+    },
+    "The local model couldn't read the prompt." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo local no pudo leer el prompt."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальна модель не змогла прочитати промпт."
+          }
+        }
+      }
+    },
+    "The local model couldn't read the request." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails. Rare: the app and its local-model service disagree.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo local no pudo leer la solicitud."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальна модель не змогла прочитати запит."
+          }
+        }
+      }
+    },
+    "The local model couldn't start: not enough memory for its context." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo local no pudo iniciarse: no hay memoria suficiente para su contexto."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальна модель не запустилася: замало пам'яті для її контексту."
+          }
+        }
+      }
+    },
     "The local model stopped unexpectedly. The next rewrite starts it again." : {
       "comment" : "Error from the AI Rewrite model that runs on this Mac.",
       "localizations" : {
@@ -14168,6 +14236,23 @@
         }
       }
     },
+    "The local model stopped with an error (%d)." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails. %d is the model's error code.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo local se detuvo con un error (%d)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальна модель зупинилася з помилкою (%d)."
+          }
+        }
+      }
+    },
     "The local model took too long to answer." : {
       "comment" : "Error from the AI Rewrite model that runs on this Mac.",
       "localizations" : {
@@ -14181,6 +14266,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Локальна модель відповідала надто довго."
+          }
+        }
+      }
+    },
+    "The local rewrite was canceled." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails. Shown when the rewrite was stopped.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se canceló la reescritura local."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальне переписування скасовано."
           }
         }
       }
@@ -14521,6 +14623,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Текст задовгий, щоб модель на цьому Mac переписала його повністю."
+          }
+        }
+      }
+    },
+    "The text is too long for the model on this Mac." : {
+      "comment" : "AI Rewrite with a model on this Mac: an error shown when the local model fails.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto es demasiado largo para el modelo de este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст задовгий для моделі на цьому Mac."
           }
         }
       }
@@ -15382,16 +15501,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Usado una vez"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Usado %lld de veces"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Usado una vez"
                 }
               },
               "other" : {
@@ -15406,12 +15525,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Використано %lld раз"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -15422,6 +15535,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Використано %lld разів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Використано %lld раз"
                 }
               },
               "other" : {
@@ -17217,16 +17336,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "en %lld dictado"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "en %lld de dictados"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "en %lld dictado"
                 }
               },
               "other" : {
@@ -17241,12 +17360,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "у %lld диктовці"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -17257,6 +17370,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "у %lld диктовках"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "у %lld диктовці"
                 }
               },
               "other" : {

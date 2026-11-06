@@ -34,6 +34,26 @@ reviews:
         start, `permissions` wider than the job needs (the default is none or
         read-only), and an action not pinned to a full commit SHA with its version in a
         comment, as the existing steps do.
+    - path: "SpeechText/SpeechText/**/*.swift"
+      instructions: >-
+        Words the user reads go through the String Catalog
+        (docs/specs/2026-11-04-localization.md). Flag UI text that bypasses it:
+        `Text(someString)` or a custom view's `String` parameter fed an English literal
+        or a computed English sentence; `NSAlert`, menu or notification text not written
+        as `String(localized:)`; a sentence glued from pieces with `+` or `joined`; a
+        `count == 1 ? … : …` plural branch instead of one key with an interpolated `Int`;
+        `uppercased()` on UI text instead of `.textCase(.uppercase)`. User content
+        (dictated text, app names, model IDs, vendor names, key names) is shown with
+        `Text(verbatim:)`, which is right. Logs (`dlog`) and text sent to a model are not
+        translated. Advice only: say what to change, do not block.
+    - path: "Packages/SpeechTextCore/Sources/**/*.swift"
+      instructions: >-
+        Words this package hands to the UI are written as `localized("…")`
+        (Localized.swift), whole sentences with interpolated values, and land in this
+        package's own String Catalog. Flag a new user-facing English string returned as a
+        plain literal. Not translated: identifiers and values that are stored or compared
+        (History's places, settings keys), vendor and model names, PromptPresets, and
+        anything sent to an API or a model. Advice only.
     - path: "**/*.xcstrings"
       instructions: >-
         A String Catalog. Each new key needs a translator comment that says where the
