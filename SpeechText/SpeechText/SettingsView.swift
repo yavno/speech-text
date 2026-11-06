@@ -1033,7 +1033,7 @@ private struct SpokenLanguagesField: View {
     private var selectedModel: (name: String, languages: LanguageCoverage)? {
         switch stt {
         case .apple:
-            return ("Apple Dictation", sttModel(vendor: .apple, id: appleSpeechModelID).languages)
+            return (String(localized: "Apple Dictation"), sttModel(vendor: .apple, id: appleSpeechModelID).languages)
         case .local:
             return localSTTModel(id: localSTTModelID).map { (speechModelName($0), $0.languages) }
         case .groq, .elevenlabs, .openai:

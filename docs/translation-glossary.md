@@ -26,6 +26,7 @@ is translated as the sentence needs.
 - **Plurals:** a string with a count gets every form the language has. Spanish: *one*,
   *many*, *other*; Ukrainian: *one*, *few*, *many*, *other*. The English *one* form may
   leave the number out ("Used once"); a translation may too, where natural.
+- **Numbers and units** stay on one line: a non-breaking space between a number and its unit (7 днів, 40 сл./хв, 19 GB), and a word joiner after the dash of a range (3–⁠19).
 - **Length:** buttons, chips, tabs and column headings have little room. Prefer the
   shorter of two equal wordings there. The comment says where a string appears.
 
@@ -42,6 +43,8 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | AI mode | modo IA |
 | Edit (rewriting selected text by voice) | Editar; the feature: Edición |
 | Hold to talk | Mantén para hablar |
+| Press to toggle | Pulsa para alternar (imperative, as Hold to talk) |
+| Apple Dictation · Apple on-device (speech models) | Dictado de Apple · Apple en el dispositivo |
 | double tap (a shortcut) | doble pulsación |
 | Record Window | Ventana de grabación |
 | Home · History · Usage · Prompts · Dictionary | Inicio · Historial · Uso · Prompts · Diccionario |
@@ -79,11 +82,13 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 |---|---|
 | dictation (a recording turned into text) | диктування; counted: диктовка (1 диктовка, 3 диктовки, 5 диктовок) |
 | dictate | диктувати |
-| AI Rewrite | ШІ-переписування (ШІ-переписуванню, ШІ-переписуванням…) |
+| AI Rewrite | ШІ‑переписування (ШІ‑переписуванню, ШІ‑переписуванням…), with a non-breaking hyphen (U+2011) so it never breaks at the hyphen; the History filter switch says ШІ |
 | AI | ШІ |
 | AI mode | режим ШІ |
 | Edit (rewriting selected text by voice) | Редагувати; the feature: Редагування |
-| Hold to talk | Затисніть і говоріть |
+| Hold to talk | Затисніть і говоріть; *hold* (the key) is затисніть everywhere, never утримуйте |
+| Recording (the state, a heading) | Запис |
+| Apple Dictation · Apple on-device (speech models) | Диктування Apple · Apple на пристрої |
 | double tap (a shortcut) | подвійне натискання |
 | Record Window | Вікно запису |
 | Home · History · Usage · Prompts · Dictionary | Головна · Історія · Облік · Промпти · Словник |

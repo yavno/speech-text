@@ -458,12 +458,16 @@ public enum UsageFormat {
 
     /// An answer's wait: "0.4 s", "12 s".
     public static func wait(_ seconds: Double) -> String {
-        seconds < 10 ? String(format: "%.1f s", seconds) : "\(Int(seconds.rounded())) s"
+        if seconds < 10 {
+            let tenths = seconds.formatted(.number.precision(.fractionLength(1)).locale(uiLocale))
+            return localized("\(tenths) s")
+        }
+        return localized("\(Int(seconds.rounded())) s")
     }
 
     /// Audio: "45 s", "12 min", "1 h 5 min".
     public static func audio(_ seconds: Double) -> String {
-        seconds < 60 ? "\(Int(seconds.rounded())) s" : HomeFormat.durationText(minutes: seconds / 60)
+        seconds < 60 ? localized("\(Int(seconds.rounded())) s") : HomeFormat.durationText(minutes: seconds / 60)
     }
 
     /// "3.6×", "12×".

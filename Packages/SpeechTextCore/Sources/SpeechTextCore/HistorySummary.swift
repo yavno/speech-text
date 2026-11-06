@@ -25,6 +25,13 @@ public enum HistoryFilter: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// The filter switch's label: the title, but a language may give AI Rewrite a shorter
+    /// word here than in a sentence, so the switch stays on the search's line.
+    public var switchTitle: String {
+        guard self == .rewritten else { return title }
+        return String(localized: "History filter: AI Rewrite", defaultValue: "AI Rewrite", bundle: .module, locale: uiLocale)
+    }
+
     func includes(_ record: TranscriptionRecord) -> Bool {
         let edit = record.refinement?.isSelectionEdit == true
         switch self {
