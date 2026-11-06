@@ -1,0 +1,34 @@
+name: Translation error
+description: A word or sentence in the app reads wrong in your language
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The app's translations are made by an AI model and fixed from reports like this one. Thank you for writing it.
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: ["Español", "Українська"]
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where in the app
+      placeholder: "Settings › Dictation, the Record Window, the Setup window…"
+    validations:
+      required: true
+  - type: textarea
+    id: says
+    attributes:
+      label: What it says
+      description: Copy the text, or attach a screenshot.
+    validations:
+      required: true
+  - type: textarea
+    id: should
+    attributes:
+      label: What it should say
+      description: Optional. If you are not sure of the right wording, say what is wrong with it.

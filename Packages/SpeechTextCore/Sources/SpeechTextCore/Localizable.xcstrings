@@ -2,7 +2,21 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@ alone keeps recording, so clicks and ⌘Tab work as usual." : {
-      "comment" : "Tip text. %@ is the shortcut's letter key, e.g. Q. Two lines at most."
+      "comment" : "Tip text. %@ is the shortcut's letter key, e.g. Q. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basta con mantener %@ para seguir grabando, así los clics y ⌘Tab funcionan como siempre."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Утримуючи лише %@, запис триває, тож клацання й ⌘Tab працюють як завжди."
+          }
+        }
+      }
     },
     "%@ can't take %@ on this Mac." : {
       "comment" : "Warning under 'Languages I speak' for Apple's recognizer. The first %@ is the model's name, the second one or more languages.",
@@ -11,6 +25,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ can't take %2$@ on this Mac."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ no admite %2$@ en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ не підтримує на цьому Mac: %2$@."
           }
         }
       }
@@ -23,6 +49,18 @@
             "state" : "new",
             "value" : "%1$@ can't take %2$@."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ no admite %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ не підтримує: %2$@."
+          }
         }
       }
     },
@@ -33,6 +71,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ couldn't transcribe the recording: %2$@ (HTTP %3$lld)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ no ha podido transcribir la grabación: %2$@ (HTTP %3$lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: не вдалося транскрибувати запис — %2$@ (HTTP %3$lld)"
           }
         }
       }
@@ -45,20 +95,88 @@
             "state" : "new",
             "value" : "%1$@ for a %2$@ Mac."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ para un Mac de %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ для Mac (%2$@)."
+          }
         }
       }
     },
     "%@ is no longer available." : {
-      "comment" : "Notice text: the model that was in use is gone. %@ is its name."
+      "comment" : "Notice text: the model that was in use is gone. %@ is its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ya no está disponible."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ більше недоступна."
+          }
+        }
+      }
     },
     "%@ is retiring." : {
-      "comment" : "Notice text after the app moved to a new model. %@ is the old model's name."
+      "comment" : "Notice text after the app moved to a new model. %@ is the old model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ se va a retirar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ виводиться з ужитку."
+          }
+        }
+      }
     },
     "%@ isn't installed — download it in Settings." : {
-      "comment" : "History: why a failed dictation can't be retried. %@ is a local model's name."
+      "comment" : "History: why a failed dictation can't be retried. %@ is a local model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no está instalado: descárgalo en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ не встановлено — завантажте її в Налаштуваннях."
+          }
+        }
+      }
     },
     "%@ only" : {
-      "comment" : "A model row's subtitle when the model knows one language: e.g. 'English only'. %@ is the language's name."
+      "comment" : "A model row's subtitle when the model knows one language: e.g. 'English only'. %@ is the language's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "лише %@"
+          }
+        }
+      }
     },
     "%@ or %@" : {
       "comment" : "Joins the last two languages of a list in the warning '… can't take %@.' The first %@ is the list so far (comma-separated), the second the last language.",
@@ -67,6 +185,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ or %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ o %2$@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ або %2$@"
           }
         }
       }
@@ -79,17 +209,71 @@
             "state" : "new",
             "value" : "%1$@ retires on %2$@."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ se retira el %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ виводиться з ужитку %2$@."
+          }
         }
       }
     },
     "%@ — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation." : {
-      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name."
+      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: los Mac con Intel no tienen Neural Engine, así que los modelos más grandes van demasiado lentos para dictar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — у Mac з Intel немає Neural Engine, тож більші моделі працюють надто повільно для диктування."
+          }
+        }
+      }
     },
     "%@ — Parakeet does not know every language you speak." : {
-      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name; Parakeet is another model's name."
+      "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name; Parakeet is another model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: Parakeet no conoce todos los idiomas que hablas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — Parakeet знає не всі мови, якими ви говорите."
+          }
+        }
+      }
     },
     "%@/min." : {
-      "comment" : "After a model-change notice: the price difference per minute of audio. %@ is a signed amount, e.g. +$0.0015."
+      "comment" : "After a model-change notice: the price difference per minute of audio. %@ is a signed amount, e.g. +$0.0015.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/min."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/хв."
+          }
+        }
+      }
     },
     "%lld dictations since %@ · %@" : {
       "comment" : "Settings › History: what History holds. %lld is the number of dictations, the first %@ the day of the oldest (e.g. 14 September), the second their size on disk.",
@@ -107,6 +291,60 @@
                 "stringUnit" : {
                   "state" : "new",
                   "value" : "%lld dictations since %@ · %@"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado desde el %@ · %@"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld de dictados desde el %@ · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictados desde el %@ · %@"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка з %@ · %@"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовки з %@ · %@"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовок з %@ · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовки з %@ · %@"
                 }
               }
             }
@@ -134,11 +372,79 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado · %@"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld de dictados · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictados · %@"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка · %@"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовки · %@"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовок · %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовки · %@"
+                }
+              }
+            }
+          }
         }
       }
     },
     "%lld h" : {
-      "comment" : "A duration in whole hours, e.g. 2 h."
+      "comment" : "A duration in whole hours, e.g. 2 h.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld год"
+          }
+        }
+      }
     },
     "%lld h %lld min" : {
       "comment" : "A duration, e.g. 1 h 5 min. Use your language's abbreviations for hours and minutes.",
@@ -148,167 +454,963 @@
             "state" : "new",
             "value" : "%1$lld h %2$lld min"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld h %2$lld min"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld год %2$lld хв"
+          }
         }
       }
     },
     "%lld languages" : {
-      "comment" : "A model row's subtitle: how many languages the model knows (always two or more)."
+      "comment" : "A model row's subtitle: how many languages the model knows (always two or more).",
+      "localizations" : {
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idioma"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idiomas"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idiomas"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мова"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мови"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мов"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мови"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld min" : {
-      "comment" : "A duration in minutes, e.g. 52 min."
+      "comment" : "A duration in minutes, e.g. 52 min.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld хв"
+          }
+        }
+      }
     },
     "%lld s" : {
-      "comment" : "A short length in seconds, e.g. a recording's '8 s'. Use your language's abbreviation."
+      "comment" : "A short length in seconds, e.g. a recording's '8 s'. Use your language's abbreviation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld с"
+          }
+        }
+      }
     },
     "%lld+ languages" : {
-      "comment" : "A model row's subtitle when the vendor says 'at least': e.g. 90+ languages."
+      "comment" : "A model row's subtitle when the vendor says 'at least': e.g. 90+ languages.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld+ idiomas"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld+ мов"
+          }
+        }
+      }
     },
     "1 year" : {
-      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 año"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 рік"
+          }
+        }
+      }
     },
     "16 GB class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 16 GB"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас 16 ГБ"
+          }
+        }
+      }
     },
     "24–32 GB class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 24–32 GB"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас 24–32 ГБ"
+          }
+        }
+      }
     },
     "256 GB+ class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 256 GB o más"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас від 256 ГБ"
+          }
+        }
+      }
     },
     "3 months" : {
-      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 meses"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 місяці"
+          }
+        }
+      }
     },
     "30 days" : {
-      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page."
+      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 днів"
+          }
+        }
+      }
     },
     "36–64 GB class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 36–64 GB"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас 36–64 ГБ"
+          }
+        }
+      }
     },
     "6 months" : {
-      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations."
+      "comment" : "Settings › History: a stop on the slider for how long History keeps dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 meses"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 місяців"
+          }
+        }
+      }
     },
     "7 days" : {
-      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page."
+      "comment" : "A length of time: a stop on History's keep slider in Settings, and a period on the Usage page.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 днів"
+          }
+        }
+      }
     },
     "8 GB class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 8 GB"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас 8 ГБ"
+          }
+        }
+      }
     },
     "90 days" : {
-      "comment" : "Usage page: a period to count over."
+      "comment" : "Usage page: a period to count over.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 днів"
+          }
+        }
+      }
     },
     "96–128 GB class" : {
-      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory."
+      "comment" : "Settings: which class of Mac a recommendation was made for, by its memory.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "clase de 96–128 GB"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "клас 96–128 ГБ"
+          }
+        }
+      }
     },
     "A failed one's audio is kept as long as the dictation, for a retry." : {
-      "comment" : "History page, at the foot: a failed dictation's recording is kept as long as the dictation itself."
+      "comment" : "History page, at the foot: a failed dictation's recording is kept as long as the dictation itself.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva tanto como el dictado, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається стільки ж, скільки сама диктовка, — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept for 3 months, for a retry." : {
-      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva 3 meses, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається 3 місяці — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept for 30 days, for a retry." : {
-      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva 30 días, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається 30 днів — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept for 6 months, for a retry." : {
-      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva 6 meses, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається 6 місяців — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept for 7 days, for a retry." : {
-      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva 7 días, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається 7 днів — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept for a year, for a retry." : {
-      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva un año, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається рік — для повторної спроби."
+          }
+        }
+      }
     },
     "A failed one's audio is kept until SpeechText quits, for a retry." : {
-      "comment" : "History page, at the foot, after what History keeps: how long a failed dictation's recording is kept so it can be retried."
+      "comment" : "History page, at the foot, after what History keeps: how long a failed dictation's recording is kept so it can be retried.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El audio de un dictado fallido se conserva hasta que salgas de SpeechText, para reintentarlo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо невдалої диктовки зберігається, доки ви не закриєте SpeechText, — для повторної спроби."
+          }
+        }
+      }
     },
     "A little more careful on hard audio, a little slower." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un poco más cuidadoso con audio difícil, un poco más lento."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Трохи уважніша до складного аудіо, трохи повільніша."
+          }
+        }
+      }
     },
     "A preview — Groq may withdraw it." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Groq is the vendor."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Groq is the vendor.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una versión preliminar: Groq puede retirarla."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня версія — Groq може її прибрати."
+          }
+        }
+      }
     },
     "A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish." : {
-      "comment" : "Notice after a quick tap on the edit shortcut canceled it. Two lines at most."
+      "comment" : "Notice after a quick tap on the edit shortcut canceled it. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pulsación rápida cancela. Mantén el atajo mientras hablas, o pulsa dos veces para pulir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб відшліфувати."
+          }
+        }
+      }
     },
     "A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free." : {
-      "comment" : "Notice after a quick tap on the dictation shortcut canceled it. Two lines at most."
+      "comment" : "Notice after a quick tap on the dictation shortcut canceled it. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pulsación rápida cancela. Mantén el atajo mientras hablas, o pulsa dos veces para grabar sin manos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб записувати без рук."
+          }
+        }
+      }
     },
     "A step behind Gemma 4 12B, a little lighter." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma 4 12B is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma 4 12B is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un paso por detrás de Gemma 4 12B, algo más ligero."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Трохи поступається Gemma 4 12B, трохи легша."
+          }
+        }
+      }
     },
     "AI" : {
-      "comment" : "Setup: the AI Rewrite step's name in the step bar."
+      "comment" : "Setup: the AI Rewrite step's name in the step bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ"
+          }
+        }
+      }
     },
     "AI Recording" : {
-      "comment" : "A dictation shortcut's name: dictation rewritten by AI Rewrite."
+      "comment" : "A dictation shortcut's name: dictation rewritten by AI Rewrite.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grabación con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запис із ШІ"
+          }
+        }
+      }
     },
     "AI Rewrite" : {
-      "comment" : "History: filter for dictations AI Rewrite rewrote. AI Rewrite is the feature's name."
+      "comment" : "History: filter for dictations AI Rewrite rewrote. AI Rewrite is the feature's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reescritura con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переписування з ШІ"
+          }
+        }
+      }
     },
     "AI Rewrite waits for your pick." : {
-      "comment" : "Notice text when AI Rewrite has no model chosen."
+      "comment" : "Notice text when AI Rewrite has no model chosen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La Reescritura con IA espera a que elijas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переписування з ШІ чекає на ваш вибір."
+          }
+        }
+      }
     },
     "About %@× the price." : {
-      "comment" : "After a model-change notice: the new model's price as a multiple of the old one's. %@ is the factor, e.g. 2."
+      "comment" : "After a model-change notice: the new model's price as a multiple of the old one's. %@ is the factor, e.g. 2.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unas %@× el precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ціна — приблизно ×%@."
+          }
+        }
+      }
     },
     "About %lld%% of the price." : {
-      "comment" : "After a model-change notice: the new model's price as a percentage of the old one's."
+      "comment" : "After a model-change notice: the new model's price as a percentage of the old one's.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alrededor del %lld%% del precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приблизно %lld%% від ціни."
+          }
+        }
+      }
     },
     "All" : {
-      "comment" : "A filter that shows everything: on History (all dictations) and on Usage (the whole period)."
+      "comment" : "A filter that shows everything: on History (all dictations) and on Usage (the whole period).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усе"
+          }
+        }
+      }
     },
     "Anthropic · Paid" : {
-      "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name."
+      "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic · De pago"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic · Платно"
+          }
+        }
+      }
     },
     "Any time" : {
-      "comment" : "History: date filter, no limit."
+      "comment" : "History: date filter, no limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cualquier fecha"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будь-коли"
+          }
+        }
+      }
     },
     "As accurate as Turbo, about 30% slower. Needs 24 GB of memory." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Turbo is another model."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Turbo is another model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tan preciso como Turbo, con un tiempo un 30% superior. Necesita 24 GB de memoria."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Точна, як Turbo, приблизно на 30% повільніша. Потрібно 24 ГБ пам'яті."
+          }
+        }
+      }
     },
     "Audio conversion failed: %@" : {
-      "comment" : "Error shown on a failed dictation when the recording could not be converted. %@ is a technical reason, in English."
+      "comment" : "Error shown on a failed dictation when the recording could not be converted. %@ is a technical reason, in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al convertir el audio: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося перетворити аудіо: %@"
+          }
+        }
+      }
     },
     "Balanced." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Equilibrado."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Збалансована."
+          }
+        }
+      }
     },
     "Built into macOS, nothing to download. Words appear as you speak." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. For Apple's recognizer."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. For Apple's recognizer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrado en macOS, no hay nada que descargar. Las palabras aparecen mientras hablas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вбудована в macOS, нічого завантажувати не треба. Слова з'являються, поки ви говорите."
+          }
+        }
+      }
     },
     "Can show words as you speak. Its key works for AI Rewrite too." : {
-      "comment" : "Settings and setup: what the OpenAI speech service is good at."
+      "comment" : "Settings and setup: what the OpenAI speech service is good at.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede mostrar las palabras mientras hablas. Su clave también sirve para la Reescritura con IA."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Може показувати слова, поки ви говорите. Її ключ працює і для Переписування з ШІ."
+          }
+        }
+      }
     },
     "ChatGPT's models, paid. Its key works for speech too." : {
-      "comment" : "Settings and setup: what the OpenAI AI service is. ChatGPT is a name."
+      "comment" : "Settings and setup: what the OpenAI AI service is. ChatGPT is a name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los modelos de ChatGPT, de pago. Su clave también sirve para la voz."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі ChatGPT, платно. Ключ працює і для мовлення."
+          }
+        }
+      }
     },
     "Cheaper, a little less accurate." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más barato, algo menos preciso."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дешевша, трохи менш точна."
+          }
+        }
+      }
     },
     "Choose" : {
-      "comment" : "Notice button that opens the model picker."
+      "comment" : "Notice button that opens the model picker.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрати"
+          }
+        }
+      }
     },
     "Choose a model for %@" : {
-      "comment" : "Notice title when a dictation or AI Rewrite needs a model to be picked. %@ is the vendor's name."
+      "comment" : "Notice title when a dictation or AI Rewrite needs a model to be picked. %@ is the vendor's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un modelo para %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель для %@"
+          }
+        }
+      }
     },
     "Choose a model for %@ in Settings." : {
-      "comment" : "History: why a failed dictation can't be retried. %@ is the vendor's name."
+      "comment" : "History: why a failed dictation can't be retried. %@ is the vendor's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un modelo para %@ en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель для %@ у Налаштуваннях."
+          }
+        }
+      }
     },
     "Choose a model for this Mac" : {
-      "comment" : "Notice title when the local engine needs a model to be picked."
+      "comment" : "Notice title when the local engine needs a model to be picked.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un modelo para este Mac"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель для цього Mac"
+          }
+        }
+      }
     },
     "Choose a model for this Mac in Settings." : {
-      "comment" : "History: why a failed dictation can't be retried — the local engine has no model."
+      "comment" : "History: why a failed dictation can't be retried — the local engine has no model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un modelo para este Mac en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель для цього Mac у Налаштуваннях."
+          }
+        }
+      }
     },
     "Claude. Careful writing, paid." : {
-      "comment" : "Settings and setup: what the Anthropic AI service is. Claude is its name."
+      "comment" : "Settings and setup: what the Anthropic AI service is. Claude is its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude. Escritura cuidada, de pago."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude. Ретельне письмо, платно."
+          }
+        }
+      }
     },
     "Clean text in about a second." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto limpio en un segundo, más o menos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чистий текст приблизно за секунду."
+          }
+        }
+      }
     },
     "Copy the key." : {
-      "comment" : "Setup and Settings, getting an API key: the step after pressing the vendor's 'Create' button on its website."
+      "comment" : "Setup and Settings, getting an API key: the step after pressing the vendor's 'Create' button on its website.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia la clave."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопіюйте ключ."
+          }
+        }
+      }
     },
     "Could not install the local model: %@" : {
-      "comment" : "Error when a model download failed. %@ is the reason, often in English."
+      "comment" : "Error when a model download failed. %@ is the reason, often in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo instalar el modelo local: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося встановити локальну модель: %@"
+          }
+        }
+      }
     },
     "Couldn't load the %@ speech model. Add it to Dictation in %@." : {
       "localizations" : {
@@ -317,168 +1419,922 @@
             "state" : "new",
             "value" : "Couldn't load the %1$@ speech model. Add it to Dictation in %2$@."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar el modelo de voz de %1$@. Añádelo a Dictado en %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося завантажити модель мовлення (%1$@). Додайте її до Диктування в розділі %2$@."
+          }
         }
       },
       "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately."
     },
     "Default" : {
-      "comment" : "Settings › Appearance: the middle stop on the glass transparency slider."
+      "comment" : "Settings › Appearance: the middle stop on the glass transparency slider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predeterminado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Типово"
+          }
+        }
+      }
     },
     "Dictation canceled" : {
-      "comment" : "Title of the notice after a dictation was canceled."
+      "comment" : "Title of the notice after a dictation was canceled.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictado cancelado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування скасовано"
+          }
+        }
+      }
     },
     "Dictation is off on this Mac. Turn it on in System Settings › Keyboard › Dictation." : {
-      "comment" : "Error when macOS Dictation is off. Use macOS's own names for System Settings › Keyboard › Dictation. Two lines at most."
+      "comment" : "Error when macOS Dictation is off. Use macOS's own names for System Settings › Keyboard › Dictation. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Dictado está desactivado en este Mac. Actívalo en Ajustes del Sistema › Teclado › Dictado."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування на цьому Mac вимкнено. Увімкніть його в Системні параметри › Клавіатура › Диктування."
+          }
+        }
+      }
     },
     "Dictation waits for your pick." : {
-      "comment" : "Notice text when dictation has no model chosen."
+      "comment" : "Notice text when dictation has no model chosen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El dictado espera a que elijas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування чекає на ваш вибір."
+          }
+        }
+      }
     },
     "Don't keep" : {
-      "comment" : "Settings › History: the first stop on the slider for how long History keeps dictations — only until the app quits."
+      "comment" : "Settings › History: the first stop on the slider for how long History keeps dictations — only until the app quits.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No conservar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не зберігати"
+          }
+        }
+      }
     },
     "Edit Selection with AI" : {
-      "comment" : "A shortcut's name: edit the selected text by voice."
+      "comment" : "A shortcut's name: edit the selected text by voice.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar la selección con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагувати виділене з ШІ"
+          }
+        }
+      }
     },
     "Edit canceled" : {
-      "comment" : "Title of the notice after a selection edit was canceled."
+      "comment" : "Title of the notice after a selection edit was canceled.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edición cancelada"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагування скасовано"
+          }
+        }
+      }
     },
     "Edits" : {
-      "comment" : "History: filter for selection edits."
+      "comment" : "History: filter for selection edits.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ediciones"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагування"
+          }
+        }
+      }
     },
     "Failed" : {
-      "comment" : "History: filter for failed dictations."
+      "comment" : "History: filter for failed dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallidos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Невдалі"
+          }
+        }
+      }
     },
     "Fast Whisper. Text appears when you stop." : {
-      "comment" : "Settings and setup: what the Groq speech service is good at. Whisper is a model's name."
+      "comment" : "Settings and setup: what the Groq speech service is good at. Whisper is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper rápido. El texto aparece cuando paras."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидкий Whisper. Текст з'являється, коли ви зупиняєтеся."
+          }
+        }
+      }
     },
     "Fast and accurate. Text appears when you stop." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rápido y preciso. El texto aparece cuando paras."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидка й точна. Текст з'являється, коли ви зупиняєтеся."
+          }
+        }
+      }
     },
     "Fast and cheap." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rápido y barato."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидка й дешева."
+          }
+        }
+      }
     },
     "Fast, and writes well." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rápido, y escribe bien."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидка й добре пише."
+          }
+        }
+      }
     },
     "Fast, with a free plan. Its key works for speech too." : {
-      "comment" : "Settings and setup: what the Groq AI service is good at."
+      "comment" : "Settings and setup: what the Groq AI service is good at.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rápido, con un plan gratuito. Su clave también sirve para la voz."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Швидкий, з безкоштовним тарифом. Ключ працює і для мовлення."
+          }
+        }
+      }
     },
     "Forever" : {
-      "comment" : "Settings › History: the last stop on the slider for how long History keeps dictations."
+      "comment" : "Settings › History: the last stop on the slider for how long History keeps dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para siempre"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завжди"
+          }
+        }
+      }
     },
     "Free plan" : {
-      "comment" : "Setup: under an online service's name on its card — it has a free plan."
+      "comment" : "Setup: under an online service's name on its card — it has a free plan.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan gratuito"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Безкоштовний тариф"
+          }
+        }
+      }
     },
     "Give it **Speech to Text** access, then copy the key." : {
-      "comment" : "Setup, getting an ElevenLabs API key. **Speech to Text** is the permission's name on the vendor's English website; keep it in English and in bold."
+      "comment" : "Setup, getting an ElevenLabs API key. **Speech to Text** is the permission's name on the vendor's English website; keep it in English and in bold.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dale acceso a **Speech to Text** y copia la clave."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надайте йому доступ **Speech to Text**, потім скопіюйте ключ."
+          }
+        }
+      }
     },
     "Hi Sarah, I'm running a few minutes late — please start without me. Sorry!" : {
-      "comment" : "Home: the intro animation's AI example: the email AI Rewrite writes from what was said."
+      "comment" : "Home: the intro animation's AI example: the email AI Rewrite writes from what was said.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hola, Sarah: voy a llegar unos minutos tarde; por favor, empiecen sin mí. ¡Perdón!"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Привіт, Саро! Трохи запізнююся — будь ласка, починайте без мене. Вибачте!"
+          }
+        }
+      }
     },
     "History keeps every dictation on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva todos los dictados en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає кожну диктовку на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps the last 3 months of dictations on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados de los últimos 3 meses en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки за останні 3 місяці на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps the last 30 days of dictations on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados de los últimos 30 días en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки за останні 30 днів на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps the last 6 months of dictations on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados de los últimos 6 meses en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки за останні 6 місяців на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps the last 7 days of dictations on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados de los últimos 7 días en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки за останні 7 днів на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps the last year of dictations on this Mac." : {
-      "comment" : "History page, at the foot: what History keeps."
+      "comment" : "History page, at the foot: what History keeps.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados del último año en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки за останній рік на цьому Mac."
+          }
+        }
+      }
     },
     "History keeps this session's dictations, until SpeechText quits." : {
-      "comment" : "History page, at the foot: what History keeps. Followed by a sentence about failed dictations' audio."
+      "comment" : "History page, at the foot: what History keeps. Followed by a sentence about failed dictations' audio.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Historial conserva los dictados de esta sesión, hasta que salgas de SpeechText."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Історія зберігає диктовки цього сеансу, доки ви не закриєте SpeechText."
+          }
+        }
+      }
     },
     "Hyphen ( - )" : {
-      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets."
+      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guion ( - )"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дефіс ( - )"
+          }
+        }
+      }
     },
     "Inline Recording" : {
-      "comment" : "A dictation shortcut's name in Settings › Shortcuts and the overlay's menu: dictation pasted where you type."
+      "comment" : "A dictation shortcut's name in Settings › Shortcuts and the overlay's menu: dictation pasted where you type.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grabación en línea"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запис у полі"
+          }
+        }
+      }
     },
     "Intel Mac" : {
-      "comment" : "Settings › Speech to text: which class of Mac a recommendation was made for."
+      "comment" : "Settings › Speech to text: which class of Mac a recommendation was made for.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac con Intel"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac з Intel"
+          }
+        }
+      }
     },
     "Invalid response from %@ API" : {
-      "comment" : "Dictation error: the speech service's reply could not be read. %@ is the vendor's name."
+      "comment" : "Dictation error: the speech service's reply could not be read. %@ is the vendor's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta no válida de la API de %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недійсна відповідь від API %@"
+          }
+        }
+      }
     },
     "Invalid response from the LLM API" : {
-      "comment" : "AI Rewrite error (notice and History): the AI service's reply could not be read."
+      "comment" : "AI Rewrite error (notice and History): the AI service's reply could not be read.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta no válida de la API del LLM"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недійсна відповідь від API LLM"
+          }
+        }
+      }
     },
     "It supersedes %@." : {
-      "comment" : "Notice text for a newer online model. %@ is the model in use. A price change may follow."
+      "comment" : "Notice text for a newer online model. %@ is the model in use. A price change may follow.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sustituye a %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вона замінює %@."
+          }
+        }
+      }
     },
     "Just %@ — that's it" : {
-      "comment" : "Tip title once only the letter key is held. %@ is that key, e.g. Q. One line."
+      "comment" : "Tip title once only the letter key is held. %@ is that key, e.g. Q. One line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo %@, nada más"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лише %@ — і все"
+          }
+        }
+      }
     },
     "Keep permissions on **All**, then copy the key. Needs credit in Billing." : {
-      "comment" : "Setup, getting an OpenAI API key. **All** and Billing are names on the vendor's English website; keep them in English."
+      "comment" : "Setup, getting an OpenAI API key. **All** and Billing are names on the vendor's English website; keep them in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deja los permisos en **All** y copia la clave. Necesita saldo en Billing."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Залиште дозволи на **All**, потім скопіюйте ключ. Потрібен баланс у Billing."
+          }
+        }
+      }
     },
     "Last 30 days" : {
-      "comment" : "History: date filter."
+      "comment" : "History: date filter.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimos 30 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Останні 30 днів"
+          }
+        }
+      }
     },
     "Last 7 days" : {
-      "comment" : "History: date filter."
+      "comment" : "History: date filter.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimos 7 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Останні 7 днів"
+          }
+        }
+      }
     },
     "Least" : {
-      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the least see-through."
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the least see-through.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mínima"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найменша"
+          }
+        }
+      }
     },
     "Leaves out fillers, false starts and sound tags like “(laughs)”." : {
-      "comment" : "Settings › Speech to text: a note on the ElevenLabs Scribe model."
+      "comment" : "Settings › Speech to text: a note on the ElevenLabs Scribe model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omite muletillas, arranques en falso y etiquetas de sonido como “(risas)”."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пропускає слова-паразити, фальстарти й позначки звуків на кшталт «(сміється)»."
+          }
+        }
+      }
     },
     "Less" : {
-      "comment" : "Settings › Appearance: a stop on the glass transparency slider."
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Менша"
+          }
+        }
+      }
     },
     "Less than half the download of v3, and slower to answer." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. v3 is Parakeet v3, a model."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. v3 is Parakeet v3, a model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos de la mitad de descarga que v3, y tarda más en responder."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удвічі менше завантаження, ніж у v3, але відповідає повільніше."
+          }
+        }
+      }
     },
     "Let go of %@ to send the instruction." : {
-      "comment" : "Tip text while editing a selection. %@ is the held key."
+      "comment" : "Tip text while editing a selection. %@ is the held key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suelta %@ para enviar la instrucción."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відпустіть %@, щоб надіслати інструкцію."
+          }
+        }
+      }
     },
     "Let go of %@ when you're done." : {
-      "comment" : "Tip text while dictating. %@ is the held key."
+      "comment" : "Tip text while dictating. %@ is the held key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suelta %@ cuando termines."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відпустіть %@, коли закінчите."
+          }
+        }
+      }
     },
     "Let's go on Friday — it works for everyone." : {
-      "comment" : "Home: the intro animation's edit example: the selected text after the edit."
+      "comment" : "Home: the intro animation's edit example: the selected text after the edit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vamos el viernes — a todos les viene bien."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Їдьмо в п'ятницю — це зручно всім."
+          }
+        }
+      }
     },
     "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet" : {
-      "comment" : "Home: the intro animation's example dictation, as said (no final full stop), shown word by word. Write a natural sentence in your language."
+      "comment" : "Home: the intro animation's example dictation, as said (no final full stop), shown word by word. Write a natural sentence in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasemos la llamada al jueves a las tres — esta noche envío el orden del día para que todos le echen un vistazo antes de la reunión"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенесімо дзвінок на четвер о третій — я надішлю порядок денний сьогодні ввечері, щоб усі переглянули його до зустрічі"
+          }
+        }
+      }
     },
     "Let's move the call to Thursday at three — I'll send the agenda tonight so everyone has a look before we meet." : {
-      "comment" : "Home: the intro animation's example — the same sentence as pasted, with the full stop. Must match the spoken one above."
+      "comment" : "Home: the intro animation's example — the same sentence as pasted, with the full stop. Must match the spoken one above.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasemos la llamada al jueves a las tres — esta noche envío el orden del día para que todos le echen un vistazo antes de la reunión."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенесімо дзвінок на четвер о третій — я надішлю порядок денний сьогодні ввечері, щоб усі переглянули його до зустрічі."
+          }
+        }
+      }
     },
     "Long dash ( — ), unchanged" : {
-      "comment" : "Settings: an option for how a dash in dictated text is written — left as the long dash. Keep the sign in brackets."
+      "comment" : "Settings: an option for how a dash in dictated text is written — left as the long dash. Keep the sign in brackets.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raya ( — ), sin cambios"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Довге тире ( — ), без змін"
+          }
+        }
+      }
     },
     "Makes mistakes in Ukrainian." : {
-      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian."
+      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comete errores en ucraniano."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помиляється в українській."
+          }
+        }
+      }
     },
     "Many mistakes. Only for a quick test." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muchos errores. Solo para una prueba rápida."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Багато помилок. Лише для швидкої перевірки."
+          }
+        }
+      }
     },
     "More" : {
-      "comment" : "Settings › Appearance: a stop on the glass transparency slider."
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Більша"
+          }
+        }
+      }
     },
     "More mistakes in Ukrainian than Parakeet v3." : {
-      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian. Parakeet v3 is a model's name."
+      "comment" : "A speech model's row: shown only to someone who speaks Ukrainian. Parakeet v3 is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más errores en ucraniano que Parakeet v3."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Більше помилок в українській, ніж у Parakeet v3."
+          }
+        }
+      }
     },
     "Most" : {
-      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the most see-through."
+      "comment" : "Settings › Appearance: a stop on the glass transparency slider, the most see-through.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máxima"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найбільша"
+          }
+        }
+      }
     },
     "Needs %lld GB of memory." : {
-      "comment" : "Added to a model row's line for a heavy model: the memory it needs, e.g. 16."
+      "comment" : "Added to a model row's line for a heavy model: the memory it needs, e.g. 16.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesita %lld GB de memoria."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрібно %lld ГБ пам'яті."
+          }
+        }
+      }
     },
     "Newer: %@" : {
-      "comment" : "Notice title: a newer model is out. %@ is its name."
+      "comment" : "Notice title: a newer model is out. %@ is its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más reciente: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новіша: %@"
+          }
+        }
+      }
     },
     "No %@" : {
-      "comment" : "A warning badge on a model row: the model can't take one of the user's languages. %@ is the language's name. Short."
+      "comment" : "A warning badge on a model row: the model can't take one of the user's languages. %@ is the language's name. Short.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знає: %@"
+          }
+        }
+      }
     },
     "No %@ +%lld" : {
       "comment" : "A warning badge on a model row: it can't take %@ and %lld more of the user's languages. Short.",
@@ -488,11 +2344,37 @@
             "state" : "new",
             "value" : "No %1$@ +%2$lld"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin %1$@ +%2$lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знає: %1$@ +%2$lld"
+          }
         }
       }
     },
     "No %@ on-device" : {
-      "comment" : "A warning badge on Apple's row: macOS can't recognize one of the user's languages on this Mac. %@ is the language. Short."
+      "comment" : "A warning badge on Apple's row: macOS can't recognize one of the user's languages on this Mac. %@ is the language. Short.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin %@ en el dispositivo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає локально: %@"
+          }
+        }
+      }
     },
     "No %@ on-device +%lld" : {
       "comment" : "A warning badge on Apple's row: no on-device recognition for %@ and %lld more of the user's languages. Short.",
@@ -502,23 +2384,105 @@
             "state" : "new",
             "value" : "No %1$@ on-device +%2$lld"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin %1$@ en el dispositivo +%2$lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає локально: %1$@ +%2$lld"
+          }
         }
       }
     },
     "No API key set for %@" : {
-      "comment" : "AI Rewrite error (notice and History). %@ is the AI provider's name, e.g. Groq."
+      "comment" : "AI Rewrite error (notice and History). %@ is the AI provider's name, e.g. Groq.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay clave de API para %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не задано API-ключ для %@"
+          }
+        }
+      }
     },
     "No audio was recorded" : {
-      "comment" : "Error shown on a failed dictation (notice and History) when the recording held no audio."
+      "comment" : "Error shown on a failed dictation (notice and History) when the recording held no audio.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se grabó audio"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аудіо не записано"
+          }
+        }
+      }
     },
     "No dictations kept yet." : {
-      "comment" : "Settings › History: what History holds, when it is empty."
+      "comment" : "Settings › History: what History holds, when it is empty.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay dictados guardados."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Збережених диктовок поки немає."
+          }
+        }
+      }
     },
     "No model chosen for %@ — choose one in Settings" : {
-      "comment" : "AI Rewrite error. %@ is the AI provider's name."
+      "comment" : "AI Rewrite error. %@ is the AI provider's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay modelo elegido para %@: elige uno en Ajustes"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вибрано модель для %@ — виберіть її в Налаштуваннях"
+          }
+        }
+      }
     },
     "No model on this Mac is ready — choose or download one in Settings › AI Rewrite" : {
-      "comment" : "AI Rewrite error when the local AI provider has no model. 'Settings › AI Rewrite' is a place in the app."
+      "comment" : "AI Rewrite error when the local AI provider has no model. 'Settings › AI Rewrite' is a place in the app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún modelo de este Mac está listo: elige o descarga uno en Ajustes › Reescritura con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жодна модель на цьому Mac не готова — виберіть або завантажте її в Налаштування › Переписування з ШІ"
+          }
+        }
+      }
     },
     "Not enough disk space: the download needs %@ free, and %@ is." : {
       "comment" : "Error before a model download. The first %@ is the space needed, the second the space free (e.g. 1.2 GB).",
@@ -528,146 +2492,802 @@
             "state" : "new",
             "value" : "Not enough disk space: the download needs %1$@ free, and %2$@ is."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay espacio suficiente en el disco: la descarga necesita %1$@ libres, y hay %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недостатньо місця на диску: для завантаження потрібно %1$@ вільного місця, а є %2$@."
+          }
         }
       }
     },
     "Not enough free disk space to install any local model." : {
-      "comment" : "Settings › Speech to text: why no local model is recommended."
+      "comment" : "Settings › Speech to text: why no local model is recommended.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay espacio libre suficiente en el disco para instalar ningún modelo local."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недостатньо вільного місця на диску, щоб установити будь-яку локальну модель."
+          }
+        }
+      }
     },
     "Nothing was changed." : {
-      "comment" : "Notice after a canceled selection edit."
+      "comment" : "Notice after a canceled selection edit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se cambió nada."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не змінено."
+          }
+        }
+      }
     },
     "Nothing was changed. The text was put back." : {
-      "comment" : "Notice after a canceled selection edit whose text had been cut and was put back."
+      "comment" : "Notice after a canceled selection edit whose text had been cut and was put back.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se cambió nada. Se restauró el texto."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не змінено. Текст повернуто."
+          }
+        }
+      }
     },
     "Nothing was heard." : {
-      "comment" : "Home, History and Prompts: the text of a dictation in which nothing was heard."
+      "comment" : "Home, History and Prompts: the text of a dictation in which nothing was heard.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se oyó nada."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не почуто."
+          }
+        }
+      }
     },
     "Nothing was pasted." : {
-      "comment" : "Notice after a canceled dictation."
+      "comment" : "Notice after a canceled dictation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pegó nada."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не вставлено."
+          }
+        }
+      }
     },
     "Nothing was pasted. The dictation is saved in History." : {
-      "comment" : "Notice after a canceled dictation whose text is in History. Two lines at most."
+      "comment" : "Notice after a canceled dictation whose text is in History. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pegó nada. El dictado está guardado en el Historial."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого не вставлено. Диктовку збережено в Історії."
+          }
+        }
+      }
     },
     "Now using %@" : {
-      "comment" : "Notice title after the app moved to a new model. %@ is the new model's name."
+      "comment" : "Notice title after the app moved to a new model. %@ is the new model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora se usa %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тепер використовується %@"
+          }
+        }
+      }
     },
     "On this Mac" : {
-      "comment" : "Where an engine runs when it is a model on this Mac rather than an online service: names the local AI provider and the local speech engine in Settings, History and Usage."
+      "comment" : "Where an engine runs when it is a model on this Mac rather than an online service: names the local AI provider and the local speech engine in Settings, History and Usage.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En este Mac"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На цьому Mac"
+          }
+        }
+      }
     },
     "OpenAI · Paid" : {
-      "comment" : "Setup: under 'ChatGPT' on the AI card. OpenAI is the vendor's name."
+      "comment" : "Setup: under 'ChatGPT' on the AI card. OpenAI is the vendor's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI · De pago"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI · Платно"
+          }
+        }
+      }
     },
     "OpenAI's open model. Close behind Gemma, and the fastest here." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Gemma is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo abierto de OpenAI. Muy cerca de Gemma, y el más rápido aquí."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрита модель OpenAI. Трохи поступається Gemma і найшвидша тут."
+          }
+        }
+      }
     },
     "Paid" : {
-      "comment" : "Setup: under an online service's name on its card — it is paid."
+      "comment" : "Setup: under an online service's name on its card — it is paid.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De pago"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Платно"
+          }
+        }
+      }
     },
     "Parakeet v3 compressed for a single language, as accurate on it." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3 comprimido para un solo idioma, igual de preciso en él."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3, стиснута для однієї мови, — так само точна на ній."
+          }
+        }
+      }
     },
     "Parakeet v3 trained further: as accurate on our tests, just as quick." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet v3 is a model's name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet v3 is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3 con más entrenamiento: igual de preciso en nuestras pruebas, igual de rápido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3 з додатковим навчанням: так само точна в наших тестах і так само швидка."
+          }
+        }
+      }
     },
     "Permissions" : {
-      "comment" : "Setup: the permissions step's name in the step bar."
+      "comment" : "Setup: the permissions step's name in the step bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дозволи"
+          }
+        }
+      }
     },
     "Pick a workspace, set expiry to **Never**, then copy the key." : {
-      "comment" : "Setup, getting an Anthropic API key. **Never** is an option on the vendor's English website; keep it in English and in bold."
+      "comment" : "Setup, getting an Anthropic API key. **Never** is an option on the vendor's English website; keep it in English and in bold.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un espacio de trabajo, pon la caducidad en **Never** y copia la clave."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть робочий простір, задайте строк дії **Never**, потім скопіюйте ключ."
+          }
+        }
+      }
     },
     "Private and free, but slow on this Mac." : {
-      "comment" : "Setup, on an Intel Mac: the 'On this Mac' card's line."
+      "comment" : "Setup, on an Intel Mac: the 'On this Mac' card's line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privado y gratuito, pero lento en este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приватно й безкоштовно, але повільно на цьому Mac."
+          }
+        }
+      }
     },
     "Record Window" : {
-      "comment" : "The app's Record Window, a window to dictate into: a shortcut's name in Settings › Shortcuts and the overlay's menu. Use the same term everywhere it appears."
+      "comment" : "The app's Record Window, a window to dictate into: a shortcut's name in Settings › Shortcuts and the overlay's menu. Use the same term everywhere it appears.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ventana de grabación"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вікно запису"
+          }
+        }
+      }
     },
     "Retired" : {
-      "comment" : "A model picker row: the vendor has switched this model off."
+      "comment" : "A model picker row: the vendor has switched this model off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виведено з ужитку"
+          }
+        }
+      }
     },
     "Retiring on %@" : {
-      "comment" : "A model picker row: the vendor switches this model off on a day. %@ is the date, e.g. 26 Feb 2027."
+      "comment" : "A model picker row: the vendor switches this model off on a day. %@ is the date, e.g. 26 Feb 2027.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se retira el %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виводиться з ужитку %@"
+          }
+        }
+      }
     },
     "Retry needs a %@ API key — add one in Settings." : {
-      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor's name (Groq)."
+      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor's name (Groq).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para reintentar hace falta una clave de API de %@: añade una en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Налаштуваннях."
+          }
+        }
+      }
     },
     "Retry needs an %@ API key — add one in Settings." : {
-      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor whose name starts with a vowel (OpenAI, ElevenLabs)."
+      "comment" : "History: why a failed dictation can't be retried. %@ is a vendor whose name starts with a vowel (OpenAI, ElevenLabs).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para reintentar hace falta una clave de API de %@: añade una en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Налаштуваннях."
+          }
+        }
+      }
     },
     "Same price." : {
-      "comment" : "After a model-change notice: the new model costs the same."
+      "comment" : "After a model-change notice: the new model costs the same.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ціна та сама."
+          }
+        }
+      }
     },
     "Settings" : {
-      "comment" : "Notice button that opens Settings."
+      "comment" : "Notice button that opens Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування"
+          }
+        }
+      }
     },
     "Short dash ( – )" : {
-      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets."
+      "comment" : "Settings: an option for how a dash in dictated text is written. Keep the sign in brackets.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guion corto ( – )"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коротке тире ( – )"
+          }
+        }
+      }
     },
     "Shows your words live as you speak." : {
-      "comment" : "Setup: the ElevenLabs speech card's line."
+      "comment" : "Setup: the ElevenLabs speech card's line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra tus palabras en directo mientras hablas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показує ваші слова наживо, поки ви говорите."
+          }
+        }
+      }
     },
     "Shows your words live too. The same key also turns on AI text polish." : {
-      "comment" : "Setup: the OpenAI speech card's line."
+      "comment" : "Setup: the OpenAI speech card's line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "También muestra tus palabras en directo. La misma clave activa además el pulido del texto con IA."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теж показує слова наживо. Той самий ключ вмикає й шліфування тексту з ШІ."
+          }
+        }
+      }
     },
     "Slower to answer than Parakeet." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet is a model's name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarda más en responder que Parakeet."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповідає повільніше, ніж Parakeet."
+          }
+        }
+      }
     },
     "Small and fast." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pequeño y rápido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мала й швидка."
+          }
+        }
+      }
     },
     "Smaller still, and less accurate." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún más pequeño, y menos preciso."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ще менша й менш точна."
+          }
+        }
+      }
     },
     "Speech" : {
-      "comment" : "Setup: the speech-engine step's name in the step bar."
+      "comment" : "Setup: the speech-engine step's name in the step bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voz"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мовлення"
+          }
+        }
+      }
     },
     "Speech Recognition is off for SpeechText. Turn it on in System Settings › Privacy & Security." : {
-      "comment" : "Error when the Speech Recognition permission is off. Use macOS's own names. Two lines at most."
+      "comment" : "Error when the Speech Recognition permission is off. Use macOS's own names. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Reconocimiento de voz está desactivado para SpeechText. Actívalo en Ajustes del Sistema › Privacidad y seguridad."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розпізнавання мовлення для SpeechText вимкнено. Увімкніть його в Системні параметри › Приватність і безпека."
+          }
+        }
+      }
     },
     "Speech recognizer not available for %@" : {
-      "comment" : "Error when Apple's recognizer has no model for a language. %@ is a locale code, e.g. uk-UA."
+      "comment" : "Error when Apple's recognizer has no model for a language. %@ is a locale code, e.g. uk-UA.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reconocimiento de voz no está disponible para %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розпізнавач мовлення недоступний для %@"
+          }
+        }
+      }
     },
     "Strongest on accents and noise. Can show words as you speak." : {
-      "comment" : "Settings and setup: what the ElevenLabs speech service is good at."
+      "comment" : "Settings and setup: what the ElevenLabs speech service is good at.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El mejor con acentos y ruido. Puede mostrar las palabras mientras hablas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найкраще справляється з акцентами й шумом. Може показувати слова, поки ви говорите."
+          }
+        }
+      }
     },
     "Switch" : {
-      "comment" : "Notice button that switches to the newer model."
+      "comment" : "Notice button that switches to the newer model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти"
+          }
+        }
+      }
     },
     "Switch to AI" : {
-      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to AI Rewrite. One line."
+      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to AI Rewrite. One line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти на ШІ"
+          }
+        }
+      }
     },
     "Switch to plain text" : {
-      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to plain dictation. One line."
+      "comment" : "Tip beside the overlay while the shortcut is held: title, when the other shortcut switches to plain dictation. One line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a texto sin formato"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти на звичайний текст"
+          }
+        }
+      }
     },
     "System Settings › Keyboard" : {
-      "comment" : "The path to the Keyboard pane in macOS System Settings, as macOS names it in your language. Inserted into an error message; setup also looks for it to offer a button to that pane."
+      "comment" : "The path to the Keyboard pane in macOS System Settings, as macOS names it in your language. Inserted into an error message; setup also looks for it to offer a button to that pane.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes del Sistema › Teclado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системні параметри › Клавіатура"
+          }
+        }
+      }
     },
     "Text appears when you stop." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. The text is pasted when recording stops."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. The text is pasted when recording stops.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto aparece cuando paras."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст з'являється, коли ви зупиняєтеся."
+          }
+        }
+      }
     },
     "The best in our rewrite test. Clean text in 2–4 seconds." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. A model on this Mac."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. A model on this Mac.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El mejor en nuestra prueba de reescritura. Texto limpio en 2–4 segundos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найкраща в нашому тесті переписування. Чистий текст за 2–4 секунди."
+          }
+        }
+      }
     },
     "The cheapest, for short clean-ups." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El más barato, para retoques breves."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найдешевша, для коротких виправлень."
+          }
+        }
+      }
     },
     "The fastest, a little less careful." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El más rápido, algo menos cuidadoso."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найшвидша, трохи менш ретельна."
+          }
+        }
+      }
     },
     "The flagship. Slower, and costs more." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El buque insignia. Más lento y más caro."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Флагман. Повільніша й дорожча."
+          }
+        }
+      }
     },
     "The largest. About 8 seconds a dictation on an M1 Pro." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. M1 Pro is a Mac's chip."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. M1 Pro is a Mac's chip.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El más grande. Unos 8 segundos por dictado en un M1 Pro."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найбільша. Близько 8 секунд на диктовку на M1 Pro."
+          }
+        }
+      }
     },
     "The local model \"%@\" is not installed yet" : {
-      "comment" : "Error when a dictation needs a local model that is not downloaded. %@ is the model's name."
+      "comment" : "Error when a dictation needs a local model that is not downloaded. %@ is the model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo local “%@” aún no está instalado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локальну модель «%@» ще не встановлено"
+          }
+        }
+      }
     },
     "The model declined the request" : {
-      "comment" : "AI Rewrite error when the model refused without a reason."
+      "comment" : "AI Rewrite error when the model refused without a reason.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo rechazó la solicitud"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель відхилила запит"
+          }
+        }
+      }
     },
     "The model declined the request: %@" : {
-      "comment" : "AI Rewrite error when the model refused. %@ is the model's own reason, usually in English."
+      "comment" : "AI Rewrite error when the model refused. %@ is the model's own reason, usually in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo rechazó la solicitud: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель відхилила запит: %@"
+          }
+        }
+      }
     },
     "The model isn't available: %@ (HTTP %lld)" : {
       "comment" : "AI Rewrite error. %@ is the service's own reason (often English) or 'the service no longer serves it.'; %lld is the HTTP status code.",
@@ -677,38 +3297,190 @@
             "state" : "new",
             "value" : "The model isn't available: %1$@ (HTTP %2$lld)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo no está disponible: %1$@ (HTTP %2$lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель недоступна: %1$@ (HTTP %2$lld)"
+          }
         }
       }
     },
     "The model returned an empty response" : {
-      "comment" : "AI Rewrite error: the model answered with no text."
+      "comment" : "AI Rewrite error: the model answered with no text.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo devolvió una respuesta vacía"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель повернула порожню відповідь"
+          }
+        }
+      }
     },
     "The model's reply was cut off before it ended." : {
-      "comment" : "AI Rewrite error: the model's answer was cut short."
+      "comment" : "AI Rewrite error: the model's answer was cut short.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La respuesta del modelo se cortó antes de terminar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповідь моделі обірвалася до кінця."
+          }
+        }
+      }
     },
     "The previous Haiku, at ten times the price." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Haiku is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Haiku is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Haiku anterior, a diez veces el precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Haiku, вдесятеро дорожча."
+          }
+        }
+      }
     },
     "The previous Luna. Costs about twice as much." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Luna is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Luna is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Luna anterior. Cuesta casi el doble."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Luna. Коштує приблизно вдвічі більше."
+          }
+        }
+      }
     },
     "The previous Opus. Costs more than Opus 5.5." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Opus is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Opus is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Opus anterior. Cuesta más que Opus 5.5."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Opus. Дорожча за Opus 5.5."
+          }
+        }
+      }
     },
     "The previous Sol, at the same price." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Sol anterior, al mismo precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Sol, за тією самою ціною."
+          }
+        }
+      }
     },
     "The previous Sol. Costs twice as much." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Sol anterior. Cuesta el doble."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Sol. Коштує вдвічі більше."
+          }
+        }
+      }
     },
     "The previous Sonnet, at the same price." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sonnet is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sonnet is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Sonnet anterior, al mismo precio."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Sonnet, за тією самою ціною."
+          }
+        }
+      }
     },
     "The previous Terra. Costs about twice as much." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Terra is a model's name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Terra is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Terra anterior. Cuesta casi el doble."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня Terra. Коштує приблизно вдвічі більше."
+          }
+        }
+      }
     },
     "The quickest to answer." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El que responde más rápido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповідає найшвидше."
+          }
+        }
+      }
     },
     "The rewrite failed: %@ (HTTP %lld)" : {
       "comment" : "AI Rewrite error. %@ is a sentence saying why (the service's own words, or one of the reasons below); %lld is the HTTP status code.",
@@ -718,41 +3490,207 @@
             "state" : "new",
             "value" : "The rewrite failed: %1$@ (HTTP %2$lld)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La reescritura falló: %1$@ (HTTP %2$lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося переписати: %1$@ (HTTP %2$lld)"
+          }
         }
       }
     },
     "The same key also turns on AI text polish." : {
-      "comment" : "Setup: the Groq speech card's line."
+      "comment" : "Setup: the Groq speech card's line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La misma clave activa además el pulido del texto con IA."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Той самий ключ вмикає й шліфування тексту з ШІ."
+          }
+        }
+      }
     },
     "The shortcut was let go before the microphone opened. Hold it until the overlay listens." : {
-      "comment" : "Notice when the shortcut was released before recording started. The overlay is the small recording window. Two lines at most."
+      "comment" : "Notice when the shortcut was released before recording started. The overlay is the small recording window. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soltaste el atajo antes de que se abriera el micrófono. Mantenlo hasta que la barra de dictado escuche."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скорочення відпустили до того, як увімкнувся мікрофон. Утримуйте його, доки накладка не почне слухати."
+          }
+        }
+      }
     },
     "This Mac has an Intel processor: a model runs on it alone, and a rewrite can take a minute or more. An online service is much faster." : {
-      "comment" : "Settings › AI Rewrite and setup, on an Intel Mac: the warning under the local models."
+      "comment" : "Settings › AI Rewrite and setup, on an Intel Mac: the warning under the local models.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac tiene un procesador Intel: el modelo funciona solo con él, y una reescritura puede tardar un minuto o más. Un servicio en línea es mucho más rápido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У цьому Mac процесор Intel: модель працює лише на ньому, і переписування може тривати хвилину чи довше. Онлайн-сервіс набагато швидший."
+          }
+        }
+      }
     },
     "To: Sarah" : {
-      "comment" : "Home: the intro animation's AI example: the email's recipient line in Mail."
+      "comment" : "Home: the intro animation's AI example: the email's recipient line in Mail.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para: Sarah"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кому: Сара"
+          }
+        }
+      }
     },
     "Today" : {
-      "comment" : "History: date filter, and the heading over today's dictations."
+      "comment" : "History: date filter, and the heading over today's dictations.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сьогодні"
+          }
+        }
+      }
     },
     "Transcription failed." : {
-      "comment" : "Home, History and Prompts: the text of a failed dictation with no error message."
+      "comment" : "Home, History and Prompts: the text of a failed dictation with no error message.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error en la transcripción."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося транскрибувати."
+          }
+        }
+      }
     },
     "Trip plan" : {
-      "comment" : "Home: the intro animation's edit example: the note's title in Notes."
+      "comment" : "Home: the intro animation's edit example: the note's title in Notes.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan del viaje"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "План поїздки"
+          }
+        }
+      }
     },
     "Try it" : {
-      "comment" : "Setup: the last step's name in the step bar."
+      "comment" : "Setup: the last step's name in the step bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pruébalo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спробувати"
+          }
+        }
+      }
     },
     "We recommend updating from %@. Download it in Settings." : {
-      "comment" : "Notice text for a newer local model. %@ is the model in use."
+      "comment" : "Notice text for a newer local model. %@ is the model in use.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te recomendamos actualizar desde %@. Descárgalo en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Радимо оновитися з %@. Завантажте нову в Налаштуваннях."
+          }
+        }
+      }
     },
     "Week of %@" : {
-      "comment" : "Usage page: a chart bar's tooltip for a week. %@ is its first day, e.g. 28 September."
+      "comment" : "Usage page: a chart bar's tooltip for a week. %@ is its first day, e.g. 28 September.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semana del %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тиждень з %@"
+          }
+        }
+      }
     },
     "Welcome" : {
-      "comment" : "Setup: the first step's name in the step bar."
+      "comment" : "Setup: the first step's name in the step bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenida"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вітаємо"
+          }
+        }
+      }
     },
     "While holding %@, press %@. Press it again to switch back." : {
       "comment" : "Tip text. The first %@ is the held key (e.g. Q), the second the other shortcut (e.g. ⌃⇧W). Two lines at most.",
@@ -762,95 +3700,513 @@
             "state" : "new",
             "value" : "While holding %1$@, press %2$@. Press it again to switch back."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mientras mantienes %1$@, pulsa %2$@. Vuelve a pulsarlo para volver."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Утримуючи %1$@, натисніть %2$@. Натисніть ще раз, щоб повернутися."
+          }
         }
       }
     },
     "Words appear as you speak." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Live text while recording."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Live text while recording.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las palabras aparecen mientras hablas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слова з'являються, поки ви говорите."
+          }
+        }
+      }
     },
     "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, GPT Transcribe transcribes the recording instead. Billed per streamed minute." : {
-      "comment" : "Settings › Speech to text: a note on OpenAI's live model. GPT Transcribe is a model's name."
+      "comment" : "Settings › Speech to text: a note on OpenAI's live model. GPT Transcribe is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las palabras aparecen en la barra de dictado mientras hablas y se pegan cuando paras. Si se corta la transmisión, GPT Transcribe transcribe la grabación. Se cobra por minuto transmitido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слова з'являються на накладці, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує GPT Transcribe. Оплата за хвилину потоку."
+          }
+        }
+      }
     },
     "Words appear on the overlay as you speak and are pasted when you stop. If the stream drops, Scribe v2 transcribes the recording instead. Billed per streamed minute." : {
-      "comment" : "Settings › Speech to text: a note on ElevenLabs' live model. Scribe v2 is a model's name."
+      "comment" : "Settings › Speech to text: a note on ElevenLabs' live model. Scribe v2 is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las palabras aparecen en la barra de dictado mientras hablas y se pegan cuando paras. Si se corta la transmisión, Scribe v2 transcribe la grabación. Se cobra por minuto transmitido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слова з'являються на накладці, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує Scribe v2. Оплата за хвилину потоку."
+          }
+        }
+      }
     },
     "Works, with some mistakes." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciona, con algunos errores."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Працює, з деякими помилками."
+          }
+        }
+      }
     },
     "Writes best. Slower, and costs more." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name."
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El que mejor escribe. Más lento y más caro."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пише найкраще. Повільніша й дорожча."
+          }
+        }
+      }
     },
     "Yesterday" : {
-      "comment" : "When something happened: a History heading, and the time on a dictation's row on Home, History and Prompts."
+      "comment" : "When something happened: a History heading, and the time on a dictation's row on Home, History and Prompts.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учора"
+          }
+        }
+      }
     },
     "You can let go of %@" : {
-      "comment" : "Tip title. %@ is the shortcut's modifier keys, e.g. ⌃⇧. One line."
+      "comment" : "Tip title. %@ is the shortcut's modifier keys, e.g. ⌃⇧. One line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes soltar %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можна відпустити %@"
+          }
+        }
+      }
     },
     "estimated from known prices" : {
-      "comment" : "Usage and Home: the note beside every cost — it is an estimate from list prices, not the bill. Lowercase; the app capitalizes it where it starts a line."
+      "comment" : "Usage and Home: the note beside every cost — it is an estimate from list prices, not the bill. Lowercase; the app capitalizes it where it starts a line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "estimado a partir de precios conocidos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "оцінка за відомими цінами"
+          }
+        }
+      }
     },
     "every dictation" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps everything."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps everything.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "todos los dictados"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "кожну диктовку"
+          }
+        }
+      }
     },
     "for as long as History keeps it" : {
-      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'."
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mientras el Historial lo conserve"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "стільки ж, скільки Історія зберігає диктовку"
+          }
+        }
+      }
     },
     "i think maybe we could go on friday if thats ok for everyone" : {
-      "comment" : "Home: the intro animation's edit example: the selected text before the edit, deliberately lowercase and unpunctuated."
+      "comment" : "Home: the intro animation's edit example: the selected text before the edit, deliberately lowercase and unpunctuated.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "creo que quizá podríamos ir el viernes si les parece bien a todos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "я думаю може ми могли б поїхати в пятницю якщо всім ок"
+          }
+        }
+      }
     },
     "make it sound more sure" : {
-      "comment" : "Home: the intro animation's edit example: the instruction said about the selected text. Lowercase, as spoken."
+      "comment" : "Home: the intro animation's edit example: the instruction said about the selected text. Lowercase, as spoken.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "haz que suene más seguro"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "зроби впевненіше"
+          }
+        }
+      }
     },
     "the API key was rejected" : {
-      "comment" : "Why a request to an online service failed; fills the %@ in 'The rewrite failed: %@' or '… couldn't transcribe the recording: %@'. Lowercase."
+      "comment" : "Why a request to an online service failed; fills the %@ in 'The rewrite failed: %@' or '… couldn't transcribe the recording: %@'. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "se rechazó la clave de API"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-ключ відхилено"
+          }
+        }
+      }
     },
     "the last 3 months of dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados de los últimos 3 meses"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки за останні 3 місяці"
+          }
+        }
+      }
     },
     "the last 30 days of dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados de los últimos 30 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки за останні 30 днів"
+          }
+        }
+      }
     },
     "the last 6 months of dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados de los últimos 6 meses"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки за останні 6 місяців"
+          }
+        }
+      }
     },
     "the last 7 days of dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados de los últimos 7 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки за останні 7 днів"
+          }
+        }
+      }
     },
     "the last year of dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados del último año"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки за останній рік"
+          }
+        }
+      }
     },
     "the recording is too large" : {
-      "comment" : "Why a transcription failed (HTTP 413); fills the reason in '… couldn't transcribe the recording: %@'. Lowercase."
+      "comment" : "Why a transcription failed (HTTP 413); fills the reason in '… couldn't transcribe the recording: %@'. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "la grabación es demasiado grande"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "запис завеликий"
+          }
+        }
+      }
     },
     "the request was refused" : {
-      "comment" : "Why a request to an online service failed (any other HTTP error); fills the reason in an error sentence. Lowercase."
+      "comment" : "Why a request to an online service failed (any other HTTP error); fills the reason in an error sentence. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "se rechazó la solicitud"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "запит відхилено"
+          }
+        }
+      }
     },
     "the service is having problems" : {
-      "comment" : "Why a request to an online service failed (HTTP 5xx); fills the reason in an error sentence. Lowercase."
+      "comment" : "Why a request to an online service failed (HTTP 5xx); fills the reason in an error sentence. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el servicio tiene problemas"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "у сервісу проблеми"
+          }
+        }
+      }
     },
     "the service no longer serves it." : {
-      "comment" : "Ends 'The model isn't available: …' when the service gives no reason. Lowercase, a sentence's end."
+      "comment" : "Ends 'The model isn't available: …' when the service gives no reason. Lowercase, a sentence's end.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el servicio ya no lo ofrece."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сервіс її більше не надає."
+          }
+        }
+      }
     },
     "the text is too long for the service" : {
-      "comment" : "Why an AI Rewrite request failed (HTTP 413); fills 'The rewrite failed: %@'. Lowercase."
+      "comment" : "Why an AI Rewrite request failed (HTTP 413); fills 'The rewrite failed: %@'. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el texto es demasiado largo para el servicio"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "текст задовгий для сервісу"
+          }
+        }
+      }
     },
     "this Mac" : {
-      "comment" : "Completes 'Choose a model for %@ in Settings to dictate.' when the local engine needs a model."
+      "comment" : "Completes 'Choose a model for %@ in Settings to dictate.' when the local engine needs a model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "este Mac"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "цього Mac"
+          }
+        }
+      }
     },
     "this session's dictations" : {
-      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps only this session."
+      "comment" : "Usage page: completes 'Counted from %@, as History keeps them' when History keeps only this session.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los dictados de esta sesión"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "диктовки цього сеансу"
+          }
+        }
+      }
     },
     "too many requests — try again in a moment" : {
-      "comment" : "Why a request to an online service failed (HTTP 429); fills the reason in an error sentence. Lowercase."
+      "comment" : "Why a request to an online service failed (HTTP 429); fills the reason in an error sentence. Lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "demasiadas solicitudes: vuelve a intentarlo en un momento"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "забагато запитів — спробуйте за мить"
+          }
+        }
+      }
     },
     "uh email to Sarah running late start without me sorry" : {
-      "comment" : "Home: the intro animation's AI example, as said: rough, unpunctuated speech. Write it the way someone would say it in your language."
+      "comment" : "Home: the intro animation's AI example, as said: rough, unpunctuated speech. Write it the way someone would say it in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eh email a Sarah que llego tarde que empiecen sin mí perdón"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "е-е лист Сарі запізнююсь починайте без мене вибач"
+          }
+        }
+      }
     },
     "until %@" : {
-      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. %@ is a day, e.g. Thursday 8 October."
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. %@ is a day, e.g. Thursday 8 October.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hasta el %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "до %@"
+          }
+        }
+      }
     },
     "until SpeechText quits" : {
-      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. SpeechText is the app's name."
+      "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'. SpeechText is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hasta que salgas de SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "доки ви не закриєте SpeechText"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
