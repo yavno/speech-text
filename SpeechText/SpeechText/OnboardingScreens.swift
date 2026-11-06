@@ -1142,7 +1142,11 @@ private struct TryItScreen: View {
     private var aLetter: String { shortcutKeys(a).last ?? a }
 
     private enum Phase { case ready, listening, transcribing, success, nothing, rejected, offline, failed(String) }
-    private enum AIPhase { case ready, listening, polishing, success(said: String, wrote: String), failed(said: String, reason: String, offline: Bool) }
+    private enum AIPhase {
+        case ready, listening, polishing
+        case success(said: String, wrote: String)
+        case failed(said: String, reason: String, offline: Bool)
+    }
 
     private var inAI: Bool { appState.isAIMode && !appState.isEditMode }
     private var listening: Bool { engine.isRecording || engine.isStartingEngine }
