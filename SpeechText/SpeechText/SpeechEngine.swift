@@ -148,6 +148,10 @@ final class SpeechEngine {
     /// The last segment failed because the vendor no longer serves the model
     /// (`RecognitionOutcome.modelUnavailable`); the failure notice offers the picker.
     private(set) var failedForModel = false
+    /// The last segment failed for want of a network (`RecognitionOutcome.offline`), read
+    /// from the error itself rather than from its message, which is translated. Setup's
+    /// Try it step shows its offline panel by it.
+    private(set) var failedOffline = false
     /// Whether a segment that produced no words, with no error, is written to History
     /// (with its audio kept for a retry). Off for the Edit shortcut's instruction: saying
     /// nothing there means "just polish", and the edit writes its own record.
@@ -231,6 +235,7 @@ final class SpeechEngine {
         lastRecordID = nil
         offlineRecordID = nil
         failedForModel = false
+        failedOffline = false
         spanLayer.reset()
         transcriptionTask?.cancel()
         transcriptionTask = nil
@@ -917,6 +922,7 @@ final class SpeechEngine {
         let audioURL = outcome.audioFileURL ?? (tooShortToRetry ? nil : (try? writer?.writeAudioFile()) ?? nil)
         if let error = failure {
             if outcome.modelUnavailable, !superseded { failedForModel = true }
+            if outcome.offline, !superseded { failedOffline = true }
             let id = history.recordFailure(error: error, provider: provider, model: model, locale: locale,
                                            duration: duration, audioURL: audioURL, usage: outcome.usage,
                                            offline: outcome.offline && audioURL != nil && onSavedOffline != nil)

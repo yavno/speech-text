@@ -73,6 +73,40 @@ class TranslationsTest(CatalogTest):
             "es": plural(one="Usado una vez", other="Usado muchas veces")}}})
         self.assertEqual(len(check.check_translations(paths)), 1)
 
+    def test_an_argument_shown_twice_fails(self):
+        paths = self.catalog({"%@ to %@": {"localizations": {"es": unit("%1$@ a %1$@")}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+
+    def test_unnumbered_arguments_keep_their_order(self):
+        paths = self.catalog({"%@ of %lld": {"localizations": {"uk": unit("%lld з %@")}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+        paths = self.catalog({"%@ of %lld": {"localizations": {"uk": unit("%2$lld з %1$@")}}})
+        self.assertEqual(check.check_translations(paths), [])
+
+    def test_a_plural_form_may_leave_out_only_the_count(self):
+        source = "%lld dictations · %@"
+        paths = self.catalog({source: {"localizations": {
+            "es": plural(one="Un dictado · %2$@", many="%1$lld dictados · %2$@", other="%1$lld dictados · %2$@")}}})
+        self.assertEqual(check.check_translations(paths), [])
+        paths = self.catalog({source: {"localizations": {
+            "es": plural(one="%lld dictado", many="%lld dictados · %@", other="%lld dictados · %@")}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+
+    def test_a_device_variation_keeps_the_count(self):
+        paths = self.catalog({"Used %lld times": {"localizations": {
+            "es": {"variations": {"device": {"mac": unit("Usado"), "other": unit("Usado %lld veces")}}}}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+
+    def test_lost_single_emphasis_fails(self):
+        paths = self.catalog({"Read *this* first": {"localizations": {"es": unit("Lee esto primero")}}})
+        self.assertEqual(len(check.check_translations(paths)), 1)
+        paths = self.catalog({"Read *this* first": {"localizations": {"es": unit("Lee *esto* primero")}}})
+        self.assertEqual(check.check_translations(paths), [])
+
+    def test_an_underscore_inside_a_word_is_not_emphasis(self):
+        paths = self.catalog({"Set speech_text_debug": {"localizations": {"uk": unit("Увімкніть speech_text_debug")}}})
+        self.assertEqual(check.check_translations(paths), [])
+
     def test_new_link_fails(self):
         paths = self.catalog({"Read the guide": {"localizations": {
             "es": unit("Lee la [guía](https://example.com)")}}})
@@ -122,6 +156,10 @@ class CompleteTest(CatalogTest):
     def test_plural_source_needs_a_plural_translation(self):
         paths = self.catalog({"%lld words": {"localizations": {
             "en": plural(one="%lld word", other="%lld words"), "es": unit("%lld palabras")}}})
+        self.assertEqual(len(check.check_complete(paths, ["es"])), 1)
+
+    def test_a_localization_with_no_value_fails(self):
+        paths = self.catalog({"Save": {"localizations": {"es": {"variations": {"device": {}}}}}})
         self.assertEqual(len(check.check_complete(paths, ["es"])), 1)
 
     def test_empty_value_fails(self):
