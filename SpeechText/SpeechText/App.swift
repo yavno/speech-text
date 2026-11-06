@@ -303,6 +303,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             UserDefaults.standard.set(true, forKey: SettingsKeys.hasRegisteredLaunchAtLogin)
             try? SMAppService.mainApp.register()
         }
+
+        #if DEBUG
+        MainActor.assumeIsolated { WindowSnapshots.runIfAsked(self) }
+        #endif
     }
 
     /// Whether the setup window opens at launch — see `OnboardingGate`. Read before the
@@ -2705,3 +2709,88 @@ struct ObservedOverlay: View {
         )
     }
 }
+
+#if DEBUG
+/// `-SPTSnapshots <folder>`: an end-to-end build (its own preferences and data, see
+/// `E2EMode`) opens each window the user reads — Setup's steps, the main window's pages,
+/// Settings' categories, the Record Window — draws each into `<folder>/<name>.png`, and
+/// quits. `scripts/window-snapshots.sh` runs it once per language, so the localized
+/// windows can be looked over side by side (docs/specs/2026-11-04-localization.md ›
+/// Stages, *test*). Drawn with `cacheDisplay`, which needs no Screen Recording grant;
+/// glass that samples what is behind a window draws plain.
+@MainActor
+enum WindowSnapshots {
+    static func runIfAsked(_ app: AppDelegate) {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let flag = arguments.firstIndex(of: "-SPTSnapshots"), arguments.count > flag + 1 else { return }
+        guard E2EMode.isActive else {
+            dlog("Snapshots", "-SPTSnapshots needs the end-to-end build, which keeps its own settings and data", level: .error)
+            return
+        }
+        let folder = URL(fileURLWithPath: arguments[flag + 1], isDirectory: true)
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        Task { @MainActor in
+            await app.drawSnapshots(into: folder)
+            NSApp.terminate(nil)
+        }
+    }
+
+    /// Waits for a window to draw, then has `scripts/window-snapshots.sh` capture it:
+    /// `<name>.window` holds its window number, and the script answers with `<name>.png`
+    /// (`screencapture -l`, that one window and nothing else on screen). Drawn here only
+    /// when no script answers: `cacheDisplay` needs no Screen Recording grant, but it
+    /// leaves the main window's clipped, shadowed page blank.
+    static func capture(_ window: NSWindow?, _ name: String, into folder: URL) async {
+        try? await Task.sleep(for: .seconds(1.2))
+        guard let window, let view = window.contentView else {
+            dlog("Snapshots", "\(name): no window", level: .error)
+            return
+        }
+        let png = folder.appendingPathComponent("\(name).png")
+        let request = folder.appendingPathComponent("\(name).window")
+        try? String(window.windowNumber).write(to: request, atomically: true, encoding: .utf8)
+        for _ in 0..<50 where !FileManager.default.fileExists(atPath: png.path) {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        try? FileManager.default.removeItem(at: request)
+        if FileManager.default.fileExists(atPath: png.path) {
+            dlog("Snapshots", "\(name).png")
+            return
+        }
+        view.layoutSubtreeIfNeeded()
+        guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+        view.cacheDisplay(in: view.bounds, to: rep)
+        try? rep.representation(using: .png, properties: [:])?.write(to: png)
+        dlog("Snapshots", "\(name).png, drawn in the app")
+    }
+}
+
+extension AppDelegate {
+    @MainActor
+    fileprivate func drawSnapshots(into folder: URL) async {
+        openSetup()
+        for step in OnboardingStep.named {
+            setupWindow?.model.step = step
+            await WindowSnapshots.capture(setupWindow, "setup-\(step.rawValue)", into: folder)
+        }
+        setupWindow?.close()
+
+        for page in MainPage.rail {
+            showMainWindow(on: page)
+            await WindowSnapshots.capture(mainWindow, "main-\(page.rawValue)", into: folder)
+        }
+
+        for category in SettingsCategory.allCases {
+            showSettings(category: category)
+            await WindowSnapshots.capture(settingsWindow, "settings-\(category.rawValue)", into: folder)
+        }
+        settingsWindow?.close()
+        mainWindow?.close()
+
+        appState.showDirectRecordingPanel()
+        await WindowSnapshots.capture(NSApp.windows.first { $0 is DirectRecordingPanelWindow },
+                                      "record-window", into: folder)
+    }
+}
+#endif
+
