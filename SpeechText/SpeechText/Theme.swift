@@ -31,15 +31,15 @@ enum AppSkin: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .minimal: return "Minimal"
-        case .techno: return "Techno"
+        case .minimal: return String(localized: "Minimal")
+        case .techno: return String(localized: "Techno")
         }
     }
 
     var detail: String {
         switch self {
-        case .minimal: return "Native macOS panels on glass. Tint them if you want to."
-        case .techno: return "A molded handset with a dot-matrix LCD."
+        case .minimal: return String(localized: "Native macOS panels on glass. Tint them if you want to.")
+        case .techno: return String(localized: "A molded handset with a dot-matrix LCD.")
         }
     }
 
@@ -110,16 +110,16 @@ enum AccentColor {
     }
 
     static let presets: [(name: String, hex: String)] = [
-        ("Default — glass", neutral),
-        ("Red", "#FF453A"),
-        ("Orange", "#FF9F0A"),
-        ("Yellow", "#FFD60A"),
-        ("Green", "#30D158"),
-        ("Teal", "#40C8E0"),
-        ("Blue", "#0A84FF"),
-        ("Purple", "#BF5AF2"),
-        ("Pink", "#FF375F"),
-        ("Graphite", "#98989D"),
+        (String(localized: "Default — glass"), neutral),
+        (String(localized: "Red"), "#FF453A"),
+        (String(localized: "Orange"), "#FF9F0A"),
+        (String(localized: "Yellow"), "#FFD60A"),
+        (String(localized: "Green"), "#30D158"),
+        (String(localized: "Teal"), "#40C8E0"),
+        (String(localized: "Blue"), "#0A84FF"),
+        (String(localized: "Purple"), "#BF5AF2"),
+        (String(localized: "Pink"), "#FF375F"),
+        (String(localized: "Graphite"), "#98989D"),
     ]
 
     /// What the level meter and the language badge are drawn in: ink on the glass,

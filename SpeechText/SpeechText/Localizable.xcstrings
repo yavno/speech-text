@@ -133,6 +133,7 @@
       "comment" : "Notice beside the dictation overlay: text under the title. Edit Selection with AI (rewrites the text selected in another app): %@ is an app's name, or 'The app'. ⌘V is the paste shortcut."
     },
     "%@ was open and had the keyboard, so nothing was pasted into %@." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. the first %@ is a menu's name or 'A menu', the second an app's name or 'the app'.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -140,8 +141,7 @@
             "value" : "%1$@ was open and had the keyboard, so nothing was pasted into %2$@."
           }
         }
-      },
-      "comment" : "Notice beside the dictation overlay: text under the title. the first %@ is a menu's name or 'A menu', the second an app's name or 'the app'."
+      }
     },
     "%@ was open and had the keyboard. The text is in the Record Window." : {
       "comment" : "Notice beside the dictation overlay: text under the title. %@ is a menu's name, or 'A menu'."
@@ -549,6 +549,9 @@
     "A menu" : {
       "comment" : "Stands in for a menu's name when it is unknown, at the start of a sentence: 'A menu was open and had the keyboard…'."
     },
+    "A molded handset with a dot-matrix LCD." : {
+      "comment" : "Settings › Appearance: the description of the Techno skin."
+    },
     "A retry from History is sent to Groq, since Apple can't transcribe a saved recording." : {
       "comment" : "Settings › Privacy & Data › What leaves this Mac › Your voice: second sentence when Apple Dictation is in use and a Groq key is stored. Groq is a company name."
     },
@@ -736,6 +739,9 @@
     "Always transcribed as %@ — the most accurate. Speech in another language may come back translated." : {
       "comment" : "Settings › Dictation › Language: caption when one language is listed. %@ is the language's name."
     },
+    "Amber" : {
+      "comment" : "Settings › Appearance: a color of the Techno skin's dot-matrix display."
+    },
     "An estimate, not your bill" : {
       "comment" : "Usage page, How this is counted: title of the note on cost."
     },
@@ -806,6 +812,7 @@
       "comment" : "Setup window: footer button that goes to the previous step."
     },
     "Back online — %lld transcribed, %lld couldn't be. All in History." : {
+      "comment" : "Notice beside the dictation overlay: text under the title. the first %lld is how many offline dictations were transcribed, the second how many failed.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -813,8 +820,7 @@
             "value" : "Back online — %1$lld transcribed, %2$lld couldn't be. All in History."
           }
         }
-      },
-      "comment" : "Notice beside the dictation overlay: text under the title. the first %lld is how many offline dictations were transcribed, the second how many failed."
+      }
     },
     "Back online — transcribed, waiting in History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. after the dictations saved offline were transcribed."
@@ -833,6 +839,9 @@
     },
     "Best quality" : {
       "comment" : "Settings › Speech to text / AI Rewrite: badge on the local model with the best quality this Mac can run."
+    },
+    "Blue" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
     },
     "Bluetooth headphones are skipped for the Mac's own microphone, so they keep playing." : {
       "comment" : "Settings › Dictation › Microphone: caption for Automatic."
@@ -1069,6 +1078,9 @@
     "Curiosity rarely arrives on schedule; it tends to show up halfway through something else, uninvited and oddly persistent." : {
       "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing."
     },
+    "Cyan" : {
+      "comment" : "Settings › Appearance: a color of the Techno skin's dot-matrix display."
+    },
     "Dashes" : {
       "comment" : "Settings › Dictation › Text: row (and its menu's label) for how the long dash is written."
     },
@@ -1089,6 +1101,9 @@
     },
     "Default — follows Liquid Glass in System Settings › Appearance." : {
       "comment" : "Settings › Appearance › Transparency: caption at the default stop, on macOS 26. Liquid Glass is Apple's name for the look; System Settings › Appearance is the macOS path."
+    },
+    "Default — glass" : {
+      "comment" : "Settings › Appearance: tooltip on the accent swatch that leaves the glass untinted."
     },
     "Default — the system's thinnest material." : {
       "comment" : "Settings › Appearance › Transparency: caption at the default stop, before macOS 26."
@@ -1392,6 +1407,12 @@
     },
     "Grant Access" : {
       "comment" : "Settings › Privacy & Data › Permissions › Accessibility: button that walks the user to System Settings."
+    },
+    "Graphite" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch (a dark grey)."
+    },
+    "Green" : {
+      "comment" : "Settings › Appearance: a color name, used for the Techno display and for an accent color."
     },
     "Groq's Whisper is given them as a hint" : {
       "comment" : "Dictionary page, What a word does: row title when Groq's Whisper model is in use. Groq and Whisper are names; keep them."
@@ -1717,6 +1738,9 @@
     "Microphone is turned off for SpeechText." : {
       "comment" : "Microphone permission denied in System Settings."
     },
+    "Minimal" : {
+      "comment" : "Settings › Appearance: the name of a skin — plain macOS panels."
+    },
     "Model on this Mac" : {
       "comment" : "Usage page, By engine: where a speech model ran."
     },
@@ -1746,6 +1770,9 @@
     },
     "Names and terms you add there are spelled exactly as you write them." : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile text when the Dictionary is empty. 'There' is the Dictionary page."
+    },
+    "Native macOS panels on glass. Tint them if you want to." : {
+      "comment" : "Settings › Appearance: the description of the Minimal skin."
     },
     "Needed" : {
       "comment" : "Settings › API Keys: status beside a key the current choices use but that is not entered. Shown after a ⚠︎."
@@ -2092,6 +2119,9 @@
     "Or set it yourself" : {
       "comment" : "Usage page, typing test popover: label beside the − and + buttons."
     },
+    "Orange" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
+    },
     "Other keys" : {
       "comment" : "Settings › API Keys: group heading over the keys the current choices do not use."
     },
@@ -2127,6 +2157,9 @@
     },
     "Permissions" : {
       "comment" : "Settings › Privacy & Data: group heading over the macOS permissions."
+    },
+    "Pink" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
     },
     "Preparing %@ for your Mac…" : {
       "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name."
@@ -2202,6 +2235,9 @@
     "Prompts" : {
       "comment" : "Settings › AI Rewrite: group heading and row title for AI Rewrite's prompts."
     },
+    "Purple" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
+    },
     "Quit" : {
       "comment" : "Alert button that quits the app."
     },
@@ -2252,6 +2288,9 @@
     },
     "Recording with %@" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. %@ is a microphone's name, e.g. MacBook Pro Microphone."
+    },
+    "Red" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
     },
     "Reduce transparency is on in System Settings — nothing to adjust." : {
       "comment" : "Settings › Appearance › Transparency: caption when macOS's Reduce transparency is on."
@@ -2729,8 +2768,14 @@
     "Teach SpeechText the words it gets wrong — names, product terms, code identifiers." : {
       "comment" : "The Dictionary page's lead under its title."
     },
+    "Teal" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
+    },
     "Team chat" : {
       "comment" : "Setup window, welcome animation: the title of a made-up chat window."
+    },
+    "Techno" : {
+      "comment" : "Settings › Appearance: the name of a skin — a retro handset with a dot-matrix display."
     },
     "Tell the speech engine" : {
       "comment" : "Dictionary page, What a word does: label of the switch that sends the words to the speech engine (read by VoiceOver; not shown)."
@@ -3149,6 +3194,9 @@
     "While the overlay is up, Esc cancels the dictation — and reaches no other app until it is gone." : {
       "comment" : "Settings › Dictation › Recording › Esc cancels a dictation: caption when on."
     },
+    "White" : {
+      "comment" : "Settings › Appearance: a color of the Techno skin's dot-matrix display."
+    },
     "With" : {
       "comment" : "Dictionary page, Replacements: placeholder in the field for the text it should be written as."
     },
@@ -3217,6 +3265,9 @@
     },
     "Wrong spellings are replaced" : {
       "comment" : "Dictionary page, What a word does: row title."
+    },
+    "Yellow" : {
+      "comment" : "Settings › Appearance: tooltip on an accent color swatch."
     },
     "You can add it again at any time." : {
       "comment" : "Settings: message of the confirmation before removing an API key not in use."
@@ -3389,8 +3440,11 @@
         }
       }
     },
-    "in the %@" : {
-      "comment" : "History page, part of 'Nothing … .': a range of days, lowercase, e.g. 'in the last 7 days'."
+    "in the last 30 days" : {
+      "comment" : "History page: part of the empty-state sentence when the date filter is the last 30 days, e.g. “Nothing in Slack, in the last 30 days.”"
+    },
+    "in the last 7 days" : {
+      "comment" : "History page: part of the empty-state sentence when the date filter is the last 7 days, e.g. “Nothing in Slack, in the last 7 days.”"
     },
     "last %@" : {
       "comment" : "Prompts page: when a prompt was last chosen, lowercase. %@ is a time today (14:05), 'yesterday', a weekday or a date."

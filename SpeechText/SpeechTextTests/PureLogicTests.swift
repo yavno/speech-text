@@ -735,3 +735,33 @@ final class DebugLogLevelTests: XCTestCase {
                        lines[1])
     }
 }
+
+/// Setup's Try it step and the failure notice pick their words by this kind. It is read
+/// from the codes in a message, so a translated message classifies the same.
+final class TranscriptionFailureKindTests: XCTestCase {
+    func testCodesDecideTheKind() {
+        XCTAssertEqual(TranscriptionFailureKind(message: "Groq couldn't transcribe the recording: the API key was rejected. (HTTP 401)"), .rejected)
+        XCTAssertEqual(TranscriptionFailureKind(message: "Groq no pudo transcribir la grabación: se rechazó la clave. (HTTP 403)"), .rejected)
+        XCTAssertEqual(TranscriptionFailureKind(message: "Не вдалося виконати операцію. (NSURLErrorDomain error -1009.)"), .offline)
+        XCTAssertEqual(TranscriptionFailureKind(message: "The operation couldn’t be completed. (NSURLErrorDomain error -1001.)"), .timedOut)
+        XCTAssertEqual(TranscriptionFailureKind(message: "(HTTP 429)"), .rateLimited)
+        XCTAssertEqual(TranscriptionFailureKind(message: "(HTTP 413)"), .tooLarge)
+    }
+
+    func testFoundationsEnglishWordsStillCount() {
+        XCTAssertEqual(TranscriptionFailureKind(message: "The Internet connection appears to be offline."), .offline)
+        XCTAssertEqual(TranscriptionFailureKind(message: "The request timed out."), .timedOut)
+    }
+
+    func testOurOwnWordsDoNot() {
+        // A missing key is not a rejected one; setup shows the message as it is.
+        XCTAssertEqual(TranscriptionFailureKind(message: "No API key set for Groq"), .other)
+        XCTAssertEqual(TranscriptionFailureKind(message: "Check your internet settings"), .other)
+    }
+
+    func testKeyboardSettingsIsInTheAssetsMessage() {
+        let failure = RecognitionFailure.apple(domain: "kLSRErrorDomain", code: 102, description: "", hasText: false,
+                                               permissionDenied: false, locale: "en-US")
+        XCTAssertTrue(failure?.message.contains(RecognitionFailure.keyboardSettings) == true)
+    }
+}

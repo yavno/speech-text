@@ -1154,10 +1154,9 @@ private struct TryItScreen: View {
         case nil: return .ready
         case .typed?: return .success
         case .nothingHeard?: return .nothing
-        case .failed(let message)?:
-            if message.localizedCaseInsensitiveContains("API key") { return .rejected }
-            if message.localizedCaseInsensitiveContains("internet") { return .offline }
-            return .failed(message)
+        case .failed(_, .rejected)?: return .rejected
+        case .failed(_, .offline)?: return .offline
+        case .failed(let message, _)?: return .failed(message)
         }
     }
 
@@ -1329,7 +1328,7 @@ private struct TryItScreen: View {
     /// A failure whose remedy is a System Settings page gets a button to that page: the
     /// path in the message alone was easy to miss.
     private func settingsFix(for message: String) -> (title: LocalizedStringKey, open: () -> Void)? {
-        if message == RecognitionFailure.dictationOffMessage || message.contains("System Settings › Keyboard") {
+        if message == RecognitionFailure.dictationOffMessage || message.contains(RecognitionFailure.keyboardSettings) {
             return ("Open Keyboard Settings", { OnboardingModel.openKeyboardSettings() })
         }
         if message == RecognitionFailure.speechPermissionMessage {
