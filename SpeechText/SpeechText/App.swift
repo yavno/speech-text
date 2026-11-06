@@ -2741,11 +2741,64 @@ enum WindowSnapshots {
     /// when no script answers: `cacheDisplay` needs no Screen Recording grant, but it
     /// leaves the main window's clipped, shadowed page blank.
     static func capture(_ window: NSWindow?, _ name: String, into folder: URL) async {
-        try? await Task.sleep(for: .seconds(1.2))
-        guard let window, let view = window.contentView else {
+        // Long enough for a window's entrance animations to settle.
+        try? await Task.sleep(for: .seconds(2))
+        guard let window, window.contentView != nil else {
             dlog("Snapshots", "\(name): no window", level: .error)
             return
         }
+        // A page longer than its window is taken a screen at a time, top to bottom:
+        // <name>.png, <name>-2.png, …, so nothing below the fold goes unseen.
+        guard let scroll = longestScrollView(in: window.contentView) else {
+            await shoot(window, name, into: folder)
+            return
+        }
+        let visible = scroll.contentView.bounds.height
+        let total = scroll.documentView?.frame.height ?? visible
+        let step = visible * 0.9
+        var offset: CGFloat = 0
+        var page = 1
+        while true {
+            scrollTo(offset, in: scroll)
+            try? await Task.sleep(for: .milliseconds(500))
+            await shoot(window, page == 1 ? name : "\(name)-\(page)", into: folder)
+            if offset + visible >= total - 1 || page >= 8 { break }
+            offset = min(offset + step, total - visible)
+            page += 1
+        }
+        scrollTo(0, in: scroll)
+    }
+
+    /// The scroll view in `view` with the most content hidden below its fold.
+    private static func longestScrollView(in view: NSView?) -> NSScrollView? {
+        guard let view else { return nil }
+        var best: (NSScrollView, CGFloat)?
+        var stack: [NSView] = [view]
+        while let next = stack.popLast() {
+            if let scroll = next as? NSScrollView, let document = scroll.documentView {
+                let hidden = document.frame.height - scroll.contentView.bounds.height
+                if hidden > 20, hidden > (best?.1 ?? 0) { best = (scroll, hidden) }
+            }
+            stack.append(contentsOf: next.subviews)
+        }
+        return best?.0
+    }
+
+    private static func scrollTo(_ offset: CGFloat, in scroll: NSScrollView) {
+        guard let document = scroll.documentView else { return }
+        let visible = scroll.contentView.bounds.height
+        let y = document.isFlipped ? offset : max(0, document.frame.height - visible - offset)
+        scroll.contentView.scroll(to: NSPoint(x: 0, y: y))
+        scroll.reflectScrolledClipView(scroll.contentView)
+    }
+
+    /// Has `scripts/window-snapshots.sh` capture `window`: `<name>.window` holds its
+    /// window number, and the script answers with `<name>.png` (`screencapture -l`, that
+    /// one window and nothing else on screen). Drawn here only when no script answers:
+    /// `cacheDisplay` needs no Screen Recording grant, but it leaves the main window's
+    /// clipped, shadowed page blank.
+    private static func shoot(_ window: NSWindow, _ name: String, into folder: URL) async {
+        guard let view = window.contentView else { return }
         let png = folder.appendingPathComponent("\(name).png")
         let request = folder.appendingPathComponent("\(name).window")
         try? String(window.windowNumber).write(to: request, atomically: true, encoding: .utf8)
@@ -2787,7 +2840,10 @@ extension AppDelegate {
         settingsWindow?.close()
         mainWindow?.close()
 
-        appState.showDirectRecordingPanel()
+        // Opened on text, as from History's "Open in Record Window": a Record Window opened
+        // empty starts recording, and the snapshots never use the microphone.
+        appState.showDirectRecordingPanel(
+            withText: String(localized: "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."))
         await WindowSnapshots.capture(NSApp.windows.first { $0 is DirectRecordingPanelWindow },
                                       "record-window", into: folder)
     }
