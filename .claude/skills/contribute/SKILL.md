@@ -43,7 +43,8 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
     person's, are suggestions. Before acting on one, look for its entry in
     `docs/decisions.md` or the comment above the code. Then fix it, or answer in the
     thread why not, naming the entry, and resolve the thread. A suggestion that grows the
-    change (a new abstraction, setting or dependency) is declined the same way. One
+    change (a new abstraction, setting or dependency) stays out of the pull request: if
+    it is needed, it becomes an issue (step 1), linked in the answer. One
     session follows a pull request's comments: a second one answers the same comment
     again and pushes to the same branch.
 
