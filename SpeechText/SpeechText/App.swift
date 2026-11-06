@@ -492,7 +492,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         updateRecordingItemTitles(in: menu)
 
         let editItem = NSMenuItem(title: "", action: #selector(toggleEdit), keyEquivalent: "")
-        StoredShortcut.edit.apply(to: editItem, title: String(localized: "Edit Selection with AI"))
+        StoredShortcut.edit.apply(to: editItem, title: String(localized: "Edit Selection"))
         editItem.target = self
         editItem.toolTip = String(localized: "Rewrites the text selected in the app in front. Speak an instruction, or double-press the shortcut to just polish it.")
         menu.addItem(editItem)
@@ -1744,7 +1744,7 @@ final class AppState {
         case .selected(let selection):
             guard selection.text.count <= SelectionEdit.maxCharacters else {
                 abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
-                          detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
+                          detail: String(localized: "Select up to \(HomeFormat.integer(SelectionEdit.maxCharacters)) characters to edit with AI."))
                 return
             }
             editSelection = selection
@@ -1829,7 +1829,7 @@ final class AppState {
                                    tint: .secondary)
                 case .tooLong:
                     self.abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
-                                   detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
+                                   detail: String(localized: "Select up to \(HomeFormat.integer(SelectionEdit.maxCharacters)) characters to edit with AI."))
                 case .unchanged(let now):
                     self.editSelection = now
                     self.removeSelection(now)

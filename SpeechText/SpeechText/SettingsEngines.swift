@@ -172,7 +172,7 @@ struct SpeechEngineSettings: View {
             }
             HStack {
                 Text(store.hasAnyModel
-                     ? "\(ByteCountFormatter.string(fromByteCount: store.installedBytes, countStyle: .file)) of models on this Mac"
+                     ? "\(HomeFormat.fileSize(store.installedBytes)) of models on this Mac"
                      : "No models downloaded yet")
                 Spacer()
                 if store.hasAnyModel {
@@ -493,7 +493,7 @@ struct AIEngineSettings: View {
             HStack {
                 Text(store.installedModels.isEmpty
                      ? "No models downloaded yet"
-                     : "\(ByteCountFormatter.string(fromByteCount: store.installedBytes, countStyle: .file)) of models on this Mac")
+                     : "\(HomeFormat.fileSize(store.installedBytes)) of models on this Mac")
                 Spacer()
                 if !store.installedModels.isEmpty {
                     Button("Show in Finder") {

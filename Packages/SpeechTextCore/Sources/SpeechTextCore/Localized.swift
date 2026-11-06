@@ -8,6 +8,11 @@ import Foundation
 /// sentence around it — English until the catalog has another.
 let uiLocale = Locale(identifier: Bundle.module.preferredLocalizations.first ?? "en")
 
+/// The locale numbers are written in: the app's language, never the Mac's region, so a
+/// size, a price and a count on one page agree — "483.3 MB" and "$0.01" in English (as in
+/// the US), "483,3 MB" and "$0,01" in Spanish.
+let numberLocale = uiLocale.language.languageCode == .english ? Locale(identifier: "en_US") : uiLocale
+
 /// A word or sentence the package hands to the interface, from its String Catalog. The
 /// compiler extracts the literal passed here as a key, as it does for `String(localized:)`.
 /// A number in it is written the app's way ("1,234" in English), not the Mac's region's.

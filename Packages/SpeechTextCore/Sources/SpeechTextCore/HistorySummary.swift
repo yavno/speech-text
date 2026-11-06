@@ -664,7 +664,7 @@ public enum HistoryFormat {
     /// What History holds now, under its settings: "125 dictations since 14 September · 70 KB".
     public static func storageSummary(count: Int, since: Date?, bytes: Int64, calendar: Calendar = .current) -> String {
         guard count > 0 else { return localized("No dictations kept yet.") }
-        let size = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+        let size = HomeFormat.fileSize(bytes)
         guard let since else { return localized("\(count) dictations · \(size)") }
         let start = formatter("d MMMM", calendar: calendar).string(from: since)
         return localized("\(count) dictations since \(start) · \(size)")

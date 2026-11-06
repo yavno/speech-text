@@ -26,6 +26,7 @@ is translated as the sentence needs.
 - **Plurals:** a string with a count gets every form the language has. Spanish: *one*,
   *many*, *other*; Ukrainian: *one*, *few*, *many*, *other*. The English *one* form may
   leave the number out ("Used once"); a translation may too, where natural.
+- **Numbers** are written the app's language's way, whatever the Mac's region: 483,3 MB, $0,01 and 0,4 s in Spanish and Ukrainian. The code formats them (`numberLocale` in SpeechTextCore); a translation never rewrites a number.
 - **Numbers and units** stay on one line: a non-breaking space between a number and its unit (7 днів, 40 сл./хв, 19 GB), and a word joiner after the dash of a range (3–⁠19).
 - **Length:** buttons, chips, tabs and column headings have little room. Prefer the
   shorter of two equal wordings there. The comment says where a string appears.
@@ -42,6 +43,7 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | AI | IA |
 | AI mode | modo IA |
 | Edit (rewriting selected text by voice) | Editar; the feature: Edición |
+| Edit selection (the feature's name, on Home, in Usage, in the overlay; Edit Selection in the menu and the shortcut list) | Editar selección |
 | Hold to talk | Mantén para hablar |
 | Press to toggle | Pulsa para alternar (imperative, as Hold to talk) |
 | Apple Dictation · Apple on-device (speech models) | Dictado de Apple · Apple en el dispositivo |
@@ -86,6 +88,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | AI | ШІ |
 | AI mode | режим ШІ |
 | Edit (rewriting selected text by voice) | Редагувати; the feature: Редагування |
+| Edit selection (the feature's name; Edit Selection in the menu and the shortcut list) | Редагування виділеного; the menu item: Редагувати виділене |
 | Hold to talk | Затисніть і говоріть; *hold* (the key) is затисніть everywhere, never утримуйте |
 | Recording (the state, a heading) | Запис |
 | Apple Dictation · Apple on-device (speech models) | Диктування Apple · Apple на пристрої |

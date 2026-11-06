@@ -451,15 +451,15 @@ public enum UsageFormat {
     public static func tokens(_ value: Int) -> String {
         switch value {
         case ..<1_000: "\(value)"
-        case ..<1_000_000: String(format: value < 10_000 ? "%.1fk" : "%.0fk", Double(value) / 1_000)
-        default: String(format: "%.1fM", Double(value) / 1_000_000)
+        case ..<1_000_000: fraction(Double(value) / 1_000, digits: value < 10_000 ? 1 : 0) + "k"
+        default: fraction(Double(value) / 1_000_000, digits: 1) + "M"
         }
     }
 
     /// An answer's wait: "0.4 s", "12 s".
     public static func wait(_ seconds: Double) -> String {
         if seconds < 10 {
-            let tenths = seconds.formatted(.number.precision(.fractionLength(1)).locale(uiLocale))
+            let tenths = fraction(seconds, digits: 1)
             return localized("\(tenths) s")
         }
         return localized("\(Int(seconds.rounded())) s")
@@ -472,7 +472,7 @@ public enum UsageFormat {
 
     /// "3.6×", "12×".
     public static func speedup(_ value: Double) -> String {
-        value >= 10 ? "\(Int(value.rounded()))×" : String(format: "%.1f×", value)
+        value >= 10 ? "\(Int(value.rounded()))×" : fraction(value, digits: 1) + "×"
     }
 
     /// A small cost as a person would say it: "$0.75", "0.3¢".
@@ -480,6 +480,11 @@ public enum UsageFormat {
         if value >= 0.01 { return HomeFormat.money(value) }
         if value <= 0 { return "$0" }
         let cents = value * 100
-        return String(format: cents >= 0.1 ? "%.1f¢" : "%.2f¢", cents)
+        return fraction(cents, digits: cents >= 0.1 ? 1 : 2) + "¢"
+    }
+
+    /// "48.2" in English, "48,2" in Spanish: a fixed number of decimals, the app's way.
+    private static func fraction(_ value: Double, digits: Int) -> String {
+        value.formatted(.number.precision(.fractionLength(digits)).grouping(.never).locale(numberLocale))
     }
 }

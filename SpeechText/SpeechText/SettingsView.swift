@@ -1202,7 +1202,7 @@ private struct GestureDemoList: View {
         var demos: [Demo]
         if holdToTalk {
             demos = [
-                Demo(gesture: .hold, title: "Hold to record",
+                Demo(gesture: .hold, title: "Hold to talk",
                      detail: modifiers.isEmpty
                         ? "It records while \(letter) is down. Let go of \(letter) to paste."
                         : "Once it records, let go of \(modifiers) — \(letter) alone keeps it going. Let go of \(letter) to paste."),

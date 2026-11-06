@@ -13,7 +13,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи лише %@, запис триває, тож клацання й ⌘Tab працюють як завжди."
+            "value" : "Поки затиснуто лише %@, запис триває, тож клацання й ⌘Tab працюють як завжди."
           }
         }
       }
@@ -225,6 +225,7 @@
       }
     },
     "%@ s" : {
+      "comment" : "A short duration in seconds with one decimal, e.g. 0.4 s, in the Usage page's request rows. %@ is the number, already formatted.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -238,8 +239,7 @@
             "value" : "%@ с"
           }
         }
-      },
-      "comment" : "A short duration in seconds with one decimal, e.g. 0.4 s, in the Usage page's request rows. %@ is the number, already formatted."
+      }
     },
     "%@ — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation." : {
       "comment" : "Settings › Speech to text: why a local model is recommended. %@ is the model's name.",
@@ -965,7 +965,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб відшліфувати."
+            "value" : "Коротке натискання скасовує. Затисніть скорочення, поки говорите, або натисніть двічі, щоб відшліфувати."
           }
         }
       }
@@ -982,7 +982,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб записувати без рук."
+            "value" : "Коротке натискання скасовує. Затисніть скорочення, поки говорите, або натисніть двічі, щоб записувати без рук."
           }
         }
       }
@@ -1158,6 +1158,7 @@
       }
     },
     "Apple on-device" : {
+      "comment" : "The name of Apple's on-device speech model, shown in sentences such as «Your words go to %@». Keep Apple.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1171,8 +1172,7 @@
             "value" : "Apple на пристрої"
           }
         }
-      },
-      "comment" : "The name of Apple's on-device speech model, shown in sentences such as «Your words go to %@». Keep Apple."
+      }
     },
     "As accurate as Turbo, about 30% slower. Needs 24 GB of memory." : {
       "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Turbo is another model.",
@@ -1554,19 +1554,19 @@
         }
       }
     },
-    "Edit Selection with AI" : {
-      "comment" : "A shortcut's name: edit the selected text by voice.",
+    "Edit Selection" : {
+      "comment" : "A shortcut's name in Settings › Shortcuts and in shortcut conflicts: edit the selected text by voice. Title case, like the other shortcut names (Inline Recording, AI Recording); the feature is called Edit selection everywhere else.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar la selección con IA"
+            "value" : "Editar selección"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагувати виділене з ШІ"
+            "value" : "Редагування виділеного"
           }
         }
       }
@@ -1810,6 +1810,7 @@
       }
     },
     "History filter: AI Rewrite" : {
+      "comment" : "History page: the filter switch's label for dictations rewritten by AI, next to All, Edits and Failed. As short as your language allows: the switch shares a line with the search.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1830,8 +1831,7 @@
             "value" : "ШІ"
           }
         }
-      },
-      "comment" : "History page: the filter switch's label for dictations rewritten by AI, next to All, Edits and Failed. As short as your language allows: the switch shares a line with the search."
+      }
     },
     "History keeps every dictation on this Mac." : {
       "comment" : "History page, at the foot: what History keeps.",
@@ -3626,7 +3626,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скорочення відпустили до того, як увімкнувся мікрофон. Утримуйте його, доки накладка не почне слухати."
+            "value" : "Скорочення відпустили до того, як увімкнувся мікрофон. Тримайте його затиснутим, доки накладка не почне слухати."
           }
         }
       }
@@ -3802,7 +3802,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи %1$@, натисніть %2$@. Натисніть ще раз, щоб повернутися."
+            "value" : "Затиснувши %1$@, натисніть %2$@. Натисніть ще раз, щоб повернутися."
           }
         }
       }

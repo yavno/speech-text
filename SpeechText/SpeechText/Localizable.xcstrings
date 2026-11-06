@@ -3169,6 +3169,7 @@
       }
     },
     "Apple Dictation" : {
+      "comment" : "The name of Apple's built-in speech recognizer as a speech model, in model lists and warnings. Keep Apple; name Dictation as macOS does in your language.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3182,8 +3183,7 @@
             "value" : "Диктування Apple"
           }
         }
-      },
-      "comment" : "The name of Apple's built-in speech recognizer as a speech model, in model lists and warnings. Keep Apple; name Dictation as macOS does in your language."
+      }
     },
     "Apple Dictation needs it on." : {
       "comment" : "Setup window, permissions: under the Dictation row — macOS Dictation must be on for Apple Dictation to work.",
@@ -5848,19 +5848,19 @@
         }
       }
     },
-    "Edit Selection with AI" : {
-      "comment" : "Menu bar menu item. Rewrites the text selected in the app in front. Title case.",
+    "Edit Selection" : {
+      "comment" : "Menu bar menu item: rewrites the text selected in the app in front. Title case, as menu items are; the feature is called Edit selection everywhere else.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar selección con IA"
+            "value" : "Editar selección"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагувати виділене з ШІ"
+            "value" : "Редагувати виділене"
           }
         }
       }
@@ -6784,7 +6784,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте %1$@ і двічі торкніться %2$@: запис іде без утримання, доки ви знову не натиснете %3$@."
+            "value" : "Затисніть %1$@ і двічі натисніть %2$@: запис іде без утримання, доки ви знову не натиснете %3$@."
           }
         }
       }
@@ -6818,30 +6818,13 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте скорочення, поки говорите"
-          }
-        }
-      }
-    },
-    "Hold to record" : {
-      "comment" : "Settings › Dictation › Recording: title of a gesture played as an animation, in hold-to-talk mode.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantén para grabar"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Затисніть, щоб записувати"
+            "value" : "Затисніть скорочення, поки говорите"
           }
         }
       }
     },
     "Hold to talk" : {
-      "comment" : "The recording mode where the shortcut is held while speaking: a choice in Settings › Dictation › Recording and in setup.",
+      "comment" : "The recording mode where the shortcut is held while speaking: a choice in Settings › Dictation › Recording and in setup. Also the title of the hold gesture's animation in Settings › Dictation › Recording.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -9559,7 +9542,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тепер спробуйте ШІ‑обробку: утримуйте"
+            "value" : "Тепер спробуйте ШІ‑обробку: затисніть"
           }
         }
       }
@@ -16099,7 +16082,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи %1$@, натисніть %2$@, щоб перейти на ШІ‑переписування, і ще раз, щоб повернутися. Якщо почати з %3$@, %4$@ перемикає навпаки."
+            "value" : "Затиснувши %1$@, натисніть %2$@, щоб перейти на ШІ‑переписування, і ще раз, щоб повернутися. Якщо почати з %3$@, %4$@ перемикає навпаки."
           }
         }
       }
