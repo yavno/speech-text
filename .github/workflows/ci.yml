@@ -7,6 +7,13 @@ name: CI
 # main showed nothing true. What only means something for a pull request (Swift
 # lint, and the DCO sign-off and Base branch steps of Checks) is skipped on a push.
 #
+# Tests and Swift lint run only when the change needs them (the Changes job,
+# scripts/ci-changes.sh): a pull request that touches nothing but the docs, the
+# changelog or an agent skill skips both. Each is gated by its own `if`, never by
+# `paths-ignore` on the workflow: the ruleset on main requires both checks, and a
+# workflow that never starts reports nothing, so the pull request would wait on
+# them forever, while a skipped job reports a check the ruleset accepts.
+#
 # Once this repository is public, nothing here may run on the organisation's
 # self-hosted Mac. A pull request is code, and on a public repository anyone may
 # open one: `xcodebuild test` on that machine would be a stranger's code running
@@ -60,8 +67,48 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Changes
+    # Which of the two Mac jobs this change needs, from the files it touches. Not a
+    # required check, so it must fail toward running: Tests and Swift lint run
+    # whenever this job did not succeed, and a skip here never reads as green.
+    runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    outputs:
+      tests: ${{ steps.changes.outputs.tests }}
+      lint: ${{ steps.changes.outputs.lint }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # A pull request: what it adds over its merge base, as the Files tab shows it,
+      # not what landed on main since. A push: what it added to main. A push with no
+      # `before` (a new branch) runs everything.
+      - name: Files changed
+        id: changes
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            range="$PR_BASE...$PR_HEAD"
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            range="$BEFORE..$AFTER"
+          else
+            printf 'tests=true\nlint=true\n' | tee -a "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          scripts/ci-changes.sh "$range" | tee -a "$GITHUB_OUTPUT"
+
   test:
     name: Tests
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tests == 'true') }}
     # The one job that needs a Mac, and the one that runs a pull request's own
     # code. Public: it gets a disposable Mac.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'xcode-27' }}
@@ -171,7 +218,8 @@ jobs:
     # configuration — an old finding elsewhere in a touched file is left alone.
     runs-on: ${{ github.repository_visibility == 'private' && 'self-hosted' || 'xcode-27' }}
     timeout-minutes: 10
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && (needs.changes.result != 'success' || needs.changes.outputs.lint == 'true') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
