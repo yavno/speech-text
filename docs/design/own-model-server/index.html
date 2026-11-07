@@ -1,0 +1,395 @@
+<!doctype html>
+<!--
+  SpeechText · Your own model server — design mock-up only, nothing here is wired to the app.
+  Spec: docs/specs/2026-11-07-own-model-server.md; rules and open questions: README.md here.
+
+  Built on docs/design/model-details/index.html: the same tokens, named after their source —
+    --card        SettingsColor.background   (SettingsWindow.swift)
+    --panel       SettingsColor.panel = MainColor.panel (MainWindow.swift)
+    --label*      SetupColor.label / label2 / label3 (OnboardingChrome.swift)
+    --accent      SetupTint.green.accent; --ai the AI step's violet (Semantic.ai)
+    --warn        SetupColor.warn, badge fill #FF9F0A at 20 % (SetupBadge .warn)
+  Place cards are EnginePlaceCards / SetupChoiceCard, rows SetupRow, groups SettingsGroup.
+  Settings is drawn at its real 820 × 600, setup at OnboardingWindow.size, 760 × 540.
+-->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpeechText · Your own model server</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --canvas: #d9ddda;
+  --card: #ffffff;
+  --panel: #f6f7f5;
+  --control: #ffffff;
+  --field: #ffffff;
+  --separator: rgba(24, 44, 32, 0.08);
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --label: rgba(0, 0, 0, 0.88);
+  --label-2: rgba(0, 0, 0, 0.56);
+  --label-3: rgba(0, 0, 0, 0.32);
+  --accent: #14543a;
+  --ai: #6c4ad8;
+  --warn: #b35f00;
+  --warn-fill: rgba(255, 159, 10, 0.2);
+  --bad: #c4321f;
+  --ok: #1e8e46;
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+:root[data-theme="dark"] {
+  --canvas: #111512;
+  --card: #2a2a2c;
+  --panel: rgba(255, 255, 255, 0.04);
+  --control: rgba(255, 255, 255, 0.08);
+  --field: rgba(0, 0, 0, 0.25);
+  --separator: rgba(255, 255, 255, 0.08);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --label: rgba(255, 255, 255, 0.9);
+  --label-2: rgba(255, 255, 255, 0.58);
+  --label-3: rgba(255, 255, 255, 0.3);
+  --accent: #61c58c;
+  --ai: #a98bff;
+  --warn: #ff9f0a;
+  --bad: #ff6b5a;
+  --ok: #30d158;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); font: 13px/1.35 var(--ui); color: var(--label); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+
+.review-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 8px 16px; background: rgba(20, 24, 22, 0.88); color: #fff; font-size: 12px; backdrop-filter: blur(10px); }
+.review-bar .grp { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; margin-right: 10px; }
+.review-bar .grp > span { opacity: 0.6; margin-right: 6px; }
+.review-bar button { background: rgba(255,255,255,0.08); border: 0; border-radius: 6px; padding: 4px 9px; cursor: pointer; color: #fff; }
+.review-bar button[aria-pressed="true"] { background: #61c58c; color: #0d3a25; font-weight: 600; }
+.review-bar button:disabled { opacity: 0.3; cursor: default; }
+
+.doc { max-width: 1300px; margin: 0 auto; padding: 28px 24px 80px; }
+.doc > h1 { font-size: 22px; margin: 0 0 4px; }
+.doc > p.lead { margin: 0 0 20px; color: var(--label-2); max-width: 860px; }
+.section-title { font-size: 15px; font-weight: 600; margin: 34px 0 4px; }
+.section-note { margin: 0 0 14px; color: var(--label-2); max-width: 860px; font-size: 12.5px; }
+.stage { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+
+/* ---- Settings window */
+.window { width: 820px; height: 600px; border-radius: 16px; background: var(--card); box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 24px 60px rgba(0,0,0,0.22);
+  display: flex; overflow: hidden; flex: none; }
+.sidebar { width: 196px; padding: 14px 10px; flex: none; }
+.traffic { display: flex; gap: 8px; margin: 2px 4px 18px; }
+.traffic i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.traffic i:nth-child(2) { background: #febc2e; } .traffic i:nth-child(3) { background: #28c840; }
+.side-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 8px; font-size: 13px; }
+.side-item .well { width: 22px; height: 22px; border-radius: 6px; background: var(--panel); display: grid; place-items: center; font-size: 11px; color: var(--label-2); }
+.side-item.on { background: var(--panel); font-weight: 600; }
+.side-gap { height: 10px; }
+.page { flex: 1; overflow: hidden; padding: 18px 22px 18px 6px; }
+.page h2 { font-size: 20px; font-weight: 700; margin: 4px 0 14px; letter-spacing: -0.01em; }
+
+.place-cards { display: flex; gap: 10px; padding: 4px; margin-bottom: 14px; }
+.place { flex: 1; border-radius: 14px; padding: 10px 12px; background: var(--panel); font-size: 11.5px; color: var(--label-2); border: 1.5px solid transparent; cursor: pointer; }
+.place.on { background: var(--control); border-color: var(--tint, var(--accent)); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.place b { display: flex; gap: 6px; align-items: center; color: var(--label); font-size: 13px; margin-bottom: 2px; }
+.place .glyph { width: 18px; height: 18px; border-radius: 5px; display: grid; place-items: center; font-size: 10px; background: var(--panel-border); color: var(--label-2); }
+.group-head { display: flex; justify-content: space-between; padding: 0 4px; margin-bottom: 7px; font-size: 12px; font-weight: 600; color: var(--label-2); }
+.group-head span:last-child { font-weight: 400; font-size: 11.5px; }
+.group { background: var(--panel); border-radius: 14px; padding: 12px 14px; }
+
+.badge { font-size: 10.5px; font-weight: 600; border-radius: 8px; padding: 2px 7px; margin-left: 4px; white-space: nowrap; }
+.badge.inuse { color: var(--accent); background: rgba(97,197,140,0.24); }
+.badge.warn { color: var(--warn); background: var(--warn-fill); }
+
+/* ---- The server form */
+.form { display: grid; grid-template-columns: 74px 1fr; gap: 9px 12px; align-items: start; }
+.form label { font-size: 12px; color: var(--label-2); padding-top: 5px; text-align: right; }
+.field { width: 100%; border-radius: 7px; background: var(--field); box-shadow: 0 0 0 1px var(--panel-border), inset 0 1px 1px rgba(0,0,0,0.04);
+  padding: 5px 8px; font: 12.5px var(--mono); color: var(--label); min-height: 26px; display: flex; align-items: center; justify-content: space-between; }
+.field.placeholder { color: var(--label-3); }
+.field.ask { box-shadow: 0 0 0 2px var(--tint, var(--accent)); }
+.field .chev { font-family: var(--ui); color: var(--label-3); }
+.under { font-size: 11px; color: var(--label-2); margin-top: 4px; }
+.under.warn, .line.warn { color: var(--warn); }
+.under.bad, .line.bad { color: var(--bad); }
+.under.ok, .line.ok { color: var(--ok); }
+.presets { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+.preset { font-size: 11px; border-radius: 6px; padding: 2px 7px; background: var(--control); box-shadow: 0 0 0 1px var(--panel-border); color: var(--label-2); }
+.preset b { color: var(--label); font-weight: 600; }
+.test { display: flex; gap: 10px; align-items: center; }
+.btn { border: 0; border-radius: 6px; padding: 4px 12px; background: var(--control); box-shadow: 0 0 0 1px var(--panel-border), 0 1px 1px rgba(0,0,0,0.05); font-size: 12.5px; }
+.btn.primary { background: var(--tint, var(--accent)); color: #fff; box-shadow: none; font-weight: 600; }
+.btn:disabled { opacity: 0.45; }
+.line { font-size: 12px; }
+.offer { display: flex; gap: 8px; align-items: center; font-size: 11.5px; color: var(--label-2); background: var(--control); border-radius: 8px; padding: 6px 9px; margin-bottom: 10px; box-shadow: 0 0 0 1px var(--panel-border); }
+.offer code { font: 11.5px var(--mono); color: var(--label); }
+.offer .btn { margin-left: auto; padding: 2px 10px; font-size: 11.5px; }
+.spin { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--label-3); border-top-color: var(--label); animation: spin 0.8s linear infinite; vertical-align: -1px; margin-right: 5px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Setup window */
+.setup { width: 760px; height: 540px; border-radius: 16px; background: var(--card); box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 24px 60px rgba(0,0,0,0.22);
+  padding: 16px 40px 22px; display: flex; flex-direction: column; flex: none; overflow: hidden; }
+.setup.ai { --tint: var(--ai); }
+.setup .traffic { margin: 0 0 14px -24px; }
+.steps { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; font-size: 11px; color: var(--label-3); }
+.steps span.on { color: var(--tint, var(--accent)); font-weight: 600; }
+.setup h3 { font-size: 26px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.015em; }
+.setup p.lead { margin: 0 0 16px; color: var(--label-2); font-size: 13.5px; }
+.setup .place-cards { padding: 0; margin-bottom: 12px; }
+.setup .group { padding: 11px 14px; }
+.setup .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+.setup .foot .skip { font-size: 12px; color: var(--label-2); }
+
+/* ---- Small surfaces */
+.mini { width: 560px; background: var(--card); border-radius: 14px; padding: 12px; box-shadow: 0 0 0 1px rgba(0,0,0,0.08); }
+.mini .group { padding: 8px 12px; }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--separator); font-size: 12.5px; }
+.kv:first-child { border-top: 0; }
+.kv span:last-child { color: var(--label-2); text-align: right; }
+.alert { width: 300px; background: var(--card); border-radius: 14px; padding: 18px 18px 14px; text-align: center; box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 18px 40px rgba(0,0,0,0.25); }
+.alert .icon { width: 44px; height: 44px; border-radius: 10px; margin: 0 auto 10px; background: #14543a; color: #b8f0cf; display: grid; place-items: center; font-weight: 700; }
+.alert b { display: block; font-size: 13px; margin-bottom: 6px; }
+.alert p { font-size: 11.5px; color: var(--label-2); margin: 0 0 14px; }
+.alert .btns { display: flex; gap: 8px; } .alert .btns .btn { flex: 1; }
+.rules { max-width: 880px; font-size: 12.5px; color: var(--label-2); margin: 0; padding-left: 18px; }
+.rules li { margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<div class="review-bar" role="toolbar" aria-label="Preview options">
+  <div class="grp"><span>Theme</span>
+    <button data-set="theme" data-val="light" aria-pressed="true">Light</button>
+    <button data-set="theme" data-val="dark" aria-pressed="false">Dark</button>
+  </div>
+  <div class="grp"><span>Role</span>
+    <button data-set="role" data-val="speech" aria-pressed="true">Speech to text</button>
+    <button data-set="role" data-val="ai" aria-pressed="false">AI Rewrite</button>
+  </div>
+  <div class="grp"><span>State</span>
+    <button data-set="state" data-val="empty" aria-pressed="false">Empty</button>
+    <button data-set="state" data-val="testing" aria-pressed="false">Testing</button>
+    <button data-set="state" data-val="ok" aria-pressed="true">Works</button>
+    <button data-set="state" data-val="noanswer" aria-pressed="false">No answer</button>
+    <button data-set="state" data-val="path" aria-pressed="false">Wrong path</button>
+    <button data-set="state" data-val="key" aria-pressed="false">Needs a key</button>
+    <button data-set="state" data-val="nomodel" aria-pressed="false">No model</button>
+    <button data-set="state" data-val="nostt" aria-pressed="false">No transcription</button>
+    <button data-set="state" data-val="audio" aria-pressed="false">Audio refused</button>
+  </div>
+  <div class="grp"><span>Address</span>
+    <button data-set="where" data-val="mac" aria-pressed="true">This Mac</button>
+    <button data-set="where" data-val="lan" aria-pressed="false">Network, HTTP</button>
+    <button data-set="where" data-val="lankey" aria-pressed="false">Network, HTTP + key</button>
+    <button data-set="where" data-val="web" aria-pressed="false">Internet, HTTPS</button>
+  </div>
+  <div class="grp"><span>Languages I speak</span>
+    <button data-set="spoken" data-val="one" aria-pressed="false">Ukrainian</button>
+    <button data-set="spoken" data-val="many" aria-pressed="true">Ukrainian, English</button>
+  </div>
+  <div class="grp"><span>Other role</span>
+    <button data-set="other" data-val="none" aria-pressed="false">Not set</button>
+    <button data-set="other" data-val="set" aria-pressed="true">Set up already</button>
+  </div>
+</div>
+
+<main class="doc">
+  <h1>Your own model server</h1>
+  <p class="lead">A third place beside <i>On this Mac</i> and <i>Online service</i>: a model the user already runs, on this Mac or elsewhere, reached at an address they write. Speech to text and AI Rewrite each have their own address, key and model. The review bar switches the role, the state the test request ends in, what kind of address it is, and the user's languages. The same form is drawn in Settings and in setup.</p>
+
+  <div class="section-title">Settings</div>
+  <p class="section-note">Picking the card shows the form under it; nothing is used until a test has passed once, so a half-typed address never takes over dictation. The card says <i>In use</i> like the others.</p>
+  <div class="stage">
+    <div class="window" aria-label="Settings">
+      <aside class="sidebar">
+        <div class="traffic"><i></i><i></i><i></i></div>
+        <div class="side-item"><span class="well">⚙︎</span>General</div>
+        <div class="side-item"><span class="well">◐</span>Appearance</div>
+        <div class="side-gap"></div>
+        <div class="side-item"><span class="well">⌨︎</span>Dictation</div>
+        <div class="side-item" id="side-speech"><span class="well">◉</span>Speech to text</div>
+        <div class="side-item" id="side-ai"><span class="well">✦</span>AI Rewrite</div>
+        <div class="side-gap"></div>
+        <div class="side-item"><span class="well">⛉</span>Privacy &amp; Data</div>
+        <div class="side-item"><span class="well">⚿</span>API Keys</div>
+      </aside>
+      <section class="page">
+        <h2 id="settings-title"></h2>
+        <div class="place-cards" id="settings-places"></div>
+        <div class="group-head"><span>Your server</span><span>Any server that speaks the OpenAI API</span></div>
+        <div class="group" id="settings-form"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="section-title">Setup</div>
+  <p class="section-note">The speech step and the AI step get the same third card. <i>Continue</i> waits for a passed test; <i>Skip for now</i> stays on the AI step as today. The key field appears only once the server asks for one.</p>
+  <div class="stage">
+    <div class="setup" id="setup" aria-label="Setup">
+      <div class="traffic"><i></i><i></i><i></i></div>
+      <div class="steps" id="setup-steps"></div>
+      <h3 id="setup-title"></h3>
+      <p class="lead" id="setup-lead"></p>
+      <div class="place-cards" id="setup-places"></div>
+      <div class="group" id="setup-form"></div>
+      <div class="foot"><span class="skip" id="setup-skip"></span><button class="btn primary" id="setup-continue">Continue</button></div>
+    </div>
+  </div>
+
+  <div class="section-title">Where else it shows</div>
+  <p class="section-note">No price, ever: it may be free on this Mac or a paid GPU somewhere else. A server that does not answer is a failed dictation retried by hand, not an offline one.</p>
+  <div class="stage">
+    <div class="mini">
+      <div class="group-head"><span>History › a dictation</span></div>
+      <div class="group">
+        <div class="kv"><span>Speech to text</span><span>Your server · whisper-large-v3-turbo</span></div>
+        <div class="kv"><span>AI Rewrite</span><span>Your server · gemma4:12b</span></div>
+        <div class="kv"><span style="color:var(--bad)">Not transcribed</span><span>Your server didn't answer. <a style="color:var(--accent)">Retry</a></span></div>
+      </div>
+      <div class="group-head" style="margin-top:12px"><span>Usage</span></div>
+      <div class="group">
+        <div class="kv"><span>Your server · gemma4:12b</span><span>38 rewrites · Not priced</span></div>
+      </div>
+      <div class="group-head" style="margin-top:12px"><span>Privacy &amp; Data › What leaves this Mac</span></div>
+      <div class="group">
+        <div class="kv"><span>Your server</span><span id="privacy-line"></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="alert" aria-label="macOS Local Network prompt">
+        <div class="icon">ST</div>
+        <b>“SpeechText” would like to find and connect to devices on your local network.</b>
+        <p>SpeechText connects to the model server you entered in Settings.</p>
+        <div class="btns"><button class="btn">Don't Allow</button><button class="btn primary">Allow</button></div>
+      </div>
+      <p class="section-note" style="max-width:300px;margin-top:10px">macOS's own prompt, shown once, the first time the address is on another machine of the network. The second line is ours (<code>NSLocalNetworkUsageDescription</code>). This Mac's own address never asks.</p>
+    </div>
+  </div>
+
+  <div class="section-title">The rules</div>
+  <ul class="rules">
+    <li><b>Third place, not a service in a list.</b> It is neither built in nor a company with an account, and where the words go is the user's to say, so it gets its own card with its own sentence about privacy.</li>
+    <li><b>Presets fill the address, never more.</b> Ollama, LM Studio, llama.cpp and Speaches are shortcuts to their documented default address; the user still tests. A preset for a server that cannot do the role is not shown (LM Studio under Speech to text).</li>
+    <li><b>Say where it goes.</b> Under the address: <i>This Mac</i>, <i>Your network</i> or <i>The internet</i>, read off the address. Plain HTTP anywhere but this Mac gets a warning, and a key typed for it a second one.</li>
+    <li><b>Every failure in words, with the next step.</b> The test sends a fixed sentence or a one-second silent WAV, never the user's words, and its result line stays until the address or model changes.</li>
+    <li><b>The model comes from the server.</b> A picker of what <code>/v1/models</code> lists; a text field only when it lists nothing.</li>
+    <li><b>The other role's address is offered</b>, once, above an empty address field; it is not copied silently.</li>
+    <li><b>More than one language</b>: none is sent (as for every engine), and the speech form says that some servers then assume English.</li>
+  </ul>
+</main>
+
+<script>
+const S = { role:"speech", state:"ok", where:"mac", spoken:"many", other:"set" };
+const $ = s => document.querySelector(s);
+
+const ADDR = {
+  mac:    { url:"http://localhost:11434/v1", kind:"This Mac.", warn:"" },
+  lan:    { url:"http://studio.local:11434/v1", kind:"Your network.", warn:"Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it." },
+  lankey: { url:"http://192.168.1.20:8000/v1", kind:"Your network.", warn:"Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it." },
+  web:    { url:"https://models.example.net/v1", kind:"The internet. Your words leave your network.", warn:"" },
+};
+const PRESETS = {
+  speech: [["Ollama", "localhost:11434"], ["Speaches", "localhost:8000"], ["llama.cpp", "localhost:9931"]],
+  ai:     [["Ollama", "localhost:11434"], ["LM Studio", "localhost:1234"], ["llama.cpp", "localhost:9931"]],
+};
+const MODELS = { speech:"whisper-large-v3-turbo", ai:"gemma4:12b" };
+
+function form(compact) {
+  const a = ADDR[S.where], st = S.state, speech = S.role === "speech";
+  if (st === "nostt" && !speech) S.state = "ok";
+  const empty = st === "empty";
+  const keyShown = st === "key" || S.where === "lankey" || S.where === "web";
+  let out = "";
+  if (empty && S.other === "set") {
+    out += `<div class="offer">Use the ${speech ? "AI Rewrite" : "speech"} server's address? <code>http://localhost:11434/v1</code><button class="btn">Use</button></div>`;
+  }
+  out += `<div class="form">`;
+  out += `<label>Address</label><div>
+    <div class="field ${empty ? "placeholder" : ""}">${empty ? "http://localhost:11434/v1" : a.url}</div>
+    ${empty ? `<div class="presets">${PRESETS[S.role].map(([n, h]) => `<span class="preset"><b>${n}</b> ${h}</span>`).join("")}</div>`
+      : `<div class="under">${a.kind}</div>${a.warn ? `<div class="under warn">⚠︎ ${a.warn}</div>` : ""}`}
+  </div>`;
+  if (keyShown) {
+    const typed = S.where === "lankey" || S.where === "web";
+    out += `<label>Key</label><div>
+      <div class="field ${st === "key" && !typed ? "ask placeholder" : ""}">${typed ? "••••••••••••••••" : "Paste the server's key"}</div>
+      ${st === "key" ? `<div class="under">The server asked for a key.</div>` : ""}
+      ${S.where === "lankey" ? `<div class="under warn">⚠︎ This key is sent in plain text.</div>` : ""}
+    </div>`;
+  }
+  const modelKnown = ["ok", "audio"].includes(st) || (st === "testing" && !empty);
+  out += `<label>Model</label><div>`;
+  if (st === "nomodel") {
+    out += `<div class="field placeholder">Model ID</div><div class="under">The server lists no models. Load one in it, or type its ID.</div>`;
+  } else {
+    out += `<div class="field ${modelKnown ? "" : "placeholder"}"><span>${modelKnown ? MODELS[S.role] : "Test the server to see its models"}</span><span class="chev">⌄</span></div>`;
+  }
+  out += `</div>`;
+  const line = {
+    empty:    "",
+    testing:  `<span class="line"><span class="spin"></span>Testing…</span>`,
+    ok:       speech ? `<span class="line ok">✓ Transcribed a test clip in 0.6 s.</span>` : `<span class="line ok">✓ Answered in 1.4 s.</span>`,
+    noanswer: `<span class="line bad">Nothing answered at this address. Is the server running?</span>`,
+    path:     `<span class="line bad">The server answered, but not at this path. Most addresses end in /v1.</span>`,
+    key:      `<span class="line bad">The server refused the request without a key.</span>`,
+    nomodel:  `<span class="line bad">No model to test with.</span>`,
+    nostt:    `<span class="line bad">This server doesn't transcribe audio. Use it for AI Rewrite, or pick another server.</span>`,
+    audio:    `<span class="line bad">The server refused the test recording. It may not take this model, or WAV.</span>`,
+  }[S.state];
+  out += `<label></label><div class="test"><button class="btn" ${empty ? "disabled" : ""}>Test</button>${line}</div>`;
+  if (speech && S.spoken === "many" && !empty) {
+    out += `<label></label><div class="under">You speak more than one language, so none is sent and the server detects it. Some servers, such as whisper.cpp, assume English instead.</div>`;
+  }
+  out += `</div>`;
+  return out;
+}
+
+function places(setup) {
+  const speech = S.role === "speech";
+  const inUse = S.state === "ok" && !setup ? `<span class="badge inuse">In use</span>` : "";
+  const mac = speech ? "Private and free. Your voice stays on your Mac, and works offline." : "Private and free. Your text stays on your Mac, and works offline.";
+  const online = speech ? "Works on any Mac. Needs internet and an account; your recording is sent to the service." : "Fast on any Mac. Needs internet and an account; your text is sent to the service.";
+  const server = speech ? "A model you already run, here or on your network. Your recording goes to the address you enter." : "A model you already run, here or on your network. Your text goes to the address you enter.";
+  return `
+    <div class="place"><b><span class="glyph">⌘</span>On this Mac</b>${mac}</div>
+    <div class="place"><b><span class="glyph">☁︎</span>Online service</b>${online}</div>
+    <div class="place on"><b><span class="glyph">⇄</span>Your server${inUse}</b>${server}</div>`;
+}
+
+function render() {
+  const speech = S.role === "speech";
+  document.querySelector('[data-set="state"][data-val="nostt"]').disabled = !speech;
+  $("#side-speech").classList.toggle("on", speech);
+  $("#side-ai").classList.toggle("on", !speech);
+  $("#settings-title").textContent = speech ? "Speech to text" : "AI Rewrite";
+  $("#settings-places").innerHTML = places(false);
+  $("#settings-form").innerHTML = form(false);
+
+  $("#setup").classList.toggle("ai", !speech);
+  $("#setup-steps").innerHTML = ["Welcome", "Speech", "AI", "Permissions", "Try it"]
+    .map((n, i) => `<span class="${(speech ? 1 : 2) === i ? "on" : ""}">${i + 1} ${n}</span>`).join("<span>·</span>");
+  $("#setup-title").textContent = speech ? "Where should your speech become text?" : "Want AI to tidy up your text?";
+  $("#setup-lead").textContent = speech ? "On this Mac, online, or a server you run — you can change it later." : "Optional. On this Mac, online, or a server you run.";
+  $("#setup-places").innerHTML = places(true);
+  $("#setup-form").innerHTML = form(true);
+  $("#setup-skip").textContent = speech ? "" : "You can turn this on later in Settings.";
+  $("#setup-continue").disabled = S.state !== "ok";
+
+  $("#privacy-line").textContent = `${speech ? "Audio" : "Text"} goes to ${ADDR[S.where].url}, and nowhere else.`;
+}
+
+function sync(k, v) { document.querySelectorAll(`[data-set="${k}"]`).forEach(x => x.setAttribute("aria-pressed", x.dataset.val === v)); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-set]");
+  if (!b || b.disabled) return;
+  const k = b.dataset.set, v = b.dataset.val;
+  if (k === "theme") document.documentElement.dataset.theme = v; else S[k] = v;
+  if (k === "role" && v === "ai" && S.state === "nostt") { S.state = "ok"; sync("state", "ok"); }
+  sync(k, v); render();
+});
+render();
+</script>
+</body>
+</html>
