@@ -1,6 +1,6 @@
 # SPEC: Your own model server
 
-- **Status:** Draft for the owner, 2026-11-07. The questions in *For the owner* come first; no code before they are answered.
+- **Status:** The owner answered the four questions on 2026-11-07 (*Decided by the owner*); next is design (#189).
 - **Date:** 2026-11-07
 - **Issues:** #188 (this spec), part of #185 *Your own model server*; design #189, build #190, test #191, ship #192
 - **Base revision:** `8288ec5`
@@ -50,18 +50,18 @@ Reasoning, where a server separates it, comes back in `reasoning` (Ollama, vLLM,
 Three things follow from it:
 
 1. **AI Rewrite works with nearly any of them**; dictation with a few. The Settings row for speech says so, and the test request (below) tells the user before a dictation does.
-2. **Dictation through a server is an upload tier.** No server here serves OpenAI's realtime WebSocket, so there is no live text on the overlay. The audio file is written as for every engine; a failed request goes to History to retry, like any upload.
+2. **Dictation through a server is an upload tier.** The servers that stream (llama.cpp, vLLM, Speaches, mlx-audio) each speak their own variant of OpenAI's realtime events, and the realtime tier is out of scope here, so there is no live text on the overlay. The audio file is written as for every engine; a failed request goes to History to retry, like any upload.
 3. **Ollama takes only WAV**, and uploads are FLAC (`AudioBufferWriter`). So this provider sends WAV (P8). Everything above that transcribes reads WAV.
 4. **`language` matters more than in the cloud.** whisper.cpp transcribes in English when none is sent. With two or more "Languages I speak", the app sends none (docs/decisions.md › A language is forced only when the user names exactly one), so the model detects — or, on whisper.cpp, does not. The Settings row says so for a user with more than one language; the app does not start guessing.
 5. **`response_format: json` is always sent**: mlx-audio answers NDJSON without it, llama.cpp answers only JSON.
 
 ## Decisions proposed
 
-- **P1 — One provider, both roles.** `Provider.server`, `STTProviderType.server`, `LLMProviderType.server`, raw value `"server"` (stored in `sttProvider`, `llmProvider` and History's ledger, so it is a name we keep). Display name "Your server".
+- **P1 — One provider, both roles, an address for each.** `Provider.server`, `STTProviderType.server`, `LLMProviderType.server`, raw value `"server"` (stored in `sttProvider`, `llmProvider` and History's ledger, so it is a name we keep). Display name "Your server". Speech and AI Rewrite each have their own address, key and model (D1), because chat and transcription often run in different servers or on different ports; the speech address starts as a copy of the chat one, and the other way round, whichever is set first.
 - **P2 — The address is the base, as the servers document it** (`http://localhost:11434/v1`). The app appends `/chat/completions`, `/audio/transcriptions` and `/models`. A trailing slash and a missing `/v1` are not guessed at: the test request says what went wrong.
 - **P3 — The model comes from `GET /v1/models`**, refreshed when the Settings row opens and by the test button; a text field takes an ID when the server lists none. Nothing is pinned: there is no default (`ModelSetting.normalized = false`, as Ollama had), and an empty choice is the "must pick" notice that exists already.
-- **P4 — The most cautious request.** Chat: the `classic` dialect (`max_tokens`, `temperature`), which every server in the table accepts — *to confirm in the test stage on each*; no `reasoning_effort`, no reasoning switch. Speech: `model`, `file`, `language` when one language is named, `response_format: json`; **no Dictionary field** (a new `VocabularyField.none`), since an unknown server may reject `prompt` or echo it on silence. The Dictionary still corrects the final text, as for every engine.
-- **P5 — The key is optional** and kept in the keychain like the others (`APIKeyStore`). With no key, no `Authorization` header is sent.
+- **P4 — The most cautious request.** Chat: the `classic` dialect (`max_tokens`, `temperature`), which every server in the table accepts — *to confirm in the test stage on each*; no `reasoning_effort`, no reasoning switch. Speech: `model`, `file`, `language` when one language is named, `response_format: json`, and the Dictionary as Whisper's free-text `prompt` (`VocabularyField.prompt`, `RecordingConfiguration.whisperPrompt`, as Groq has it; D3). Two servers treat `prompt` differently, and the test stage measures both: llama.cpp puts it *in place of* the model's own instruction, and Ollama uses it only for models without speech instructions. A server where the corpus shows it hurting (an instruction lost, the prompt echoed on silence) gets it left out, written down in the table with the measurement. The Dictionary also corrects the final text, as for every engine.
+- **P5 — Each key is optional** and kept in the keychain like the others (`APIKeyStore`), one per role. With no key, no `Authorization` header is sent.
 - **P6 — Usage shows it as "Your server", not priced** (`.notPriced`), never ≈ a list price. It may be free on this Mac or a paid GPU elsewhere; we cannot know.
 - **P7 — A test request in Settings.** One chat request with a fixed short text, and one transcription of a bundled one-second WAV of silence. It reports, in words: cannot connect, the path answered 404 (the address probably lacks `/v1`), the key was refused (401 or 403), the model is not loaded, the audio was refused, or the time it took. It sends nothing of the user's.
 - **P8 — WAV, 16 kHz mono, for this provider.** The FLAC that cloud uploads use was chosen to halve the bytes against a 25 MB ceiling; a server on this Mac or the local network has no such ceiling, and Ollama refuses FLAC. A FLAC archived in History is converted before a retry to this provider.
@@ -83,8 +83,8 @@ This is the first provider whose destination the user writes. Text and audio go 
 
 ## Surfaces
 
-- **Settings › AI Rewrite and › Speech:** "Your server" in the provider picker; under it the address, the key, the model and the test button. The address and key are shared by both roles if P1's question is answered *one address* (below).
-- **Setup:** no card. Someone who runs a server finds it in Settings; setup's first run stays three choices.
+- **Settings › AI Rewrite and › Speech:** "Your server" in the provider picker; under it the address, the key, the model and the test button, each role its own (P1).
+- **Setup:** a "Your server" card on the speech step and on the AI step (D4), beside the others: the address, the model once the server answers, and the test request; the key only when the server asks for one (401 or 403). The AI step's card offers the speech step's address, and the other way round.
 - **Edit selection** goes through the same chat client and gets the server for free.
 - **Usage and Home's Engines:** "Your server", the model ID as the server named it.
 - **History:** the provider name; retry works as for any upload.
@@ -96,15 +96,16 @@ This is the first provider whose destination the user writes. Text and audio go 
 - Each server in the table that serves the role, run on this Mac: one AI dictation and one Edit selection through the app, one plain dictation where speech is served.
 - A cold first request and a warm one, timed, beside the built-in path.
 - A WAV upload to each speech server, and a retry from History of a dictation archived as FLAC.
+- The Dictionary as `prompt` on each speech server, with and without, on the audio corpus (docs/audio-corpus.md), silence clips included: the word error rate, the Dictionary's terms spelled right, and whether the prompt comes back on silence (D3).
 - A server on another machine on the local network: the Local Network prompt, then a dictation.
 - Offline: the server stopped mid-dictation goes to History and retries once it is back.
 
-## For the owner
+## Decided by the owner (2026-11-07)
 
-1. **One address, or one per role?** People often run chat in Ollama or LM Studio and speech in a separate transcription server, on another port. *Proposed:* one per role, the second prefilled from the first.
-2. **WAV for this provider (P8)?** It is twice the bytes of FLAC, which matters only over a slow link to a server elsewhere. *Proposed:* yes, because Ollama, the most installed of them, takes nothing else.
-3. **The Dictionary to a server?** *Proposed:* off (P4). A later switch, once a server has been measured on the corpus with `prompt`.
-4. **Setup card?** *Proposed:* none (Surfaces).
+- **D1 — An address for each role.** Speech and AI Rewrite each have their own address, key and model (P1).
+- **D2 — WAV for this provider** (P8).
+- **D3 — The Dictionary goes to the server**, as `prompt`, unless the test stage measures it hurting on a server (P4).
+- **D4 — Setup has a card** for it, on the speech step and the AI step (Surfaces).
 
 ## Sources
 
