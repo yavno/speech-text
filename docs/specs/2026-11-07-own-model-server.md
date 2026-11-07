@@ -64,7 +64,7 @@ Three things follow from it:
 - **P5 — Each key is optional** and kept in the keychain like the others (`APIKeyStore`), one per role. With no key, no `Authorization` header is sent.
 - **P6 — Usage shows it as "Your server", not priced** (`.notPriced`), never ≈ a list price. It may be free on this Mac or a paid GPU elsewhere; we cannot know.
 - **P7 — A test request in Settings.** One chat request with a fixed short text, and one transcription of a bundled one-second WAV of silence. It reports, in words: cannot connect, the path answered 404 (the address probably lacks `/v1`), the key was refused (401 or 403), the model is not loaded, the audio was refused, or the time it took. It sends nothing of the user's.
-- **P8 — WAV, 16 kHz mono, for this provider.** The FLAC that cloud uploads use was chosen to halve the bytes against a 25 MB ceiling; a server on this Mac or the local network has no such ceiling, and Ollama refuses FLAC. A FLAC archived in History is converted before a retry to this provider.
+- **P8 — WAV, 16 kHz mono, for this provider.** The FLAC that cloud uploads use was chosen to halve the bytes against a 25 MB ceiling; a server on this Mac or the local network has no such ceiling, and Ollama refuses FLAC. A FLAC archived in History is converted before a retry to this provider. One limit does apply: vLLM refuses audio over 25 MB by default (`VLLM_MAX_AUDIO_CLIP_FILESIZE_MB`), which 16 kHz mono WAV reaches at about 13 minutes; its error says so and names the setting.
 - **P9 — Nothing else changes for a dictation.** It goes through `BatchRecognitionSession` like Groq, so the engine, History, retry and offline handling need no new branch beyond P8's format. `batchUnavailableReason` gains "Set your server's address in Settings."
 
 ## Privacy
@@ -72,12 +72,12 @@ Three things follow from it:
 This is the first provider whose destination the user writes. Text and audio go wherever the address points, which can be off this Mac, and over plain `http://`. So:
 
 - `docs/privacy.md` and Privacy & Data › What leaves this Mac say: "Your server: audio and text go to the address you entered, and nowhere else."
-- Settings shows, under the address, whether it is this Mac (loopback), your local network (a private range or `.local`) or the internet, read off the address. Plain `http://` to the internet gets a warning; it is not refused.
+- Settings shows, under the address, whether it is this Mac (loopback), your local network (a private range or `.local`) or the internet, read off the address. Plain `http://` to anything but this Mac gets a warning — anyone on the same network can read what is sent, the key included — and a key typed for such an address says so beside the field. It is not refused: a home server without TLS is the common case, and the choice is the user's.
 - The log records the address's kind (loopback, network, internet), never the address itself: a host name can name a person's machine.
 
 ## Networking
 
-- **App Transport Security** does not apply to `localhost`, IP addresses or `.local` names, which is how Ollama worked here without an exception (`Info.plist` has never had one). Plain `http://` to a full domain name is blocked. Proposed: no exception; such a server needs `https://`, and the test request says so.
+- **App Transport Security.** Plain `http://localhost` worked in this app without an exception while it talked to Ollama (`Info.plist` has never had one). Plain `http://` to a full domain name is blocked; such a server needs `https://`, and the test request says so. Whether ATS lets plain `http://` through to an IP address (`127.0.0.1`, `192.168.…`) or a `.local` name on macOS 14 and later is *not verified*: Apple's pages disagree across versions. The build stage tries each from the signed app (the hardened runtime, as `scripts/rebuild.sh` signs it); if any is blocked, `NSAllowsLocalNetworking` is the narrow exception for exactly these, and nothing wider is added.
 - **Local Network privacy.** A server elsewhere on the local network makes macOS ask once for Local Network access, and the prompt needs `NSLocalNetworkUsageDescription` (in `Info.plist` and, as its English source, `InfoPlist.xcstrings`; `scripts/check-infoplist-strings.sh`). Loopback does not ask. Wording proposed: "SpeechText connects to the model server you entered in Settings."
 - **Timeouts.** A local server loads its model on the first request; Ollama's first request after its idle unload can take tens of seconds. The chat session's request timeout is 90 s and the upload's is `STTTuning.batchRequestTimeoutSeconds`; the test stage measures a cold first request on each server before deciding whether that is enough.
 
@@ -96,9 +96,10 @@ This is the first provider whose destination the user writes. Text and audio go 
 - Each server in the table that serves the role, run on this Mac: one AI dictation and one Edit selection through the app, one plain dictation where speech is served.
 - A cold first request and a warm one, timed, beside the built-in path.
 - A WAV upload to each speech server, and a retry from History of a dictation archived as FLAC.
+- An upload over 25 MB to vLLM: the error names its limit.
 - The Dictionary as `prompt` on each speech server, with and without, on the audio corpus (docs/audio-corpus.md), silence clips included: the word error rate, the Dictionary's terms spelled right, and whether the prompt comes back on silence (D3).
 - A server on another machine on the local network: the Local Network prompt, then a dictation.
-- Offline: the server stopped mid-dictation goes to History and retries once it is back.
+- A stopped server: the dictation goes to History as failed, "Your server didn't answer", and is retried by hand. It is not queued as offline: `OfflineRetry` waits for the Mac's network to come back, and a server restarting is not a network change.
 
 ## Decided by the owner (2026-11-07)
 
