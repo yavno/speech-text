@@ -209,6 +209,22 @@ moves the work:
 | Tests | `self-hosted` | `xcode-27` | `xcodebuild test`, the String Catalogs check (`scripts/sync-strings.sh --check`, the app's and SpeechTextCore's) and the evaluation tool's build, a compiler warning in our code an error — one of the two jobs that need a Mac, with Swift lint |
 | Swift lint | `self-hosted` | `xcode-27` | `scripts/lint-swift.sh` — swift-format's semantic rules (not layout) on the lines a pull request adds or changes; needs Xcode's `swift-format` |
 | Checks | `self-hosted` | `ubuntu-latest` | the checks below, one step each |
+| Changes | `self-hosted` | `ubuntu-latest` | `scripts/ci-changes.sh` — whether this change needs Tests and Swift lint |
+
+**Tests and Swift lint run only when the change needs them.** A pull request that touches
+nothing but Markdown, `docs/`, the agent skills (`.claude/`, `.agents/`), the issue and
+discussion templates or `.coderabbit.yaml` skips Tests, and Swift lint runs only when a
+Swift file, `.swift-format`, the lint script or the gating itself changed. The list in
+`scripts/ci-changes.sh` is of what may be skipped, so a path it does not name runs the
+job. A pull request is read against its merge base, a push to `main` against the commit
+before it. Checks always runs: it is seconds on Linux, and its steps read the docs.
+
+Each job is gated by its own `if`, never by `paths-ignore` on the workflow: the ruleset
+requires Tests and Swift lint, a workflow that never starts reports neither, and the
+pull request would wait on them forever, while a skipped job reports a check the ruleset
+accepts. Changes is not a required check, so it fails toward running: Tests and Swift
+lint run whenever it did not succeed, and a broken Changes job never turns into a green
+skip.
 
 The hosted Mac is GitHub's `xcode-27` image (macOS 27, Xcode 27.1 by default;
 still a preview, actions/runner-images#14404), not `macos-latest`: on 2026-10-29
@@ -249,7 +265,7 @@ someone's Mac.
 
 **The ruleset on `main` is the gate.** *Safe merge* takes changes only as
 squash-merged pull requests, with no approving review required, and refuses a merge while
-Tests, Swift lint or Checks is red; it also refuses force-pushes and deleting the
+Tests, Swift lint or Checks is red (skipped counts as passed); it also refuses force-pushes and deleting the
 branch. Organization admins can bypass it, which is how the maintainer merges his
 own pull requests. *DCO sign-off* and *Base branch* are steps of Checks, so they
 block a merge too; a red Package run is "do not merge" by agreement.
