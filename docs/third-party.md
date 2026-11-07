@@ -12,7 +12,8 @@ Local speech models are third-party weights, downloaded when you choose one. Whi
 
 - Parakeet v3 is [NVIDIA's `parakeet-tdt-0.6b-v3`](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3);
 - Parakeet Ultra and Parakeet Redux are moondream's [`parakeet-ultra`](https://huggingface.co/moondream/parakeet-ultra) and [`parakeet-redux`](https://huggingface.co/moondream/parakeet-redux);
-- Phonon-2 is Fermion Research's [`Phonon-2`](https://huggingface.co/FermionResearch/Phonon-2).
+- Phonon-2 is Fermion Research's [`Phonon-2`](https://huggingface.co/FermionResearch/Phonon-2);
+- Bark 3.0 and Bark 3.0 Clean are Conway Research's [`Underdog-Bark-3.0`](https://huggingface.co/ConwayResearch/Underdog-Bark-3.0) and [`Underdog-Bark-3.0-Clean`](https://huggingface.co/ConwayResearch/Underdog-Bark-3.0-Clean), in [FluidInference's Core ML build](https://huggingface.co/FluidInference/bark-3.0-coreml); their notice is in the acknowledgements too.
 
 ## License details
 

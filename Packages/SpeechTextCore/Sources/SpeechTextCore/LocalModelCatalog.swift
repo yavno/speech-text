@@ -55,8 +55,8 @@ public struct LocalSTTModel: Identifiable, Hashable, Sendable {
     /// the other, so this file stays free of the framework.
     public var parakeetVersion: ParakeetVersion? = nil
     /// The oldest macOS (major version) the model runs on — what Apple calls a *minimum
-    /// system version*. A property of the Mac, not of the vendor: Parakeet Redux and
-    /// Phonon-2 compress their encoders with Core ML ops macOS 14 does not have, and
+    /// system version*. A property of the Mac, not of the vendor: Parakeet Redux, Phonon-2
+    /// and Bark compress their encoders with Core ML ops macOS 14 does not have, and
     /// FluidAudio refuses them there before downloading anything. A model above the
     /// running macOS is not offered (`isOffered(on:)`).
     var minimumSystemVersion = 14
@@ -85,7 +85,7 @@ public struct LocalSTTModel: Identifiable, Hashable, Sendable {
     }
 }
 
-/// The Parakeet TDT 0.6B v3 family FluidAudio runs: v3 itself and three re-trainings of
+/// The Parakeet TDT 0.6B v3 family FluidAudio runs: v3 itself and five re-trainings of
 /// it with the same tokenizer, window and decoder contract, so one runtime runs them all.
 /// Named as FluidAudio names them (`AsrModelVersion`).
 public enum ParakeetVersion: Hashable, Sendable {
@@ -98,6 +98,11 @@ public enum ParakeetVersion: Hashable, Sendable {
     case redux
     /// Fermion Research's quantisation-aware re-training of v3, English only.
     case phonon2
+    /// Conway Research's Underdog Bark 3.0, a post-training of v3 (through moondream's
+    /// Ultra), English only and verbatim — it keeps "um", "uh" and repeats.
+    case bark3
+    /// Underdog Bark 3.0 Clean: Bark 3.0 trained to drop fillers, false starts and repeats.
+    case bark3Clean
 }
 
 /// The local models a Mac is offered, in catalogue order.
@@ -177,6 +182,43 @@ public let localSTTModels: [LocalSTTModel] = [
         summary: "NVIDIA's Parakeet. On our test it matched the best cloud engine word for word, in a third of a second — and it is smaller than Turbo.",
         languages: parakeetV3Languages, languageNotes: [:],
         parakeetVersion: .v3
+    ),
+    // Underdog Bark 3.0 and Bark 3.0 Clean are candidates (#43): offered in Settings on
+    // macOS 15+, in no tier's picks. The one person they could be picked for speaks English
+    // alone and is recommended Phonon-2, which they tied on the corpus (M1 Pro, three English
+    // clips; 2026-10-26, and again on FluidAudio 0.18.2 on 2026-11-07): Bark 3.0 had Phonon-2's
+    // WER on every English clip, Clean too but for the fillers it drops by design, and both
+    // loaded first in 95–98 s against Phonon-2's 94 s. Their IDs are the folders FluidAudio
+    // caches `Repo.bark3` / `.bark3Clean` in.
+    LocalSTTModel(
+        id: "bark-3.0-clean",
+        engine: .parakeet,
+        displayName: "Bark 3.0 Clean",
+        // Measured from an install on 2026-11-07: the four bundles and the vocabulary.
+        downloadBytes: 447_420_083,
+        memoryFloorBytes: 8 * gigabyte,
+        summary: "Underdog's Bark 3.0, trained to leave out fillers, false starts and repeated words. As accurate as Phonon-2 on our recordings, and it drops a sentence's opening \"So\" with the fillers.",
+        // English only, as the model card says (`language: [en]`).
+        languages: parakeetLanguages(repository: "FluidInference/bark-3.0-coreml", codes: ["en"],
+                                     checked: ModelRetirement.day(2026, 11, 7)),
+        languageNotes: ["en": LanguageNote(text: localized("Once wrote \"Yeah.\" for a cough."),
+                                           measured: "audio corpus, 2026-10-26 and 2026-11-07, M1 Pro: noise-breath-cough on the MacBook microphone, every pass")],
+        parakeetVersion: .bark3Clean,
+        minimumSystemVersion: 15
+    ),
+    LocalSTTModel(
+        id: "bark-3.0",
+        engine: .parakeet,
+        displayName: "Bark 3.0",
+        // Measured from an install on 2026-11-07, as Clean was.
+        downloadBytes: 436_436_886,
+        memoryFloorBytes: 8 * gigabyte,
+        summary: "Underdog's Bark 3.0, a Parakeet v3 trained further, writing down every word as said. As accurate as Phonon-2 on our recordings, on a small sample.",
+        languages: parakeetLanguages(repository: "FluidInference/bark-3.0-coreml", codes: ["en"],
+                                     checked: ModelRetirement.day(2026, 11, 7)),
+        languageNotes: [:],
+        parakeetVersion: .bark3,
+        minimumSystemVersion: 15
     ),
     LocalSTTModel(
         id: "phonon-2",
@@ -514,7 +556,9 @@ public func localModelFolder(for modelID: String) -> URL {
 /// test calls installed, and the first dictation then fails on a missing decoder
 /// instead of the model simply not being there. Ultra, Redux and Phonon-2 install the
 /// same four names (seen in real installs on 2026-10-16); Phonon-2's alternative encoders
-/// in its repo are not fetched.
+/// in its repo are not fetched. So do Bark 3.0 and Bark 3.0 Clean, from a folder each of
+/// one repo, their GPU encoder (`Encoder_lut3`) left behind (FluidAudio 0.18.2's file
+/// list, 2026-11-07).
 public let parakeetRequiredBundles = [
     "Preprocessor.mlmodelc", "Encoder.mlmodelc", "Decoder.mlmodelc", "JointDecisionv3.mlmodelc",
 ]
