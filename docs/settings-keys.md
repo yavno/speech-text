@@ -11,7 +11,7 @@ across a bundle-identifier rename.
 | `sttProvider` | STT backend (`"apple"`, `"groq"`, `"elevenlabs"`, `"openai"`, `"local"` — `local` covers both on-disk engines, chosen by `localSTTModel`) | `"apple"` |
 | `groqAPIKey` | Groq API key — like every `…APIKey`, held by `APIKeyStore`: the keychain in a build with the profile, UserDefaults otherwise; never in `portable` | empty |
 | `groqModel` | Groq Whisper model ID | `"whisper-large-v3-turbo"` |
-| `localSTTModel` | Model ID for the local engine — a WhisperKit variant or a Parakeet build (`parakeet-tdt-0.6b-v3`, `parakeet-ultra`, `parakeet-redux`, `phonon-2`), the catalogue entry's `engine` deciding which runtime gets it (an ID the catalogue does not know is cleared at launch) | `"parakeet-tdt-0.6b-v3"` |
+| `localSTTModel` | Model ID for the local engine — a WhisperKit variant or a Parakeet build (`parakeet-tdt-0.6b-v3`, `parakeet-ultra`, `parakeet-redux`, `phonon-2`, `bark-3.0`, `bark-3.0-clean`), the catalogue entry's `engine` deciding which runtime gets it (an ID the catalogue does not know is cleared at launch) | `"parakeet-tdt-0.6b-v3"` |
 | `elevenLabsAPIKey` / `elevenLabsModel` | ElevenLabs key and Scribe model (`scribe_v2`; `"scribe_v2_realtime"` streams) | empty / `"scribe_v2"` |
 | `openAISTTModel` | OpenAI transcription model (`"gpt-live-transcribe"` streams). Separate from `openAIModel`, the chat model; the two tiers share only `openAIAPIKey` | `"gpt-transcribe"` |
 | `removeDisfluencies` | Clean hesitation sounds, stretched letters and trailing `...` out of transcripts | `true` |
