@@ -11,7 +11,7 @@ in, is not linked into the app and is not listed.
 WhisperKit
 ==========
 
-argmax-oss-swift 1.1.0 — https://github.com/argmaxinc/argmax-oss-swift
+argmax-oss-swift 1.1.1 — https://github.com/argmaxinc/argmax-oss-swift
 
 --- LICENSE ---
 
