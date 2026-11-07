@@ -6,7 +6,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, and a prompt without its contradictions and repeats: modes for the kind of text, modifiers for language, length, tone and format (both done). Then possibly two steps — a fast model picks the mode, the writing model gets only that mode.
+- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, and a prompt without its contradictions and repeats (both done): modes for the kind of text, modifiers for language, length, tone and format. Then possibly two steps — a fast model picks the mode, the writing model gets only that mode.
 
 ## Next
 
