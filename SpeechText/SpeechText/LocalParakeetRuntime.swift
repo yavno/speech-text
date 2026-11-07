@@ -23,7 +23,7 @@ import SpeechTextCore
 /// framework exists. That is what keeps the standalone test bundle building, and it
 /// means a third engine later is one more conforming type.
 ///
-/// One runtime runs the whole v3 family (`ParakeetVersion`): v3 and its three
+/// One runtime runs the whole v3 family (`ParakeetVersion`): v3 and its five
 /// re-trainings share the tokenizer, the 15 s window and the decoder contract, and differ
 /// only in their weights and which repo they come from.
 ///
@@ -31,7 +31,9 @@ import SpeechTextCore
 /// - v3: `FluidInference/parakeet-tdt-0.6b-v3-coreml`, from `nvidia/parakeet-tdt-0.6b-v3`;
 /// - Ultra: `FluidInference/parakeet-ultra-coreml`, from `moondream/parakeet-ultra`;
 /// - Redux: `FluidInference/parakeet-redux-coreml`, from `moondream/parakeet-redux`;
-/// - Phonon-2: `FluidInference/phonon-2-coreml`, from `FermionResearch/Phonon-2`.
+/// - Phonon-2: `FluidInference/phonon-2-coreml`, from `FermionResearch/Phonon-2`;
+/// - Bark 3.0 and Bark 3.0 Clean: the two folders of `FluidInference/bark-3.0-coreml`, from
+///   `ConwayResearch/Underdog-Bark-3.0` and `-Clean` (in ThirdPartyNotices too).
 struct ParakeetRuntime: LocalSTTRuntime {
     /// FluidAudio writes into `<parent of the directory you pass>/<its own folder name>`
     /// and hands back the path you gave it, so passing a folder named anything else
@@ -80,8 +82,8 @@ struct ParakeetRuntime: LocalSTTRuntime {
     /// a missing-file error. `.int8` is FluidAudio's default and is what was measured;
     /// `.int8V2` is a 577 MB rebuild that avoids a token-corruption bug
     /// (FluidInference/FluidAudio#760) we have not seen, and `.int4` a 298 MB one we have
-    /// not tested. It names a file for v3 only: Ultra, Redux and Phonon-2 each ship one encoder, which FluidAudio
-    /// fetches and opens whatever this says.
+    /// not tested. It names a file for v3 only: Ultra, Redux, Phonon-2 and Bark each ship one
+    /// encoder FluidAudio fetches and opens (`Encoder.mlmodelc`), whatever this says.
     fileprivate static let encoderPrecision: ParakeetEncoderPrecision = .int8
 
     /// Turns our stored language into Parakeet's hint, which on v3 filters the decoder's
@@ -137,6 +139,13 @@ struct ParakeetBuild {
             // The Neural Engine, never the GPU: there Phonon-2's sparse encoder is expanded
             // on every load (~150 s of CPU, FluidAudio measured), and Core ML never caches it.
             (version, repo, encoderComputeUnits) = (.phonon2, .phonon2, nil)
+        case .bark3:
+            // The Neural Engine, as for Phonon-2: Bark's encoder is the same kind of sparse
+            // palette, rebuilt on every GPU load (the repo's README). FluidAudio fetches only
+            // `Encoder.mlmodelc`, not the GPU's `Encoder_lut3`, and refuses Bark below macOS 15.
+            (version, repo, encoderComputeUnits) = (.bark3, .bark3, nil)
+        case .bark3Clean:
+            (version, repo, encoderComputeUnits) = (.bark3Clean, .bark3Clean, nil)
         }
     }
 }
