@@ -26,6 +26,8 @@ is translated as the sentence needs.
 - **Plurals:** a string with a count gets every form the language has. Spanish: *one*,
   *many*, *other*; Ukrainian: *one*, *few*, *many*, *other*. The English *one* form may
   leave the number out ("Used once"); a translation may too, where natural.
+- **Numbers** are written the app's language's way, whatever the Mac's region: 483,3 MB, $0,01 and 0,4 s in Spanish and Ukrainian. The code formats them (`numberLocale` in SpeechTextCore); a translation never rewrites a number.
+- **Numbers and units** stay on one line: a non-breaking space between a number and its unit (7 днів, 40 сл./хв, 19 GB), and a word joiner after the dash of a range (3–⁠19).
 - **Length:** buttons, chips, tabs and column headings have little room. Prefer the
   shorter of two equal wordings there. The comment says where a string appears.
 
@@ -41,10 +43,14 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | AI | IA |
 | AI mode | modo IA |
 | Edit (rewriting selected text by voice) | Editar; the feature: Edición |
+| Edit selection (the feature's name, on Home, in Usage, in the overlay; Edit Selection in the menu and the shortcut list) | Editar selección |
 | Hold to talk | Mantén para hablar |
+| Press to toggle | Pulsa para alternar (imperative, as Hold to talk) |
+| Apple Dictation · Apple on-device (speech models) | Dictado de Apple · Apple en el dispositivo |
 | double tap (a shortcut) | doble pulsación |
 | Record Window | Ventana de grabación |
 | Home · History · Usage · Prompts · Dictionary | Inicio · Historial · Uso · Prompts · Diccionario |
+| Notepad · Notetaker (pages) | Notas · Reuniones |
 | prompt | prompt (m.) |
 | When to use (a prompt's field) | Cuándo usarlo |
 | Instructions (a prompt's field) | Instrucciones |
@@ -78,20 +84,24 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 |---|---|
 | dictation (a recording turned into text) | диктування; counted: диктовка (1 диктовка, 3 диктовки, 5 диктовок) |
 | dictate | диктувати |
-| AI Rewrite | Переписування з ШІ |
+| AI Rewrite | ШІ‑переписування (ШІ‑переписуванню, ШІ‑переписуванням…), with a non-breaking hyphen (U+2011) so it never breaks at the hyphen; the History filter switch says ШІ |
 | AI | ШІ |
 | AI mode | режим ШІ |
 | Edit (rewriting selected text by voice) | Редагувати; the feature: Редагування |
-| Hold to talk | Утримуйте, щоб говорити |
+| Edit selection (the feature's name; Edit Selection in the menu and the shortcut list) | Редагування виділеного; the menu item: Редагувати виділене |
+| Hold to talk | Затисніть і говоріть; *hold* (the key) is затисніть everywhere, never утримуйте |
+| Recording (the state, a heading) | Запис |
+| Apple Dictation · Apple on-device (speech models) | Диктування Apple · Apple на пристрої |
 | double tap (a shortcut) | подвійне натискання |
 | Record Window | Вікно запису |
-| Home · History · Usage · Prompts · Dictionary | Головна · Історія · Використання · Промпти · Словник |
+| Home · History · Usage · Prompts · Dictionary | Головна · Історія · Облік · Промпти · Словник |
+| Notepad · Notetaker (pages) | Нотатник · Зустрічі |
 | prompt | промпт |
 | When to use (a prompt's field) | Коли використовувати |
 | Instructions (a prompt's field) | Інструкції |
 | Default (the default prompt) | Типовий |
 | Replacements | Заміни |
-| Settings (the app's window) | Налаштування |
+| Settings (the app's window) | Параметри, as macOS names an app's settings; *setup* stays налаштування |
 | Setup (the first-run window) | Початкове налаштування |
 | speech engine | рушій мовлення |
 | speech model | модель мовлення |
@@ -102,7 +112,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | transcription · transcribe | транскрипція · транскрибувати |
 | on this Mac | на цьому Mac |
 | skin · Techno · Minimal | оформлення · Techno · Minimal |
-| System Settings | Системні параметри |
+| System Settings | Системні параметри; a path after a preposition takes the locative: «у Системних параметрах › Звук» |
 | Privacy & Security | Приватність і безпека |
 | Keyboard · Dictation (macOS) | Клавіатура · Диктування |
 | Accessibility | Універсальний доступ |
@@ -110,3 +120,22 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Sound | Звук |
 | Login Items | Елементи входу |
 | menu bar · Dock · Control Center | смуга меню · Dock · Центр керування |
+
+## Adding a language
+
+A new language is not done when every string has a value. Before it is turned on:
+
+1. **Every window is looked at and compared with English.** Run
+   `scripts/window-snapshots.sh --languages "en <code>"` and go through every screen in
+   `index.html` beside its English: text cut off or clipped, a word broken across lines,
+   a button pushed out of its window, English left over, a sentence that reads wrong.
+   Write the assessment down in the pull request that turns the language on, screen by
+   screen, with what was fixed.
+2. **Every term is right and the same everywhere.** Each row of this glossary gets the
+   language's word, the macOS names the ones macOS itself uses in that language (Settings
+   is *Параметри* in Ukrainian, not *Налаштування*), a page's name in the sidebar fits it
+   at full size (*Облік*, not *Використання*; the rail is 68 pt wide at 11.5 pt), and every string that names a page,
+   a feature or a setting uses that word — in the window itself, in the notices that send
+   the user there, and in the paths (*Settings › AI Rewrite*). Grammar around a name
+   follows the language (Ukrainian puts a path after «у» in the locative).
+

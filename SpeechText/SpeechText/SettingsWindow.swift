@@ -216,6 +216,10 @@ private struct SettingsSidebarItem: View {
                 Text(category.title)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
                     .foregroundStyle(isSelected ? SetupColor.label : SetupColor.label2)
+                    // One line, at full size, selected or not: the semibold of a selected
+                    // «ШІ‑переписування» wrapped a letter onto a second line.
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 7)
@@ -618,7 +622,7 @@ struct SettingsKeyField: View {
             if inUse {
                 SettingsStatus(text: hasValue ? "Added" : "Needed", ok: hasValue)
             }
-            Spacer(minLength: 0)
+            Spacer(minLength: 12)
             getKeyLink
         }
     }
@@ -628,6 +632,7 @@ struct SettingsKeyField: View {
             if let page = service.descriptor.apiKey?.keysPage { NSWorkspace.shared.open(page) }
         }
         .buttonStyle(SetupInlineLinkStyle())
+        .fixedSize()
         .pointingHandCursor()
     }
 

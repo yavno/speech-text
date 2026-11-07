@@ -131,8 +131,9 @@ A new issue template, `.github/ISSUE_TEMPLATE/translation_error.yml`, labeled `t
    5. the CI checks.
 
    No language is turned on yet. Then the first `es` and `uk` translations, in one pull request made the same way the scheduled job will make them.
-2. **Test (#75):** strings run longer in Spanish and Ukrainian than in English. Run the main windows, the overlay, the Record Window, Setup and Settings with the *Double-Length Pseudolanguage* scheme option, and in both languages.
-3. **Ship (#76):** `knownRegions` gains `es` and `uk`; the release check, the issue template and the glossary land; the scheduled job is turned on, with its manual run mentioned in `docs/releasing.md`; CONTRIBUTING.md › Language no longer says the repository is written in the UI's language; a `CHANGELOG.md` entry.
+2. **Test (#75):** strings run longer in Spanish and Ukrainian than in English. `scripts/window-snapshots.sh` draws Setup's steps, the main window's pages, Settings' categories and the Record Window in every language, side by side in one page (with `--double-length`, also in the double-length pseudolanguage); the overlay is looked at by hand, since it only shows while recording.
+3. **A language is turned on** only after the two checks in docs/translation-glossary.md › *Adding a language*: every window looked at beside English, with the assessment in the pull request, and every term right and the same everywhere.
+4. **Ship (#76):** `knownRegions` gains `es` and `uk`; the release check, the issue template and the glossary land; the scheduled job is turned on, with its manual run mentioned in `docs/releasing.md`; CONTRIBUTING.md › Language no longer says the repository is written in the UI's language; a `CHANGELOG.md` entry.
 
 ## Open
 

@@ -1033,7 +1033,7 @@ private struct SpokenLanguagesField: View {
     private var selectedModel: (name: String, languages: LanguageCoverage)? {
         switch stt {
         case .apple:
-            return ("Apple Dictation", sttModel(vendor: .apple, id: appleSpeechModelID).languages)
+            return (String(localized: "Apple Dictation"), sttModel(vendor: .apple, id: appleSpeechModelID).languages)
         case .local:
             return localSTTModel(id: localSTTModelID).map { (speechModelName($0), $0.languages) }
         case .groq, .elevenlabs, .openai:
@@ -1119,7 +1119,9 @@ struct RecordingModePicker: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12)
+            // Setup's column is narrow: a little less inset keeps a longer title, such as
+            // «Затисніть і говоріть», on one line at full size.
+            .padding(.horizontal, compact ? 9 : 12)
             .padding(.vertical, compact ? 7 : 9)
             .background {
                 if selected {
@@ -1200,7 +1202,7 @@ private struct GestureDemoList: View {
         var demos: [Demo]
         if holdToTalk {
             demos = [
-                Demo(gesture: .hold, title: "Hold to record",
+                Demo(gesture: .hold, title: "Hold to talk",
                      detail: modifiers.isEmpty
                         ? "It records while \(letter) is down. Let go of \(letter) to paste."
                         : "Once it records, let go of \(modifiers) — \(letter) alone keeps it going. Let go of \(letter) to paste."),

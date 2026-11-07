@@ -312,7 +312,7 @@ public enum HomeFormat {
     private static let integerFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.locale = uiLocale.language.languageCode == .english ? Locale(identifier: "en_US") : uiLocale
+        formatter.locale = numberLocale
         return formatter
     }()
 
@@ -338,7 +338,12 @@ public enum HomeFormat {
         if value <= 0 { return "$0" }
         if value < 0.01 { return "<$0.01" }
         if value >= 100 { return "$" + integer(Int(value.rounded())) }
-        return String(format: "$%.2f", value)
+        return "$" + value.formatted(.number.precision(.fractionLength(2)).locale(numberLocale))
+    }
+
+    /// "483.3 MB" — a file or download size, written the app's way like every other number.
+    public static func fileSize(_ bytes: Int64) -> String {
+        bytes.formatted(.byteCount(style: .file).locale(numberLocale))
     }
 
     /// A cost said as the estimate it is: "≈ $1.20" — "$0" stays exact.

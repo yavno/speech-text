@@ -417,8 +417,11 @@ private struct MainSidebarItemStyle: ButtonStyle {
             Text(page.title)
                 .font(.system(size: 11.5, weight: lit ? .semibold : .medium))
                 .foregroundStyle(.white.opacity(lit || hovering || isOpen ? 1 : 0.66))
+                // A longer word in another language shrinks to fit the rail rather than
+                // running past its edges, or breaking mid-word on a second line.
                 .lineLimit(1)
-                .fixedSize()
+                .minimumScaleFactor(0.7)
+                .frame(maxWidth: MainSidebar.width - 4)
         }
         .padding(.top, compact ? 2 : 3)
         .padding(.bottom, compact ? 3 : 5)
