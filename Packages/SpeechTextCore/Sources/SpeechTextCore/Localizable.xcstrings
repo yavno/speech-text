@@ -2983,7 +2983,21 @@
       }
     },
     "Set your server's address in Settings › AI Rewrite" : {
-      "comment" : "AI Rewrite error: the user's server has no valid address"
+      "comment" : "AI Rewrite error: the user's server has no valid address",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indica la dirección de tu servidor en Ajustes › Reescritura con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Укажіть адресу свого сервера в Налаштування › ШІ‑переписування"
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Notice button that opens Settings.",
@@ -3939,7 +3953,21 @@
       }
     },
     "Your server" : {
-      "comment" : "The place card for a model server the user runs, and that provider's name"
+      "comment" : "The place card for a model server the user runs, and that provider's name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш сервер"
+          }
+        }
+      }
     },
     "estimated from known prices" : {
       "comment" : "Usage and Home: the note beside every cost — it is an estimate from list prices, not the bill. Lowercase; the app capitalizes it where it starts a line.",

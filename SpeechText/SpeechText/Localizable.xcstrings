@@ -1942,7 +1942,21 @@
       }
     },
     "A model you already run. Your text goes to the address you enter." : {
-      "comment" : "Settings › AI Rewrite: the sentence under the place cards while Your server is open"
+      "comment" : "Settings › AI Rewrite: the sentence under the place cards while Your server is open",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un modelo que ya tienes en marcha. Tu texto va a la dirección que indiques."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель, яку ви вже запускаєте. Ваш текст надсилається на вказану вами адресу."
+          }
+        }
+      }
     },
     "A molded handset with a dot-matrix LCD." : {
       "comment" : "Settings › Appearance: the description of the Techno skin.",
@@ -6209,7 +6223,21 @@
       }
     },
     "Fill in:" : {
-      "comment" : "Settings › Your server: before the names that fill in a server's default address"
+      "comment" : "Settings › Your server: before the names that fill in a server's default address",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rellenar:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заповнити:"
+          }
+        }
+      }
     },
     "Filter..." : {
       "comment" : "Debug Log window: placeholder of the search field.",
@@ -8256,10 +8284,38 @@
       }
     },
     "Model" : {
-      "comment" : "Settings › Your server: the heading over the models the server lists"
+      "comment" : "Settings › Your server: the heading over the models the server lists",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель"
+          }
+        }
+      }
     },
     "Model ID" : {
-      "comment" : "Settings › Your server: placeholder for typing a model's ID when the server lists none"
+      "comment" : "Settings › Your server: placeholder for typing a model's ID when the server lists none",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID del modelo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID моделі"
+          }
+        }
+      }
     },
     "Model on this Mac" : {
       "comment" : "Usage page, By engine: where a speech model ran.",
@@ -8823,7 +8879,21 @@
       }
     },
     "No model to test with." : {
-      "comment" : "Settings › Your server: the test could not run, the server listed no model"
+      "comment" : "Settings › Your server: the test could not run, the server listed no model",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ningún modelo con el que probar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає моделі для перевірки."
+          }
+        }
+      }
     },
     "No models downloaded yet" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Models on this Mac: footer when none is on this Mac.",
@@ -8962,7 +9032,21 @@
       }
     },
     "Not an address yet. It starts with http:// or https://." : {
-      "comment" : "Settings › Your server: under an address that cannot be used"
+      "comment" : "Settings › Your server: under an address that cannot be used",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no es una dirección. Empieza por http:// o https://."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Це ще не адреса. Вона починається з http:// або https://."
+          }
+        }
+      }
     },
     "Not checked yet." : {
       "comment" : "About panel: the app hasn't looked for an update yet.",
@@ -9220,7 +9304,21 @@
       }
     },
     "Nothing answered at this address. Is the server running?" : {
-      "comment" : "Settings › Your server: the test found nothing at the address"
+      "comment" : "Settings › Your server: the test found nothing at the address",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada ha respondido en esta dirección. ¿Está en marcha el servidor?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За цією адресою ніщо не відповіло. Сервер запущено?"
+          }
+        }
+      }
     },
     "Nothing dictated in this period." : {
       "comment" : "Usage page, By engine: shown when there is nothing.",
@@ -10533,7 +10631,21 @@
       }
     },
     "Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it." : {
-      "comment" : "Settings › Your server: warning for an unencrypted address off this Mac"
+      "comment" : "Settings › Your server: warning for an unencrypted address off this Mac",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP sin cifrar: cualquiera en esta red puede leer lo que se envía. Usa https:// si el servidor lo admite."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP без шифрування: будь-хто в цій мережі може прочитати надіслане. Якщо сервер має https:// — використовуйте його."
+          }
+        }
+      }
     },
     "Preparing %@ for your Mac…" : {
       "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name.",
@@ -11341,7 +11453,21 @@
       }
     },
     "Remove the server's key?" : {
-      "comment" : "Settings › Your server: asks before removing the stored key"
+      "comment" : "Settings › Your server: asks before removing the stored key",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quitar la clave del servidor?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вилучити ключ сервера?"
+          }
+        }
+      }
     },
     "Remove your %@ key?" : {
       "comment" : "Settings: title of the confirmation before removing an API key. %@ is the service's name.",
@@ -12211,7 +12337,21 @@
       }
     },
     "Server address" : {
-      "comment" : "Settings › Your server: the heading over the address field"
+      "comment" : "Settings › Your server: the heading over the address field",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del servidor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адреса сервера"
+          }
+        }
+      }
     },
     "Set an LLM API key in Settings to use AI mode" : {
       "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no API key.",
@@ -12248,7 +12388,21 @@
       }
     },
     "Set up your server in Settings to edit text with AI." : {
-      "comment" : "Edit selection: AI Rewrite is set to the user's server, which has no address or model"
+      "comment" : "Edit selection: AI Rewrite is set to the user's server, which has no address or model",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura tu servidor en Ajustes para editar texto con IA."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштуйте свій сервер у Налаштуваннях, щоб редагувати текст за допомогою ШІ."
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Settings — the window, and its place in the main window's sidebar.",
@@ -13828,10 +13982,38 @@
       }
     },
     "Test" : {
-      "comment" : "Settings › Your server: button that sends one request to the server"
+      "comment" : "Settings › Your server: button that sends one request to the server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірити"
+          }
+        }
+      }
     },
     "Testing…" : {
-      "comment" : "Settings › Your server: while the test request runs"
+      "comment" : "Settings › Your server: while the test request runs",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probando…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірка…"
+          }
+        }
+      }
     },
     "Text" : {
       "comment" : "Settings › Dictation: group heading over how the text is written.",
@@ -14174,7 +14356,21 @@
       }
     },
     "The internet. Your words leave your network." : {
-      "comment" : "Settings › Your server: where the address leads"
+      "comment" : "Settings › Your server: where the address leads",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internet. Tus palabras salen de tu red."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інтернет. Ваші слова виходять за межі вашої мережі."
+          }
+        }
+      }
     },
     "The lid is closed, so this microphone hears nothing." : {
       "comment" : "Settings › Dictation › Microphone: caption when the MacBook's own microphone is in use with the lid closed.",
@@ -14568,22 +14764,106 @@
       }
     },
     "The server answered, but not at this path. Most addresses end in /v1." : {
-      "comment" : "Settings › Your server: the test got HTTP 404"
+      "comment" : "Settings › Your server: the test got HTTP 404",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha respondido, pero no en esta ruta. La mayoría de las direcciones terminan en /v1."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер відповів, але не за цим шляхом. Більшість адрес закінчуються на /v1."
+          }
+        }
+      }
     },
     "The server lists no models. Load one in it, or type its ID." : {
-      "comment" : "Settings › Your server: under the model ID field"
+      "comment" : "Settings › Your server: under the model ID field",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor no muestra ningún modelo. Carga uno en él o escribe su ID."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер не показує жодної моделі. Завантажте модель на ньому або введіть її ID."
+          }
+        }
+      }
     },
     "The server refused the request (HTTP %lld)." : {
-      "comment" : "Settings › Your server: the test got another HTTP error. The number is the status code"
+      "comment" : "Settings › Your server: the test got another HTTP error. The number is the status code",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha rechazado la solicitud (HTTP %lld)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер відхилив запит (HTTP %lld)."
+          }
+        }
+      }
     },
     "The server refused the request without a key." : {
-      "comment" : "Settings › Your server: the test got HTTP 401 or 403"
+      "comment" : "Settings › Your server: the test got HTTP 401 or 403",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha rechazado la solicitud sin clave."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер відхилив запит без ключа."
+          }
+        }
+      }
     },
     "The server's address" : {
-      "comment" : "Settings › Your server: placeholder in the address field"
+      "comment" : "Settings › Your server: placeholder in the address field",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección del servidor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адреса сервера"
+          }
+        }
+      }
     },
     "The server's reply wasn't one SpeechText can read." : {
-      "comment" : "Settings › Your server: the test got an answer in an unexpected form"
+      "comment" : "Settings › Your server: the test got an answer in an unexpected form",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText no puede leer la respuesta del servidor."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText не може прочитати відповідь сервера."
+          }
+        }
+      }
     },
     "The service won't serve it to your key. The recording is in History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. under 'This model isn't available'.",
@@ -14756,7 +15036,21 @@
       }
     },
     "This Mac." : {
-      "comment" : "Settings › Your server: where the address leads"
+      "comment" : "Settings › Your server: where the address leads",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей Mac."
+          }
+        }
+      }
     },
     "This build does not update itself." : {
       "comment" : "About panel: the app's update status.",
@@ -14810,7 +15104,21 @@
       }
     },
     "This key is sent in plain text." : {
-      "comment" : "Settings › Your server: warning under the key for an unencrypted address off this Mac"
+      "comment" : "Settings › Your server: warning under the key for an unencrypted address off this Mac",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta clave se envía sin cifrar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей ключ надсилається без шифрування."
+          }
+        }
+      }
     },
     "This model isn't available" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. the speech provider refused the selected model.",
@@ -16886,7 +17194,21 @@
       }
     },
     "Your network." : {
-      "comment" : "Settings › Your server: where the address leads"
+      "comment" : "Settings › Your server: where the address leads",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu red."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша мережа."
+          }
+        }
+      }
     },
     "Your own prompts and changes are replaced by the three that come with SpeechText." : {
       "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name.",
@@ -16923,10 +17245,38 @@
       }
     },
     "Your server" : {
-      "comment" : "The place card for a model server the user runs, and that provider's name"
+      "comment" : "The place card for a model server the user runs, and that provider's name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш сервер"
+          }
+        }
+      }
     },
     "Your server isn't set up. Pasted the raw transcription." : {
-      "comment" : "Notice after an AI dictation: the user's server has no address or model"
+      "comment" : "Notice after an AI dictation: the user's server has no address or model",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor no está configurado. Se ha pegado la transcripción sin procesar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш сервер не налаштовано. Вставлено необроблену транскрипцію."
+          }
+        }
+      }
     },
     "Your shortcuts" : {
       "comment" : "Setup window, Done step: heading over the shortcuts.",
@@ -18231,7 +18581,21 @@
       }
     },
     "✓ Answered in %@ s." : {
-      "comment" : "Settings › Your server: the test succeeded. The value is seconds"
+      "comment" : "Settings › Your server: the test succeeded. The value is seconds",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✓ Ha respondido en %@ s."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✓ Відповів за %@ с."
+          }
+        }
+      }
     },
     "✓ Done" : {
       "comment" : "Setup window, Try it step: chip after AI polish wrote its text.",
