@@ -813,9 +813,11 @@ final class AppState {
     private(set) var isRefining = false
 
     /// Whether a restart would cost the user words: a dictation or its rewrite under way,
-    /// or the Record Window open, whose text and own rewrite live only in the window.
+    /// an edit whose selection is cut and not yet put back, or the Record Window open,
+    /// whose text and own rewrite live only in the window.
     var isHoldingWords: Bool {
-        speechEngine.phase != .idle || speechEngine.isTranscribing || isRefining || directRecordingPanel != nil
+        speechEngine.phase != .idle || speechEngine.isTranscribing || isRefining || isEditMode
+            || directRecordingPanel != nil
     }
     private var refinementTask: Task<Void, Never>?
     /// The task parked in `waitForTranscription()`. Cancelling the inline flow cancels
