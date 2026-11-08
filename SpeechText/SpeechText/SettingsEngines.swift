@@ -717,7 +717,7 @@ private struct ServerEngineSettings: View {
         models = ids
         listsNoModels = ids.isEmpty
         let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? (typed.isEmpty ? selectedModel : typed)
+        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? (typed.isEmpty && !testedDraft ? selectedModel : typed)
         guard !model.isEmpty else {
             result = .noModels
             return
