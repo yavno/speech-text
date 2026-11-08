@@ -2,11 +2,11 @@
 
 When a vendor switches a model off, our release moves users off it. That only works if we
 know weeks in advance, from the vendor rather than from a "Transcription failed" in
-someone's History. Two things keep us informed. One is a script that compares the
-catalogues with each vendor's own API, looks each model up on the vendor's deprecation
-page, and shows what is new on its changelog. The other is a daily workflow that runs the
-script and files an issue when something changed. Neither uses a language model: what the
-script finds is decided by code, and what a changelog line means is left to a person.
+someone's History. A script compares the catalogues with each vendor's own API, looks each
+model up on the vendor's deprecation page, and shows what is new on its changelog. A daily
+workflow runs the script and files an issue when something changed. What the script finds
+is decided by code and uses no language model; what it means is judged by the `vendor-watch`
+skill (below).
 
 The catalogues give each model a lifecycle state: `current`, `superseded`, `deprecated` or
 `retired`, with the vendor's shutdown date once one is announced. A retired model stays in
@@ -166,3 +166,17 @@ decided by the script: it shows the new lines (`TEXT_PAGES`), and a person reads
 - **Reading a run.** The report is the run's summary; the issues it filed or commented on
   are listed under it. The lines new on the vendors' pages are not filed unless they name
   a catalogue model with a lifecycle word: someone reads them.
+
+## The agent's pass
+
+The `vendor-watch` skill (`.claude/skills/vendor-watch/`) runs on the script's findings. A
+subagent on a cheaper model checks each new finding against the vendor's page, and the
+main agent routes it: a mechanical update (a price, a shutdown date, a language list, a
+package release) becomes a pull request, nothing merged by itself; what needs a choice
+becomes an issue; a new model nobody would pick is dropped. Once a week, scouts look for
+models and services outside the catalogue and propose at most three, as issues under a
+`scout/` key, so a closed one is never proposed again.
+
+Only the `vendor-verifier` and `vendor-scout` subagents read vendor pages, and they have
+web tools and nothing else: text on a page cannot reach the keys, `gh` or the repository.
+The agents that write receive their structured conclusions.
