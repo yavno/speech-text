@@ -658,6 +658,7 @@ private struct ServerAddressField: View {
             .textFieldStyle(.plain)
             .font(.system(size: 12, design: .monospaced))
             .autocorrectionDisabled()
+            .accessibilityLabel(prompt)
             .padding(.horizontal, 10)
             .frame(height: 30)
             .background(shape.fill(SetupColor.control))

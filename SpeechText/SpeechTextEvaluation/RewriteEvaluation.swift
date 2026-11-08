@@ -67,7 +67,8 @@ enum RewriteEvaluation {
         /// `groq/openai/gpt-oss-120b`, `local/<id>`, or a bare local id (the old form).
         init?(_ spec: String) {
             let parts = spec.split(separator: "/", maxSplits: 1).map(String.init)
-            if parts.count == 2, let provider = LLMProviderType(rawValue: parts[0]) {
+            // Not `server/…`: a server's address is the user's setting, and this tool has none.
+            if parts.count == 2, let provider = LLMProviderType(rawValue: parts[0]), provider != .server {
                 self.provider = provider; id = parts[1]
             } else if localChatModel(id: spec) != nil {
                 provider = .local; id = spec
