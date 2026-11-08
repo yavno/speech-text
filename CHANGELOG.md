@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **SpeechText can be installed with Homebrew**, as a cask: the command is in the README's Install section. It installs the same signed disk image, and the app still updates itself, so `brew upgrade` leaves it alone unless you pass `--greedy`.
 - **A download link that is always the latest version**: [SpeechText.dmg](https://github.com/yavno/speech-text/releases/latest/download/SpeechText.dmg). Every release now carries the disk image under that name too, beside `SpeechText-X.Y.Z.dmg` — the same signed and notarized file.
 - **SpeechText in Spanish and Ukrainian.** When Spanish or Ukrainian is your Mac's preferred language, SpeechText's windows, menu, notices and overlay are in that language, and so are the permission requests macOS shows for it. Setup's Try it step still recognizes a rejected key or a lost connection in either language, and AI Rewrite on this Mac mostly says why it failed in that language too; a Mac without the memory for the model is still told so in English. A translation that reads wrong can be reported on GitHub with the *Translation error* issue form.
+- **Bark 3.0 and Bark 3.0 Clean, two English-only speech models on this Mac**, in Settings › Speech to text and setup, on macOS 15 or later. Bark 3.0 writes down every word as said, "um" and repeats included; Bark 3.0 Clean leaves out fillers, false starts and repeated words. Both were as accurate as Phonon-2 in our tests, which stays the recommended model if you speak only English. Each is about a 440 MB download.
 
 ### Changed
 
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Parakeet models no longer paste a stray `<unk>`.** Parakeet v3, Parakeet Ultra and Parakeet Redux sometimes put the marker `<unk>` into the text where they missed a word; it no longer appears.
 - **Dictations and edits into Chrome are pasted again.** Since Chrome 156, a dictation or an AI Rewrite into a web page was reported as pasted while the field stayed empty, and the Edit shortcut cut the selection and put nothing back in its place. SpeechText now presses ⌘ the way a person does around the ⌘V, ⌘C and ⌘X it sends, which Chrome accepts.
 - **History no longer says "Pasted" for a dictation saved offline.** When a dictation made with no connection was rewritten by AI Rewrite once the network was back, its AI output read *Pasted* though nothing had been pasted; it now reads *Not pasted*, and a rewrite that failed says the dictated text was kept rather than pasted.
 
