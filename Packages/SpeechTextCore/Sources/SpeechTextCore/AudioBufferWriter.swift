@@ -54,6 +54,39 @@ public final class AudioBufferWriter: @unchecked Sendable {
         preferredUploadCodec == .flac && frames < flacBlockFrames ? .wav : preferredUploadCodec
     }
 
+    /// A WAV copy of `file` in the temporary folder; the caller deletes it. For the one
+    /// destination that needs WAV whatever was recorded or archived: Ollama reads nothing
+    /// else (docs/specs/2026-11-07-own-model-server.md).
+    static func temporaryWAVCopy(of file: URL) throws -> URL {
+        let source = try AVAudioFile(forReading: file)
+        // A piece at a time: a long dictation is hundreds of megabytes once decoded.
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: source.processingFormat, frameCapacity: 65_536) else {
+            throw AudioBufferWriterError.conversionFailed("could not allocate a buffer for the WAV copy")
+        }
+        let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".wav")
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM,
+                                       AVSampleRateKey: source.fileFormat.sampleRate,
+                                       AVNumberOfChannelsKey: source.fileFormat.channelCount,
+                                       AVLinearPCMBitDepthKey: 16,
+                                       AVLinearPCMIsFloatKey: false,
+                                       AVLinearPCMIsBigEndianKey: false]
+        // In a scope of its own: `AVAudioFile` finishes the header when it is released.
+        do {
+            let output = try AVAudioFile(forWriting: copy, settings: settings,
+                                         commonFormat: source.processingFormat.commonFormat,
+                                         interleaved: source.processingFormat.isInterleaved)
+            while source.framePosition < source.length {
+                try source.read(into: buffer)
+                try output.write(from: buffer)
+            }
+        } catch {
+            // Someone's voice, which nothing else would come back for.
+            try? FileManager.default.removeItem(at: copy)
+            throw error
+        }
+        return copy
+    }
+
     /// The two containers `writeAudioFile` can produce. Both hold 16 kHz mono 16-bit
     /// samples; only the encoding differs. Everything downstream — the multipart filename
     /// and MIME type, the History archive's filename — is driven by `fileExtension`, so

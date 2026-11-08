@@ -58,7 +58,7 @@ public func makeStreamingTranscriber(configuration: RecordingConfiguration) -> S
         return OpenAIRealtimeTranscriber(apiKey: configuration.apiKey(for: .openAI),
                                       model: configuration.model.id,
                                       keywords: configuration.liveVocabulary)
-    case .apple, .groq, .local:
+    case .apple, .groq, .local, .server:
         return nil
     }
 }

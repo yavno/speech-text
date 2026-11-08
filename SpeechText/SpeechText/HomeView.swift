@@ -1007,6 +1007,7 @@ struct HomeEngines: View {
     @AppStorage(SettingsKeys.groqModel) private var groqModel = Provider.groq.defaultSpeechModel
     @AppStorage(SettingsKeys.elevenLabsModel) private var elevenLabsModel = Provider.elevenLabs.defaultSpeechModel
     @AppStorage(SettingsKeys.openAISTTModel) private var openAISTTModel = Provider.openAI.defaultSpeechModel
+    @AppStorage(SettingsKeys.serverSpeechModel) private var serverSTTModel = ""
     @AppStorage(SettingsKeys.localSTTModel) private var localSTTModelID = Provider.local.defaultSpeechModel
     @AppStorage(SettingsKeys.spokenLanguages) private var spokenLanguages = ""
     @AppStorage(SettingsKeys.llmProvider) private var llmProvider = LLMProviderType.groq.rawValue
@@ -1041,6 +1042,7 @@ struct HomeEngines: View {
         case .groq: return cloudEngine(provider, model: groqModel)
         case .elevenlabs: return cloudEngine(provider, model: elevenLabsModel)
         case .openai: return cloudEngine(provider, model: openAISTTModel)
+        case .server: return cloudEngine(provider, model: serverSTTModel)
         }
     }
 

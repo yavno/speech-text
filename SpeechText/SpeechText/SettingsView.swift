@@ -716,6 +716,10 @@ struct SettingsView: View {
                 + Text("A retry from History is sent to Groq, since Apple can't transcribe a saved recording.")
         case .local:
             return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
+        case .server:
+            return sendVocabulary
+                ? Text("Each recording is sent to the address you entered, with your Dictionary's words. A retry from History sends it again.")
+                : Text("Each recording is sent to the address you entered. A retry from History sends it again.")
         case .groq, .elevenlabs, .openai:
             let vendor = stt.vendor.displayName
             return sendVocabulary
@@ -729,6 +733,9 @@ struct SettingsView: View {
         guard hasLLMKey else { return Text("AI Rewrite is off, so nothing is sent.") }
         if llm == .local {
             return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
+        }
+        if llm == .server {
+            return Text("AI dictations and edits are sent to the address you entered. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
         }
         return Text("AI dictations and edits are sent to \(llm.vendor.displayName). With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
     }
@@ -1036,6 +1043,8 @@ private struct SpokenLanguagesField: View {
             return (String(localized: "Apple Dictation"), sttModel(vendor: .apple, id: appleSpeechModelID).languages)
         case .local:
             return localSTTModel(id: localSTTModelID).map { (speechModelName($0), $0.languages) }
+        case .server:
+            return nil
         case .groq, .elevenlabs, .openai:
             let id = switch stt {
             case .groq: groqModel

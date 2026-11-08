@@ -138,7 +138,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .general: "How SpeechText starts, and how it stays up to date."
         case .appearance: "How the recording overlay and the Record Window look."
         case .dictation: "How you dictate: the shortcuts, the microphone, your languages and how the text is written."
-        case .speech: "What turns your voice into text — on this Mac or online."
+        case .speech: "What turns your voice into text — on this Mac, online or on your own server."
         case .ai: "Optional. Turns a dictation into finished text — an email, a list, a translation — or does what you ask (“a short reply, in English”)."
         case .privacy: "What is kept on this Mac, what is sent, and what macOS allows."
         case .apiKeys: "Every key SpeechText holds. The ones your choices use come first."

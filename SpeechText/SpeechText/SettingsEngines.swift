@@ -188,7 +188,11 @@ struct SpeechEngineSettings: View {
     }
 
     private static func place(of engine: STTProviderType) -> EnginePlace {
-        engine == .apple || engine == .local ? .thisMac : .online
+        switch engine {
+        case .apple, .local: .thisMac
+        case .server: .server
+        case .groq, .elevenlabs, .openai: .online
+        }
     }
 
     private var engine: STTProviderType { STTProviderType(rawValue: sttProvider) ?? .apple }
@@ -201,12 +205,13 @@ struct SpeechEngineSettings: View {
                     ? String(localized: "Private and free. Your voice stays on your Mac, and works offline.")
                     : String(localized: "Private and free, but slow on this Mac.")),
                 (.online, String(localized: "Works on any Mac. Needs internet and an account; your recording is sent to the service.")),
+                (.server, String(localized: "A model you already run. Your recording goes to the address you enter.")),
             ])
 
         switch place {
         case .thisMac: thisMac
         case .online: online
-        case .server: EmptyView()
+        case .server: ServerEngineSettings(role: .speech)
         }
     }
 
@@ -503,17 +508,35 @@ struct SpeechEngineSettings: View {
 /// AI Rewrite through a server the user runs: its address, the test, its models and, when
 /// it asks for one, its key. A typed address is a draft until a test passes, so one half
 /// written never takes over the rewrites (docs/specs/2026-11-07-own-model-server.md).
-private struct ServerChatSettings: View {
-    /// Each server's documented default address (the spec's table).
-    private static let presets = [("Ollama", "http://localhost:11434/v1"),
-                                  ("LM Studio", "http://localhost:1234/v1"),
-                                  ("llama.cpp", "http://localhost:9931/v1")]
+private struct ServerEngineSettings: View {
+    enum Role {
+        case speech, chat
 
-    @AppStorage(SettingsKeys.llmProvider) private var llmProvider = LLMProviderType.groq.rawValue
-    @AppStorage(SettingsKeys.serverChatAddress) private var storedAddress = ""
-    @AppStorage(SettingsKeys.serverChatModel) private var storedModel = ""
-    @State private var address = UserDefaults.standard.string(forKey: SettingsKeys.serverChatAddress) ?? ""
+        var providerKey: String { self == .speech ? SettingsKeys.sttProvider : SettingsKeys.llmProvider }
+        var addressKey: String { self == .speech ? SettingsKeys.serverSpeechAddress : SettingsKeys.serverChatAddress }
+        var modelKey: String { self == .speech ? SettingsKeys.serverSpeechModel : SettingsKeys.serverChatModel }
+        var apiKeyName: String { self == .speech ? SettingsKeys.serverSpeechAPIKey : SettingsKeys.serverChatAPIKey }
+        var otherAddressKey: String { self == .speech ? SettingsKeys.serverChatAddress : SettingsKeys.serverSpeechAddress }
+
+        /// Each server's documented default address (the spec's table), under the role it
+        /// can do: LM Studio does not transcribe.
+        var presets: [(String, String)] {
+            let shared = [("Ollama", "http://localhost:11434/v1"), ("llama.cpp", "http://localhost:9931/v1")]
+            return shared + (self == .speech ? [("Speaches", "http://localhost:8000/v1")]
+                                             : [("LM Studio", "http://localhost:1234/v1")])
+        }
+    }
+
+    let role: Role
+    @AppStorage private var provider: String
+    @AppStorage private var storedAddress: String
+    @AppStorage private var storedModel: String
+    @AppStorage private var otherAddress: String
+    @State private var address: String
     @State private var typedModel = ""
+    /// The server answered with no models, or has no list at all (whisper.cpp's): the
+    /// model is typed, and stays typable through a failed test.
+    @State private var listsNoModels = false
     /// A model picked from a draft server's list, which is no choice for the server in use.
     @State private var draftModel: String?
     /// A key typed for a draft server: the stored one is another server's, and neither is
@@ -523,20 +546,30 @@ private struct ServerChatSettings: View {
     @State private var testing = false
     @State private var result: ServerTestResult?
 
+    init(role: Role) {
+        self.role = role
+        _provider = AppStorage(wrappedValue: "", role.providerKey)
+        _storedAddress = AppStorage(wrappedValue: "", role.addressKey)
+        _storedModel = AppStorage(wrappedValue: "", role.modelKey)
+        _otherAddress = AppStorage(wrappedValue: "", role.otherAddressKey)
+        _address = State(initialValue: UserDefaults.standard.string(forKey: role.addressKey) ?? "")
+    }
+
     private var endpoint: ServerEndpoint? { ServerEndpoint(address: address) }
     private var isDraft: Bool { address != storedAddress }
     private var selectedModel: String { isDraft ? draftModel ?? storedModel : storedModel }
-    private var key: String { isDraft ? draftKey : APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) }
+    private var key: String { isDraft ? draftKey : APIKeyStore.shared.value(for: role.apiKeyName) }
     private var keyBinding: Binding<String> {
-        Binding(get: { APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) },
-                set: { APIKeyStore.shared.set($0, for: SettingsKeys.serverChatAPIKey) })
+        let name = role.apiKeyName
+        return Binding(get: { APIKeyStore.shared.value(for: name) }, set: { APIKeyStore.shared.set($0, for: name) })
     }
-    private var inUse: Bool { llmProvider == LLMProviderType.server.rawValue }
+    private var inUse: Bool { provider == LLMProviderType.server.rawValue }
     private var showsKey: Bool { result == .needsKey || !key.isEmpty }
 
     var body: some View {
         SettingsGroup(title: "Server address", inset: 12) {
             VStack(alignment: .leading, spacing: 6) {
+                if address.isEmpty && !otherAddress.isEmpty { offer }
                 HStack(spacing: 6) {
                     // The test stores the address it asked: not one typed while it ran.
                     ServerAddressField(text: $address).disabled(testing)
@@ -549,16 +582,17 @@ private struct ServerChatSettings: View {
                 resultLine
                 if showsKey {
                     if isDraft {
-                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4)
+                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4).disabled(testing)
                     } else {
                         SettingsKeyField(service: .server, value: keyBinding, showsHeader: false, showsGetKey: false)
                             .padding(.top, 4)
+                            .disabled(testing)
                     }
                     if endpoint?.isReadableOnTheWay == true {
                         warning("This key is sent in plain text.")
                     }
                 }
-                if result == .noModels {
+                if listsNoModels {
                     ServerAddressField(text: $typedModel, prompt: "Model ID").padding(.top, 4)
                     Text("The server lists no models. Load one in it, or type its ID.").rowNote()
                 }
@@ -568,6 +602,7 @@ private struct ServerChatSettings: View {
             result = nil
             draftModel = nil
             models = []
+            listsNoModels = false
         }
         // What the server lists now; no chat request until the user asks for a test.
         .task { await refreshModels() }
@@ -581,12 +616,32 @@ private struct ServerChatSettings: View {
             }
             .padding(.top, 8)
         }
+        if role == .speech && !address.isEmpty && storedSpokenLanguages().count > 1 {
+            Text("You speak more than one language, so none is sent and the server detects it. Some servers, such as whisper.cpp, assume English instead.")
+                .rowNote()
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 5)
+                .padding(.top, 8)
+        }
+    }
+
+    /// The other role's server, often the same one, offered rather than copied.
+    private var offer: some View {
+        HStack(spacing: 8) {
+            (role == .speech ? Text("Use the AI Rewrite server?") : Text("Use the speech server?")).rowNote()
+            Text(verbatim: otherAddress)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(SetupColor.label)
+                .lineLimit(1)
+            Spacer(minLength: 0)
+            Button("Use") { address = otherAddress }.buttonStyle(SetupInlineLinkStyle())
+        }
     }
 
     private var presetRow: some View {
         HStack(spacing: 10) {
             Text("Fill in:").rowNote()
-            ForEach(Self.presets, id: \.0) { name, url in
+            ForEach(role.presets, id: \.0) { name, url in
                 Button { address = url } label: { Text(verbatim: name) }.buttonStyle(SetupInlineLinkStyle())
             }
         }
@@ -618,11 +673,14 @@ private struct ServerChatSettings: View {
             switch result {
             case nil: EmptyView()
             case .answered(let seconds):
-                Text("✓ Answered in \(String(format: "%.1f", seconds)) s.").rowNote(ok: true)
+                let time = String(format: "%.1f", seconds)
+                (role == .speech ? Text("✓ Transcribed a test clip in \(time) s.") : Text("✓ Answered in \(time) s.")).rowNote(ok: true)
             case .noAnswer: Text("Nothing answered at this address. Is the server running?").rowNote(bad: true)
             case .wrongPath: Text("The server answered, but not at this path. Most addresses end in /v1.").rowNote(bad: true)
             case .needsKey: Text("The server refused the request without a key.").rowNote(bad: true)
             case .noModels: Text("No model to test with.").rowNote(bad: true)
+            case .noTranscription: Text("This server doesn't transcribe audio. Use it for AI Rewrite, or pick another server.").rowNote(bad: true)
+            case .audioRefused: Text("The server refused the test recording. It may not take this model, or WAV.").rowNote(bad: true)
             case .refused(let status): Text("The server refused the request (HTTP \(status)).").rowNote(bad: true)
             case .badReply: Text("The server's reply wasn't one SpeechText can read.").rowNote(bad: true)
             }
@@ -638,7 +696,7 @@ private struct ServerChatSettings: View {
     /// a request that was answered stores the address and puts the server in use.
     private func test() async {
         guard let endpoint else { return }
-        let pickWhenAsked = llmProvider
+        let pickWhenAsked = provider
         // What this test asks with is what it stores, whatever is typed while it runs.
         let testedKey = key
         let testedDraft = isDraft
@@ -646,6 +704,9 @@ private struct ServerChatSettings: View {
         defer { testing = false }
         let ids: [String]
         switch await ServerProbe.models(endpoint: endpoint, apiKey: testedKey) {
+        // whisper.cpp's server has no list to give; its model is typed.
+        case .failure(let failure) where role == .speech && failure.result == .wrongPath:
+            ids = []
         case .failure(let failure):
             result = failure.result
             models = []
@@ -654,22 +715,25 @@ private struct ServerChatSettings: View {
             ids = listed
         }
         models = ids
+        listsNoModels = ids.isEmpty
         let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? typed
+        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? (typed.isEmpty && !testedDraft ? selectedModel : typed)
         guard !model.isEmpty else {
             result = .noModels
             return
         }
-        let outcome = await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: testedKey)
+        let outcome = role == .speech
+            ? await ServerProbe.transcription(endpoint: endpoint, model: model, apiKey: testedKey)
+            : await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: testedKey)
         result = outcome
         // Another provider chosen while this ran stays chosen.
-        guard case .answered = outcome, llmProvider == pickWhenAsked else { return }
-        if testedDraft { APIKeyStore.shared.set(testedKey, for: SettingsKeys.serverChatAPIKey) }
+        guard case .answered = outcome, provider == pickWhenAsked else { return }
+        if testedDraft { APIKeyStore.shared.set(testedKey, for: role.apiKeyName) }
         storedAddress = address
         storedModel = model
         draftModel = nil
         draftKey = ""
-        llmProvider = LLMProviderType.server.rawValue
+        provider = LLMProviderType.server.rawValue
     }
 }
 
@@ -741,7 +805,7 @@ struct AIEngineSettings: View {
         switch place {
         case .thisMac: thisMac
         case .online: online
-        case .server: ServerChatSettings()
+        case .server: ServerEngineSettings(role: .chat)
         }
     }
 

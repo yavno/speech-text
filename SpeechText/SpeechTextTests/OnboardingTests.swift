@@ -233,7 +233,7 @@ final class SetupCardsTests: XCTestCase {
             case .groq, .elevenlabs, .openai:
                 XCTAssertEqual(card?.engine, engine)
                 XCTAssertEqual(SetupCards.speech(for: card!.service).engine, engine)
-            case .apple, .local:
+            case .apple, .local, .server:
                 XCTAssertNil(card, engine.rawValue)
             }
         }

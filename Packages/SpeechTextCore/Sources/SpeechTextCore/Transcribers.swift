@@ -11,11 +11,14 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
     case elevenlabs = "elevenlabs"
     case openai = "openai"
     case local = "local"
+    /// A model server the user runs (`ServerEndpoint`).
+    case server = "server"
 
     public var id: String { rawValue }
 
     var displayName: String {
         switch self {
+        case .server: "Your server"
         case .apple: "Apple"
         case .groq: "Groq Whisper"
         case .elevenlabs: "ElevenLabs Scribe"
@@ -276,6 +279,9 @@ public func makeBatchTranscriber(configuration: RecordingConfiguration) -> Batch
                                     prompt: configuration.whisperPrompt, keywords: configuration.batchVocabulary)
     case .local:
         LocalSTT.transcriberFactory(configuration.modelID(for: .local))
+    case .server:
+        ServerTranscriber(endpoint: configuration.serverEndpoint, apiKey: configuration.apiKey(for: .server),
+                          model: configuration.batchModel, prompt: configuration.whisperPrompt)
     }
 }
 
@@ -325,6 +331,19 @@ struct OpenAICompatibleTranscriber: BatchTranscriber {
         return URLSession(configuration: config)
     }()
 
+    /// Refuse a redirect to another host: the user's own server, whose address they chose.
+    var staysOnOrigin = false
+
+    /// For an upload whose address is not on the descriptor: the user's own server.
+    init(provider: Provider, upload: OpenAICompatibleUpload, apiKey: String, model: String, prompt: String?) {
+        self.provider = provider
+        self.upload = upload
+        self.apiKey = apiKey
+        self.model = model
+        self.prompt = prompt
+        keywords = []
+    }
+
     /// `provider` must have a `speechUpload`; `ProviderDescriptorTests` checks every
     /// engine that `makeBatchTranscriber` sends here has one.
     init(provider: Provider, apiKey: String, model: String? = nil, prompt: String? = nil, keywords: [String] = []) {
@@ -354,7 +373,8 @@ struct OpenAICompatibleTranscriber: BatchTranscriber {
 
         var request = URLRequest(url: upload.url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        // A key is optional only on the user's own server, which may take none.
+        if !apiKey.isEmpty { request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization") }
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
         let audioData = try Data(contentsOf: audioFileURL)
@@ -368,7 +388,7 @@ struct OpenAICompatibleTranscriber: BatchTranscriber {
 
         let startTime = CFAbsoluteTimeGetCurrent()
         dlog(log, "transcribe: sending request…", level: .debug)
-        let (data, response) = try await Self.session.data(for: request)
+        let (data, response) = try await Self.session.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
         let elapsed = CFAbsoluteTimeGetCurrent() - startTime
         dlog(log, "transcribe: response received in \(String(format: "%.2f", elapsed))s, size=\(data.count) bytes")
         RateLimitStore.shared.record(vendor: provider, model: model, response: response)
@@ -459,6 +479,11 @@ public enum TranscriptionError: LocalizedError, Sendable {
     /// The realtime socket reported an error, or sent something unusable. The code is
     /// what `StreamReconnectPolicy` reads (`no_session` is a drop worth reopening).
     case realtime(Provider, String, String)
+    /// Set to the user's server, and its address is empty or malformed.
+    case noServerAddress
+    /// Nothing listened at the user's server. Not "no network": the Mac's connection is
+    /// fine, and it coming back would not start the server (`OfflineRetry`).
+    case serverNoAnswer
 
     public var errorDescription: String? {
         switch self {
@@ -466,6 +491,8 @@ public enum TranscriptionError: LocalizedError, Sendable {
         case .httpError(let provider, let code, let body):
             providerErrorMessage(vendor: provider.displayName, status: code, body: body)
         case .realtime(let provider, let code, let detail): "\(provider.displayName) realtime \(code): \(detail)"
+        case .noServerAddress: localized("Set your server's address in Settings › Speech to text.")
+        case .serverNoAnswer: localized("Your server didn't answer.")
         }
     }
 }
