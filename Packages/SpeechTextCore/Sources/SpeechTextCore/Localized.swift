@@ -99,7 +99,7 @@ public enum AppLanguage {
         effective(choice: candidate, localizations: available, system: systemLanguages) != running
     }
 
-    private static var systemLanguages: [String] {
+    static var systemLanguages: [String] {
         CFPreferencesCopyValue(key as CFString, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser,
                                kCFPreferencesAnyHost) as? [String] ?? []
     }
