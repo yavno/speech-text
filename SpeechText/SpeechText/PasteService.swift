@@ -153,7 +153,7 @@ struct PasteService {
             let items = saveClipboard(pasteboard)
             restoreClipboard(pasteboard, items: saved)
             landedLate(items)
-        }) { changed in
+        }, completion: { changed in
             guard changed else {
                 dlog("Edit", "cut: ⌘X changed nothing")
                 completion(.nothing)
@@ -163,7 +163,7 @@ struct PasteService {
             let items = saveClipboard(pasteboard)
             restoreClipboard(pasteboard, items: saved)
             completion(.cut(items: items, text: text))
-        }
+        })
     }
 
     /// Polls the pasteboard until a ⌘C or ⌘X lands. The copy happens in another process
