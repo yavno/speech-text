@@ -807,6 +807,7 @@ private struct UsageEngines: View {
             case .groq: Text(verbatim: "Groq")
             case .openai: Text(verbatim: "OpenAI")
             case .local: Text("On this Mac")
+            case .server: Text("Your server")
             // Before AI Rewrite ran models itself (2026-10-16).
             case nil where engine.provider == "ollama": Text("Ollama · on this Mac")
             case nil: Text(verbatim: engine.provider ?? "")

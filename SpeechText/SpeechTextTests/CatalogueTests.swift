@@ -290,7 +290,7 @@ final class StoredProviderNameTests: XCTestCase {
     }
 
     func testTheAPIKeysKeepTheirStoredNames() {
-        XCTAssertEqual(APIKeyStore.keys, ["groqAPIKey", "elevenLabsAPIKey", "anthropicAPIKey", "openAIAPIKey"])
+        XCTAssertEqual(APIKeyStore.keys, ["groqAPIKey", "elevenLabsAPIKey", "anthropicAPIKey", "openAIAPIKey", "serverChatAPIKey"])
     }
 
     /// Each provider serves exactly the steps a pick maps to it for.
@@ -318,6 +318,7 @@ final class StoredProviderNameTests: XCTestCase {
     /// rename. Order does not matter, membership does.
     func testThePortableSettingsKeepTheirStoredNames() {
         XCTAssertEqual(Set(SettingsKeys.portable), [
+            "serverChatAddress", "serverChatModel",
             "selectedLanguage", "spokenLanguages",
             "sttProvider", "groqModel", "elevenLabsModel", "openAISTTModel", "localSTTModel",
             "removeDisfluencies", "dashStyle",
@@ -382,7 +383,7 @@ final class StoredProviderNameTests: XCTestCase {
     /// `sttProvider` / `llmProvider` store these, and History records them as `provider`.
     func testTheEngineAndProviderPicksKeepTheirStoredNames() {
         XCTAssertEqual(STTProviderType.allCases.map(\.rawValue), ["apple", "groq", "elevenlabs", "openai", "local"])
-        XCTAssertEqual(LLMProviderType.allCases.map(\.rawValue), ["groq", "anthropic", "openai", "local"])
+        XCTAssertEqual(LLMProviderType.allCases.map(\.rawValue), ["groq", "anthropic", "openai", "local", "server"])
     }
 
     /// AI Rewrite through Ollama moves to the built-in path on the same model where the

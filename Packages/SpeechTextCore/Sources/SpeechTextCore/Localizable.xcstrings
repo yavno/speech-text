@@ -299,16 +299,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado desde el %@ · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados desde el %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado desde el %@ · %@"
                 }
               },
               "other" : {
@@ -323,12 +323,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка з %@ · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -339,6 +333,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок з %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка з %@ · %@"
                 }
               },
               "other" : {
@@ -376,16 +376,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado · %@"
                 }
               },
               "other" : {
@@ -400,12 +400,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -416,6 +410,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка · %@"
                 }
               },
               "other" : {
@@ -475,16 +475,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld idioma"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld idiomas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idioma"
                 }
               },
               "other" : {
@@ -499,12 +499,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld мова"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -515,6 +509,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld мов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мова"
                 }
               },
               "other" : {
@@ -1416,6 +1416,7 @@
       }
     },
     "Couldn't load the %@ speech model. Add it to Dictation in %@." : {
+      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1435,8 +1436,7 @@
             "value" : "Не вдалося завантажити модель мовлення (%1$@). Додайте її до Диктування в розділі %2$@."
           }
         }
-      },
-      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately."
+      }
     },
     "Default" : {
       "comment" : "Settings › Appearance: the middle stop on the glass transparency slider.",
@@ -2890,6 +2890,9 @@
         }
       }
     },
+    "Set your server's address in Settings › AI Rewrite" : {
+
+    },
     "Settings" : {
       "comment" : "Notice button that opens Settings.",
       "localizations" : {
@@ -3842,6 +3845,9 @@
           }
         }
       }
+    },
+    "Your server" : {
+
     },
     "estimated from known prices" : {
       "comment" : "Usage and Home: the note beside every cost — it is an estimate from list prices, not the bill. Lowercase; the app capitalizes it where it starts a line.",

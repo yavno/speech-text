@@ -517,7 +517,17 @@ struct SetupCenteredScroll<Content: View>: View {
 
 /// One answer of a step's question, as a card in a radio group.
 struct SetupChoiceCard: View {
-    enum Glyph { case mac, cloud }
+    enum Glyph {
+        case mac, cloud, server
+
+        var symbol: String {
+            switch self {
+            case .mac: "laptopcomputer"
+            case .cloud: "cloud"
+            case .server: "server.rack"
+            }
+        }
+    }
     let glyph: Glyph
     let name: String
     var badge: String?
@@ -538,7 +548,7 @@ struct SetupChoiceCard: View {
                     .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isSelected ? .clear : SetupColor.panelBorder, lineWidth: 0.5))
                     .frame(width: 34, height: 34)
                     .overlay {
-                        Image(systemName: glyph == .mac ? "laptopcomputer" : "cloud")
+                        Image(systemName: glyph.symbol)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
                     }

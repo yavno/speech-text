@@ -5,6 +5,7 @@ SpeechText has no server, no account, no telemetry and no analytics. Where your 
 ## What is sent where
 
 - **Apple engine**: audio never leaves your Mac while you dictate. The one exception: Apple's recogniser cannot read a saved recording, so a retry from History is uploaded to Groq, and only if you have stored a Groq key. Settings › Privacy & Data says when that applies.
+- **Your server**: if you point AI Rewrite at a server you run, the text goes to the address you entered and nowhere else. That address can be on this Mac, on your network or on the internet; Settings says which, and warns about plain HTTP off this Mac.
 - **Local model** (Parakeet or Whisper): audio never leaves your Mac either; the model runs on it, and no key is involved. The same goes for AI Rewrite on a built-in model: the text stays on your Mac too.
 - **Groq / ElevenLabs / OpenAI**: audio is uploaded to that provider, using *your* API key, under *their* privacy policy. SpeechText never sees your audio or your keys.
 - **AI Rewrite and Edit with AI**: text, never the audio, is sent to the LLM provider you selected, with your key: the transcript (or the selected text and your instruction), your Dictionary's words, and the app, window title and field the text is for. Nothing is read from a password manager, and only the app's name from a password field.

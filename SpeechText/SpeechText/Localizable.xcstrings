@@ -1941,6 +1941,9 @@
         }
       }
     },
+    "A model you already run. Your text goes to the address you enter." : {
+
+    },
     "A molded handset with a dot-matrix LCD." : {
       "comment" : "Settings › Appearance: the description of the Techno skin.",
       "localizations" : {
@@ -6188,6 +6191,9 @@
         }
       }
     },
+    "Fill in:" : {
+
+    },
     "Filter..." : {
       "comment" : "Debug Log window: placeholder of the search field.",
       "localizations" : {
@@ -8249,6 +8255,12 @@
         }
       }
     },
+    "Model" : {
+
+    },
+    "Model ID" : {
+
+    },
     "Model on this Mac" : {
       "comment" : "Usage page, By engine: where a speech model ran.",
       "localizations" : {
@@ -8810,6 +8822,9 @@
         }
       }
     },
+    "No model to test with." : {
+
+    },
     "No models downloaded yet" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Models on this Mac: footer when none is on this Mac.",
       "localizations" : {
@@ -8945,6 +8960,9 @@
           }
         }
       }
+    },
+    "Not an address yet. It starts with http:// or https://." : {
+
     },
     "Not checked yet." : {
       "comment" : "About panel: the app hasn't looked for an update yet.",
@@ -9200,6 +9218,9 @@
           }
         }
       }
+    },
+    "Nothing answered at this address. Is the server running?" : {
+
     },
     "Nothing dictated in this period." : {
       "comment" : "Usage page, By engine: shown when there is nothing.",
@@ -10511,6 +10532,9 @@
         }
       }
     },
+    "Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it." : {
+
+    },
     "Preparing %@ for your Mac…" : {
       "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name.",
       "localizations" : {
@@ -11315,6 +11339,9 @@
           }
         }
       }
+    },
+    "Remove the server's key?" : {
+
     },
     "Remove your %@ key?" : {
       "comment" : "Settings: title of the confirmation before removing an API key. %@ is the service's name.",
@@ -12183,6 +12210,9 @@
         }
       }
     },
+    "Server address" : {
+
+    },
     "Set an LLM API key in Settings to use AI mode" : {
       "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no API key.",
       "localizations" : {
@@ -12216,6 +12246,9 @@
           }
         }
       }
+    },
+    "Set up your server in Settings to edit text with AI." : {
+
     },
     "Settings" : {
       "comment" : "Settings — the window, and its place in the main window's sidebar.",
@@ -13794,6 +13827,12 @@
         }
       }
     },
+    "Test" : {
+
+    },
+    "Testing…" : {
+
+    },
     "Text" : {
       "comment" : "Settings › Dictation: group heading over how the text is written.",
       "localizations" : {
@@ -14133,6 +14172,9 @@
           }
         }
       }
+    },
+    "The internet. Your words leave your network." : {
+
     },
     "The lid is closed, so this microphone hears nothing." : {
       "comment" : "Settings › Dictation › Microphone: caption when the MacBook's own microphone is in use with the lid closed.",
@@ -14525,6 +14567,24 @@
         }
       }
     },
+    "The server answered, but not at this path. Most addresses end in /v1." : {
+
+    },
+    "The server lists no models. Load one in it, or type its ID." : {
+
+    },
+    "The server refused the request (HTTP %lld)." : {
+
+    },
+    "The server refused the request without a key." : {
+
+    },
+    "The server's address" : {
+
+    },
+    "The server's reply wasn't one SpeechText can read." : {
+
+    },
     "The service won't serve it to your key. The recording is in History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. under 'This model isn't available'.",
       "localizations" : {
@@ -14695,6 +14755,9 @@
         }
       }
     },
+    "This Mac." : {
+
+    },
     "This build does not update itself." : {
       "comment" : "About panel: the app's update status.",
       "localizations" : {
@@ -14745,6 +14808,9 @@
           }
         }
       }
+    },
+    "This key is sent in plain text." : {
+
     },
     "This model isn't available" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. the speech provider refused the selected model.",
@@ -16819,6 +16885,9 @@
         }
       }
     },
+    "Your network." : {
+
+    },
     "Your own prompts and changes are replaced by the three that come with SpeechText." : {
       "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name.",
       "localizations" : {
@@ -16852,6 +16921,12 @@
           }
         }
       }
+    },
+    "Your server" : {
+
+    },
+    "Your server isn't set up. Pasted the raw transcription." : {
+
     },
     "Your shortcuts" : {
       "comment" : "Setup window, Done step: heading over the shortcuts.",
@@ -17142,6 +17217,23 @@
         }
       }
     },
+    "commit message fix the token expiring too early" : {
+      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in Structured prompt: a request for a commit message, then what it should say. Write a natural example in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mensaje de commit arregla que el token caduque demasiado pronto"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "коміт меседж виправ що токен спливає зарано"
+          }
+        }
+      }
+    },
     "counted since %@" : {
       "comment" : "Usage page: note after the 'Requests' heading. %@ is a date.",
       "localizations" : {
@@ -17206,23 +17298,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "напр. спіч текст, speech text"
-          }
-        }
-      }
-    },
-    "commit message fix the token expiring too early" : {
-      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in Structured prompt: a request for a commit message, then what it should say. Write a natural example in your language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mensaje de commit arregla que el token caduque demasiado pronto"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "коміт меседж виправ що токен спливає зарано"
           }
         }
       }
@@ -17684,6 +17759,23 @@
         }
       }
     },
+    "reply to Oleh in English дякую що прийшли" : {
+      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in Message prompt: a reply asked for in another language, then the words (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "responde a Oleh en inglés дякую що прийшли"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "відповідь Олегу англійською дякую що прийшли"
+          }
+        }
+      }
+    },
     "requests a provider refused or that broke off" : {
       "comment" : "Usage page, Overhead: under the Refused figure.",
       "localizations" : {
@@ -17879,23 +17971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "перші %1$lld з %2$lld"
-          }
-        }
-      }
-    },
-    "reply to Oleh in English дякую що прийшли" : {
-      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in Message prompt: a reply asked for in another language, then the words (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "responde a Oleh en inglés дякую що прийшли"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "відповідь Олегу англійською дякую що прийшли"
           }
         }
       }
@@ -18154,6 +18229,9 @@
           }
         }
       }
+    },
+    "✓ Answered in %@ s." : {
+
     },
     "✓ Done" : {
       "comment" : "Setup window, Try it step: chip after AI polish wrote its text.",
