@@ -269,6 +269,9 @@ final class ProviderDescriptorTests: XCTestCase {
                 XCTAssertNil(engine.vendor.descriptor.speechUpload)
             case .local:
                 XCTAssertNil(engine.vendor.descriptor.speechUpload)
+            case .server:
+                XCTAssertTrue(makeBatchTranscriber(configuration: configuration) is ServerTranscriber)
+                XCTAssertNil(engine.vendor.descriptor.speechUpload)
             }
         }
     }

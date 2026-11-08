@@ -54,6 +54,32 @@ public final class AudioBufferWriter: @unchecked Sendable {
         preferredUploadCodec == .flac && frames < flacBlockFrames ? .wav : preferredUploadCodec
     }
 
+    /// A WAV copy of `file` in the temporary folder; the caller deletes it. For the one
+    /// destination that needs WAV whatever was recorded or archived: Ollama reads nothing
+    /// else (docs/specs/2026-11-07-own-model-server.md).
+    static func temporaryWAVCopy(of file: URL) throws -> URL {
+        let source = try AVAudioFile(forReading: file)
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: source.processingFormat, frameCapacity: AVAudioFrameCount(source.length)) else {
+            throw NSError(domain: "AudioBufferWriter", code: 1)
+        }
+        try source.read(into: buffer)
+        let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".wav")
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM,
+                                       AVSampleRateKey: source.fileFormat.sampleRate,
+                                       AVNumberOfChannelsKey: source.fileFormat.channelCount,
+                                       AVLinearPCMBitDepthKey: 16,
+                                       AVLinearPCMIsFloatKey: false,
+                                       AVLinearPCMIsBigEndianKey: false]
+        // In a scope of its own: `AVAudioFile` finishes the header when it is released.
+        do {
+            let output = try AVAudioFile(forWriting: copy, settings: settings,
+                                         commonFormat: source.processingFormat.commonFormat,
+                                         interleaved: source.processingFormat.isInterleaved)
+            try output.write(from: buffer)
+        }
+        return copy
+    }
+
     /// The two containers `writeAudioFile` can produce. Both hold 16 kHz mono 16-bit
     /// samples; only the encoding differs. Everything downstream — the multipart filename
     /// and MIME type, the History archive's filename — is driven by `fileExtension`, so

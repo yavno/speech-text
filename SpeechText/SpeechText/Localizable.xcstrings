@@ -1941,6 +1941,23 @@
         }
       }
     },
+    "A model you already run. Your recording goes to the address you enter." : {
+      "comment" : "Settings › Speech to text: the sentence under the place cards while Your server is open",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un modelo que ya tienes en marcha. Tu grabación va a la dirección que indiques."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель, яку ви вже запускаєте. Ваш запис надсилається на вказану вами адресу."
+          }
+        }
+      }
+    },
     "A model you already run. Your text goes to the address you enter." : {
       "comment" : "Settings › AI Rewrite: the sentence under the place cards while Your server is open",
       "localizations" : {
@@ -2226,6 +2243,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Диктування з ШІ та редагування надсилаються в %@. Разом із ними — слова з вашого Словника, а також програма, назва вікна й поле, для яких текст. Назва вікна може містити тему листа. Менеджери паролів і поля паролів ніколи не зчитуються."
+          }
+        }
+      }
+    },
+    "AI dictations and edits are sent to the address you entered. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
+      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los dictados con IA y las ediciones se envían a la dirección que indicaste. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo al que va el texto; un título de ventana puede mostrar el asunto de un correo. Nunca se leen los gestores de contraseñas ni los campos de contraseña."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування з ШІ та редагування надсилаються на вказану вами адресу. Разом із ними — слова з вашого Словника, а також програма, назва вікна й поле, для яких текст. Назва вікна може містити тему листа. Менеджери паролів і поля паролів ніколи не зчитуються."
           }
         }
       }
@@ -5793,6 +5827,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Кожен запис надсилається в %@ для транскрипції. Повтор з Історії надсилає його ще раз."
+          }
+        }
+      }
+    },
+    "Each recording is sent to the address you entered, with your Dictionary's words. A retry from History sends it again." : {
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada grabación se envía a la dirección que indicaste, con las palabras de tu Diccionario. Un reintento desde el Historial la envía de nuevo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен запис надсилається на вказану вами адресу разом зі словами з вашого Словника. Повтор з Історії надсилає його ще раз."
+          }
+        }
+      }
+    },
+    "Each recording is sent to the address you entered. A retry from History sends it again." : {
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada grabación se envía a la dirección que indicaste. Un reintento desde el Historial la envía de nuevo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен запис надсилається на вказану вами адресу. Повтор з Історії надсилає його ще раз."
           }
         }
       }
@@ -14831,6 +14899,23 @@
         }
       }
     },
+    "The server refused the test recording. It may not take this model, or WAV." : {
+      "comment" : "Settings › Your server: the test upload got HTTP 400, 413, 415 or 422",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha rechazado la grabación de prueba. Puede que no admita este modelo o WAV."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер відхилив тестовий запис. Можливо, він не приймає цю модель або WAV."
+          }
+        }
+      }
+    },
     "The server's address" : {
       "comment" : "Settings › Your server: placeholder in the address field",
       "localizations" : {
@@ -15201,6 +15286,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ця частина SpeechText вже в дорозі."
+          }
+        }
+      }
+    },
+    "This server doesn't transcribe audio. Use it for AI Rewrite, or pick another server." : {
+      "comment" : "Settings › Your server: the test upload got HTTP 404",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este servidor no transcribe audio. Úsalo para Reescritura con IA o elige otro servidor."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей сервер не транскрибує аудіо. Використовуйте його для ШІ‑переписування або виберіть інший сервер."
           }
         }
       }
@@ -15783,6 +15885,23 @@
         }
       }
     },
+    "Use" : {
+      "comment" : "Settings › Your server: takes the other role's address into the field",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Використати"
+          }
+        }
+      }
+    },
     "Use %@" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Online services: button that selects a service that has a key. %@ is the service's name.",
       "localizations" : {
@@ -15851,6 +15970,23 @@
         }
       }
     },
+    "Use the AI Rewrite server?" : {
+      "comment" : "Settings › Your server: offers the address already set for AI Rewrite",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Usar el servidor de Reescritura con IA?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Використати сервер для ШІ‑переписування?"
+          }
+        }
+      }
+    },
     "Use the average, 40 wpm" : {
       "comment" : "Usage page, typing test popover: button that drops the user's own speed.",
       "localizations" : {
@@ -15864,6 +16000,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Взяти середню швидкість, 40 сл./хв"
+          }
+        }
+      }
+    },
+    "Use the speech server?" : {
+      "comment" : "Settings › Your server: offers the address already set for speech",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Usar el servidor de voz?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Використати сервер мовлення?"
           }
         }
       }
@@ -16251,19 +16404,19 @@
         }
       }
     },
-    "What turns your voice into text — on this Mac or online." : {
-      "comment" : "Settings › Speech to text: line under the page title.",
+    "What turns your voice into text — on this Mac, online or on your own server." : {
+      "comment" : "Settings › Speech to text: the page's lead",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lo que convierte tu voz en texto, en este Mac o en línea."
+            "value" : "Lo que convierte tu voz en texto, en este Mac, en línea o en tu propio servidor."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Що перетворює ваш голос на текст — на цьому Mac чи онлайн."
+            "value" : "Що перетворює ваш голос на текст — на цьому Mac, онлайн чи на вашому сервері."
           }
         }
       }
@@ -17074,6 +17227,23 @@
         }
       }
     },
+    "You speak more than one language, so none is sent and the server detects it. Some servers, such as whisper.cpp, assume English instead." : {
+      "comment" : "Settings › Your server: for someone with several Languages I speak",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hablas más de un idioma, así que no se envía ninguno y el servidor lo detecta. Algunos servidores, como whisper.cpp, asumen inglés."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви розмовляєте кількома мовами, тому мова не надсилається, і сервер визначає її сам. Деякі сервери, як-от whisper.cpp, натомість вважають, що мова англійська."
+          }
+        }
+      }
+    },
     "You type at %lld wpm" : {
       "comment" : "Usage page: button that opens the typing test, once a speed is measured.",
       "localizations" : {
@@ -17274,6 +17444,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваш сервер"
+          }
+        }
+      }
+    },
+    "Your server is given them as a hint" : {
+      "comment" : "Dictionary page: how the words reach the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor las recibe como pista"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш сервер отримує їх як підказку"
           }
         }
       }
@@ -18678,6 +18865,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "✓ Працює!"
+          }
+        }
+      }
+    },
+    "✓ Transcribed a test clip in %@ s." : {
+      "comment" : "Settings › Your server: the test succeeded. The value is seconds",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✓ Clip de prueba transcrito en %@ s."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✓ Тестовий фрагмент транскрибовано за %@ с."
           }
         }
       }

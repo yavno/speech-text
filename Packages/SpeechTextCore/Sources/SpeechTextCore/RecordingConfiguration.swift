@@ -29,6 +29,9 @@ public struct RecordingConfiguration: Sendable {
     /// Each provider's API key as `APIKeyStore` held it at the start; a provider with
     /// none stored is absent. One key per provider, whichever step it serves.
     var apiKeys: [Provider: String] = [:]
+    /// The server a `.server` session uploads to, nil while its address is unusable.
+    /// Its key is `apiKeys[.server]`.
+    var serverEndpoint: ServerEndpoint? = nil
     /// The speech model stored for each provider; an absent one means its default
     /// (`ProviderDescriptor.speechModel`).
     var models: [Provider: String] = [:]
@@ -197,6 +200,9 @@ public struct RecordingConfiguration: Sendable {
     /// `modelInstalled` is a parameter so the check stays testable without a filesystem.
     public func batchUnavailableReason(modelInstalled: (String) -> Bool = { isLocalModelInstalled($0) }) -> String? {
         let batch = batchDescriptor
+        if batch.vendor == .server, serverEndpoint == nil {
+            return localized("Set your server's address in Settings › Speech to text.")
+        }
         if models[batch.vendor] == clearedModelChoice {
             return batch.vendor == .local
                 ? localized("Choose a model for this Mac in Settings.")
@@ -257,6 +263,8 @@ public struct RecordingConfiguration: Sendable {
             dictionary: Vocabulary.load(),
             replacements: TextReplacements.load()
         )
+        configuration.apiKeys[.server] = APIKeyStore.shared.value(for: SettingsKeys.serverSpeechAPIKey)
+        configuration.serverEndpoint = ServerEndpoint(address: defaults.string(forKey: SettingsKeys.serverSpeechAddress) ?? "")
         if CustomVocabulary.isSent(defaults) {
             let entries = configuration.dictionary
             // History is searched only when something this session may send cannot take

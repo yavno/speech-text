@@ -540,6 +540,7 @@ private struct DictionaryEffects: View {
     @AppStorage(SettingsKeys.groqModel) private var groqModel = Provider.groq.defaultSpeechModel
     @AppStorage(SettingsKeys.elevenLabsModel) private var elevenLabsModel = Provider.elevenLabs.defaultSpeechModel
     @AppStorage(SettingsKeys.openAISTTModel) private var openAISTTModel = Provider.openAI.defaultSpeechModel
+    @AppStorage(SettingsKeys.serverSpeechModel) private var serverSTTModel = ""
     @AppStorage(SettingsKeys.localSTTModel) private var localSTTModel = Provider.local.defaultSpeechModel
     @AppStorage(SettingsKeys.sendVocabularyToEngine) private var sends = true
     @AppStorage(SettingsKeys.llmProvider) private var llmProvider = LLMProviderType.groq.rawValue
@@ -582,6 +583,7 @@ private struct DictionaryEffects: View {
         case .elevenlabs: elevenLabsModel
         case .openai: openAISTTModel
         case .local: localSTTModel
+        case .server: serverSTTModel
         }
         return sttModel(vendor: provider.vendor, id: id)
     }
@@ -607,6 +609,10 @@ private struct DictionaryEffects: View {
         switch provider {
         case .groq:
             return (Text("Groq's Whisper is given them as a hint"),
+                    Self.count(sent: Vocabulary.whisperPromptTerms(terms).count, of: terms.count, model: model.displayName),
+                    true)
+        case .server:
+            return (Text("Your server is given them as a hint"),
                     Self.count(sent: Vocabulary.whisperPromptTerms(terms).count, of: terms.count, model: model.displayName),
                     true)
         case .local:

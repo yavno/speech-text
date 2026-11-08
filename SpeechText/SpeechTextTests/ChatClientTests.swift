@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import XCTest
+import AVFoundation
 @testable import SpeechTextCore
 
 // MARK: - The chat request body (ChatClients.swift)
@@ -424,5 +425,66 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertNil(body["max_completion_tokens"])
         XCTAssertNil(body["reasoning_effort"])
         XCTAssertTrue(client.staysOnOrigin)
+    }
+
+    func testAStatusOnTheUploadSaysWhatWentWrong() {
+        XCTAssertEqual(ServerProbe.speechResult(forStatus: 404), .noTranscription)
+        XCTAssertEqual(ServerProbe.speechResult(forStatus: 415), .audioRefused)
+        XCTAssertEqual(ServerProbe.speechResult(forStatus: 401), .needsKey)
+        XCTAssertEqual(ServerProbe.speechResult(forStatus: 500), .refused(status: 500))
+    }
+
+    func testTheTestClipIsASecondOfSilence() {
+        let wav = ServerProbe.silentWAV()
+        XCTAssertEqual(wav.count, 44 + 32_000)
+        XCTAssertEqual(String(decoding: wav.prefix(4), as: UTF8.self), "RIFF")
+    }
+
+    func testAServersSpeechModelIsUploadedAndNotPriced() {
+        let model = sttModel(vendor: .server, id: "whisper-small")
+        XCTAssertEqual(model.displayName, "whisper-small")
+        XCTAssertEqual(model.delivery, .upload)
+        XCTAssertEqual(model.price, .notPriced)
+        XCTAssertEqual(model.requirement, .none)
+    }
+
+    func testRetryNeedsAnAddress() throws {
+        var configuration = RecordingConfiguration(provider: .server, locale: "en-US", localeIsAutomatic: true,
+                                                   models: [.server: "whisper-small"])
+        XCTAssertNotNil(configuration.batchUnavailableReason())
+        configuration.serverEndpoint = try XCTUnwrap(ServerEndpoint(address: "http://localhost:8000/v1"))
+        XCTAssertNil(configuration.batchUnavailableReason())
+        XCTAssertEqual(configuration.batchProvider, .server)
+    }
+
+    func testNoAddressFailsTheUploadAndIsNotOffline() async {
+        let transcriber = ServerTranscriber(endpoint: nil, apiKey: "", model: "m", prompt: nil)
+        do {
+            _ = try await transcriber.transcribe(audioFileURL: URL(fileURLWithPath: "/nonexistent.wav"), language: nil)
+            XCTFail("an upload with no address")
+        } catch {
+            XCTAssertFalse(NetworkFailure.isOffline(error))
+        }
+        XCTAssertFalse(NetworkFailure.isOffline(TranscriptionError.serverNoAnswer))
+    }
+
+    func testAFLACRecordingBecomesAWAVWithTheSameFrames() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let flac = folder.appendingPathComponent("clip.flac")
+        let frames: AVAudioFrameCount = 16_000
+        let format = try XCTUnwrap(AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16_000, channels: 1, interleaved: true))
+        let buffer = try XCTUnwrap(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames))
+        buffer.frameLength = frames
+        do {
+            let file = try AVAudioFile(forWriting: flac, settings: AudioBufferWriter.UploadCodec.flac.fileSettings,
+                                       commonFormat: .pcmFormatInt16, interleaved: true)
+            try file.write(from: buffer)
+        }
+        let wav = try AudioBufferWriter.temporaryWAVCopy(of: flac)
+        defer { try? FileManager.default.removeItem(at: wav) }
+        XCTAssertEqual(String(decoding: try Data(contentsOf: wav).prefix(4), as: UTF8.self), "RIFF")
+        XCTAssertEqual(try AVAudioFile(forReading: wav).length, AVAudioFramePosition(frames))
     }
 }

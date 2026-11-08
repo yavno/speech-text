@@ -39,7 +39,7 @@ public final class APIKeyStore: @unchecked Sendable {
     /// key (`APIKeyDescriptor`). The launch migration moves exactly these, so the list is
     /// pinned literally in the tests.
     static let keys: [String] = Provider.allCases.compactMap { $0.descriptor.apiKey?.settingsKey }
-        + [SettingsKeys.serverChatAPIKey]
+        + [SettingsKeys.serverChatAPIKey, SettingsKeys.serverSpeechAPIKey]
 
     public enum Mode: Equatable, Sendable {
         /// Not opened: every key reads as empty. The test bundle's state.

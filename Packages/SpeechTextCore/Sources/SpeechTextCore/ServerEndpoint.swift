@@ -26,6 +26,7 @@ public struct ServerEndpoint: Equatable, Sendable {
 
     public var chatCompletionsURL: URL { base.appendingPathComponent("chat/completions") }
     public var modelsURL: URL { base.appendingPathComponent("models") }
+    var transcriptionsURL: URL { base.appendingPathComponent("audio/transcriptions") }
 
     public var isPlainHTTP: Bool { base.scheme?.lowercased() == "http" }
 
@@ -86,6 +87,8 @@ public enum ServerTestResult: Equatable, Sendable {
     case wrongPath
     case needsKey
     case noModels
+    case noTranscription
+    case audioRefused
     case refused(status: Int)
     case badReply
 
@@ -143,6 +146,58 @@ public enum ServerProbe {
         }
     }
 
+    /// One transcription of a second of silence, through the transcriber a dictation uses.
+    public static func transcription(endpoint: ServerEndpoint, model: String, apiKey: String) async -> ServerTestResult {
+        let clip = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".wav")
+        defer { try? FileManager.default.removeItem(at: clip) }
+        do {
+            try silentWAV().write(to: clip)
+        } catch {
+            return .badReply
+        }
+        let transcriber = ServerTranscriber(endpoint: endpoint, apiKey: apiKey, model: model, prompt: nil)
+        let start = CFAbsoluteTimeGetCurrent()
+        do {
+            _ = try await transcriber.transcribe(audioFileURL: clip, language: nil)
+            return .answered(seconds: CFAbsoluteTimeGetCurrent() - start)
+        } catch TranscriptionError.httpError(_, let status, _) {
+            return speechResult(forStatus: status)
+        } catch TranscriptionError.serverNoAnswer {
+            return .noAnswer
+        } catch is URLError {
+            return .noAnswer
+        } catch {
+            return .badReply
+        }
+    }
+
+    /// What a status on the transcription request means: the list of models has already
+    /// answered, so a 404 here is a server that does not transcribe.
+    static func speechResult(forStatus status: Int) -> ServerTestResult {
+        switch status {
+        case 404: .noTranscription
+        case 400, 413, 415, 422: .audioRefused
+        default: ServerTestResult.forStatus(status) ?? .badReply
+        }
+    }
+
+    /// A second of 16 kHz mono 16-bit silence, as a WAV file.
+    static func silentWAV(seconds: Int = 1) -> Data {
+        let rate: UInt32 = 16_000
+        let bytes = UInt32(seconds) * rate * 2
+        var data = Data()
+        func append<T: FixedWidthInteger>(_ value: T) { withUnsafeBytes(of: value.littleEndian) { data.append(contentsOf: $0) } }
+        data.append(contentsOf: Array("RIFF".utf8))
+        append(36 + bytes)
+        data.append(contentsOf: Array("WAVEfmt ".utf8))
+        append(UInt32(16)); append(UInt16(1)); append(UInt16(1))
+        append(rate); append(rate * 2); append(UInt16(2)); append(UInt16(16))
+        data.append(contentsOf: Array("data".utf8))
+        append(bytes)
+        data.append(Data(count: Int(bytes)))
+        return data
+    }
+
     /// The IDs of an OpenAI `{"data": [{"id": …}]}` list; nil for any other reply.
     static func parseModelIDs(_ data: Data) -> [String]? {
         struct List: Decodable {
@@ -150,6 +205,42 @@ public enum ServerProbe {
             let data: [Model]
         }
         return (try? JSONDecoder().decode(List.self, from: data))?.data.map(\.id)
+    }
+}
+
+/// Dictation through the user's server: the upload every cloud provider's OpenAI-shaped
+/// transcription uses, at an address that is a setting.
+struct ServerTranscriber: BatchTranscriber {
+    let endpoint: ServerEndpoint?
+    let apiKey: String
+    let model: String
+    /// The Dictionary as Whisper's free-text prompt (the spec's D3).
+    let prompt: String?
+
+    var meter: UsageMeter? { UsageMeter(vendor: .server, model: model) }
+
+    func transcribe(audioFileURL: URL, language: String?) async throws -> String {
+        try await transcribeMetered(audioFileURL: audioFileURL, language: language).text
+    }
+
+    func transcribeMetered(audioFileURL: URL, language: String?) async throws -> Transcription {
+        guard let endpoint else { throw TranscriptionError.noServerAddress }
+        // `response_format` is always asked for: mlx-audio answers NDJSON without it, and
+        // llama.cpp answers only JSON (their sources, 2026-11-07; the spec's table).
+        let upload = OpenAICompatibleUpload(url: endpoint.transcriptionsURL,
+                                            fixedFields: [(name: "response_format", value: "json")], vocabulary: .prompt)
+        var transcriber = OpenAICompatibleTranscriber(provider: .server, upload: upload,
+                                                      apiKey: apiKey.trimmingCharacters(in: .whitespacesAndNewlines),
+                                                      model: model, prompt: prompt)
+        transcriber.staysOnOrigin = true
+        let isWAV = audioFileURL.pathExtension.lowercased() == "wav"
+        let file = isWAV ? audioFileURL : try AudioBufferWriter.temporaryWAVCopy(of: audioFileURL)
+        defer { if !isWAV { try? FileManager.default.removeItem(at: file) } }
+        do {
+            return try await transcriber.transcribeMetered(audioFileURL: file, language: language)
+        } catch let error as URLError where error.code == .cannotConnectToHost {
+            throw TranscriptionError.serverNoAnswer
+        }
     }
 }
 

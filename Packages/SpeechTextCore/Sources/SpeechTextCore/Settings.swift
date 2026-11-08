@@ -68,6 +68,11 @@ public enum SettingsKeys {
     public static let serverChatAddress = "serverChatAddress"
     public static let serverChatModel = "serverChatModel"
     public static let serverChatAPIKey = "serverChatAPIKey"
+    /// Dictation through the user's own server: often another program than the one
+    /// serving AI Rewrite, so it has an address, a model and a key of its own.
+    public static let serverSpeechAddress = "serverSpeechAddress"
+    public static let serverSpeechModel = "serverSpeechModel"
+    public static let serverSpeechAPIKey = "serverSpeechAPIKey"
     static let anthropicAPIKey = "anthropicAPIKey"
     public static let anthropicModel = "anthropicModel"
     static let openAIAPIKey = "openAIAPIKey"
@@ -202,6 +207,7 @@ public enum SettingsKeys {
         holdToTalk, escapeCancelsDictation,
         llmProvider,
         serverChatAddress,
+        serverSpeechAddress,
         promptPresets, defaultPresetID, aiModeInRecordWindow,
         appSkin, accentColor, technoPhosphor, glassTransparency, dockIconMode,
         hotkeyLayoutVersion,

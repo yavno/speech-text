@@ -12,6 +12,7 @@ extension STTProviderType {
         case .elevenlabs: .elevenLabs
         case .openai: .openAI
         case .local: .local
+        case .server: .server
         }
     }
 }
@@ -350,6 +351,13 @@ public func pickerSTTModels(of vendor: Provider, selected: String) -> [STTModelD
 public func sttModel(vendor: Provider, id: String) -> STTModelDescriptor {
     if let listed = sttModelCatalog.first(where: { $0.vendor == vendor && $0.id == id }) {
         return listed
+    }
+    if vendor == .server {
+        // Whatever the server lists: uploaded under its own ID, not priced, and silent
+        // about languages, since nobody knows which ones it takes.
+        return STTModelDescriptor(id: id, vendor: .server, displayName: id, delivery: .upload, language: .single,
+                                  batchUpload: .itself, requirement: .none, price: .notPriced,
+                                  languages: .unpublished, languageNotes: [:])
     }
     let models = knownSTTModels(of: vendor)
     precondition(!models.isEmpty, "\(vendor) serves no speech")

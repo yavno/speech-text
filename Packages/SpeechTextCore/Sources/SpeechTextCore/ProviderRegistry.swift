@@ -122,10 +122,13 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                                                        defaultID: "gemma-4-12b-it-qat-q4_0"),
                                speechUpload: nil)
         case .server:
+            // `speechUpload` is nil because its address is a setting (`ServerTranscriber`).
             // No key of its own to check and no catalogue: the address, the key if the
             // server asks for one and the model it lists are the user's, in settings of
             // their own (`LLMConfiguration.serverEndpoint`). Nothing to pin at launch.
-            ProviderDescriptor(displayName: "Your server", roles: [.chat], apiKey: nil, speechModel: nil,
+            ProviderDescriptor(displayName: "Your server", roles: [.speech, .chat], apiKey: nil,
+                               speechModel: ModelSetting(settingsKey: SettingsKeys.serverSpeechModel, defaultID: "",
+                                                         normalized: false),
                                chatModel: ModelSetting(settingsKey: SettingsKeys.serverChatModel, defaultID: "",
                                                        normalized: false),
                                speechUpload: nil)

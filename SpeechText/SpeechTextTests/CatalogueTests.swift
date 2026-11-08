@@ -199,12 +199,13 @@ final class STTModelCatalogTests: XCTestCase {
     }
 
     func testEveryModelBelongsToOneVendorAndIsListedOnce() {
-        for vendor in Provider.allCases where vendor.descriptor.roles.contains(.speech) {
+        // A server's models are whatever it lists; it has no catalogue.
+        for vendor in Provider.allCases where vendor.descriptor.roles.contains(.speech) && vendor != .server {
             let ids = knownSTTModels(of: vendor).map(\.id)
             XCTAssertFalse(ids.isEmpty, vendor.rawValue)
             XCTAssertEqual(ids.count, Set(ids).count, vendor.rawValue)
         }
-        for provider in STTProviderType.allCases {
+        for provider in STTProviderType.allCases where provider != .server {
             XCTAssertFalse(knownSTTModels(of: provider.vendor).isEmpty, provider.rawValue)
         }
     }
@@ -290,7 +291,7 @@ final class StoredProviderNameTests: XCTestCase {
     }
 
     func testTheAPIKeysKeepTheirStoredNames() {
-        XCTAssertEqual(APIKeyStore.keys, ["groqAPIKey", "elevenLabsAPIKey", "anthropicAPIKey", "openAIAPIKey", "serverChatAPIKey"])
+        XCTAssertEqual(APIKeyStore.keys, ["groqAPIKey", "elevenLabsAPIKey", "anthropicAPIKey", "openAIAPIKey", "serverChatAPIKey", "serverSpeechAPIKey"])
     }
 
     /// Each provider serves exactly the steps a pick maps to it for.
@@ -318,7 +319,7 @@ final class StoredProviderNameTests: XCTestCase {
     /// rename. Order does not matter, membership does.
     func testThePortableSettingsKeepTheirStoredNames() {
         XCTAssertEqual(Set(SettingsKeys.portable), [
-            "serverChatAddress", "serverChatModel",
+            "serverChatAddress", "serverChatModel", "serverSpeechAddress", "serverSpeechModel",
             "selectedLanguage", "spokenLanguages",
             "sttProvider", "groqModel", "elevenLabsModel", "openAISTTModel", "localSTTModel",
             "removeDisfluencies", "dashStyle",
@@ -339,7 +340,7 @@ final class StoredProviderNameTests: XCTestCase {
     /// A default is a pointer into the provider's own catalogue, and every model key is
     /// stored, carried across a rename, and named once.
     func testEveryDefaultModelIsOneTheProviderOffers() {
-        for engine in STTProviderType.allCases {
+        for engine in STTProviderType.allCases where engine != .server {
             let setting = engine.vendor.descriptor.speechModel
             XCTAssertNotNil(setting, engine.rawValue)
             XCTAssertTrue(offeredSTTModels(of: engine.vendor).map(\.id).contains(engine.vendor.defaultSpeechModel), engine.rawValue)
@@ -382,7 +383,7 @@ final class StoredProviderNameTests: XCTestCase {
 
     /// `sttProvider` / `llmProvider` store these, and History records them as `provider`.
     func testTheEngineAndProviderPicksKeepTheirStoredNames() {
-        XCTAssertEqual(STTProviderType.allCases.map(\.rawValue), ["apple", "groq", "elevenlabs", "openai", "local"])
+        XCTAssertEqual(STTProviderType.allCases.map(\.rawValue), ["apple", "groq", "elevenlabs", "openai", "local", "server"])
         XCTAssertEqual(LLMProviderType.allCases.map(\.rawValue), ["groq", "anthropic", "openai", "local", "server"])
     }
 

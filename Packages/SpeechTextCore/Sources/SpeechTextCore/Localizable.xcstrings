@@ -2999,6 +2999,23 @@
         }
       }
     },
+    "Set your server's address in Settings › Speech to text." : {
+      "comment" : "Dictation or retry: the user's server has no valid address",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indica la dirección de tu servidor en Ajustes › Voz a texto."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Укажіть адресу свого сервера в Налаштування › Мовлення в текст."
+          }
+        }
+      }
+    },
     "Settings" : {
       "comment" : "Notice button that opens Settings.",
       "localizations" : {
@@ -3965,6 +3982,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваш сервер"
+          }
+        }
+      }
+    },
+    "Your server didn't answer." : {
+      "comment" : "A dictation failed: nothing answered at the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu servidor no ha respondido."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш сервер не відповів."
           }
         }
       }
