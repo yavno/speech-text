@@ -1334,10 +1334,13 @@ struct SpokenLanguagesChips: View {
 
 /// The language of the app's own windows, small, for Setup's first step: its name in itself,
 /// so it can be found by someone who cannot read the language showing now. Choosing a
-/// different one restarts the app, which comes back to this step.
+/// different one restarts the app, which comes back to this step; while a restart would
+/// cost words (back here from Try it, say, with a dictation still on) the button waits.
 struct AppLanguageMenu: View {
     @State private var open = false
     @State private var hovering = false
+
+    private var holdingWords: Bool { AppState.current?.isHoldingWords ?? false }
 
     var body: some View {
         Button { open = true } label: {
@@ -1353,6 +1356,9 @@ struct AppLanguageMenu: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .disabled(holdingWords)
+        .opacity(holdingWords ? 0.5 : 1)
+        .help(holdingWords ? Text("Finish the dictation and close the Record Window first.") : Text(verbatim: ""))
         .onHover { hovering = $0 }
         .fixedSize()
         .accessibilityLabel(Text("App language"))
@@ -1375,6 +1381,8 @@ struct AppLanguageMenu: View {
 
     private func pick(_ code: String?) {
         open = false
+        // A dictation can start while the list is open.
+        guard !holdingWords else { return }
         AppLanguage.choice = code
         if AppLanguage.needsRestart(for: code) { AppInstaller.restart() }
     }
