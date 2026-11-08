@@ -20,7 +20,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 - the three built-in modes, Clean-up, Message and Structured, never the user's, with the fixture's own `presets` beside them;
 - `RewriteModes.request` / `buildEditSystemPrompt` and `userMessage`, with the fixture's context and Dictionary;
-- in an editor, a terminal or an AI's field, Clean-up alone, chosen by code and sent with no marker; with `presets`, Clean-up and those, picked by the model. The summary counts the rows code decided apart from the routing (`+n by code`);
+- in an editor, a terminal or an AI's field, Clean-up alone, chosen by code and sent with no marker, and in a terminal with the rule its `terminalFocus` picks (a command at a shell prompt; words in a program; words unless a command is named where it is `unknown` or absent); with `presets`, Clean-up and those, picked by the model. The summary counts the rows code decided apart from the routing (`+n by code`);
 - the client `LLMConfiguration.makeChatClient(model:apiKey:)` builds for the app, with each model's catalogue switches;
 - the reply read as the app reads it, then `polishedReply` with the fixture's Dictionary.
 
@@ -34,7 +34,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 - **What was said:** `transcript`, or for the Edit shortcut (`"kind": "edit"`) a `selection` and an optional `instruction`.
 - **How clean:** `noise` — `dirty` for a transcript written the way a speech engine really writes one (misheard and transliterated words, no punctuation, a word cut in two), `clean` (the default) for text as a person types it. The summary counts the two apart.
-- **Where:** `context` (app, bundle ID, window, field) and `vocabulary` (the Dictionary's words).
+- **Where:** `context` (app, bundle ID, window, field, and in a terminal `terminalFocus`) and `vocabulary` (the Dictionary's words).
 - **What a right reply looks like**, in two kinds kept apart:
   - **Text checks**, which hold whatever the prompt:
     - `language`: `uk`, `any`, or a language written in Latin script;

@@ -82,7 +82,8 @@ final class LlamaModel {
     /// A copy of the state, not a trimmed cache: Qwen3.5 and 3.8 are hybrid models whose
     /// recurrent layers cannot be rolled back to a position. Three are kept, most recent
     /// first — AI dictation's two (`RewriteModes.request`: the routing prompt, and the one
-    /// for an editor, a terminal or an AI's field) and the Edit shortcut's.
+    /// for an editor, a program in a terminal or an AI's field) and the Edit shortcut's. A
+    /// terminal's prompts for a shell are read when first used, and push out the oldest.
     private var prefixes: [(tokens: [llama_token], state: [UInt8])] = []
     static let savedPrefixes = 3
 

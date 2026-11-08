@@ -403,7 +403,29 @@ struct PasteService {
                                     bundleID: target.bundleIdentifier,
                                     windowTitle: windowTitle,
                                     fieldLabels: fieldLabels,
-                                    isSecureField: isSecureField)
+                                    isSecureField: isSecureField,
+                                    foreground: FocusContext.isTerminal(bundleID: target.bundleIdentifier)
+                                        ? TerminalFocus.foregroundJobs(of: target.processIdentifier, in: processTable()) : [])
+    }
+
+    /// Every process, from one sysctl. Names and process groups only, and they stay on this
+    /// Mac: what is sent is at most which rule `RewriteModes` used.
+    private static func processTable() -> [TerminalFocus.Process] {
+        var query = [CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0]
+        var size = 0
+        guard sysctl(&query, 4, nil, &size, nil, 0) == 0 else { return [] }
+        // Room for what starts between the two calls.
+        var entries = [kinfo_proc](repeating: kinfo_proc(), count: size / MemoryLayout<kinfo_proc>.stride + 32)
+        size = entries.count * MemoryLayout<kinfo_proc>.stride
+        guard sysctl(&query, 4, &entries, &size, nil, 0) == 0 else { return [] }
+        return entries.prefix(size / MemoryLayout<kinfo_proc>.stride).map { entry in
+            let name = withUnsafePointer(to: entry.kp_proc.p_comm) {
+                $0.withMemoryRebound(to: CChar.self, capacity: MemoryLayout.size(ofValue: entry.kp_proc.p_comm)) { String(cString: $0) }
+            }
+            return TerminalFocus.Process(id: entry.kp_proc.p_pid, parent: entry.kp_eproc.e_ppid,
+                                         group: entry.kp_eproc.e_pgid, foregroundGroup: entry.kp_eproc.e_tpgid,
+                                         terminal: entry.kp_eproc.e_tdev == -1 ? nil : entry.kp_eproc.e_tdev, name: name)
+        }
     }
 
     /// The focused element of `app`, or of whatever is frontmost when `app` is nil.
