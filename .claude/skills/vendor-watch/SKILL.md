@@ -23,6 +23,8 @@ nothing: pass `--dry-run`, open no pull request, and list what would have been o
    ```bash
    git fetch origin && git switch --detach origin/main
    export SPEECHTEXT_VENDOR_WATCH="$HOME/.local/state/speech-text/vendor-watch"
+   # Not the default under /tmp: macOS empties it piecemeal, and a half-gone checkout fails the build.
+   export SPEECHTEXT_DERIVED_DATA="$SPEECHTEXT_VENDOR_WATCH/derived"
    out="$SPEECHTEXT_VENDOR_WATCH/reports/$(date -u +%F)"; mkdir -p "$out"
    scripts/check-vendor-models.sh --out "$out/report.md" --json "$out/findings.json"
    ```
