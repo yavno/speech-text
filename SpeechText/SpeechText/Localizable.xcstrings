@@ -2514,7 +2514,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Універсальний доступ"
+            "value" : "Доступність"
           }
         }
       }
@@ -2531,7 +2531,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Потрібен універсальний доступ"
+            "value" : "Потрібен дозвіл «Доступність»"
           }
         }
       }
@@ -2548,7 +2548,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Універсальний доступ вимкнено, тож ваш текст відкривається у Вікні запису."
+            "value" : "Дозвіл «Доступність» вимкнено, тож ваш текст відкривається у Вікні запису."
           }
         }
       }
@@ -4912,7 +4912,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Predeterminado: sigue Liquid Glass en Ajustes del Sistema › Apariencia."
+            "value" : "Predeterminado: sigue Liquid Glass en Ajustes del Sistema › Aspecto."
           }
         },
         "uk" : {
@@ -5497,7 +5497,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Натисніть двічі, щоб лише впорядкувати текст."
+            "value" : "Натисніть двічі, щоб лише обробити текст."
           }
         }
       }
@@ -5673,7 +5673,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетягніть у список «Універсальний доступ»"
+            "value" : "Перетягніть у список «Доступність»"
           }
         }
       }
@@ -6058,7 +6058,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esc funciona en tus apps como siempre. Para cancelar un dictado, haz clic en ✕ en el indicador."
+            "value" : "Esc funciona en tus apps como siempre. Para cancelar un dictado, haz clic en ✕ en la barra de dictado."
           }
         },
         "uk" : {
@@ -6999,7 +6999,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo se ven el indicador de grabación y la Ventana de grabación."
+            "value" : "Cómo se ven la barra de dictado y la Ventana de grabación."
           }
         },
         "uk" : {
@@ -8941,7 +8941,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Немає — лише впорядковано"
+            "value" : "Немає — лише оброблено"
           }
         }
       }
@@ -9060,7 +9060,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вставлено — універсальний доступ вимкнено"
+            "value" : "Не вставлено — вимкнено «Доступність»"
           }
         }
       }
@@ -11685,7 +11685,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписує текст, виділений у програмі на передньому плані. Скажіть інструкцію або натисніть скорочення двічі, щоб лише впорядкувати текст."
+            "value" : "Переписує текст, виділений у програмі на передньому плані. Скажіть інструкцію або натисніть скорочення двічі, щоб лише обробити текст."
           }
         }
       }
@@ -12280,7 +12280,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка скорочень на Головній"
+            "value" : "Блок зі скороченнями на Головній"
           }
         }
       }
@@ -12297,7 +12297,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скорочення клавіш"
+            "value" : "Клавіатурні скорочення"
           }
         }
       }
@@ -12714,7 +12714,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скажіть — і отримайте відшліфований текст"
+            "value" : "Скажіть — і отримайте оброблений текст"
           }
         }
       }
@@ -14027,7 +14027,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка вгорі Головної, що показує кожне скорочення — Диктування, ШІ‑переписування та Редагування."
+            "value" : "Блок угорі Головної, що показує кожне скорочення — Диктування, ШІ‑переписування та Редагування."
           }
         }
       }
@@ -14044,7 +14044,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка вгорі сторінки «Промпти» з прикладами того, що ви кажете, і промпту, який цьому підходить."
+            "value" : "Блок угорі сторінки «Промпти» з прикладами того, що ви кажете, і промпту, який цьому підходить."
           }
         }
       }
@@ -16122,7 +16122,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Поки видно накладку, Esc скасовує диктування — і до інших програм не доходить, доки вона не зникне."
+            "value" : "Поки видно панель, Esc скасовує диктування — і до інших програм не доходить, доки вона не зникне."
           }
         }
       }
@@ -16950,7 +16950,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш текст у Вікні запису. Увімкніть Універсальний доступ, щоб SpeechText міг друкувати за вас."
+            "value" : "Ваш текст у Вікні запису. Увімкніть «Доступність», щоб SpeechText міг друкувати за вас."
           }
         }
       }
@@ -17463,7 +17463,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Funciones rápidas de teclado), y puede tener prioridad."
+            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Atajos de teclado), y puede tener prioridad."
           }
         },
         "uk" : {

@@ -226,6 +226,9 @@ package hands to the UI, which it writes as `localized("…")` (`Localized.swift
   (`scripts/check-infoplist-strings.sh`).
 - The rest — comments, plurals, what stays verbatim — is in
   docs/specs/2026-11-04-localization.md.
+- Adding or turning on a language: docs/translation-glossary.md › *Adding a language*.
+  Run `scripts/window-snapshots.sh`, look at every screen beside its English, and attach
+  the folder to the pull request; it is required, and a language without it is not done.
 
 ## Taste
 

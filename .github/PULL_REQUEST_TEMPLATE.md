@@ -23,4 +23,4 @@ Closes #
 
 ## Screenshots
 
-<!-- Required for UI changes. Before/after. Video if there's motion or timing. -->
+<!-- Required for UI changes. Before/after. Video if there's motion or timing. A new language: the folder from scripts/window-snapshots.sh, zipped, every screen (docs/translation-glossary.md › Adding a language). -->

@@ -44,6 +44,9 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | AI mode | modo IA |
 | Edit (rewriting selected text by voice) | Editar; the feature: Edición |
 | Edit selection (the feature's name, on Home, in Usage, in the overlay; Edit Selection in the menu and the shortcut list) | Editar selección |
+| AI polish · polish | pulido con IA · pulir |
+| overlay (the recording overlay) | barra de dictado |
+| card (a block on a page) | tarjeta |
 | Hold to talk | Mantén para hablar |
 | Press to toggle | Pulsa para alternar (imperative, as Hold to talk) |
 | Apple Dictation · Apple on-device (speech models) | Dictado de Apple · Apple en el dispositivo |
@@ -62,18 +65,18 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | speech model | modelo de voz |
 | provider | proveedor |
 | API key | clave de API |
-| shortcut | atajo |
+| shortcut | atajo; macOS's Keyboard Shortcuts: Atajos de teclado |
 | paste | pegar |
 | transcription · transcribe | transcripción · transcribir |
 | on this Mac | en este Mac |
 | skin · Techno · Minimal | aspecto · Techno · Minimal |
 | System Settings | Ajustes del Sistema |
 | Privacy & Security | Privacidad y seguridad |
-| Keyboard · Dictation (macOS) | Teclado · Dictado |
+| Keyboard · Dictation · Appearance (macOS) | Teclado · Dictado · Aspecto |
 | Accessibility | Accesibilidad |
 | Microphone · Speech Recognition · Automation | Micrófono · Reconocimiento de voz · Automatización |
 | Sound | Sonido |
-| Login Items | Ítems de inicio de sesión |
+| Login Items & Extensions | Ítems de inicio y extensiones |
 | menu bar · Dock · Control Center | barra de menús · Dock · Centro de control |
 
 ## Ukrainian (`uk`)
@@ -89,6 +92,9 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | AI mode | режим ШІ |
 | Edit (rewriting selected text by voice) | Редагувати; the feature: Редагування |
 | Edit selection (the feature's name; Edit Selection in the menu and the shortcut list) | Редагування виділеного; the menu item: Редагувати виділене |
+| AI polish · polish | ШІ‑обробка · обробити; *tidy up* stays впорядкувати |
+| overlay (the recording overlay) | панель запису; short: панель |
+| card (a block on a page) | блок, never картка |
 | Hold to talk | Затисніть і говоріть; *hold* (the key) is затисніть everywhere, never утримуйте |
 | Recording (the state, a heading) | Запис |
 | Apple Dictation · Apple on-device (speech models) | Диктування Apple · Apple на пристрої |
@@ -107,18 +113,18 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | speech model | модель мовлення |
 | provider | провайдер |
 | API key | API-ключ |
-| shortcut | скорочення клавіш; short: скорочення |
+| shortcut | скорочення; the heading, as macOS's Keyboard Shortcuts: клавіатурні скорочення |
 | paste | вставити |
 | transcription · transcribe | транскрипція · транскрибувати |
 | on this Mac | на цьому Mac |
 | skin · Techno · Minimal | оформлення · Techno · Minimal |
 | System Settings | Системні параметри; a path after a preposition takes the locative: «у Системних параметрах › Звук» |
 | Privacy & Security | Приватність і безпека |
-| Keyboard · Dictation (macOS) | Клавіатура · Диктування |
-| Accessibility | Універсальний доступ |
+| Keyboard · Dictation · Appearance (macOS) | Клавіатура · Диктування · Вигляд |
+| Accessibility | Доступність, as macOS names it; the permission in a sentence: дозвіл «Доступність» |
 | Microphone · Speech Recognition · Automation | Мікрофон · Розпізнавання мовлення · Автоматизація |
 | Sound | Звук |
-| Login Items | Елементи входу |
+| Login Items & Extensions | Автозапуск і розширення |
 | menu bar · Dock · Control Center | смуга меню · Dock · Центр керування |
 
 ## Adding a language
@@ -128,9 +134,16 @@ A new language is not done when every string has a value. Before it is turned on
 1. **Every window is looked at and compared with English.** Run
    `scripts/window-snapshots.sh --languages "en <code>"` and go through every screen in
    `index.html` beside its English: text cut off or clipped, a word broken across lines,
-   a button pushed out of its window, English left over, a sentence that reads wrong.
-   Write the assessment down in the pull request that turns the language on, screen by
-   screen, with what was fixed.
+   a button pushed out of its window, a row that has become cramped, English left over,
+   a sentence that reads wrong. The script needs a Mac with Xcode and the Screen Recording
+   grant, and draws every screen the same way each time, so nobody picks which to show.
+
+   The pull request that adds or turns on a language **must include these screens**: zip
+   the folder the script wrote (`index.html` and the language folders, about 20 MB) and
+   attach it to the pull request. Add the assessment screen by screen, with what was
+   fixed. Screens from anywhere else, or only some of them, do not count; a pull request
+   without them is not reviewed. An AI agent preparing the language runs the script and
+   looks at the images itself, and still attaches the folder.
 2. **Every term is right and the same everywhere.** Each row of this glossary gets the
    language's word, the macOS names the ones macOS itself uses in that language (Settings
    is *Параметри* in Ukrainian, not *Налаштування*), a page's name in the sidebar fits it
@@ -138,4 +151,9 @@ A new language is not done when every string has a value. Before it is turned on
    a feature or a setting uses that word — in the window itself, in the notices that send
    the user there, and in the paths (*Settings › AI Rewrite*). Grammar around a name
    follows the language (Ukrainian puts a path after «у» in the locative).
+
+   A macOS name is read from macOS, never from memory, since Apple renames them: the
+   strings are in `/System/Library/ExtensionKit/Extensions/*/Contents/Resources/*.loctable`
+   (`plutil -p`), one table per language, and macOS's Accessibility in Ukrainian is
+   *Доступність*, not the older *Універсальний доступ*.
 
