@@ -141,10 +141,9 @@ struct PasteService {
         let saved = saveClipboard(pasteboard)
         pasteboardWrites += 1
         let before = pasteboard.changeCount
-        // The poll's 600 ms and the late watch, with a margin.
-        cutWatchEnds = ProcessInfo.processInfo.systemUptime + 0.7 + lateChangeSeconds
+        cutsBeingWatched += 1
         simulateCommandKey("x", name: "⌘X")
-        awaitChange(of: pasteboard, since: before, late: {
+        awaitChange(of: pasteboard, since: before, finished: { cutsBeingWatched -= 1 }, late: {
             let text = pasteboard.string(forType: .string) ?? ""
             guard isSelection(text) else {
                 dlog("Edit", "cut: the pasteboard changed late to \(text.count) chars that are not the selection — left alone")
@@ -170,13 +169,16 @@ struct PasteService {
     /// Polls the pasteboard until a ⌘C or ⌘X lands. The copy happens in another process
     /// with no signal of its own. Once the poll has given up, `late` runs if the key lands
     /// after all (`watchForLateChange`).
+    /// `finished` runs when nothing more can happen: the key landed, or the watch is over.
     private static func awaitChange(of pasteboard: NSPasteboard, since before: Int, attempt: Int = 0,
+                                    finished: @escaping () -> Void = {},
                                     late: @escaping () -> Void, completion: @escaping (Bool) -> Void) {
         // ~600 ms in 20 ms steps: Chromium takes its time. An app with nothing selected
         // leaves the pasteboard alone, so running out means nothing was there.
         let maxAttempts = 30
         guard pasteboard.changeCount == before else {
             completion(true)
+            finished()
             return
         }
         guard attempt < maxAttempts else {
@@ -184,11 +186,13 @@ struct PasteService {
             let writes = pasteboardWrites
             completion(false)
             watchForLateChange(of: pasteboard, since: before, writes: writes,
-                               until: ProcessInfo.processInfo.systemUptime + lateChangeSeconds, landed: late)
+                               until: ProcessInfo.processInfo.systemUptime + lateChangeSeconds,
+                               finished: finished, landed: late)
             return
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
-            awaitChange(of: pasteboard, since: before, attempt: attempt + 1, late: late, completion: completion)
+            awaitChange(of: pasteboard, since: before, attempt: attempt + 1, finished: finished,
+                        late: late, completion: completion)
         }
     }
 
@@ -207,15 +211,24 @@ struct PasteService {
     /// of ours in between is taken for the key; a write of ours ends the watch, since the
     /// change would then be ours.
     private static func watchForLateChange(of pasteboard: NSPasteboard, since before: Int, writes: Int,
-                                           until deadline: TimeInterval, landed: @escaping () -> Void) {
-        guard writes == pasteboardWrites else { return }
-        guard pasteboard.changeCount == before else {
-            landed()
+                                           until deadline: TimeInterval, finished: @escaping () -> Void,
+                                           landed: @escaping () -> Void) {
+        guard writes == pasteboardWrites else {
+            finished()
             return
         }
-        guard ProcessInfo.processInfo.systemUptime < deadline else { return }
+        guard pasteboard.changeCount == before else {
+            landed()
+            finished()
+            return
+        }
+        guard ProcessInfo.processInfo.systemUptime < deadline else {
+            finished()
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            watchForLateChange(of: pasteboard, since: before, writes: writes, until: deadline, landed: landed)
+            watchForLateChange(of: pasteboard, since: before, writes: writes, until: deadline,
+                               finished: finished, landed: landed)
         }
     }
 
@@ -466,13 +479,13 @@ struct PasteService {
     /// cancelled and rescheduled, never re-taken.
     private static var savedClipboard: [NSPasteboardItem]?
     private static var pendingRestore: DispatchWorkItem?
-    /// When the last ⌘X's poll and late watch are over: until then a cut can still land.
-    private static var cutWatchEnds: TimeInterval = 0
+    /// ⌘Xs whose poll or late watch is still running: each can still land a cut.
+    private static var cutsBeingWatched = 0
 
     /// Whether quitting now would strand something: a clipboard still to be put back, or
     /// a cut that may yet land and need returning to its document. Seconds at most.
     static var hasPendingCleanup: Bool {
-        pendingRestore != nil || ProcessInfo.processInfo.systemUptime < cutWatchEnds
+        pendingRestore != nil || cutsBeingWatched > 0
     }
     /// The pasteboard's change count right after our text went on it. If it differs
     /// when the restore fires, someone else wrote the pasteboard in between — the user
