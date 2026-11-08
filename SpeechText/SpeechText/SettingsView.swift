@@ -1419,7 +1419,7 @@ private struct VersionRow: View {
 /// Settings › General: the language of the app's own windows. Foundation reads it at launch,
 /// so a choice that changes it offers a restart, which waits for a dictation in progress.
 private struct AppLanguageRow: View {
-    @State private var choice = AppLanguage.choice ?? ""
+    @State private var choice = AppLanguage.choice ?? AppLanguage.unavailablePreference ?? ""
 
     private var pending: Bool { AppLanguage.needsRestart(for: choice.isEmpty ? nil : choice) }
     private var dictating: Bool { (AppState.current?.speechEngine.phase ?? .idle) != .idle }
@@ -1439,6 +1439,9 @@ private struct AppLanguageRow: View {
                 Picker("App language", selection: $choice) {
                     Text("System language").tag("")
                     Divider()
+                    if let other = AppLanguage.unavailablePreference {
+                        Text(verbatim: AppLanguage.name(of: other)).tag(other)
+                    }
                     ForEach(AppLanguage.available, id: \.self) { code in
                         Text(verbatim: AppLanguage.name(of: code)).tag(code)
                     }

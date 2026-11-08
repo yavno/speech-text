@@ -58,12 +58,7 @@ public enum AppLanguage {
     /// The language chosen here, or nil to follow the system. Read from the app's own
     /// preferences: `UserDefaults.standard` would also answer with the system's list.
     public static var choice: String? {
-        get {
-            guard let domain = Bundle.main.bundleIdentifier,
-                  let stored = UserDefaults.standard.persistentDomain(forName: domain)?[key] as? [String],
-                  let first = stored.first else { return nil }
-            return Bundle.preferredLocalizations(from: available, forPreferences: [first]).first
-        }
+        get { storedPreference.flatMap { match($0, in: available) } }
         set {
             if let newValue {
                 UserDefaults.standard.set([newValue], forKey: key)
@@ -72,6 +67,28 @@ public enum AppLanguage {
             }
             UserDefaults.standard.synchronize()
         }
+    }
+
+    /// What the app's preferences hold when no language of the app answers to it: a
+    /// language since removed. It is neither a language to offer nor the system's, so a
+    /// picker shows it as it is and either can still be chosen over it.
+    public static var unavailablePreference: String? {
+        storedPreference.flatMap { match($0, in: available) == nil ? $0 : nil }
+    }
+
+    /// The app's language for a stored preference ("uk-UA" is "uk"), or nil when it has
+    /// none in that language. Foundation alone would answer with the development language.
+    static func match(_ preference: String, in localizations: [String]) -> String? {
+        guard let found = Bundle.preferredLocalizations(from: localizations, forPreferences: [preference]).first,
+              Locale(identifier: found).language.languageCode == Locale(identifier: preference).language.languageCode
+        else { return nil }
+        return found
+    }
+
+    private static var storedPreference: String? {
+        guard let domain = Bundle.main.bundleIdentifier,
+              let stored = UserDefaults.standard.persistentDomain(forName: domain)?[key] as? [String] else { return nil }
+        return stored.first
     }
 
     /// The language the windows are showing now.

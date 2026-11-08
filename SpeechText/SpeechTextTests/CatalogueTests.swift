@@ -91,6 +91,13 @@ final class RecordingConfigurationTests: XCTestCase {
         XCTAssertEqual(AppLanguage.name(of: "en"), "English")
     }
 
+    func testAStoredPreferenceMatchesOnlyItsOwnLanguage() {
+        let all = ["en", "es", "uk"]
+        XCTAssertEqual(AppLanguage.match("uk-UA", in: all), "uk")
+        XCTAssertEqual(AppLanguage.match("es", in: all), "es")
+        XCTAssertNil(AppLanguage.match("fr", in: all), "not the development language")
+    }
+
     func testAChoiceOutranksTheSystemsLanguages() {
         let all = ["en", "es", "uk"]
         XCTAssertEqual(AppLanguage.effective(choice: "uk", localizations: all, system: ["en-SE", "es"]), "uk")
