@@ -468,7 +468,7 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertFalse(NetworkFailure.isOffline(TranscriptionError.serverNoAnswer))
     }
 
-    func testAFLACRecordingBecomesAWAVWithTheSameFrames() throws {
+    func testAFLACRecordingBecomesAWAVWithTheSameSamples() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -477,6 +477,9 @@ final class ServerEndpointTests: XCTestCase {
         let format = try XCTUnwrap(AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16_000, channels: 1, interleaved: true))
         let buffer = try XCTUnwrap(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames))
         buffer.frameLength = frames
+        let samples = try XCTUnwrap(buffer.int16ChannelData?[0])
+        // A ramp, so a copy that turned the audio to silence would not pass.
+        for frame in 0..<Int(frames) { samples[frame] = Int16(truncatingIfNeeded: frame * 3) }
         do {
             let file = try AVAudioFile(forWriting: flac, settings: AudioBufferWriter.UploadCodec.flac.fileSettings,
                                        commonFormat: .pcmFormatInt16, interleaved: true)
@@ -485,6 +488,12 @@ final class ServerEndpointTests: XCTestCase {
         let wav = try AudioBufferWriter.temporaryWAVCopy(of: flac)
         defer { try? FileManager.default.removeItem(at: wav) }
         XCTAssertEqual(String(decoding: try Data(contentsOf: wav).prefix(4), as: UTF8.self), "RIFF")
-        XCTAssertEqual(try AVAudioFile(forReading: wav).length, AVAudioFramePosition(frames))
+        let copy = try AVAudioFile(forReading: wav, commonFormat: .pcmFormatInt16, interleaved: true)
+        XCTAssertEqual(copy.length, AVAudioFramePosition(frames))
+        let decoded = try XCTUnwrap(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames))
+        try copy.read(into: decoded)
+        let copied = try XCTUnwrap(decoded.int16ChannelData?[0])
+        XCTAssertEqual(Array(UnsafeBufferPointer(start: copied, count: Int(frames))),
+                       Array(UnsafeBufferPointer(start: samples, count: Int(frames))))
     }
 }

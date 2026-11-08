@@ -61,7 +61,7 @@ public final class AudioBufferWriter: @unchecked Sendable {
         let source = try AVAudioFile(forReading: file)
         // A piece at a time: a long dictation is hundreds of megabytes once decoded.
         guard let buffer = AVAudioPCMBuffer(pcmFormat: source.processingFormat, frameCapacity: 65_536) else {
-            throw NSError(domain: "AudioBufferWriter", code: 1)
+            throw AudioBufferWriterError.conversionFailed("could not allocate a buffer for the WAV copy")
         }
         let copy = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".wav")
         let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM,
