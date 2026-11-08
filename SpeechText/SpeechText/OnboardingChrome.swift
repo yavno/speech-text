@@ -1362,7 +1362,8 @@ struct AppLanguageMenu: View {
 
     private var rows: some View {
         VStack(alignment: .leading, spacing: 0) {
-            LanguagePickerRow(title: String(localized: "System language"), checked: AppLanguage.choice == nil) { pick(nil) }
+            LanguagePickerRow(title: String(localized: "System language"),
+                              checked: AppLanguage.choice == nil && AppLanguage.unavailablePreference == nil) { pick(nil) }
             Divider().padding(.vertical, 4)
             ForEach(AppLanguage.available, id: \.self) { code in
                 LanguagePickerRow(title: AppLanguage.name(of: code), checked: AppLanguage.choice == code) { pick(code) }
