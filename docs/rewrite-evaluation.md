@@ -51,7 +51,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 `--self-check` runs the checks on every example, holds every routing expectation to what a router can answer, and asks no model. The script runs it first and stops on a mismatch.
 
-A check must almost never fail a good answer, so the strict ones are opt-in per fixture, and anything fuzzy is left to the judge. Where today's prompt contradicts itself, a fixture asserts the behaviour the specific rule asks for. In a program in a terminal, or where the focus is `unknown`, an instruction is written down, not turned into a command, unless a command is asked for by name there; at a shell prompt, it becomes the command.
+A check must almost never fail a good answer, so the strict ones are opt-in per fixture, and anything fuzzy is left to the judge. Where today's prompt contradicts itself, a fixture asserts the behaviour the specific rule asks for. In a program in a terminal, an instruction is written down, not turned into a command; where the focus is `unknown`, the same unless a command is asked for by name; at a shell prompt, it becomes the command.
 
 ## The judge
 

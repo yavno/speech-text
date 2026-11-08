@@ -81,7 +81,10 @@ public enum TerminalFocus: String, Codable, Sendable {
         // Several tabs and only some at a prompt: the title is of the tab in front. cmux's
         // shell puts the directory there at a prompt and the command while one runs, so a
         // directory is a prompt; Claude Code writes its own. An ssh tab was ruled out
-        // above, since a remote shell's title looks the same.
+        // above, since a remote shell's title looks the same. A program that writes a path
+        // as its own title would read as a prompt: nothing better says which tab is in
+        // front (cmux's scripting has no tty and its CLI refuses outside processes), and
+        // the cost is a command pasted, never run, where words were wanted.
         if bundleID?.hasPrefix("com.cmuxterm.app") == true, !shellTabs.isEmpty, isDirectoryTitle(windowTitle) {
             return .shellPrompt
         }
