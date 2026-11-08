@@ -63,6 +63,11 @@ public enum SettingsKeys {
     // LLM post-processing
     public static let llmProvider = "llmProvider"
     public static let groqLLMModel = "groqLLMModel"
+    /// AI Rewrite through the user's own server: its base address as they wrote it, the
+    /// model it lists, and the key if it asks for one (`APIKeyStore`, never `portable`).
+    public static let serverChatAddress = "serverChatAddress"
+    public static let serverChatModel = "serverChatModel"
+    public static let serverChatAPIKey = "serverChatAPIKey"
     static let anthropicAPIKey = "anthropicAPIKey"
     public static let anthropicModel = "anthropicModel"
     static let openAIAPIKey = "openAIAPIKey"
@@ -196,6 +201,7 @@ public enum SettingsKeys {
         editHotkeyKeyCode, editHotkeyModifierFlags,
         holdToTalk, escapeCancelsDictation,
         llmProvider,
+        serverChatAddress,
         promptPresets, defaultPresetID, aiModeInRecordWindow,
         appSkin, accentColor, technoPhosphor, glassTransparency, dockIconMode,
         hotkeyLayoutVersion,

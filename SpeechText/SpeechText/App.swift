@@ -1301,7 +1301,9 @@ final class AppState {
                 title: String(localized: "AI processing skipped"),
                 detail: type.needsAPIKey
                     ? String(localized: "No API key for \(type.displayName). Pasted the raw transcription.")
-                    : String(localized: "No \(type.displayName) model selected. Pasted the raw transcription."),
+                    : type == .server
+                        ? String(localized: "Your server isn't set up. Pasted the raw transcription.")
+                        : String(localized: "No \(type.displayName) model selected. Pasted the raw transcription."),
                 tint: .orange
             )
             DictationTraceRecorder.record(.refinement, error: "not configured")
@@ -1940,7 +1942,9 @@ final class AppState {
             abortEdit(icon: "key.slash", title: String(localized: "AI isn't set up"),
                       detail: type.needsAPIKey
                           ? String(localized: "Add a \(type.displayName) API key in Settings to edit text with AI.")
-                          : String(localized: "Choose a \(type.displayName) model in Settings to edit text with AI."))
+                          : type == .server
+                              ? String(localized: "Set up your server in Settings to edit text with AI.")
+                              : String(localized: "Choose a \(type.displayName) model in Settings to edit text with AI."))
             return
         }
 

@@ -203,7 +203,7 @@ struct CorpusEngine {
         case .elevenLabs: .elevenlabs
         case .openAI: .openai
         case .local: .local
-        case .apple, .anthropic, .ollama: .apple
+        case .apple, .anthropic, .server, .ollama: .apple
         }
     }
 

@@ -1014,6 +1014,7 @@ struct HomeEngines: View {
     @AppStorage(SettingsKeys.anthropicModel) private var anthropicModel = Provider.anthropic.defaultChatModel
     @AppStorage(SettingsKeys.openAIModel) private var openAIModel = Provider.openAI.defaultChatModel
     @AppStorage(SettingsKeys.localLLMModel) private var localLLMModel = Provider.local.defaultChatModel
+    @AppStorage(SettingsKeys.serverChatModel) private var serverChatModel = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -1057,7 +1058,7 @@ struct HomeEngines: View {
 
     private var aiEngine: Text {
         let type = LLMProviderType(rawValue: llmProvider) ?? .groq
-        _ = (groqLLMModel, anthropicModel, openAIModel, localLLMModel)
+        _ = (groqLLMModel, anthropicModel, openAIModel, localLLMModel, serverChatModel)
         guard LLMConfiguration.isConfigured else {
             return Text("Off").foregroundStyle(MainColor.ink2).fontWeight(.regular)
                 + Text(verbatim: " · ").foregroundStyle(MainColor.ink2).fontWeight(.regular)
@@ -1070,6 +1071,7 @@ struct HomeEngines: View {
         case .groq: Text(verbatim: "Groq")
         case .openai: Text(verbatim: "OpenAI")
         case .local: Text("On this Mac")
+        case .server: Text("Your server")
         }
         let name: Text = if id == clearedModelChoice {
             Text("Choose a model")
@@ -1077,7 +1079,7 @@ struct HomeEngines: View {
             switch type {
             case .anthropic: Text(verbatim: Self.plainName(listed).replacingOccurrences(of: "Claude ", with: ""))
             case .groq, .openai: Text(verbatim: Self.plainName(listed))
-            case .local: Text(verbatim: listed)
+            case .local, .server: Text(verbatim: listed)
             }
         }
         return vendor + Text(verbatim: " · ") + name

@@ -87,7 +87,8 @@ final class LLMRequestPayloadTests: XCTestCase {
 final class ChatModelCatalogTests: XCTestCase {
 
     func testEveryProviderOffersModelsAndItsDefaultIsOne() {
-        for provider in LLMProviderType.allCases {
+        // A server's models are whatever it lists; it has no catalogue.
+        for provider in LLMProviderType.allCases where provider != .server {
             XCTAssertFalse(offeredChatModels(of: provider).isEmpty, provider.rawValue)
         }
         XCTAssertNotNil(listedChatModel(provider: .groq, id: "openai/gpt-oss-120b"))
@@ -347,5 +348,81 @@ final class ChatHTTPErrorWordsTests: XCTestCase {
                        "The rewrite failed: too many requests — try again in a moment. (HTTP 429)")
         XCTAssertEqual(LLMError.httpError(400, "Bad Request").errorDescription,
                        "The rewrite failed: the request was refused. (HTTP 400)")
+    }
+}
+
+// MARK: - Your server
+
+final class ServerEndpointTests: XCTestCase {
+    func testAddressIsTrimmedAndKeepsItsPath() {
+        XCTAssertEqual(ServerEndpoint(address: "  http://localhost:11434/v1/ \n")?.base.absoluteString, "http://localhost:11434/v1")
+        XCTAssertEqual(ServerEndpoint(address: "http://localhost:11434/v1")?.chatCompletionsURL.absoluteString,
+                       "http://localhost:11434/v1/chat/completions")
+        XCTAssertEqual(ServerEndpoint(address: "https://models.example.net/v1")?.modelsURL.absoluteString,
+                       "https://models.example.net/v1/models")
+    }
+
+    func testWhatCannotBeAnAddressIsNil() {
+        for text in ["", "   ", "localhost:11434/v1", "ftp://host/v1", "http://"] {
+            XCTAssertNil(ServerEndpoint(address: text), text)
+        }
+    }
+
+    func testPlaceIsReadOffTheAddress() {
+        let places: [(String, ServerEndpoint.Place)] = [
+            ("http://localhost:1234/v1", .thisMac), ("http://127.0.0.1:1234/v1", .thisMac), ("http://[::1]:1234/v1", .thisMac),
+            ("http://studio.local:1234/v1", .network), ("http://studio:1234/v1", .network),
+            ("http://192.168.1.20/v1", .network), ("http://10.0.0.2/v1", .network), ("http://172.16.0.2/v1", .network),
+            ("http://169.254.1.1/v1", .network), ("http://100.101.1.1/v1", .network), ("http://[fd00::1]/v1", .network),
+            ("http://127.example.com/v1", .internet), ("http://127.+1.1.1/v1", .internet), ("http://192.168.example.com/v1", .internet),
+            ("http://172.32.0.2/v1", .internet), ("http://8.8.8.8/v1", .internet), ("https://models.example.net/v1", .internet),
+        ]
+        for (address, place) in places {
+            XCTAssertEqual(ServerEndpoint(address: address)?.place, place, address)
+        }
+    }
+
+    func testOnlyPlainHTTPOffThisMacIsReadableOnTheWay() {
+        XCTAssertEqual(ServerEndpoint(address: "http://localhost/v1")?.isReadableOnTheWay, false)
+        XCTAssertEqual(ServerEndpoint(address: "http://studio.local/v1")?.isReadableOnTheWay, true)
+        XCTAssertEqual(ServerEndpoint(address: "https://studio.local/v1")?.isReadableOnTheWay, false)
+    }
+
+    func testARedirectStaysOnTheServerItCameFrom() throws {
+        func url(_ text: String) throws -> URL { try XCTUnwrap(URL(string: text)) }
+        XCTAssertTrue(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://LOCALHOST:1234/other")))
+        XCTAssertTrue(ServerEndpoint.isSameOrigin(try url("https://a.example/v1"), try url("https://a.example:443/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://studio.local:1234/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://localhost:1235/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("https://a.example/v1"), try url("http://a.example/v1")))
+    }
+
+    func testStatusesSayWhatToDo() {
+        XCTAssertNil(ServerTestResult.forStatus(200))
+        XCTAssertEqual(ServerTestResult.forStatus(401), .needsKey)
+        XCTAssertEqual(ServerTestResult.forStatus(403), .needsKey)
+        XCTAssertEqual(ServerTestResult.forStatus(404), .wrongPath)
+        XCTAssertEqual(ServerTestResult.forStatus(500), .refused(status: 500))
+    }
+
+    func testModelListIsOpenAIsShape() {
+        let reply = Data(#"{"object":"list","data":[{"id":"gemma4:12b","object":"model"},{"id":"qwen3.5:9b"}]}"#.utf8)
+        XCTAssertEqual(ServerProbe.parseModelIDs(reply), ["gemma4:12b", "qwen3.5:9b"])
+        XCTAssertNil(ServerProbe.parseModelIDs(Data("<html>".utf8)))
+    }
+
+    func testAServersModelIsSentNoSwitchAndHasNoPrice() throws {
+        let model = chatModel(provider: .server, id: "gemma4:12b")
+        XCTAssertEqual(model.displayName, "gemma4:12b")
+        XCTAssertEqual(model.price, .notPriced)
+        let endpoint = try XCTUnwrap(ServerEndpoint(address: "http://localhost:11434/v1"))
+        let client = try XCTUnwrap(LLMConfiguration.makeServerChatClient(endpoint: endpoint, model: "gemma4:12b", apiKey: "")
+            as? OpenAICompatibleChatClient)
+        XCTAssertEqual(client.baseURL.absoluteString, "http://localhost:11434/v1/chat/completions")
+        let body = client.payload(system: "s", user: "u")
+        XCTAssertEqual(body["max_tokens"] as? Int, 8192)
+        XCTAssertNil(body["max_completion_tokens"])
+        XCTAssertNil(body["reasoning_effort"])
+        XCTAssertTrue(client.staysOnOrigin)
     }
 }

@@ -228,6 +228,9 @@ Read the streaming entries in docs/decisions.md › Key patterns first. The rule
   end a dictation mid-sentence or replace a whole selection. Pin it with literal bodies in
   `ChatReplyEndingTests`.
 - Throw on any failure; the app falls back to the raw transcript.
+- The one provider with no catalogue is `.server`: its address, key and model are the
+  user's settings (`ServerEndpoint`, `LLMConfiguration.makeServerChatClient`), and
+  `chatModel(provider:id:)` describes whatever ID the server lists.
 
 ## 7. The key
 

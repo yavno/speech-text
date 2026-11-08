@@ -247,7 +247,7 @@ final class SetupCardsTests: XCTestCase {
             case .groq, .anthropic, .openai:
                 XCTAssertEqual(card?.pick, pick)
                 XCTAssertEqual(SetupCards.ai(for: card!.service).pick, pick)
-            case .local:
+            case .local, .server:
                 XCTAssertNil(card, pick.rawValue)
             }
         }

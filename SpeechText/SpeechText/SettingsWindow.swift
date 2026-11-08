@@ -581,6 +581,8 @@ struct SettingsKeyField: View {
     let service: Provider
     @Binding var value: String
     var showsHeader = true
+    /// The link to the vendor's key page; a server the user runs has none.
+    var showsGetKey = true
     /// Everything the key can be used for, in pipeline order.
     var roles: [SettingsKeyRole] = []
     /// The roles the current choices use it for.
@@ -603,7 +605,7 @@ struct SettingsKeyField: View {
             }
         }
         .padding(.vertical, showsHeader ? 12 : 0)
-        .confirmationDialog("Remove your \(service.displayName) key?", isPresented: $confirmingRemove) {
+        .confirmationDialog(service == .server ? "Remove the server's key?" : "Remove your \(service.displayName) key?", isPresented: $confirmingRemove) {
             Button("Remove", role: .destructive) { value = "" }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -695,7 +697,7 @@ struct SettingsKeyField: View {
             if editing {
                 Button("Cancel") { editing = false; draft = "" }
                     .buttonStyle(SetupInlineLinkStyle())
-            } else if !showsHeader {
+            } else if !showsHeader && showsGetKey {
                 getKeyLink
             }
         }
