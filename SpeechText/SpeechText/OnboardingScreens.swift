@@ -1770,7 +1770,7 @@ private struct DoneScreen: View {
                 Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
                 shortcut(.edit, model.aiIsSetUp ? "Edit selection" : "Edit selection · off", on: model.aiIsSetUp)
                 Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
-                shortcut(.recordWindow, "Dictation window", on: true)
+                shortcut(.recordWindow, "Record Window", on: true)
             }
             .padding(.vertical, 8)
             .background(RoundedRectangle(cornerRadius: 12).fill(.black.opacity(0.26)))

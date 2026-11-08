@@ -4177,23 +4177,6 @@
         }
       }
     },
-    "choose a provider" : {
-      "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "elijas un proveedor"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "виберете провайдера"
-          }
-        }
-      }
-    },
     "Choose a provider" : {
       "comment" : "Button that opens the AI Rewrite provider settings when no provider is set up yet.",
       "localizations" : {
@@ -4207,6 +4190,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вибрати провайдера"
+          }
+        }
+      }
+    },
+    "choose a provider" : {
+      "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "elijas un proveedor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "виберете провайдера"
           }
         }
       }
@@ -4747,8 +4747,8 @@
         }
       }
     },
-    "Copy What You Said" : {
-      "comment" : "History page: context menu item on an AI dictation that copies what was said, before the rewrite. Title case, as macOS menu items are in English.",
+    "Copy what you said" : {
+      "comment" : "History page, an open AI dictation: button that copies what was said, before the rewrite.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4764,8 +4764,8 @@
         }
       }
     },
-    "Copy what you said" : {
-      "comment" : "History page, an open AI dictation: button that copies what was said, before the rewrite.",
+    "Copy What You Said" : {
+      "comment" : "History page: context menu item on an AI dictation that copies what was said, before the rewrite. Title case, as macOS menu items are in English.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5532,23 +5532,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Диктування"
-          }
-        }
-      }
-    },
-    "Dictation window" : {
-      "comment" : "Setup window, Done step: what the Record Window shortcut opens.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ventana de grabación"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вікно запису"
           }
         }
       }
@@ -11047,23 +11030,6 @@
         }
       }
     },
-    "Optional" : {
-      "comment" : "Setup window, welcome step: note after 'Your languages, for better accuracy'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opcional"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Необов'язково"
-          }
-        }
-      }
-    },
     "optional" : {
       "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty.",
       "localizations" : {
@@ -11077,6 +11043,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "необов'язково"
+          }
+        }
+      }
+    },
+    "Optional" : {
+      "comment" : "Setup window, welcome step: note after 'Your languages, for better accuracy'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opcional"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необов'язково"
           }
         }
       }
@@ -12012,7 +11995,7 @@
       }
     },
     "Record Window" : {
-      "comment" : "Menu bar menu item. Opens the Record Window, the app's floating dictation window. Title case.",
+      "comment" : "The Record Window, the app's floating dictation window: a menu bar menu item and a row in Setup's Done step. Title case.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -16949,8 +16932,8 @@
         }
       }
     },
-    "Use as default" : {
-      "comment" : "Prompts page, editing a prompt: button that makes it the default.",
+    "Use as Default" : {
+      "comment" : "Prompts page: context menu item that makes a prompt the default. Title case, as macOS menu items are in English.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -16966,8 +16949,8 @@
         }
       }
     },
-    "Use as Default" : {
-      "comment" : "Prompts page: context menu item that makes a prompt the default. Title case, as macOS menu items are in English.",
+    "Use as default" : {
+      "comment" : "Prompts page, editing a prompt: button that makes it the default.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
