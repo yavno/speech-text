@@ -5287,13 +5287,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dictar con IA · desactivado"
+            "value" : "Dictar con IA · inactivo"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Диктувати з ШІ · вимкнено"
+            "value" : "Диктувати з ШІ · вимк."
           }
         }
       }
@@ -5338,13 +5338,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ventana de dictado"
+            "value" : "Ventana de grabación"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вікно диктування"
+            "value" : "Вікно запису"
           }
         }
       }
@@ -5922,13 +5922,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar selección · desactivado"
+            "value" : "Editar selección · inactivo"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагування виділеного · вимкнено"
+            "value" : "Редагування виділеного · вимк."
           }
         }
       }
@@ -13281,7 +13281,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Почати користуватися SpeechText"
+            "value" : "Почати роботу"
           }
         }
       }
@@ -16377,7 +16377,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Працюють у будь-якій програмі. Затисніть і говоріть, відпустіть, щоб зупинити. Змінити їх можна будь-коли в %@."
+            "value" : "Працюють у будь-якій програмі. Затисніть і говоріть, відпустіть, щоб зупинити. Змінити їх можна будь-коли: %@."
           }
         }
       }
@@ -16394,7 +16394,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Працюють у будь-якій програмі. Натисніть раз, щоб почати, і ще раз, щоб зупинити. Змінити їх можна будь-коли в %@."
+            "value" : "Працюють у будь-якій програмі. Натисніть раз, щоб почати, і ще раз, щоб зупинити. Змінити їх можна будь-коли: %@."
           }
         }
       }

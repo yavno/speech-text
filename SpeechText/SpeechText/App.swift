@@ -2745,6 +2745,8 @@ enum WindowSnapshots {
         try? await Task.sleep(for: .seconds(2))
         guard let window, window.contentView != nil else {
             dlog("Snapshots", "\(name): no window", level: .error)
+            // The script reports the run as incomplete.
+            try? Data().write(to: folder.appendingPathComponent("\(name).missing"))
             return
         }
         // A page longer than its window is taken a screen at a time, top to bottom:
@@ -2823,9 +2825,14 @@ extension AppDelegate {
     fileprivate func drawSnapshots(into folder: URL) async {
         openSetup()
         for step in OnboardingStep.named {
+            if setupWindow == nil { openSetup() }  // Closed during the run: every step is still wanted.
             setupWindow?.model.step = step
             await WindowSnapshots.capture(setupWindow, "setup-\(step.rawValue)", into: folder)
         }
+        // Not one of the steps the bar names, but a screen of its own.
+        if setupWindow == nil { openSetup() }
+        setupWindow?.model.step = .done
+        await WindowSnapshots.capture(setupWindow, "setup-\(OnboardingStep.done.rawValue)", into: folder)
         setupWindow?.close()
 
         for page in MainPage.rail {
