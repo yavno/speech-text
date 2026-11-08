@@ -127,7 +127,7 @@ What is checked is a short list of swift-format's rules about constructs to avoi
 
 ## Adding a language
 
-A new language comes with every screen of the app in that language: run `scripts/window-snapshots.sh --languages "en <code>"` and attach the folder it writes, zipped, to the pull request, with an assessment of each screen beside its English. Screens from anywhere else, or only some of them, do not count. This applies whether a person or an AI agent did the translating. [docs/translation-glossary.md](docs/translation-glossary.md) › *Adding a language* has both checks, and the terms each language must use.
+A new language comes with every screen of the app in that language: run `scripts/window-snapshots.sh --languages "en <code>"` and attach the folder it writes, zipped, to the pull request, with an assessment of each screen beside its English. Screens from anywhere else, or only some of them, do not count. It also comes with its terms: the language's table in [docs/translation-glossary.md](docs/translation-glossary.md), every row filled in, one word for one thing on every screen, and the names of macOS's own settings taken from macOS itself. This applies whether a person or an AI agent did the translating. [docs/translation-glossary.md](docs/translation-glossary.md) › *Adding a language* has both checks, and the terms each language must use.
 
 ## Language
 

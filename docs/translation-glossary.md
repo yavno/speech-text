@@ -28,6 +28,12 @@ is translated as the sentence needs.
   leave the number out ("Used once"); a translation may too, where natural.
 - **Numbers** are written the app's language's way, whatever the Mac's region: 483,3 MB, $0,01 and 0,4 s in Spanish and Ukrainian. The code formats them (`numberLocale` in SpeechTextCore); a translation never rewrites a number.
 - **Numbers and units** stay on one line: a non-breaking space between a number and its unit (7 днів, 40 сл./хв, 19 GB), and a word joiner after the dash of a range (3–⁠19).
+- **Terms:** every translation, new or changed, uses this glossary's word. One thing has
+  one word in a language, on every screen; a second word for it is a bug, even when both
+  are correct. A thing named in more than one string and missing from the table gets a
+  row in the same pull request. A term is what a person would read in software in that
+  language, not a word-for-word copy of the English (*Shortcut card* is *Блок зі
+  скороченнями* in Ukrainian; *Картка скорочень* reads like a paper card).
 - **Length:** buttons, chips, tabs and column headings have little room. Prefer the
   shorter of two equal wordings there. The comment says where a string appears.
 
@@ -156,4 +162,11 @@ A new language is not done when every string has a value. Before it is turned on
    strings are in `/System/Library/ExtensionKit/Extensions/*/Contents/Resources/*.loctable`
    (`plutil -p`), one table per language, and macOS's Accessibility in Ukrainian is
    *Доступність*, not the older *Універсальний доступ*.
+
+   To find a second word for one thing, take each row's English and read every string
+   that says it, in the catalogs, beside its translation; that is how *overlay* turned
+   up as both *панель* and *накладка*. The pull request that adds or turns on a language
+   **must include** the language's table in this file, with every row filled in, and say
+   which macOS names were checked in those string tables and how the search for second
+   words went. A language without them is not done.
 

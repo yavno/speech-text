@@ -229,6 +229,9 @@ package hands to the UI, which it writes as `localized("…")` (`Localized.swift
 - Adding or turning on a language: docs/translation-glossary.md › *Adding a language*.
   Run `scripts/window-snapshots.sh`, look at every screen beside its English, and attach
   the folder to the pull request; it is required, and a language without it is not done.
+- Any translation uses the glossary's word for a term: one thing, one word, on every
+  screen. A new language fills in its table, and takes macOS's names from macOS's own
+  string tables, not from memory (same file).
 
 ## Taste
 
