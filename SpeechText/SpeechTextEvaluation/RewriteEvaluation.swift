@@ -67,7 +67,8 @@ enum RewriteEvaluation {
         /// `groq/openai/gpt-oss-120b`, `local/<id>`, or a bare local id (the old form).
         init?(_ spec: String) {
             let parts = spec.split(separator: "/", maxSplits: 1).map(String.init)
-            if parts.count == 2, let provider = LLMProviderType(rawValue: parts[0]) {
+            // Not `server/…`: a server's address is the user's setting, and this tool has none.
+            if parts.count == 2, let provider = LLMProviderType(rawValue: parts[0]), provider != .server {
                 self.provider = provider; id = parts[1]
             } else if localChatModel(id: spec) != nil {
                 provider = .local; id = spec
@@ -79,6 +80,7 @@ enum RewriteEvaluation {
         var name: String {
             switch provider {
             case .local: localChatModel(id: id)?.displayName ?? id
+            case .server: id
             // Groq serves other makers' models, so its name goes first.
             case .groq: "Groq \(chatModel(provider: provider, id: id).displayName)"
             case .anthropic, .openai: chatModel(provider: provider, id: id).displayName
@@ -98,6 +100,7 @@ enum RewriteEvaluation {
                 case .qwen: return "qwen"
                 case nil: return "local"
                 }
+            case .server: return "server"
             }
         }
 
@@ -106,7 +109,7 @@ enum RewriteEvaluation {
             case .groq: "GROQ_API_KEY"
             case .anthropic: "ANTHROPIC_API_KEY"
             case .openai: "OPENAI_API_KEY"
-            case .local: nil
+            case .local, .server: nil
             }
         }
     }

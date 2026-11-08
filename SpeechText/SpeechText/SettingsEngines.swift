@@ -13,27 +13,104 @@ import SpeechTextCore
 
 /// Where a step runs: on this Mac, or at an online service.
 enum EnginePlace: Hashable {
-    case thisMac, online
+    case thisMac, online, server
+
+    var name: String {
+        switch self {
+        case .thisMac: String(localized: "On this Mac")
+        case .online: String(localized: "Online service")
+        case .server: String(localized: "Your server")
+        }
+    }
+
+    var glyph: SetupChoiceCard.Glyph {
+        switch self {
+        case .thisMac: .mac
+        case .online: .cloud
+        case .server: .server
+        }
+    }
 }
 
-/// The two cards at the top of both pages. Which one is open is the page's own state; the
-/// card holding what is in use says so.
+/// The places at the top of both pages: a column each with only its name, and the open
+/// one's sentence under the row. Sentences inside the cards wrapped to different heights
+/// beside each other, and three abreast left the names too little room (owner, 2026-11-08).
+/// Which one is open is the page's own state; the card holding what is in use says so.
 struct EnginePlaceCards: View {
     @Binding var place: EnginePlace
     let inUse: EnginePlace
-    let macFacts: String
-    let onlineFacts: String
+    let places: [(place: EnginePlace, facts: String)]
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
-                            badge: inUse == .thisMac ? String(localized: "In use") : nil,
-                            facts: macFacts, isSelected: place == .thisMac) { place = .thisMac }
-            SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
-                            badge: inUse == .online ? String(localized: "In use") : nil,
-                            facts: onlineFacts, isSelected: place == .online) { place = .online }
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 8) {
+                ForEach(places, id: \.place) { item in
+                    EnginePlaceCard(place: item.place, inUse: inUse == item.place, isSelected: place == item.place) {
+                        place = item.place
+                    }
+                }
+            }
+            Text(verbatim: places.first { $0.place == place }?.facts ?? "")
+                .font(.system(size: 11.5))
+                .foregroundStyle(SetupColor.label2)
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 6)
         }
         .padding(4)
+    }
+}
+
+private struct EnginePlaceCard: View {
+    let place: EnginePlace
+    let inUse: Bool
+    let isSelected: Bool
+    let action: () -> Void
+    @Environment(\.setupTint) private var tint
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isSelected
+                          ? AnyShapeStyle(LinearGradient(colors: tint.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
+                          : AnyShapeStyle(SetupColor.panel))
+                    .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isSelected ? .clear : SetupColor.panelBorder, lineWidth: 0.5))
+                    .frame(width: 34, height: 34)
+                    .overlay {
+                        Image(systemName: place.glyph.symbol)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
+                    }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(verbatim: place.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(SetupColor.label)
+                        .lineLimit(1)
+                    if inUse {
+                        Text("In use").font(.system(size: 10.5, weight: .semibold)).foregroundStyle(tint.accent)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(12)
+            .background(RoundedRectangle(cornerRadius: 16).fill(SetupColor.control))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(isSelected ? tint.accent : hovering ? tint.accent.opacity(0.4) : SetupColor.panelBorder,
+                                  lineWidth: isSelected ? 1.5 : 1)
+            }
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 20).fill(tint.glow.opacity(0.32)).padding(-4)
+                }
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -119,14 +196,17 @@ struct SpeechEngineSettings: View {
     var body: some View {
         EnginePlaceCards(
             place: $place, inUse: Self.place(of: engine),
-            macFacts: capabilities.isAppleSilicon
-                ? String(localized: "Private and free. Your voice stays on your Mac, and works offline.")
-                : String(localized: "Private and free, but slow on this Mac."),
-            onlineFacts: String(localized: "Works on any Mac. Needs internet and an account; your recording is sent to the service."))
+            places: [
+                (.thisMac, capabilities.isAppleSilicon
+                    ? String(localized: "Private and free. Your voice stays on your Mac, and works offline.")
+                    : String(localized: "Private and free, but slow on this Mac.")),
+                (.online, String(localized: "Works on any Mac. Needs internet and an account; your recording is sent to the service.")),
+            ])
 
         switch place {
         case .thisMac: thisMac
         case .online: online
+        case .server: EmptyView()
         }
     }
 
@@ -418,6 +498,199 @@ struct SpeechEngineSettings: View {
     }
 }
 
+// MARK: - Your server
+
+/// AI Rewrite through a server the user runs: its address, the test, its models and, when
+/// it asks for one, its key. A typed address is a draft until a test passes, so one half
+/// written never takes over the rewrites (docs/specs/2026-11-07-own-model-server.md).
+private struct ServerChatSettings: View {
+    /// Each server's documented default address (the spec's table).
+    private static let presets = [("Ollama", "http://localhost:11434/v1"),
+                                  ("LM Studio", "http://localhost:1234/v1"),
+                                  ("llama.cpp", "http://localhost:9931/v1")]
+
+    @AppStorage(SettingsKeys.llmProvider) private var llmProvider = LLMProviderType.groq.rawValue
+    @AppStorage(SettingsKeys.serverChatAddress) private var storedAddress = ""
+    @AppStorage(SettingsKeys.serverChatModel) private var storedModel = ""
+    @State private var address = UserDefaults.standard.string(forKey: SettingsKeys.serverChatAddress) ?? ""
+    @State private var typedModel = ""
+    /// A model picked from a draft server's list, which is no choice for the server in use.
+    @State private var draftModel: String?
+    /// A key typed for a draft server: the stored one is another server's, and neither is
+    /// sent to the other's address or replaced until a test passes.
+    @State private var draftKey = ""
+    @State private var models: [String] = []
+    @State private var testing = false
+    @State private var result: ServerTestResult?
+
+    private var endpoint: ServerEndpoint? { ServerEndpoint(address: address) }
+    private var isDraft: Bool { address != storedAddress }
+    private var selectedModel: String { isDraft ? draftModel ?? storedModel : storedModel }
+    private var key: String { isDraft ? draftKey : APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) }
+    private var keyBinding: Binding<String> {
+        Binding(get: { APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) },
+                set: { APIKeyStore.shared.set($0, for: SettingsKeys.serverChatAPIKey) })
+    }
+    private var inUse: Bool { llmProvider == LLMProviderType.server.rawValue }
+    private var showsKey: Bool { result == .needsKey || !key.isEmpty }
+
+    var body: some View {
+        SettingsGroup(title: "Server address", inset: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    // The test stores the address it asked: not one typed while it ran.
+                    ServerAddressField(text: $address).disabled(testing)
+                    Button("Test") { Task { await test() } }
+                        .buttonStyle(SetupButtonStyle(kind: .secondary, height: 30))
+                        .font(.system(size: 12))
+                        .disabled(endpoint == nil || testing)
+                }
+                if address.isEmpty { presetRow } else { whereItGoes }
+                resultLine
+                if showsKey {
+                    if isDraft {
+                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4)
+                    } else {
+                        SettingsKeyField(service: .server, value: keyBinding, showsHeader: false, showsGetKey: false)
+                            .padding(.top, 4)
+                    }
+                    if endpoint?.isReadableOnTheWay == true {
+                        warning("This key is sent in plain text.")
+                    }
+                }
+                if result == .noModels {
+                    ServerAddressField(text: $typedModel, prompt: "Model ID").padding(.top, 4)
+                    Text("The server lists no models. Load one in it, or type its ID.").rowNote()
+                }
+            }
+        }
+        .onChange(of: address) {
+            result = nil
+            draftModel = nil
+            models = []
+        }
+        // What the server lists now; no chat request until the user asks for a test.
+        .task { await refreshModels() }
+        if !models.isEmpty || (inUse && !selectedModel.isEmpty) {
+            SettingsGroup(title: "Model", inset: 5) {
+                ForEach(models.isEmpty ? [selectedModel] : models, id: \.self) { id in
+                    SetupRow(title: id, isSelected: id == selectedModel, compact: true) {
+                        if isDraft { draftModel = id } else { storedModel = id }
+                    } extra: { EmptyView() }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+
+    private var presetRow: some View {
+        HStack(spacing: 10) {
+            Text("Fill in:").rowNote()
+            ForEach(Self.presets, id: \.0) { name, url in
+                Button { address = url } label: { Text(verbatim: name) }.buttonStyle(SetupInlineLinkStyle())
+            }
+        }
+    }
+
+    @ViewBuilder private var whereItGoes: some View {
+        switch endpoint?.place {
+        case nil: Text("Not an address yet. It starts with http:// or https://.").rowNote()
+        case .thisMac: Text("This Mac.").rowNote()
+        case .network: Text("Your network.").rowNote()
+        case .internet: Text("The internet. Your words leave your network.").rowNote()
+        }
+        if endpoint?.isReadableOnTheWay == true {
+            warning("Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it.")
+        }
+    }
+
+    private func warning(_ text: LocalizedStringKey) -> some View {
+        Label { Text(text) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
+            .font(.system(size: 11))
+            .foregroundStyle(SetupColor.warn)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder private var resultLine: some View {
+        if testing {
+            HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("Testing…").rowNote() }
+        } else {
+            switch result {
+            case nil: EmptyView()
+            case .answered(let seconds):
+                Text("✓ Answered in \(String(format: "%.1f", seconds)) s.").rowNote(ok: true)
+            case .noAnswer: Text("Nothing answered at this address. Is the server running?").rowNote(bad: true)
+            case .wrongPath: Text("The server answered, but not at this path. Most addresses end in /v1.").rowNote(bad: true)
+            case .needsKey: Text("The server refused the request without a key.").rowNote(bad: true)
+            case .noModels: Text("No model to test with.").rowNote(bad: true)
+            case .refused(let status): Text("The server refused the request (HTTP \(status)).").rowNote(bad: true)
+            case .badReply: Text("The server's reply wasn't one SpeechText can read.").rowNote(bad: true)
+            }
+        }
+    }
+
+    private func refreshModels() async {
+        guard let endpoint, case .success(let ids) = await ServerProbe.models(endpoint: endpoint, apiKey: key) else { return }
+        models = ids
+    }
+
+    /// Asks what the server lists, then sends one short request to the chosen model. Only
+    /// a request that was answered stores the address and puts the server in use.
+    private func test() async {
+        guard let endpoint else { return }
+        let pickWhenAsked = llmProvider
+        // What this test asks with is what it stores, whatever is typed while it runs.
+        let testedKey = key
+        let testedDraft = isDraft
+        testing = true
+        defer { testing = false }
+        let ids: [String]
+        switch await ServerProbe.models(endpoint: endpoint, apiKey: testedKey) {
+        case .failure(let failure):
+            result = failure.result
+            models = []
+            return
+        case .success(let listed):
+            ids = listed
+        }
+        models = ids
+        let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
+        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? typed
+        guard !model.isEmpty else {
+            result = .noModels
+            return
+        }
+        let outcome = await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: testedKey)
+        result = outcome
+        // Another provider chosen while this ran stays chosen.
+        guard case .answered = outcome, llmProvider == pickWhenAsked else { return }
+        if testedDraft { APIKeyStore.shared.set(testedKey, for: SettingsKeys.serverChatAPIKey) }
+        storedAddress = address
+        storedModel = model
+        draftModel = nil
+        draftKey = ""
+        llmProvider = LLMProviderType.server.rawValue
+    }
+}
+
+private struct ServerAddressField: View {
+    @Binding var text: String
+    var prompt: LocalizedStringKey = "The server's address"
+    private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 9) }
+
+    var body: some View {
+        TextField(text: $text, prompt: Text(prompt).foregroundStyle(SetupColor.label3)) { EmptyView() }
+            .textFieldStyle(.plain)
+            .font(.system(size: 12, design: .monospaced))
+            .autocorrectionDisabled()
+            .accessibilityLabel(prompt)
+            .padding(.horizontal, 10)
+            .frame(height: 30)
+            .background(shape.fill(SetupColor.control))
+            .overlay(shape.strokeBorder(SettingsColor.panelBorder, lineWidth: 1))
+    }
+}
+
 // MARK: - AI Rewrite
 
 struct AIEngineSettings: View {
@@ -441,22 +714,34 @@ struct AIEngineSettings: View {
 
     init() {
         let stored = LLMProviderType(rawValue: UserDefaults.standard.string(forKey: SettingsKeys.llmProvider) ?? "") ?? .groq
-        _place = State(initialValue: stored == .local ? .thisMac : .online)
+        _place = State(initialValue: Self.place(of: stored))
+    }
+
+    private static func place(of pick: LLMProviderType) -> EnginePlace {
+        switch pick {
+        case .local: .thisMac
+        case .server: .server
+        case .groq, .anthropic, .openai: .online
+        }
     }
 
     private var pick: LLMProviderType { LLMProviderType(rawValue: llmProvider) ?? .groq }
 
     var body: some View {
         EnginePlaceCards(
-            place: $place, inUse: pick == .local ? .thisMac : .online,
-            macFacts: capabilities.isAppleSilicon
-                ? String(localized: "Private and free. Your text stays on your Mac, and works offline.")
-                : String(localized: "Private and free, but slow on this Mac."),
-            onlineFacts: String(localized: "Fast on any Mac. Needs internet and an account; your text is sent to the service."))
+            place: $place, inUse: Self.place(of: pick),
+            places: [
+                (.thisMac, capabilities.isAppleSilicon
+                    ? String(localized: "Private and free. Your text stays on your Mac, and works offline.")
+                    : String(localized: "Private and free, but slow on this Mac.")),
+                (.online, String(localized: "Fast on any Mac. Needs internet and an account; your text is sent to the service.")),
+                (.server, String(localized: "A model you already run. Your text goes to the address you enter.")),
+            ])
 
         switch place {
         case .thisMac: thisMac
         case .online: online
+        case .server: ServerChatSettings()
         }
     }
 
@@ -631,6 +916,7 @@ struct AIEngineSettings: View {
         case .anthropic: anthropicModel
         case .openai: openAIModel
         case .local: localModelID
+        case .server: ""
         }
     }
 
@@ -640,6 +926,7 @@ struct AIEngineSettings: View {
         case .anthropic: anthropicModel = id
         case .openai: openAIModel = id
         case .local: localModelID = id
+        case .server: break
         }
     }
 

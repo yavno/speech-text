@@ -1,6 +1,6 @@
 # SPEC: Your own model server
 
-- **Status:** The owner answered the four questions on 2026-11-07 (*Decided by the owner*); next is design (#189).
+- **Status:** The owner answered the four questions on 2026-11-07 (*Decided by the owner*). Designed on the running app (#189); being built under #190.
 - **Date:** 2026-11-07
 - **Issues:** #188 (this spec), part of #185 *Your own model server*; design #189, build #190, test #191, ship #192
 - **Base revision:** `8288ec5`
@@ -83,8 +83,8 @@ This is the first provider whose destination the user writes. Text and audio go 
 
 ## Surfaces
 
-- **Settings › AI Rewrite and › Speech:** "Your server" in the provider picker; under it the address, the key, the model and the test button, each role its own (P1).
-- **Setup:** a "Your server" card on the speech step and on the AI step (D4), beside the others: the address, the model once the server answers, and the test request; the key only when the server asks for one (401 or 403). The AI step's card offers the speech step's address, and the other way round.
+- **Settings › AI Rewrite and › Speech:** a third place beside *On this Mac* and *Online service*: three columns holding a glyph and a name, the open one's sentence under the row (owner, 2026-11-08, from screenshots of the running app). Under it the address, the key, the model and the test button, each role its own (P1).
+- **Setup:** a "Your server" card in the column of the speech step and of the AI step (D4), and in the panel beside it: the address, the model once the server answers, and the test request; the key only when the server asks for one (401 or 403). The AI step's card offers the speech step's address, and the other way round.
 - **Edit selection** goes through the same chat client and gets the server for free.
 - **Usage and Home's Engines:** "Your server", the model ID as the server named it.
 - **History:** the provider name; retry works as for any upload.

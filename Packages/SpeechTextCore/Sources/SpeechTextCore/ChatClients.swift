@@ -12,6 +12,8 @@ public enum LLMProviderType: String, CaseIterable, Identifiable, Sendable {
     case openai = "openai"
     /// Built in: a GGUF model run by llama.cpp in the SpeechTextLLM service.
     case local = "local"
+    /// A model server the user runs (`ServerEndpoint`).
+    case server = "server"
 
     public var id: String { rawValue }
 
@@ -21,6 +23,7 @@ public enum LLMProviderType: String, CaseIterable, Identifiable, Sendable {
         case .anthropic: "Anthropic (Claude)"
         case .openai: "OpenAI"
         case .local: localized("On this Mac")
+        case .server: localized("Your server")
         }
     }
 
@@ -31,6 +34,7 @@ public enum LLMProviderType: String, CaseIterable, Identifiable, Sendable {
         case .anthropic: .anthropic
         case .openai: .openAI
         case .local: .local
+        case .server: .server
         }
     }
 
@@ -282,6 +286,11 @@ public func chatModel(provider: LLMProviderType, id: String) -> ChatModelDescrip
         // unlisted ID is named and free, and the request fails as not downloaded.
         return ChatModelDescriptor(provider: .local, id: id, displayName: id, reasoningEffort: nil,
                                    reasoningOutput: .unchanged, refusalFallbacks: false, price: .free)
+    case .server:
+        // The model is whatever the server lists. It is sent no switch, for the reason
+        // above, and not priced: it may be free on this Mac or a paid GPU elsewhere.
+        return ChatModelDescriptor(provider: .server, id: id, displayName: id, reasoningEffort: nil,
+                                   reasoningOutput: .unchanged, refusalFallbacks: false, price: .notPriced)
     }
 }
 
@@ -334,6 +343,8 @@ public enum LLMError: LocalizedError, Sendable {
     /// The reply ran out of tokens before it ended: only the start of one, never pasted.
     case cutOff
     case noLocalModel
+    /// AI Rewrite is set to the user's server, and its address is empty or malformed.
+    case noServerAddress
     /// The choice of model was cleared because the one stored leads to no model on offer
     /// (`clearedModelChoice`), and the user has not picked another.
     case noModelChosen(LLMProviderType)
@@ -350,6 +361,7 @@ public enum LLMError: LocalizedError, Sendable {
         case .emptyResponse: localized("The model returned an empty response")
         case .cutOff: localized("The model's reply was cut off before it ended.")
         case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › AI Rewrite")
+        case .noServerAddress: localized("Set your server's address in Settings › AI Rewrite")
         case .noModelChosen(let p): localized("No model chosen for \(p.displayName) — choose one in Settings")
         }
     }
@@ -406,6 +418,8 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
     let apiKey: String
     let model: ChatModelDescriptor
     let dialect: Dialect
+    /// Refuse a redirect to another host: the user's own server, whose address they chose.
+    var staysOnOrigin = false
 
     public init(label: String, baseURL: URL, apiKey: String, model: ChatModelDescriptor, dialect: Dialect) {
         self.label = label
@@ -446,14 +460,15 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
     public func complete(system: String, user: String) async throws -> ChatReply {
         var request = URLRequest(url: baseURL)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        // A key is optional only on the user's own server, which may take none.
+        if !apiKey.isEmpty { request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization") }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         request.httpBody = try JSONSerialization.data(withJSONObject: payload(system: system, user: user))
 
         let start = CFAbsoluteTimeGetCurrent()
         dlog("LLM", "\(label): sending request, model=\(model.id), input=\(user.count) chars")
-        let (data, response) = try await llmSession.data(for: request)
+        let (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
         let elapsed = CFAbsoluteTimeGetCurrent() - start
         // Before the status check: a 429 carries the limit that was hit.
         RateLimitStore.shared.record(vendor: model.provider.vendor, model: model.id, response: response)
@@ -674,8 +689,14 @@ public enum LLMConfiguration {
     public static var isConfigured: Bool {
         let type = providerType
         if type == .local { return localChatModel(id: model(for: type)) != nil }
+        if type == .server { return serverEndpoint != nil && !model(for: type).isEmpty }
         let value = type.needsAPIKey ? apiKey(for: type) : model(for: type)
         return !value.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    /// The server AI Rewrite is pointed at; nil while its address is empty or malformed.
+    public static var serverEndpoint: ServerEndpoint? {
+        ServerEndpoint(address: UserDefaults.standard.string(forKey: SettingsKeys.serverChatAddress) ?? "")
     }
 
     public static func makeChatClient() throws -> ChatClient {
@@ -683,6 +704,13 @@ public enum LLMConfiguration {
         if type == .local {
             guard let model = localChatModel(id: model(for: type)) else { throw LLMError.noLocalModel }
             return LocalChat.clientFactory(model)
+        }
+        if type == .server {
+            guard let endpoint = serverEndpoint else { throw LLMError.noServerAddress }
+            let id = model(for: type)
+            guard !id.isEmpty else { throw LLMError.noModelChosen(type) }
+            return makeServerChatClient(endpoint: endpoint, model: id,
+                                        apiKey: APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey))
         }
         let key = apiKey(for: type).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty else { throw LLMError.missingAPIKey(type) }
@@ -694,6 +722,16 @@ public enum LLMConfiguration {
     /// The cloud client for `model`, with `apiKey` — the one place a provider's endpoint and
     /// dialect are named, so the rewrite evaluation builds exactly the client the app does.
     /// Pure: nothing is read from the settings. A model on this Mac has no cloud client.
+    public static func makeServerChatClient(endpoint: ServerEndpoint, model id: String, apiKey key: String) -> ChatClient {
+        // `classic`: every server checked accepts `max_tokens`, and Ollama and llama.cpp
+        // ignore `max_completion_tokens` (their docs and source, 2026-11-07; the spec's table).
+        var client = OpenAICompatibleChatClient(label: "Your server", baseURL: endpoint.chatCompletionsURL,
+                                                apiKey: key.trimmingCharacters(in: .whitespacesAndNewlines),
+                                                model: chatModel(provider: .server, id: id), dialect: .classic)
+        client.staysOnOrigin = true
+        return client
+    }
+
     public static func makeChatClient(model: ChatModelDescriptor, apiKey key: String) -> ChatClient {
         switch model.provider {
         case .groq:
@@ -712,6 +750,8 @@ public enum LLMConfiguration {
             return AnthropicChatClient(apiKey: key, model: model)
         case .local:
             preconditionFailure("a model on this Mac goes through LocalChat.clientFactory")
+        case .server:
+            preconditionFailure("a server's client is built from its address: makeServerChatClient")
         }
     }
 }

@@ -19,6 +19,8 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
     case anthropic
     case openAI
     case local
+    /// A model server the user runs and addresses themselves (`ServerEndpoint`).
+    case server
     case ollama
 
     public var id: String { rawValue }
@@ -118,6 +120,14 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
                                                          defaultID: parakeetV3ModelID),
                                chatModel: ModelSetting(settingsKey: SettingsKeys.localLLMModel,
                                                        defaultID: "gemma-4-12b-it-qat-q4_0"),
+                               speechUpload: nil)
+        case .server:
+            // No key of its own to check and no catalogue: the address, the key if the
+            // server asks for one and the model it lists are the user's, in settings of
+            // their own (`LLMConfiguration.serverEndpoint`). Nothing to pin at launch.
+            ProviderDescriptor(displayName: "Your server", roles: [.chat], apiKey: nil, speechModel: nil,
+                               chatModel: ModelSetting(settingsKey: SettingsKeys.serverChatModel, defaultID: "",
+                                                       normalized: false),
                                speechUpload: nil)
         case .ollama:
             // Removed 2026-10-16, when AI Rewrite on this Mac moved into the app (llama.cpp).

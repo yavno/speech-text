@@ -1031,7 +1031,7 @@ final class UsageLedgerPricingTests: XCTestCase {
         XCTAssertTrue(json.contains(#""vendor":"elevenLabs""#), json)
         XCTAssertTrue(json.contains(#""kind":"stream""#), json)
         XCTAssertEqual(Provider.allCases.map(\.rawValue),
-                       ["apple", "groq", "elevenLabs", "anthropic", "openAI", "local", "ollama"])
+                       ["apple", "groq", "elevenLabs", "anthropic", "openAI", "local", "server", "ollama"])
         XCTAssertEqual([UsageEvent.Kind.upload, .stream, .retry, .rewrite, .edit].map(\.rawValue),
                        ["upload", "stream", "retry", "rewrite", "edit"])
     }

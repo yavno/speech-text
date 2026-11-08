@@ -30,6 +30,9 @@ across a bundle-identifier rename.
 | `hotkeyLayoutVersion` | Shortcut-layout migration marker | `0` (unmigrated) |
 | `llmProvider` | LLM backend (`"groq"`, `"anthropic"`, `"openai"`, `"local"`); a stored `"ollama"` moves to `"local"` at launch | `"groq"` |
 | `groqLLMModel` | Groq chat model ID | `"openai/gpt-oss-120b"` |
+| `serverChatAddress` | AI Rewrite through the user's own server: its base address, stored once a test has passed (`ServerEndpoint`). In `portable` | absent |
+| `serverChatModel` | The model that server listed and the user picked. In `portable`; never normalized, since the server's list is the user's | absent |
+| `serverChatAPIKey` | That server's key, only if it asks for one. Held by `APIKeyStore` in the keychain; never in `portable` | absent |
 | `anthropicAPIKey` / `anthropicModel` | Anthropic key and model | empty / `"claude-sonnet-5-5"` |
 | `openAIAPIKey` / `openAIModel` | OpenAI key and chat model. The key is shared with the speech engine, as Groq's is | empty / `"gpt-6-luna"` |
 | `localLLMModel` | The chat model AI Rewrite runs on this Mac — a `LocalChatModel` id, normalised against `localChatModels` | `"gemma-4-12b-it-qat-q4_0"` |
