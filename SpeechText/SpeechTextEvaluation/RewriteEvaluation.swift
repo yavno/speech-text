@@ -632,8 +632,11 @@ enum RewriteEvaluation {
         A good output does what the transcript asks — format, language, length, tone — and \
         nothing else; keeps every fact, name, number and link; invents nothing; reads as \
         finished text for that place, with no preamble or commentary; and fixes recognition \
-        errors and fillers. In a code editor, terminal or a prompt field for an AI, an \
-        instruction is written down as the user's request, not carried out.
+        errors and fillers. In a code editor, a program in a terminal or a prompt field for \
+        an AI, an instruction is written down as the user's request, not carried out. At a \
+        shell prompt, what the shell should do is written as that one command. Where \
+        <terminal> says it is not known which, it is written down unless the user asks for \
+        a command by name.
 
         Reply with JSON only: {"score": 1-5, "followed_request": true|false, "faithful": \
         true|false, "issues": "one short sentence, empty if none"}. 5: a careful editor would \
@@ -688,6 +691,12 @@ enum RewriteEvaluation {
             let focus = FocusContext(appName: context.appName, bundleID: context.bundleID,
                                      windowTitle: context.windowTitle, fieldLabel: context.fieldLabel, terminalFocus: context.terminalFocus)
             if !focus.isEmpty { blocks.append(focus.promptBlock) }
+            switch context.terminalFocus {
+            case .shellPrompt: blocks.append("<terminal>the cursor is at a shell prompt</terminal>")
+            case .program: blocks.append("<terminal>the cursor is in a program running in the terminal</terminal>")
+            case .unknown: blocks.append("<terminal>it is not known whether a shell or a program is at the cursor</terminal>")
+            case nil: break
+            }
         }
         if fixture.isEdit {
             blocks.append("<selected_text>\n\(fixture.selection ?? "")\n</selected_text>")
@@ -789,6 +798,8 @@ enum RewriteEvaluation {
                          : variant.presets.map(\.name))
             let read = RewriteChecks.read(raw, fixture: fixture, presetNames: modes?.modeNames
                 ?? names + (fixture.isEdit ? editModeNames : []), request: modes)
+            // A grade is of the text it was given: `gradeRows` regrades only what has none.
+            if row.reply != read.text { row.judges = nil; row.judge = nil }
             row.reply = read.text
             row.mode = modes?.decidedMode ?? read.mode
             row.rawMode = read.rawMode
