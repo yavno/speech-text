@@ -811,6 +811,12 @@ final class AppState {
     private(set) var showsLiveTranscript = false
     /// True while the LLM is rewriting the transcription — keeps the overlay spinning.
     private(set) var isRefining = false
+
+    /// Whether a restart would cost the user words: a dictation or its rewrite under way,
+    /// or the Record Window open, whose text and own rewrite live only in the window.
+    var isHoldingWords: Bool {
+        speechEngine.phase != .idle || speechEngine.isTranscribing || isRefining || directRecordingPanel != nil
+    }
     private var refinementTask: Task<Void, Never>?
     /// The task parked in `waitForTranscription()`. Cancelling the inline flow cancels
     /// it too: `cancelRecording()` moves the engine off `.finishing`, which resumes the

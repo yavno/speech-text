@@ -1417,12 +1417,12 @@ private struct VersionRow: View {
 }
 
 /// Settings › General: the language of the app's own windows. Foundation reads it at launch,
-/// so a choice that changes it offers a restart, which waits for a dictation in progress.
+/// so a choice that changes it offers a restart, which waits while words could be lost.
 private struct AppLanguageRow: View {
     @State private var choice = AppLanguage.choice ?? AppLanguage.unavailablePreference ?? ""
 
     private var pending: Bool { AppLanguage.needsRestart(for: choice.isEmpty ? nil : choice) }
-    private var dictating: Bool { (AppState.current?.speechEngine.phase ?? .idle) != .idle }
+    private var holdingWords: Bool { AppState.current?.isHoldingWords ?? false }
 
     var body: some View {
         SettingsRow(title: "App language",
@@ -1433,8 +1433,8 @@ private struct AppLanguageRow: View {
                 if pending {
                     Button("Restart") { AppInstaller.restart() }
                         .buttonStyle(SetupButtonStyle(kind: .secondary, height: 28))
-                        .disabled(dictating)
-                        .help(dictating ? Text("Finish the dictation first.") : Text(verbatim: ""))
+                        .disabled(holdingWords)
+                        .help(holdingWords ? Text("Finish the dictation and close the Record Window first.") : Text(verbatim: ""))
                 }
                 Picker("App language", selection: $choice) {
                     Text("System language").tag("")

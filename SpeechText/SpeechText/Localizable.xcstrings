@@ -6562,19 +6562,19 @@
         }
       }
     },
-    "Finish the dictation first." : {
-      "comment" : "Settings › General › App language: tooltip on the disabled Restart button while a dictation is running.",
+    "Finish the dictation and close the Record Window first." : {
+      "comment" : "Settings › General › App language: tooltip on the disabled Restart button while a dictation or a rewrite is running, or the Record Window is open.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Termina antes el dictado."
+            "value" : "Termina antes el dictado y cierra la Ventana de grabación."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Спершу завершіть диктування."
+            "value" : "Спершу завершіть диктування й закрийте Вікно запису."
           }
         }
       }
