@@ -56,6 +56,29 @@ public struct ServerEndpoint: Equatable, Sendable {
     }
 }
 
+extension ServerEndpoint {
+    /// The same scheme, host and port: where a redirect may go and still be the server
+    /// the user addressed, and the one Settings described.
+    static func isSameOrigin(_ a: URL, _ b: URL) -> Bool {
+        func origin(_ url: URL) -> (String, String, Int?) {
+            let scheme = url.scheme?.lowercased() ?? ""
+            return (scheme, url.host?.lowercased() ?? "", url.port ?? (scheme == "https" ? 443 : scheme == "http" ? 80 : nil))
+        }
+        return origin(a) == origin(b)
+    }
+}
+
+/// Refuses a redirect off the server: without it a server could send the user's words on
+/// to a host Settings never named. A refused redirect comes back as the 3xx it was.
+final class SameOriginRedirects: NSObject, URLSessionTaskDelegate, Sendable {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest) async -> URLRequest? {
+        guard let from = task.originalRequest?.url, let to = request.url,
+              ServerEndpoint.isSameOrigin(from, to) else { return nil }
+        return request
+    }
+}
+
 /// How a test of the server ended, in the words Settings gives it.
 public enum ServerTestResult: Equatable, Sendable {
     case answered(seconds: Double)
@@ -94,7 +117,7 @@ public enum ServerProbe {
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         if !key.isEmpty { request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization") }
         do {
-            let (data, response) = try await session.data(for: request)
+            let (data, response) = try await session.data(for: request, delegate: SameOriginRedirects())
             guard let status = (response as? HTTPURLResponse)?.statusCode else { return .failure(.init(.badReply)) }
             if let failure = ServerTestResult.forStatus(status) { return .failure(.init(failure)) }
             guard let ids = parseModelIDs(data) else { return .failure(.init(.badReply)) }

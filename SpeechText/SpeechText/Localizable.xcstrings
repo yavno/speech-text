@@ -14848,6 +14848,23 @@
         }
       }
     },
+    "The server's key" : {
+      "comment" : "Settings › Your server: placeholder for the key of a server not yet tested",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave del servidor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ключ сервера"
+          }
+        }
+      }
+    },
     "The server's reply wasn't one SpeechText can read." : {
       "comment" : "Settings › Your server: the test got an answer in an unexpected form",
       "localizations" : {

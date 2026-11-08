@@ -418,6 +418,8 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
     let apiKey: String
     let model: ChatModelDescriptor
     let dialect: Dialect
+    /// Refuse a redirect to another host: the user's own server, whose address they chose.
+    var staysOnOrigin = false
 
     public init(label: String, baseURL: URL, apiKey: String, model: ChatModelDescriptor, dialect: Dialect) {
         self.label = label
@@ -466,7 +468,7 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
 
         let start = CFAbsoluteTimeGetCurrent()
         dlog("LLM", "\(label): sending request, model=\(model.id), input=\(user.count) chars")
-        let (data, response) = try await llmSession.data(for: request)
+        let (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
         let elapsed = CFAbsoluteTimeGetCurrent() - start
         // Before the status check: a 429 carries the limit that was hit.
         RateLimitStore.shared.record(vendor: model.provider.vendor, model: model.id, response: response)
@@ -723,9 +725,11 @@ public enum LLMConfiguration {
     public static func makeServerChatClient(endpoint: ServerEndpoint, model id: String, apiKey key: String) -> ChatClient {
         // `classic`: every server checked accepts `max_tokens`, and Ollama and llama.cpp
         // ignore `max_completion_tokens` (their docs and source, 2026-11-07; the spec's table).
-        OpenAICompatibleChatClient(label: "Your server", baseURL: endpoint.chatCompletionsURL,
-                                   apiKey: key.trimmingCharacters(in: .whitespacesAndNewlines),
-                                   model: chatModel(provider: .server, id: id), dialect: .classic)
+        var client = OpenAICompatibleChatClient(label: "Your server", baseURL: endpoint.chatCompletionsURL,
+                                                apiKey: key.trimmingCharacters(in: .whitespacesAndNewlines),
+                                                model: chatModel(provider: .server, id: id), dialect: .classic)
+        client.staysOnOrigin = true
+        return client
     }
 
     public static func makeChatClient(model: ChatModelDescriptor, apiKey key: String) -> ChatClient {

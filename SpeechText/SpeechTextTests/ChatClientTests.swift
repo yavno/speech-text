@@ -388,6 +388,15 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertEqual(ServerEndpoint(address: "https://studio.local/v1")?.isReadableOnTheWay, false)
     }
 
+    func testARedirectStaysOnTheServerItCameFrom() throws {
+        func url(_ text: String) throws -> URL { try XCTUnwrap(URL(string: text)) }
+        XCTAssertTrue(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://LOCALHOST:1234/other")))
+        XCTAssertTrue(ServerEndpoint.isSameOrigin(try url("https://a.example/v1"), try url("https://a.example:443/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://studio.local:1234/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("http://localhost:1234/v1"), try url("http://localhost:1235/v1")))
+        XCTAssertFalse(ServerEndpoint.isSameOrigin(try url("https://a.example/v1"), try url("http://a.example/v1")))
+    }
+
     func testStatusesSayWhatToDo() {
         XCTAssertNil(ServerTestResult.forStatus(200))
         XCTAssertEqual(ServerTestResult.forStatus(401), .needsKey)
@@ -414,5 +423,6 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertEqual(body["max_tokens"] as? Int, 8192)
         XCTAssertNil(body["max_completion_tokens"])
         XCTAssertNil(body["reasoning_effort"])
+        XCTAssertTrue(client.staysOnOrigin)
     }
 }

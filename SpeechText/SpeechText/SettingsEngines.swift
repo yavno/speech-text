@@ -514,12 +514,19 @@ private struct ServerChatSettings: View {
     @AppStorage(SettingsKeys.serverChatModel) private var storedModel = ""
     @State private var address = UserDefaults.standard.string(forKey: SettingsKeys.serverChatAddress) ?? ""
     @State private var typedModel = ""
+    /// A model picked from a draft server's list, which is no choice for the server in use.
+    @State private var draftModel: String?
+    /// A key typed for a draft server: the stored one is another server's, and neither is
+    /// sent to the other's address or replaced until a test passes.
+    @State private var draftKey = ""
     @State private var models: [String] = []
     @State private var testing = false
     @State private var result: ServerTestResult?
 
     private var endpoint: ServerEndpoint? { ServerEndpoint(address: address) }
-    private var key: String { APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) }
+    private var isDraft: Bool { address != storedAddress }
+    private var selectedModel: String { draftModel ?? storedModel }
+    private var key: String { isDraft ? draftKey : APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) }
     private var keyBinding: Binding<String> {
         Binding(get: { APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) },
                 set: { APIKeyStore.shared.set($0, for: SettingsKeys.serverChatAPIKey) })
@@ -541,8 +548,12 @@ private struct ServerChatSettings: View {
                 if address.isEmpty { presetRow } else { whereItGoes }
                 resultLine
                 if showsKey {
-                    SettingsKeyField(service: .server, value: keyBinding, showsHeader: false, showsGetKey: false)
-                        .padding(.top, 4)
+                    if isDraft {
+                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4)
+                    } else {
+                        SettingsKeyField(service: .server, value: keyBinding, showsHeader: false, showsGetKey: false)
+                            .padding(.top, 4)
+                    }
                     if endpoint?.isReadableOnTheWay == true {
                         warning("This key is sent in plain text.")
                     }
@@ -556,10 +567,12 @@ private struct ServerChatSettings: View {
         .onChange(of: address) { result = nil }
         // What the server lists now; no chat request until the user asks for a test.
         .task { await refreshModels() }
-        if !models.isEmpty || (inUse && !storedModel.isEmpty) {
+        if !models.isEmpty || (inUse && !selectedModel.isEmpty) {
             SettingsGroup(title: "Model", inset: 5) {
-                ForEach(models.isEmpty ? [storedModel] : models, id: \.self) { id in
-                    SetupRow(title: id, isSelected: id == storedModel, compact: true) { storedModel = id } extra: { EmptyView() }
+                ForEach(models.isEmpty ? [selectedModel] : models, id: \.self) { id in
+                    SetupRow(title: id, isSelected: id == selectedModel, compact: true) {
+                        if isDraft { draftModel = id } else { storedModel = id }
+                    } extra: { EmptyView() }
                 }
             }
             .padding(.top, 8)
@@ -621,6 +634,7 @@ private struct ServerChatSettings: View {
     /// a request that was answered stores the address and puts the server in use.
     private func test() async {
         guard let endpoint else { return }
+        let pickWhenAsked = llmProvider
         testing = true
         defer { testing = false }
         let ids: [String]
@@ -634,16 +648,20 @@ private struct ServerChatSettings: View {
         }
         models = ids
         let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = ids.contains(storedModel) ? storedModel : ids.first ?? typed
+        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? typed
         guard !model.isEmpty else {
             result = .noModels
             return
         }
         let outcome = await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: key)
         result = outcome
-        guard case .answered = outcome else { return }
+        // Another provider chosen while this ran stays chosen.
+        guard case .answered = outcome, llmProvider == pickWhenAsked else { return }
+        if isDraft { APIKeyStore.shared.set(draftKey, for: SettingsKeys.serverChatAPIKey) }
         storedAddress = address
         storedModel = model
+        draftModel = nil
+        draftKey = ""
         llmProvider = LLMProviderType.server.rawValue
     }
 }
