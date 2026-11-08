@@ -33,7 +33,7 @@ func languageName(_ code: String, english: String?) -> String {
 /// Language & Region › Applications writes too, so the two always agree. Foundation reads it
 /// once at launch, so a change takes a restart.
 public enum AppLanguage {
-    private static let key = "AppleLanguages"
+    private static let key = SettingsKeys.appLanguage
 
     /// The languages the app has, as their codes, in the order of their own names.
     public static func choices(localizations: [String]) -> [String] {

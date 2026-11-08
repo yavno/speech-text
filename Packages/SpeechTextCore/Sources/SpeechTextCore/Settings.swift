@@ -4,6 +4,8 @@
 import Foundation
 
 public enum SettingsKeys {
+    /// The system's per-app language list; see `AppLanguage`.
+    public static let appLanguage = "AppleLanguages"
     /// Pre-list single language choice. Read once by `migrateSelectedLanguageIfNeeded()`
     /// and never again; kept in `portable` so the migration still has its source after a
     /// bundle-identifier change.
