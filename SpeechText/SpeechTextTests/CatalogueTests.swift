@@ -107,9 +107,11 @@ final class RecordingConfigurationTests: XCTestCase {
 
     /// The windows' language must not decide what the user is assumed to speak.
     func testTheSpeechLocaleIsTheSystemsNotTheWindows() {
-        XCTAssertEqual(speechLocale(fromSystem: "en_SE", fallback: "uk_SE"), "en-SE")
-        XCTAssertEqual(speechLocale(fromSystem: "uk_UA@calendar=gregorian", fallback: "en_US"), "uk-UA")
-        XCTAssertEqual(speechLocale(fromSystem: nil, fallback: "en_US"), "en-US")
+        XCTAssertEqual(speechLocale(fromSystem: "en_SE", systemLanguages: ["uk-SE"]), "en-SE")
+        XCTAssertEqual(speechLocale(fromSystem: "uk_UA@calendar=gregorian", systemLanguages: ["en-US"]), "uk-UA")
+        XCTAssertEqual(speechLocale(fromSystem: nil, systemLanguages: ["fr-FR", "en-US"]), "fr-FR")
+        XCTAssertEqual(speechLocale(fromSystem: "", systemLanguages: ["fr-FR"]), "fr-FR")
+        XCTAssertEqual(speechLocale(fromSystem: nil, systemLanguages: []), "en-US")
     }
 
     /// One named language is the only case that forces anything on an engine that can

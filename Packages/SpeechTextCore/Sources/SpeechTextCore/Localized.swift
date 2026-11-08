@@ -107,7 +107,8 @@ public enum AppLanguage {
 
 /// `AppleLocale`, the system's own, as "fr-FR". `Locale.current` takes its language from the
 /// app's language, which says what the windows show and nothing about what the user speaks.
-func speechLocale(fromSystem appleLocale: String?, fallback: String) -> String {
-    (appleLocale?.prefix { $0 != "@" }).map(String.init).flatMap { $0.isEmpty ? nil : $0 }
-        .map { $0.replacingOccurrences(of: "_", with: "-") } ?? fallback.replacingOccurrences(of: "_", with: "-")
+/// With no `AppleLocale`, the system's first language, then `en-US`: never `Locale.current`.
+func speechLocale(fromSystem appleLocale: String?, systemLanguages: [String]) -> String {
+    let locale = (appleLocale?.prefix { $0 != "@" }).map(String.init).flatMap { $0.isEmpty ? nil : $0 }
+    return (locale ?? systemLanguages.first ?? "en-US").replacingOccurrences(of: "_", with: "-")
 }

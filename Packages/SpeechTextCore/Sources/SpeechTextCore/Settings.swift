@@ -564,7 +564,7 @@ public func resolvedLocale() -> String {
         systemLocale: speechLocale(
             fromSystem: CFPreferencesCopyValue("AppleLocale" as CFString, kCFPreferencesAnyApplication,
                                                kCFPreferencesCurrentUser, kCFPreferencesAnyHost) as? String,
-            fallback: AppLanguage.systemLanguages.first ?? "en-US")
+            systemLanguages: AppLanguage.systemLanguages)
     )
 }
 
