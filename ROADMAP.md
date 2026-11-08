@@ -13,7 +13,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 - **Notetaker** — record a conversation you are part of, then review a speaker-attributed transcript, summarise it, ask questions and export it. Microphone and system audio are captured as two separate tracks, so who-said-what is exact for a one-to-one conversation without any speaker model at all.
 - **More providers** — behind the provider registry (`ProviderDescriptor`, see `docs/adding-a-provider.md`). New providers are a good contribution.
 - **Your own model server** — use a model you already run, in Ollama, LM Studio or any server that speaks the OpenAI API, for AI Rewrite and, where the server transcribes audio, for dictation: an address, an optional key and a model from the server's list.
-- **Localization** — the UI is English-only today. Translations are being prepared now, and more languages come in the order people ask for them.
+- **Localization** — the release you can download today is English-only. The first translations are being tested and arrive with the next release; more languages come in the order people ask for them.
 - **Playground** — try your own dictations from History through other models and prompts, side by side with what came out, how long it took and what it cost.
 
 ## Later
