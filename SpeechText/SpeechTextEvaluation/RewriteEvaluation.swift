@@ -79,6 +79,7 @@ enum RewriteEvaluation {
         var name: String {
             switch provider {
             case .local: localChatModel(id: id)?.displayName ?? id
+            case .server: id
             // Groq serves other makers' models, so its name goes first.
             case .groq: "Groq \(chatModel(provider: provider, id: id).displayName)"
             case .anthropic, .openai: chatModel(provider: provider, id: id).displayName
@@ -98,6 +99,7 @@ enum RewriteEvaluation {
                 case .qwen: return "qwen"
                 case nil: return "local"
                 }
+            case .server: return "server"
             }
         }
 
@@ -106,7 +108,7 @@ enum RewriteEvaluation {
             case .groq: "GROQ_API_KEY"
             case .anthropic: "ANTHROPIC_API_KEY"
             case .openai: "OPENAI_API_KEY"
-            case .local: nil
+            case .local, .server: nil
             }
         }
     }

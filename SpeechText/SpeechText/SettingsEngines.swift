@@ -531,7 +531,8 @@ private struct ServerChatSettings: View {
         SettingsGroup(title: "Server address", inset: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    ServerAddressField(text: $address)
+                    // The test stores the address it asked: not one typed while it ran.
+                    ServerAddressField(text: $address).disabled(testing)
                     Button("Test") { Task { await test() } }
                         .buttonStyle(SetupButtonStyle(kind: .secondary, height: 30))
                         .font(.system(size: 12))

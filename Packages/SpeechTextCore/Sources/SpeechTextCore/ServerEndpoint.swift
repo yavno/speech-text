@@ -34,20 +34,22 @@ public struct ServerEndpoint: Equatable, Sendable {
 
     public var place: Place {
         let host = (base.host ?? "").lowercased()
-        if host == "localhost" || host == "::1" || host.hasPrefix("127.") { return .thisMac }
-        if host.hasSuffix(".local") || !host.contains(".") && !host.contains(":") { return .network }
+        if host == "localhost" || host == "::1" { return .thisMac }
+        // Only four numbers are an IP address: `127.example.com` is a name like any other.
+        let octets = host.split(separator: ".", omittingEmptySubsequences: false).map { UInt8($0) }
+        if octets.count == 4, !octets.contains(nil) {
+            switch (octets[0]!, octets[1]!) {
+            case (127, _): return .thisMac
+            case (10, _), (192, 168), (169, 254), (172, 16...31): return .network
+            // The shared range, which Tailscale's addresses come from.
+            case (100, 64...127): return .network
+            default: return .internet
+            }
+        }
         if host.contains(":") {
             return host.hasPrefix("fc") || host.hasPrefix("fd") || host.hasPrefix("fe80") ? .network : .internet
         }
-        let octets = host.split(separator: ".").compactMap { Int($0) }
-        guard octets.count == 4 else { return .internet }
-        switch (octets[0], octets[1]) {
-        case (10, _), (192, 168), (169, 254): return .network
-        case (172, 16...31): return .network
-        // The shared range, which Tailscale's addresses come from.
-        case (100, 64...127): return .network
-        default: return .internet
-        }
+        return host.hasSuffix(".local") || !host.contains(".") ? .network : .internet
     }
 }
 

@@ -374,6 +374,7 @@ final class ServerEndpointTests: XCTestCase {
             ("http://studio.local:1234/v1", .network), ("http://studio:1234/v1", .network),
             ("http://192.168.1.20/v1", .network), ("http://10.0.0.2/v1", .network), ("http://172.16.0.2/v1", .network),
             ("http://169.254.1.1/v1", .network), ("http://100.101.1.1/v1", .network), ("http://[fd00::1]/v1", .network),
+            ("http://127.example.com/v1", .internet), ("http://192.168.example.com/v1", .internet),
             ("http://172.32.0.2/v1", .internet), ("http://8.8.8.8/v1", .internet), ("https://models.example.net/v1", .internet),
         ]
         for (address, place) in places {
