@@ -36,7 +36,10 @@ public struct ServerEndpoint: Equatable, Sendable {
         let host = (base.host ?? "").lowercased()
         if host == "localhost" || host == "::1" { return .thisMac }
         // Only four numbers are an IP address: `127.example.com` is a name like any other.
-        let octets = host.split(separator: ".", omittingEmptySubsequences: false).map { UInt8($0) }
+        let octets = host.split(separator: ".", omittingEmptySubsequences: false).map { part in
+            // Digits only: `UInt8` would also take a leading `+`.
+            part.utf8.allSatisfy { (48...57).contains($0) } ? UInt8(part) : nil
+        }
         if octets.count == 4, !octets.contains(nil) {
             switch (octets[0]!, octets[1]!) {
             case (127, _): return .thisMac
