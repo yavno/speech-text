@@ -211,7 +211,7 @@ public let sttModelCatalog: [STTModelDescriptor] = {
 
     let cloud: [STTModelDescriptor] = [
         STTModelDescriptor(
-            id: appleSpeechModelID, vendor: .apple, displayName: "Apple on-device",
+            id: appleSpeechModelID, vendor: .apple, displayName: localized("Apple on-device"),
             delivery: .systemRecognizer, language: .localeRequired,
             batchUpload: .selectedModel(of: .groq), requirement: .none,
             price: .free, languages: .decidedBySystem, languageNotes: [:],

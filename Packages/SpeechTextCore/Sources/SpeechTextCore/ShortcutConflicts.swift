@@ -83,7 +83,7 @@ public enum ShortcutAction: CaseIterable, Hashable, Sendable {
         case .inline: return localized("Inline Recording")
         case .ai: return localized("AI Recording")
         case .recordWindow: return localized("Record Window")
-        case .edit: return localized("Edit Selection with AI")
+        case .edit: return localized("Edit Selection")
         }
     }
 

@@ -22,7 +22,7 @@ body:
     attributes:
       label: Which part of SpeechText?
       description: Optional.
-      options: ["Inline recording", "AI recording", "Record Window", "Edit Selection with AI", "Speech engines / models", "Main window (Home, History, Usage, Prompts, Dictionary)", "Settings / setup", "Other"]
+      options: ["Inline recording", "AI recording", "Record Window", "Edit selection", "Speech engines / models", "Main window (Home, History, Usage, Prompts, Dictionary)", "Settings / setup", "Other"]
   - type: checkboxes
     id: help
     attributes:

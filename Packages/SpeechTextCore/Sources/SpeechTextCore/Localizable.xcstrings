@@ -13,7 +13,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи лише %@, запис триває, тож клацання й ⌘Tab працюють як завжди."
+            "value" : "Поки затиснуто лише %@, запис триває, тож клацання й ⌘Tab працюють як завжди."
           }
         }
       }
@@ -156,7 +156,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ не встановлено — завантажте її в Налаштуваннях."
+            "value" : "%@ не встановлено — завантажте її в Параметрах."
           }
         }
       }
@@ -220,6 +220,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ виводиться з ужитку %2$@."
+          }
+        }
+      }
+    },
+    "%@ s" : {
+      "comment" : "A short duration in seconds with one decimal, e.g. 0.4 s, in the Usage page's request rows. %@ is the number, already formatted.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ s"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ с"
           }
         }
       }
@@ -299,16 +316,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado desde el %@ · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados desde el %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado desde el %@ · %@"
                 }
               },
               "other" : {
@@ -323,12 +340,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка з %@ · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -339,6 +350,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок з %@ · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка з %@ · %@"
                 }
               },
               "other" : {
@@ -376,16 +393,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld dictado · %@"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld de dictados · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dictado · %@"
                 }
               },
               "other" : {
@@ -400,12 +417,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld диктовка · %@"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -416,6 +427,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld диктовок · %@"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld диктовка · %@"
                 }
               },
               "other" : {
@@ -441,7 +458,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld год"
+            "value" : "%lld год"
           }
         }
       }
@@ -458,13 +475,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld h %2$lld min"
+            "value" : "%1$lld h %2$lld min"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld год %2$lld хв"
+            "value" : "%1$lld год %2$lld хв"
           }
         }
       }
@@ -475,16 +492,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld idioma"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld idiomas"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld idioma"
                 }
               },
               "other" : {
@@ -499,12 +516,6 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld мова"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -515,6 +526,12 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld мов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld мова"
                 }
               },
               "other" : {
@@ -534,13 +551,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld min"
+            "value" : "%lld min"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld хв"
+            "value" : "%lld хв"
           }
         }
       }
@@ -557,7 +574,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld с"
+            "value" : "%lld с"
           }
         }
       }
@@ -585,13 +602,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 año"
+            "value" : "1 año"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 рік"
+            "value" : "1 рік"
           }
         }
       }
@@ -602,13 +619,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 16 GB"
+            "value" : "clase de 16 GB"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас 16 ГБ"
+            "value" : "клас 16 ГБ"
           }
         }
       }
@@ -619,13 +636,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 24–32 GB"
+            "value" : "clase de 24–⁠32 GB"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас 24–32 ГБ"
+            "value" : "клас 24–⁠32 ГБ"
           }
         }
       }
@@ -636,13 +653,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 256 GB o más"
+            "value" : "clase de 256 GB o más"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас від 256 ГБ"
+            "value" : "клас від 256 ГБ"
           }
         }
       }
@@ -653,13 +670,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 meses"
+            "value" : "3 meses"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 місяці"
+            "value" : "3 місяці"
           }
         }
       }
@@ -670,13 +687,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "30 días"
+            "value" : "30 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "30 днів"
+            "value" : "30 днів"
           }
         }
       }
@@ -687,13 +704,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 36–64 GB"
+            "value" : "clase de 36–⁠64 GB"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас 36–64 ГБ"
+            "value" : "клас 36–⁠64 ГБ"
           }
         }
       }
@@ -704,13 +721,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "6 meses"
+            "value" : "6 meses"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "6 місяців"
+            "value" : "6 місяців"
           }
         }
       }
@@ -721,13 +738,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 días"
+            "value" : "7 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 днів"
+            "value" : "7 днів"
           }
         }
       }
@@ -738,13 +755,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 8 GB"
+            "value" : "clase de 8 GB"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас 8 ГБ"
+            "value" : "клас 8 ГБ"
           }
         }
       }
@@ -755,13 +772,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "90 días"
+            "value" : "90 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "90 днів"
+            "value" : "90 днів"
           }
         }
       }
@@ -772,13 +789,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "clase de 96–128 GB"
+            "value" : "clase de 96–⁠128 GB"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "клас 96–128 ГБ"
+            "value" : "клас 96–⁠128 ГБ"
           }
         }
       }
@@ -806,13 +823,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El audio de un dictado fallido se conserva 3 meses, para reintentarlo."
+            "value" : "El audio de un dictado fallido se conserva 3 meses, para reintentarlo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо невдалої диктовки зберігається 3 місяці — для повторної спроби."
+            "value" : "Аудіо невдалої диктовки зберігається 3 місяці — для повторної спроби."
           }
         }
       }
@@ -823,13 +840,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El audio de un dictado fallido se conserva 30 días, para reintentarlo."
+            "value" : "El audio de un dictado fallido se conserva 30 días, para reintentarlo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо невдалої диктовки зберігається 30 днів — для повторної спроби."
+            "value" : "Аудіо невдалої диктовки зберігається 30 днів — для повторної спроби."
           }
         }
       }
@@ -840,13 +857,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El audio de un dictado fallido se conserva 6 meses, para reintentarlo."
+            "value" : "El audio de un dictado fallido se conserva 6 meses, para reintentarlo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо невдалої диктовки зберігається 6 місяців — для повторної спроби."
+            "value" : "Аудіо невдалої диктовки зберігається 6 місяців — для повторної спроби."
           }
         }
       }
@@ -857,13 +874,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El audio de un dictado fallido se conserva 7 días, para reintentarlo."
+            "value" : "El audio de un dictado fallido se conserva 7 días, para reintentarlo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо невдалої диктовки зберігається 7 днів — для повторної спроби."
+            "value" : "Аудіо невдалої диктовки зберігається 7 днів — для повторної спроби."
           }
         }
       }
@@ -948,7 +965,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб відшліфувати."
+            "value" : "Коротке натискання скасовує. Затисніть скорочення, поки говорите, або натисніть двічі, щоб обробити."
           }
         }
       }
@@ -965,7 +982,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коротке натискання скасовує. Утримуйте скорочення, поки говорите, або натисніть двічі, щоб записувати без рук."
+            "value" : "Коротке натискання скасовує. Затисніть скорочення, поки говорите, або натисніть двічі, щоб записувати без рук."
           }
         }
       }
@@ -1033,7 +1050,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ"
+            "value" : "ШІ‑переписування"
           }
         }
       }
@@ -1050,7 +1067,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ чекає на ваш вибір."
+            "value" : "ШІ‑переписування чекає на ваш вибір."
           }
         }
       }
@@ -1140,19 +1157,36 @@
         }
       }
     },
+    "Apple on-device" : {
+      "comment" : "The name of Apple's on-device speech model, shown in sentences such as «Your words go to %@». Keep Apple.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple en el dispositivo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple на пристрої"
+          }
+        }
+      }
+    },
     "As accurate as Turbo, about 30% slower. Needs 24 GB of memory." : {
       "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Turbo is another model.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tan preciso como Turbo, con un tiempo un 30% superior. Necesita 24 GB de memoria."
+            "value" : "Tan preciso como Turbo, pero un 30% más lento. Necesita 24 GB de memoria."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Точна, як Turbo, приблизно на 30% повільніша. Потрібно 24 ГБ пам'яті."
+            "value" : "Точна, як Turbo, приблизно на 30% повільніша. Потрібно 24 ГБ пам'яті."
           }
         }
       }
@@ -1223,7 +1257,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Може показувати слова, поки ви говорите. Її ключ працює і для Переписування з ШІ."
+            "value" : "Може показувати слова, поки ви говорите. Її ключ працює і для ШІ‑переписування."
           }
         }
       }
@@ -1308,7 +1342,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель для %@ у Налаштуваннях."
+            "value" : "Виберіть модель для %@ у Параметрах."
           }
         }
       }
@@ -1342,7 +1376,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель для цього Mac у Налаштуваннях."
+            "value" : "Виберіть модель для цього Mac у Параметрах."
           }
         }
       }
@@ -1416,6 +1450,7 @@
       }
     },
     "Couldn't load the %@ speech model. Add it to Dictation in %@." : {
+      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1435,8 +1470,7 @@
             "value" : "Не вдалося завантажити модель мовлення (%1$@). Додайте її до Диктування в розділі %2$@."
           }
         }
-      },
-      "comment" : "Error from Apple's speech recognition. The first %@ is a language name (English); the second is 'System Settings › Keyboard', translated separately."
+      }
     },
     "Default" : {
       "comment" : "Settings › Appearance: the middle stop on the glass transparency slider.",
@@ -1484,7 +1518,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Диктування на цьому Mac вимкнено. Увімкніть його в Системні параметри › Клавіатура › Диктування."
+            "value" : "Диктування на цьому Mac вимкнено. Увімкніть його в Системних параметрах › Клавіатура › Диктування."
           }
         }
       }
@@ -1512,30 +1546,30 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No conservar"
+            "value" : "No guardar"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не зберігати"
+            "value" : "Ніколи"
           }
         }
       }
     },
-    "Edit Selection with AI" : {
-      "comment" : "A shortcut's name: edit the selected text by voice.",
+    "Edit Selection" : {
+      "comment" : "A shortcut's name in Settings › Shortcuts and in shortcut conflicts: edit the selected text by voice. Title case, like the other shortcut names (Inline Recording, AI Recording); the feature is called Edit selection everywhere else.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar la selección con IA"
+            "value" : "Editar selección"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагувати виділене з ШІ"
+            "value" : "Редагування виділеного"
           }
         }
       }
@@ -1682,7 +1716,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para siempre"
+            "value" : "Siempre"
           }
         },
         "uk" : {
@@ -1706,6 +1740,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Безкоштовний тариф"
+          }
+        }
+      }
+    },
+    "Get your free key ↗" : {
+      "comment" : "Setup and Settings: link that opens the provider's page for an API key; the provider has a free plan. Keep the ↗.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigue tu clave gratis ↗"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Безкоштовний ключ ↗"
+          }
+        }
+      }
+    },
+    "Get your key ↗" : {
+      "comment" : "Setup and Settings: link that opens the provider's page for an API key. Keep the ↗.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigue tu clave ↗"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отримати ключ ↗"
           }
         }
       }
@@ -1744,6 +1812,30 @@
         }
       }
     },
+    "History filter: AI Rewrite" : {
+      "comment" : "History page: the filter switch's label for dictations rewritten by AI, next to All, Edits and Failed. As short as your language allows: the switch shares a line with the search.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Rewrite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ"
+          }
+        }
+      }
+    },
     "History keeps every dictation on this Mac." : {
       "comment" : "History page, at the foot: what History keeps.",
       "localizations" : {
@@ -1767,13 +1859,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El Historial conserva los dictados de los últimos 3 meses en este Mac."
+            "value" : "El Historial conserva los dictados de los últimos 3 meses en este Mac."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Історія зберігає диктовки за останні 3 місяці на цьому Mac."
+            "value" : "Історія зберігає диктовки за останні 3 місяці на цьому Mac."
           }
         }
       }
@@ -1784,13 +1876,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El Historial conserva los dictados de los últimos 30 días en este Mac."
+            "value" : "El Historial conserva los dictados de los últimos 30 días en este Mac."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Історія зберігає диктовки за останні 30 днів на цьому Mac."
+            "value" : "Історія зберігає диктовки за останні 30 днів на цьому Mac."
           }
         }
       }
@@ -1801,13 +1893,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El Historial conserva los dictados de los últimos 6 meses en este Mac."
+            "value" : "El Historial conserva los dictados de los últimos 6 meses en este Mac."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Історія зберігає диктовки за останні 6 місяців на цьому Mac."
+            "value" : "Історія зберігає диктовки за останні 6 місяців на цьому Mac."
           }
         }
       }
@@ -1818,13 +1910,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El Historial conserva los dictados de los últimos 7 días en este Mac."
+            "value" : "El Historial conserva los dictados de los últimos 7 días en este Mac."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Історія зберігає диктовки за останні 7 днів на цьому Mac."
+            "value" : "Історія зберігає диктовки за останні 7 днів на цьому Mac."
           }
         }
       }
@@ -1886,7 +1978,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grabación en línea"
+            "value" : "Grabación en el cursor"
           }
         },
         "uk" : {
@@ -2005,13 +2097,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Últimos 30 días"
+            "value" : "Últimos 30 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Останні 30 днів"
+            "value" : "Останні 30 днів"
           }
         }
       }
@@ -2022,13 +2114,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Últimos 7 días"
+            "value" : "Últimos 7 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Останні 7 днів"
+            "value" : "Останні 7 днів"
           }
         }
       }
@@ -2294,13 +2386,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Necesita %lld GB de memoria."
+            "value" : "Necesita %lld GB de memoria."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Потрібно %lld ГБ пам'яті."
+            "value" : "Потрібно %lld ГБ пам'яті."
           }
         }
       }
@@ -2465,7 +2557,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вибрано модель для %@ — виберіть її в Налаштуваннях"
+            "value" : "Не вибрано модель для %@ — виберіть її в Параметрах"
           }
         }
       }
@@ -2482,7 +2574,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Жодна модель на цьому Mac не готова — виберіть або завантажте її в Налаштування › Переписування з ШІ"
+            "value" : "Жодна модель на цьому Mac не готова — виберіть або завантажте її в Параметрах › ШІ‑переписування"
           }
         }
       }
@@ -2851,7 +2943,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Налаштуваннях."
+            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Параметрах."
           }
         }
       }
@@ -2868,7 +2960,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Налаштуваннях."
+            "value" : "Для повторної спроби потрібен API-ключ %@ — додайте його в Параметрах."
           }
         }
       }
@@ -2902,7 +2994,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування"
+            "value" : "Параметри"
           }
         }
       }
@@ -2913,7 +3005,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guion corto ( – )"
+            "value" : "Raya corta ( – )"
           }
         },
         "uk" : {
@@ -2953,7 +3045,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Теж показує слова наживо. Той самий ключ вмикає й шліфування тексту з ШІ."
+            "value" : "Теж показує слова наживо. Той самий ключ вмикає й ШІ‑обробку тексту."
           }
         }
       }
@@ -3038,7 +3130,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Розпізнавання мовлення для SpeechText вимкнено. Увімкніть його в Системні параметри › Приватність і безпека."
+            "value" : "Розпізнавання мовлення для SpeechText вимкнено. Увімкніть його в Системних параметрах › Приватність і безпека."
           }
         }
       }
@@ -3168,13 +3260,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El mejor en nuestra prueba de reescritura. Texto limpio en 2–4 segundos."
+            "value" : "El mejor en nuestra prueba de reescritura. Texto limpio en 2–⁠4 segundos."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Найкраща в нашому тесті переписування. Чистий текст за 2–4 секунди."
+            "value" : "Найкраща в нашому тесті переписування. Чистий текст за 2–⁠4 секунди."
           }
         }
       }
@@ -3526,7 +3618,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Той самий ключ вмикає й шліфування тексту з ШІ."
+            "value" : "Той самий ключ вмикає й ШІ‑обробку тексту."
           }
         }
       }
@@ -3543,7 +3635,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скорочення відпустили до того, як увімкнувся мікрофон. Утримуйте його, доки накладка не почне слухати."
+            "value" : "Скорочення відпустили до того, як увімкнувся мікрофон. Тримайте його затиснутим, доки панель не почне слухати."
           }
         }
       }
@@ -3662,7 +3754,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Радимо оновитися з %@. Завантажте нову в Налаштуваннях."
+            "value" : "Радимо оновитися з %@. Завантажте нову в Параметрах."
           }
         }
       }
@@ -3719,7 +3811,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи %1$@, натисніть %2$@. Натисніть ще раз, щоб повернутися."
+            "value" : "Затиснувши %1$@, натисніть %2$@. Натисніть ще раз, щоб повернутися."
           }
         }
       }
@@ -3753,7 +3845,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Слова з'являються на накладці, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує GPT Transcribe. Оплата за хвилину потоку."
+            "value" : "Слова з'являються на панелі, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує GPT Transcribe. Оплата за хвилину потоку."
           }
         }
       }
@@ -3770,7 +3862,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Слова з'являються на накладці, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує Scribe v2. Оплата за хвилину потоку."
+            "value" : "Слова з'являються на панелі, поки ви говорите, і вставляються, коли ви зупиняєтеся. Якщо потік обривається, запис транскрибує Scribe v2. Оплата за хвилину потоку."
           }
         }
       }
@@ -3951,13 +4043,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "los dictados de los últimos 3 meses"
+            "value" : "los dictados de los últimos 3 meses"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "диктовки за останні 3 місяці"
+            "value" : "диктовки за останні 3 місяці"
           }
         }
       }
@@ -3968,13 +4060,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "los dictados de los últimos 30 días"
+            "value" : "los dictados de los últimos 30 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "диктовки за останні 30 днів"
+            "value" : "диктовки за останні 30 днів"
           }
         }
       }
@@ -3985,13 +4077,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "los dictados de los últimos 6 meses"
+            "value" : "los dictados de los últimos 6 meses"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "диктовки за останні 6 місяців"
+            "value" : "диктовки за останні 6 місяців"
           }
         }
       }
@@ -4002,13 +4094,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "los dictados de los últimos 7 días"
+            "value" : "los dictados de los últimos 7 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "диктовки за останні 7 днів"
+            "value" : "диктовки за останні 7 днів"
           }
         }
       }

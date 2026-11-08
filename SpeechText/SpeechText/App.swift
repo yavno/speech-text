@@ -303,6 +303,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             UserDefaults.standard.set(true, forKey: SettingsKeys.hasRegisteredLaunchAtLogin)
             try? SMAppService.mainApp.register()
         }
+
+        #if DEBUG
+        MainActor.assumeIsolated { WindowSnapshots.runIfAsked(self) }
+        #endif
     }
 
     /// Whether the setup window opens at launch — see `OnboardingGate`. Read before the
@@ -488,7 +492,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         updateRecordingItemTitles(in: menu)
 
         let editItem = NSMenuItem(title: "", action: #selector(toggleEdit), keyEquivalent: "")
-        StoredShortcut.edit.apply(to: editItem, title: String(localized: "Edit Selection with AI"))
+        StoredShortcut.edit.apply(to: editItem, title: String(localized: "Edit Selection"))
         editItem.target = self
         editItem.toolTip = String(localized: "Rewrites the text selected in the app in front. Speak an instruction, or double-press the shortcut to just polish it.")
         menu.addItem(editItem)
@@ -1740,7 +1744,7 @@ final class AppState {
         case .selected(let selection):
             guard selection.text.count <= SelectionEdit.maxCharacters else {
                 abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
-                          detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
+                          detail: String(localized: "Select up to \(HomeFormat.integer(SelectionEdit.maxCharacters)) characters to edit with AI."))
                 return
             }
             editSelection = selection
@@ -1825,7 +1829,7 @@ final class AppState {
                                    tint: .secondary)
                 case .tooLong:
                     self.abortEdit(icon: "text.badge.xmark", title: String(localized: "Selection too long"),
-                                   detail: String(localized: "Select up to \(SelectionEdit.maxCharacters.formatted()) characters to edit with AI."))
+                                   detail: String(localized: "Select up to \(HomeFormat.integer(SelectionEdit.maxCharacters)) characters to edit with AI."))
                 case .unchanged(let now):
                     self.editSelection = now
                     self.removeSelection(now)
@@ -2705,3 +2709,151 @@ struct ObservedOverlay: View {
         )
     }
 }
+
+#if DEBUG
+/// `-SPTSnapshots <folder>`: an end-to-end build (its own preferences and data, see
+/// `E2EMode`) opens each window the user reads — Setup's steps, the main window's pages,
+/// Settings' categories, the Record Window — draws each into `<folder>/<name>.png`, and
+/// quits. `scripts/window-snapshots.sh` runs it once per language, so the localized
+/// windows can be looked over side by side (docs/specs/2026-11-04-localization.md ›
+/// Stages, *test*). Drawn with `cacheDisplay`, which needs no Screen Recording grant;
+/// glass that samples what is behind a window draws plain.
+@MainActor
+enum WindowSnapshots {
+    static func runIfAsked(_ app: AppDelegate) {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let flag = arguments.firstIndex(of: "-SPTSnapshots"), arguments.count > flag + 1 else { return }
+        guard E2EMode.isActive else {
+            dlog("Snapshots", "-SPTSnapshots needs the end-to-end build, which keeps its own settings and data", level: .error)
+            return
+        }
+        let folder = URL(fileURLWithPath: arguments[flag + 1], isDirectory: true)
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        Task { @MainActor in
+            await app.drawSnapshots(into: folder)
+            NSApp.terminate(nil)
+        }
+    }
+
+    /// Waits for a window to draw, then has `scripts/window-snapshots.sh` capture it:
+    /// `<name>.window` holds its window number, and the script answers with `<name>.png`
+    /// (`screencapture -l`, that one window and nothing else on screen). Drawn here only
+    /// when no script answers: `cacheDisplay` needs no Screen Recording grant, but it
+    /// leaves the main window's clipped, shadowed page blank.
+    static func capture(_ window: NSWindow?, _ name: String, into folder: URL) async {
+        // Long enough for a window's entrance animations to settle.
+        try? await Task.sleep(for: .seconds(2))
+        guard let window, window.contentView != nil else {
+            dlog("Snapshots", "\(name): no window", level: .error)
+            // The script reports the run as incomplete.
+            try? Data().write(to: folder.appendingPathComponent("\(name).missing"))
+            return
+        }
+        // A page longer than its window is taken a screen at a time, top to bottom:
+        // <name>.png, <name>-2.png, …, so nothing below the fold goes unseen.
+        guard let scroll = longestScrollView(in: window.contentView) else {
+            await shoot(window, name, into: folder)
+            return
+        }
+        let visible = scroll.contentView.bounds.height
+        let total = scroll.documentView?.frame.height ?? visible
+        let step = visible * 0.9
+        var offset: CGFloat = 0
+        var page = 1
+        while true {
+            scrollTo(offset, in: scroll)
+            try? await Task.sleep(for: .milliseconds(500))
+            await shoot(window, page == 1 ? name : "\(name)-\(page)", into: folder)
+            if offset + visible >= total - 1 || page >= 8 { break }
+            offset = min(offset + step, total - visible)
+            page += 1
+        }
+        scrollTo(0, in: scroll)
+    }
+
+    /// The scroll view in `view` with the most content hidden below its fold.
+    private static func longestScrollView(in view: NSView?) -> NSScrollView? {
+        guard let view else { return nil }
+        var best: (NSScrollView, CGFloat)?
+        var stack: [NSView] = [view]
+        while let next = stack.popLast() {
+            if let scroll = next as? NSScrollView, let document = scroll.documentView {
+                let hidden = document.frame.height - scroll.contentView.bounds.height
+                if hidden > 20, hidden > (best?.1 ?? 0) { best = (scroll, hidden) }
+            }
+            stack.append(contentsOf: next.subviews)
+        }
+        return best?.0
+    }
+
+    private static func scrollTo(_ offset: CGFloat, in scroll: NSScrollView) {
+        guard let document = scroll.documentView else { return }
+        let visible = scroll.contentView.bounds.height
+        let y = document.isFlipped ? offset : max(0, document.frame.height - visible - offset)
+        scroll.contentView.scroll(to: NSPoint(x: 0, y: y))
+        scroll.reflectScrolledClipView(scroll.contentView)
+    }
+
+    /// Has `scripts/window-snapshots.sh` capture `window`: `<name>.window` holds its
+    /// window number, and the script answers with `<name>.png` (`screencapture -l`, that
+    /// one window and nothing else on screen). Drawn here only when no script answers:
+    /// `cacheDisplay` needs no Screen Recording grant, but it leaves the main window's
+    /// clipped, shadowed page blank.
+    private static func shoot(_ window: NSWindow, _ name: String, into folder: URL) async {
+        guard let view = window.contentView else { return }
+        let png = folder.appendingPathComponent("\(name).png")
+        let request = folder.appendingPathComponent("\(name).window")
+        try? String(window.windowNumber).write(to: request, atomically: true, encoding: .utf8)
+        for _ in 0..<50 where !FileManager.default.fileExists(atPath: png.path) {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        try? FileManager.default.removeItem(at: request)
+        if FileManager.default.fileExists(atPath: png.path) {
+            dlog("Snapshots", "\(name).png")
+            return
+        }
+        view.layoutSubtreeIfNeeded()
+        guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+        view.cacheDisplay(in: view.bounds, to: rep)
+        try? rep.representation(using: .png, properties: [:])?.write(to: png)
+        dlog("Snapshots", "\(name).png, drawn in the app")
+    }
+}
+
+extension AppDelegate {
+    @MainActor
+    fileprivate func drawSnapshots(into folder: URL) async {
+        openSetup()
+        for step in OnboardingStep.named {
+            if setupWindow == nil { openSetup() }  // Closed during the run: every step is still wanted.
+            setupWindow?.model.step = step
+            await WindowSnapshots.capture(setupWindow, "setup-\(step.rawValue)", into: folder)
+        }
+        // Not one of the steps the bar names, but a screen of its own.
+        if setupWindow == nil { openSetup() }
+        setupWindow?.model.step = .done
+        await WindowSnapshots.capture(setupWindow, "setup-\(OnboardingStep.done.rawValue)", into: folder)
+        setupWindow?.close()
+
+        for page in MainPage.rail {
+            showMainWindow(on: page)
+            await WindowSnapshots.capture(mainWindow, "main-\(page.rawValue)", into: folder)
+        }
+
+        for category in SettingsCategory.allCases {
+            showSettings(category: category)
+            await WindowSnapshots.capture(settingsWindow, "settings-\(category.rawValue)", into: folder)
+        }
+        settingsWindow?.close()
+        mainWindow?.close()
+
+        // Opened on text, as from History's "Open in Record Window": a Record Window opened
+        // empty starts recording, and the snapshots never use the microphone.
+        appState.showDirectRecordingPanel(
+            withText: String(localized: "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."))
+        await WindowSnapshots.capture(NSApp.windows.first { $0 is DirectRecordingPanelWindow },
+                                      "record-window", into: folder)
+    }
+}
+#endif
+

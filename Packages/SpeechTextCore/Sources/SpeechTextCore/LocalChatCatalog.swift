@@ -36,7 +36,7 @@ public struct LocalChatModel: Identifiable, Hashable, Sendable {
     }
 
     public var downloadSizeDescription: String {
-        ByteCountFormatter.string(fromByteCount: downloadBytes, countStyle: .file)
+        HomeFormat.fileSize(downloadBytes)
     }
 }
 

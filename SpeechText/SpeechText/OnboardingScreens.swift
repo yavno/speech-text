@@ -574,7 +574,7 @@ private struct SpeechScreen: View {
                 }
                 ForEach(listing.picks) { row($0) }
                 // macOS asks for Speech Recognition at the first Apple dictation — Try it, here.
-                SetupRow(title: "Apple Dictation", subtitle: String(localized: "Built in"),
+                SetupRow(title: String(localized: "Apple Dictation"), subtitle: String(localized: "Built in"),
                          languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
                          detail: appleDictationLine + " " + String(localized: "macOS asks to allow Speech Recognition the first time."),
                          isSelected: model.speechUsesApple) { model.pickAppleDictation() }

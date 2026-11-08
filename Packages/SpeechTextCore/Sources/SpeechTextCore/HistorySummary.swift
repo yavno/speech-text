@@ -25,6 +25,13 @@ public enum HistoryFilter: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// The filter switch's label: the title, but a language may give AI Rewrite a shorter
+    /// word here than in a sentence, so the switch stays on the search's line.
+    public var switchTitle: String {
+        guard self == .rewritten else { return title }
+        return String(localized: "History filter: AI Rewrite", defaultValue: "AI Rewrite", bundle: .module, locale: uiLocale)
+    }
+
     func includes(_ record: TranscriptionRecord) -> Bool {
         let edit = record.refinement?.isSelectionEdit == true
         switch self {
@@ -657,7 +664,7 @@ public enum HistoryFormat {
     /// What History holds now, under its settings: "125 dictations since 14 September · 70 KB".
     public static func storageSummary(count: Int, since: Date?, bytes: Int64, calendar: Calendar = .current) -> String {
         guard count > 0 else { return localized("No dictations kept yet.") }
-        let size = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+        let size = HomeFormat.fileSize(bytes)
         guard let since else { return localized("\(count) dictations · \(size)") }
         let start = formatter("d MMMM", calendar: calendar).string(from: since)
         return localized("\(count) dictations since \(start) · \(size)")
