@@ -1431,7 +1431,7 @@ private struct AppLanguageRow: View {
                         : "The language of SpeechText’s own windows. The languages you dictate in are under Dictation.") {
             HStack(spacing: 8) {
                 if pending {
-                    Button("Restart") { AppInstaller.restart() }
+                    Button("Restart") { AppState.current?.restartWhenSettled() }
                         .buttonStyle(SetupButtonStyle(kind: .secondary, height: 28))
                         .disabled(holdingWords)
                         .help(holdingWords ? Text("Finish the dictation and close the Record Window first.") : Text(verbatim: ""))

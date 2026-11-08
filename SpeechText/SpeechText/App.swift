@@ -814,6 +814,26 @@ final class AppState {
     /// True while the LLM is rewriting the transcription — keeps the overlay spinning.
     private(set) var isRefining = false
 
+    private var restartPending = false
+
+    /// Restarts for a change only a launch can apply, once nothing is lost by it. What is
+    /// left to wait for here is the pasteboard's own cleanup, seconds at most; a dictation
+    /// begun meanwhile calls the restart off.
+    func restartWhenSettled() {
+        guard !restartPending, !isHoldingWords else { return }
+        restartPending = true
+        Task { @MainActor [weak self] in
+            while PasteService.hasPendingCleanup {
+                try? await Task.sleep(for: .milliseconds(100))
+                guard let self, !self.isHoldingWords else {
+                    self?.restartPending = false
+                    return
+                }
+            }
+            AppInstaller.restart()
+        }
+    }
+
     /// Whether a restart would cost the user words: a dictation or its rewrite under way,
     /// an edit whose selection is cut and not yet put back, or the Record Window open,
     /// whose text and own rewrite live only in the window, or closed with its recording

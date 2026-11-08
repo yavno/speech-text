@@ -141,6 +141,8 @@ struct PasteService {
         let saved = saveClipboard(pasteboard)
         pasteboardWrites += 1
         let before = pasteboard.changeCount
+        // The poll's 600 ms and the late watch, with a margin.
+        cutWatchEnds = ProcessInfo.processInfo.systemUptime + 0.7 + lateChangeSeconds
         simulateCommandKey("x", name: "⌘X")
         awaitChange(of: pasteboard, since: before, late: {
             let text = pasteboard.string(forType: .string) ?? ""
@@ -464,6 +466,14 @@ struct PasteService {
     /// cancelled and rescheduled, never re-taken.
     private static var savedClipboard: [NSPasteboardItem]?
     private static var pendingRestore: DispatchWorkItem?
+    /// When the last ⌘X's poll and late watch are over: until then a cut can still land.
+    private static var cutWatchEnds: TimeInterval = 0
+
+    /// Whether quitting now would strand something: a clipboard still to be put back, or
+    /// a cut that may yet land and need returning to its document. Seconds at most.
+    static var hasPendingCleanup: Bool {
+        pendingRestore != nil || ProcessInfo.processInfo.systemUptime < cutWatchEnds
+    }
     /// The pasteboard's change count right after our text went on it. If it differs
     /// when the restore fires, someone else wrote the pasteboard in between — the user
     /// pressed ⌘C mid-dictation — and putting the old snapshot back would wipe that copy.

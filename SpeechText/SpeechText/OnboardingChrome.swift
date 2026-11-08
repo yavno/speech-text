@@ -1384,7 +1384,7 @@ struct AppLanguageMenu: View {
         // A dictation can start while the list is open.
         guard !holdingWords else { return }
         AppLanguage.choice = code
-        if AppLanguage.needsRestart(for: code) { AppInstaller.restart() }
+        if AppLanguage.needsRestart(for: code) { AppState.current?.restartWhenSettled() }
     }
 }
 
