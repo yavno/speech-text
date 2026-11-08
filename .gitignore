@@ -27,3 +27,4 @@ NOTE.md
 
 # claude plugin eval output
 .claude/skills/*/evals/results/
+__pycache__/
