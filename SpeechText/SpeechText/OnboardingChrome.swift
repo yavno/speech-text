@@ -1332,6 +1332,53 @@ struct SpokenLanguagesChips: View {
     }
 }
 
+/// The language of the app's own windows, small, for Setup's first step: its name in itself,
+/// so it can be found by someone who cannot read the language showing now. Choosing a
+/// different one restarts the app, which comes back to this step.
+struct AppLanguageMenu: View {
+    @State private var open = false
+    @State private var hovering = false
+
+    var body: some View {
+        Button { open = true } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "globe").font(.system(size: 11))
+                Text(verbatim: AppLanguage.name(of: AppLanguage.running)).font(.system(size: 12, weight: .medium))
+                Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold))
+            }
+            .foregroundStyle(hovering ? SetupColor.label : SetupColor.label2)
+            .padding(.horizontal, 10)
+            .frame(height: 26)
+            .background(Capsule().strokeBorder(SetupColor.panelBorder, lineWidth: 1))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .fixedSize()
+        .accessibilityLabel(Text("App language"))
+        .accessibilityValue(Text(verbatim: AppLanguage.name(of: AppLanguage.running)))
+        .popover(isPresented: $open, arrowEdge: .bottom) { rows }
+    }
+
+    private var rows: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            LanguagePickerRow(title: String(localized: "System language"), checked: AppLanguage.choice == nil) { pick(nil) }
+            Divider().padding(.vertical, 4)
+            ForEach(AppLanguage.available, id: \.self) { code in
+                LanguagePickerRow(title: AppLanguage.name(of: code), checked: AppLanguage.choice == code) { pick(code) }
+            }
+        }
+        .padding(.vertical, 6)
+        .frame(width: 200)
+    }
+
+    private func pick(_ code: String?) {
+        open = false
+        AppLanguage.choice = code
+        if AppLanguage.needsRestart(for: code) { AppInstaller.restart() }
+    }
+}
+
 /// One stated language — or, with none stated, what that means.
 struct LanguageChip: View {
     let title: String
@@ -1446,19 +1493,28 @@ struct LanguagePicker: View {
 
 private struct LanguagePickerRow: View {
     let title: String
+    var checked = false
     let action: () -> Void
     @State private var hovering = false
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.system(size: 13))
-                .foregroundStyle(SetupColor.label)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 8)
-                .frame(height: 26)
-                .background(RoundedRectangle(cornerRadius: 6).fill(hovering ? SettingsColor.panel : .clear))
-                .contentShape(Rectangle())
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.system(size: 13))
+                    .foregroundStyle(SetupColor.label)
+                Spacer(minLength: 0)
+                if checked {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(SetupColor.brand)
+                        .accessibilityLabel(Text("Selected"))
+                }
+            }
+            .padding(.horizontal, 8)
+            .frame(height: 26)
+            .background(RoundedRectangle(cornerRadius: 6).fill(hovering ? SettingsColor.panel : .clear))
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 4)

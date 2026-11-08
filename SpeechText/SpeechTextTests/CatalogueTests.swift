@@ -84,6 +84,27 @@ final class RecordingConfigurationTests: XCTestCase {
         XCTAssertEqual(spokenLanguagesMigrating(from: nil), [])
     }
 
+    func testTheAppsLanguagesAreListedByTheirOwnNames() {
+        XCTAssertEqual(AppLanguage.choices(localizations: ["uk", "Base", "en", "es"]), ["en", "es", "uk"])
+        XCTAssertEqual(AppLanguage.name(of: "uk"), "Українська")
+        XCTAssertEqual(AppLanguage.name(of: "es"), "Español")
+        XCTAssertEqual(AppLanguage.name(of: "en"), "English")
+    }
+
+    func testAChoiceOutranksTheSystemsLanguages() {
+        let all = ["en", "es", "uk"]
+        XCTAssertEqual(AppLanguage.effective(choice: "uk", localizations: all, system: ["en-SE", "es"]), "uk")
+        XCTAssertEqual(AppLanguage.effective(choice: nil, localizations: all, system: ["es-MX", "en"]), "es")
+        XCTAssertEqual(AppLanguage.effective(choice: nil, localizations: all, system: ["fr-FR", "uk-UA"]), "uk")
+    }
+
+    /// The windows' language must not decide what the user is assumed to speak.
+    func testTheSpeechLocaleIsTheSystemsNotTheWindows() {
+        XCTAssertEqual(speechLocale(fromSystem: "en_SE", fallback: "uk_SE"), "en-SE")
+        XCTAssertEqual(speechLocale(fromSystem: "uk_UA@calendar=gregorian", fallback: "en_US"), "uk-UA")
+        XCTAssertEqual(speechLocale(fromSystem: nil, fallback: "en_US"), "en-US")
+    }
+
     /// One named language is the only case that forces anything on an engine that can
     /// detect a language itself.
     func testOneLanguageIsForcedOnEveryTier() {

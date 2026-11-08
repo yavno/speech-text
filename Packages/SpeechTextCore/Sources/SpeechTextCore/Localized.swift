@@ -27,3 +27,70 @@ func languageName(_ code: String, english: String?) -> String {
     if uiLocale.language.languageCode == .english { return english ?? named ?? code }
     return named ?? english ?? code
 }
+
+/// The language of the app's own windows, when the user has chosen one. It is the system's
+/// per-app setting, `AppleLanguages` in the app's own preferences, the key System Settings ›
+/// Language & Region › Applications writes too, so the two always agree. Foundation reads it
+/// once at launch, so a change takes a restart.
+public enum AppLanguage {
+    private static let key = "AppleLanguages"
+
+    /// The languages the app has, as their codes, in the order of their own names.
+    public static func choices(localizations: [String]) -> [String] {
+        Array(Set(localizations).subtracting(["Base"]))
+            .sorted { name(of: $0).compare(name(of: $1), locale: Locale(identifier: "en")) == .orderedAscending }
+    }
+
+    public static var available: [String] { choices(localizations: Bundle.main.localizations) }
+
+    /// A language's name in itself: "Español", "Українська". Every language reads its own
+    /// name, so someone who cannot read the current one can still find theirs.
+    public static func name(of code: String) -> String {
+        let own = Locale(identifier: code)
+        return own.localizedString(forLanguageCode: code)?.capitalized(with: own) ?? code
+    }
+
+    /// The language the windows would show under `choice` (nil follows the system's order).
+    public static func effective(choice: String?, localizations: [String], system: [String]) -> String {
+        Bundle.preferredLocalizations(from: localizations, forPreferences: choice.map { [$0] } ?? system).first ?? "en"
+    }
+
+    /// The language chosen here, or nil to follow the system. Read from the app's own
+    /// preferences: `UserDefaults.standard` would also answer with the system's list.
+    public static var choice: String? {
+        get {
+            guard let domain = Bundle.main.bundleIdentifier,
+                  let stored = UserDefaults.standard.persistentDomain(forName: domain)?[key] as? [String],
+                  let first = stored.first else { return nil }
+            return Bundle.preferredLocalizations(from: available, forPreferences: [first]).first
+        }
+        set {
+            if let newValue {
+                UserDefaults.standard.set([newValue], forKey: key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+            UserDefaults.standard.synchronize()
+        }
+    }
+
+    /// The language the windows are showing now.
+    public static var running: String { Bundle.main.preferredLocalizations.first ?? "en" }
+
+    /// Whether `candidate` (nil is the system's) needs a restart to show.
+    public static func needsRestart(for candidate: String?) -> Bool {
+        effective(choice: candidate, localizations: available, system: systemLanguages) != running
+    }
+
+    private static var systemLanguages: [String] {
+        CFPreferencesCopyValue(key as CFString, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser,
+                               kCFPreferencesAnyHost) as? [String] ?? []
+    }
+}
+
+/// `AppleLocale`, the system's own, as "fr-FR". `Locale.current` takes its language from the
+/// app's language, which says what the windows show and nothing about what the user speaks.
+func speechLocale(fromSystem appleLocale: String?, fallback: String) -> String {
+    (appleLocale?.prefix { $0 != "@" }).map(String.init).flatMap { $0.isEmpty ? nil : $0 }
+        .map { $0.replacingOccurrences(of: "_", with: "-") } ?? fallback.replacingOccurrences(of: "_", with: "-")
+}

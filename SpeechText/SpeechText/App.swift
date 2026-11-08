@@ -156,6 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var setupWindow: OnboardingWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppState.current = appState
         #if DEBUG
         if MainActor.assumeIsolated({ LocalChatSmoke.runIfAsked() }) { return }
         #endif
@@ -744,6 +745,10 @@ extension Notification.Name {
 
 @MainActor @Observable
 final class AppState {
+    /// The running app's state, for a view that has no path to it and only needs to know
+    /// whether a dictation is on.
+    @ObservationIgnored static weak var current: AppState?
+
     let speechEngine = SpeechEngine()
     let hotkeyManager = HotkeyManager()
 

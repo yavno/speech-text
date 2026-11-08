@@ -559,7 +559,10 @@ public func resolvedLocale() -> String {
     resolveLocale(
         spoken: storedSpokenLanguages(),
         keyboardLanguage: currentInputSourceLanguage(),
-        systemLocale: Locale.current.identifier.replacingOccurrences(of: "_", with: "-")
+        systemLocale: speechLocale(
+            fromSystem: CFPreferencesCopyValue("AppleLocale" as CFString, kCFPreferencesAnyApplication,
+                                               kCFPreferencesCurrentUser, kCFPreferencesAnyHost) as? String,
+            fallback: Locale.current.identifier)
     )
 }
 

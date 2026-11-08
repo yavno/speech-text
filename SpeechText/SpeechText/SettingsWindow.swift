@@ -135,7 +135,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
     /// The line under the page's title.
     var lead: LocalizedStringResource {
         switch self {
-        case .general: "How SpeechText starts, and how it stays up to date."
+        case .general: "Its language, how SpeechText starts, and how it stays up to date."
         case .appearance: "How the recording overlay and the Record Window look."
         case .dictation: "How you dictate: the shortcuts, the microphone, your languages and how the text is written."
         case .speech: "What turns your voice into text — on this Mac, online or on your own server."

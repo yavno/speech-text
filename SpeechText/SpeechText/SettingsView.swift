@@ -186,6 +186,12 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var generalPage: some View {
+        if AppLanguage.available.count > 1 {
+            SettingsGroup(title: "Language") {
+                AppLanguageRow()
+            }
+        }
+
         SettingsGroup(title: "Startup") {
             SettingsRow(title: "Launch at login",
                         detail: launchAtLogin
@@ -1407,5 +1413,42 @@ private struct VersionRow: View {
         let reset = DispatchWorkItem { copied = false }
         resetCopied = reset
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: reset)
+    }
+}
+
+/// Settings › General: the language of the app's own windows. Foundation reads it at launch,
+/// so a choice that changes it offers a restart, which waits for a dictation in progress.
+private struct AppLanguageRow: View {
+    @State private var choice = AppLanguage.choice ?? ""
+
+    private var pending: Bool { AppLanguage.needsRestart(for: choice.isEmpty ? nil : choice) }
+    private var dictating: Bool { (AppState.current?.speechEngine.phase ?? .idle) != .idle }
+
+    var body: some View {
+        SettingsRow(title: "App language",
+                    detail: pending
+                        ? "SpeechText restarts to switch to this language."
+                        : "The language of SpeechText’s own windows. The languages you dictate in are under Dictation.") {
+            HStack(spacing: 8) {
+                if pending {
+                    Button("Restart") { AppInstaller.restart() }
+                        .buttonStyle(SetupButtonStyle(kind: .secondary, height: 28))
+                        .disabled(dictating)
+                        .help(dictating ? Text("Finish the dictation first.") : Text(verbatim: ""))
+                }
+                Picker("App language", selection: $choice) {
+                    Text("System language").tag("")
+                    Divider()
+                    ForEach(AppLanguage.available, id: \.self) { code in
+                        Text(verbatim: AppLanguage.name(of: code)).tag(code)
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+                .onChange(of: choice) { _, newValue in
+                    AppLanguage.choice = newValue.isEmpty ? nil : newValue
+                }
+            }
+        }
     }
 }
