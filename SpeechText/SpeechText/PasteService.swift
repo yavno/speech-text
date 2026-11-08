@@ -83,11 +83,12 @@ struct PasteService {
         pasteboardWrites += 1
         let before = pasteboard.changeCount
         simulateCommandKey("c", name: "⌘C")
-        awaitChange(of: pasteboard, since: before, late: {
+        keysBeingWatched += 1
+        awaitChange(of: pasteboard, since: before, finished: { keysBeingWatched -= 1 }, late: {
             // Taken for nothing selected, but the copy did land, over the user's clipboard.
             dlog("Edit", "selection: the ⌘C landed late — the clipboard is put back")
             restoreClipboard(pasteboard, items: saved)
-        }) { changed in
+        }, completion: { changed in
             guard changed else {
                 dlog("Edit", "selection: ⌘C changed nothing — nothing selected")
                 completion(nil)
@@ -114,7 +115,7 @@ struct PasteService {
                 return
             }
             completion((text, items))
-        }
+        })
     }
 
     /// What `cutSelection` took out of the document.
@@ -141,9 +142,9 @@ struct PasteService {
         let saved = saveClipboard(pasteboard)
         pasteboardWrites += 1
         let before = pasteboard.changeCount
-        cutsBeingWatched += 1
+        keysBeingWatched += 1
         simulateCommandKey("x", name: "⌘X")
-        awaitChange(of: pasteboard, since: before, finished: { cutsBeingWatched -= 1 }, late: {
+        awaitChange(of: pasteboard, since: before, finished: { keysBeingWatched -= 1 }, late: {
             let text = pasteboard.string(forType: .string) ?? ""
             guard isSelection(text) else {
                 dlog("Edit", "cut: the pasteboard changed late to \(text.count) chars that are not the selection — left alone")
@@ -479,13 +480,13 @@ struct PasteService {
     /// cancelled and rescheduled, never re-taken.
     private static var savedClipboard: [NSPasteboardItem]?
     private static var pendingRestore: DispatchWorkItem?
-    /// ⌘Xs whose poll or late watch is still running: each can still land a cut.
-    private static var cutsBeingWatched = 0
+    /// ⌘Cs and ⌘Xs whose poll or late watch is still running: each can still land.
+    private static var keysBeingWatched = 0
 
     /// Whether quitting now would strand something: a clipboard still to be put back, or
-    /// a cut that may yet land and need returning to its document. Seconds at most.
+    /// a copy or cut that may yet land and need undoing. Seconds at most.
     static var hasPendingCleanup: Bool {
-        pendingRestore != nil || cutsBeingWatched > 0
+        pendingRestore != nil || keysBeingWatched > 0
     }
     /// The pasteboard's change count right after our text went on it. If it differs
     /// when the restore fires, someone else wrote the pasteboard in between — the user
