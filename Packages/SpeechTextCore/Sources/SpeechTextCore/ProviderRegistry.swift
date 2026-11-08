@@ -279,7 +279,7 @@ extension Provider {
 
     /// Setup's and Settings' link to the key page.
     public var linkTitle: String {
-        descriptor.apiKey?.freePlan == true ? "Get your free key ↗" : "Get your key ↗"
+        descriptor.apiKey?.freePlan == true ? localized("Get your free key ↗") : localized("Get your key ↗")
     }
 
     /// What a verification answer says about the key.

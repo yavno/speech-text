@@ -559,7 +559,7 @@ private struct ModelNaming {
                   case .listed(let now) = chatModel(provider: chat, id: new).price else { return nil }
             let ratio = (now.inputPerToken + now.outputPerToken) / (was.inputPerToken + was.outputPerToken)
             if abs(ratio - 1) < 0.05 { return localized("Same price.") }
-            let times = String(format: "%.2g", ratio)
+            let times = ratio.formatted(.number.precision(.significantDigits(1...2)).locale(numberLocale))
             return ratio > 1 ? localized("About \(times)× the price.")
                              : localized("About \(Int((ratio * 100).rounded()))% of the price.")
         }
@@ -569,5 +569,5 @@ private struct ModelNaming {
 
 /// "$0.003", "$2.5", "$15" — up to four significant digits, no trailing zeros.
 func dollars(_ value: Double) -> String {
-    "$" + String(format: "%.4g", value)
+    "$" + value.formatted(.number.precision(.significantDigits(1...4)).grouping(.never).locale(numberLocale))
 }

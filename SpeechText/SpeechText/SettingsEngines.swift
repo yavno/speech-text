@@ -235,7 +235,7 @@ struct SpeechEngineSettings: View {
             // Once a render, not twice a row: a download renders the page ten times a second.
             let picks = LocalPicks(recommended: recommended?.id, bestQuality: bestQuality?.id)
             ForEach(listing.picks) { localRow($0, picks: picks) }
-            SetupRow(title: "Apple Dictation", subtitle: String(localized: "Built in"),
+            SetupRow(title: String(localized: "Apple Dictation"), subtitle: String(localized: "Built in"),
                      languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),
                      detail: appleDictationLine,
                      isSelected: engine == .apple) { sttProvider = STTProviderType.apple.rawValue }
@@ -252,7 +252,7 @@ struct SpeechEngineSettings: View {
             }
             HStack {
                 Text(store.hasAnyModel
-                     ? "\(ByteCountFormatter.string(fromByteCount: store.installedBytes, countStyle: .file)) of models on this Mac"
+                     ? "\(HomeFormat.fileSize(store.installedBytes)) of models on this Mac"
                      : "No models downloaded yet")
                 Spacer()
                 if store.hasAnyModel {
@@ -308,7 +308,7 @@ struct SpeechEngineSettings: View {
         localSTTModels.first { $0.id != removing?.id && store.state(for: $0.id).isUsable }
     }
 
-    private var fallbackName: String { fallback.map(speechModelName) ?? "Apple Dictation" }
+    private var fallbackName: String { fallback.map(speechModelName) ?? String(localized: "Apple Dictation") }
 
     private func remove(_ model: LocalSTTModel) {
         let inUse = engine == .local && localModelID == model.id
@@ -751,7 +751,7 @@ struct AIEngineSettings: View {
             HStack {
                 Text(store.installedModels.isEmpty
                      ? "No models downloaded yet"
-                     : "\(ByteCountFormatter.string(fromByteCount: store.installedBytes, countStyle: .file)) of models on this Mac")
+                     : "\(HomeFormat.fileSize(store.installedBytes)) of models on this Mac")
                 Spacer()
                 if !store.installedModels.isEmpty {
                     Button("Show in Finder") {

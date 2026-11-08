@@ -139,6 +139,8 @@ struct HistoryView: View {
                 filters
             }
         }
+        // The rule under it runs the page's width on two lines as on one.
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 10)
         .background(MainColor.card)
         .overlay(alignment: .bottom) {
@@ -612,7 +614,7 @@ private struct HistoryFilterSwitch: View {
         let count = counts[item] ?? 0
         return Button { filter = item } label: {
             HStack(spacing: 5) {
-                Text(verbatim: item.title)
+                Text(verbatim: item.switchTitle)
                     .foregroundStyle(selected ? MainColor.ink : MainColor.ink2)
                 Text(verbatim: HomeFormat.integer(count))
                     .monospacedDigit()

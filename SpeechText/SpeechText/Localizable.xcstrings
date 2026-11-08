@@ -241,7 +241,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ не завантажено — завантажте її в Налаштування › Переписування з ШІ."
+            "value" : "%@ не завантажено — завантажте її в Параметрах › ШІ‑переписування."
           }
         }
       }
@@ -588,13 +588,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ppm"
+            "value" : "%@ ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ сл./хв"
+            "value" : "%@ сл./хв"
           }
         }
       }
@@ -1364,7 +1364,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld с"
+            "value" : "%lld с"
           }
         }
       }
@@ -1760,13 +1760,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld ppm"
+            "value" : "%lld ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld сл./хв"
+            "value" : "%lld сл./хв"
           }
         }
       }
@@ -1777,13 +1777,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld ppm. El tiempo ahorrado es lo que tardarías en escribir las palabras menos lo que tardas en decirlas."
+            "value" : "%lld ppm. El tiempo ahorrado es lo que tardarías en escribir las palabras menos lo que tardas en decirlas."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld сл./хв. Зекономлений час — це час набору слів мінус час, щоб їх сказати."
+            "value" : "%lld сл./хв. Зекономлений час — це час набору слів мінус час, щоб їх сказати."
           }
         }
       }
@@ -1800,7 +1800,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld с"
+            "value" : "%lld с"
           }
         }
       }
@@ -1862,13 +1862,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "40 ppm, una media. Mide la tuya para una comparación justa."
+            "value" : "40 ppm, una media. Mide la tuya para una comparación justa."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "40 сл./хв — у середньому. Виміряйте свою швидкість для чесного порівняння."
+            "value" : "40 сл./хв — у середньому. Виміряйте свою швидкість для чесного порівняння."
           }
         }
       }
@@ -1950,7 +1950,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un auricular moldeado con una pantalla LCD de matriz de puntos."
+            "value" : "Un aparato moldeado con una pantalla LCD de matriz de puntos."
           }
         },
         "uk" : {
@@ -2024,7 +2024,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ШІ-ОБРОБКА"
+            "value" : "ШІ‑ОБРОБКА"
           }
         }
       }
@@ -2058,7 +2058,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ"
+            "value" : "ШІ‑переписування"
           }
         }
       }
@@ -2075,7 +2075,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ вимкнене, тож нічого не надсилається."
+            "value" : "ШІ‑переписування вимкнене, тож нічого не надсилається."
           }
         }
       }
@@ -2092,7 +2092,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ зберігає їх як написано"
+            "value" : "ШІ‑переписування зберігає їх як написано"
           }
         }
       }
@@ -2109,7 +2109,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ вставляє ваші слова як сказано, доки ви не додасте ключ."
+            "value" : "ШІ‑переписування вставляє ваші слова як сказано, доки ви не додасте ключ."
           }
         }
       }
@@ -2126,7 +2126,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписуванню з ШІ сказали, що текст для: %@"
+            "value" : "ШІ‑переписуванню сказали, що текст для: %@"
           }
         }
       }
@@ -2364,7 +2364,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ШІ-обробка майже готова"
+            "value" : "ШІ‑обробка майже готова"
           }
         }
       }
@@ -2381,7 +2381,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ШІ-обробка готова — вона використовує ваш ключ %@."
+            "value" : "ШІ‑обробка готова — вона використовує ваш ключ %@."
           }
         }
       }
@@ -2517,7 +2517,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Універсальний доступ"
+            "value" : "Доступність"
           }
         }
       }
@@ -2534,7 +2534,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Потрібен універсальний доступ"
+            "value" : "Потрібен дозвіл «Доступність»"
           }
         }
       }
@@ -2551,7 +2551,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Універсальний доступ вимкнено, тож ваш текст відкривається у Вікні запису."
+            "value" : "Дозвіл «Доступність» вимкнено, тож ваш текст відкривається у Вікні запису."
           }
         }
       }
@@ -2602,7 +2602,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Додайте API-ключ %@ у Налаштуваннях, щоб редагувати текст із ШІ."
+            "value" : "Додайте API-ключ %@ у Параметрах, щоб редагувати текст із ШІ."
           }
         }
       }
@@ -2721,7 +2721,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Додайте імена й терміни, які SpeechText пише неправильно — ім'я колеги, ваш продукт, ідентифікатор у коді, — і те, як вони виходять натомість. Їх виправлятиме після кожного диктування."
+            "value" : "Додайте імена й терміни, які SpeechText пише неправильно — ім'я колеги, ваш продукт, ідентифікатор у коді, — і те, як вони виходять натомість. SpeechText виправлятиме їх після кожного диктування."
           }
         }
       }
@@ -3171,6 +3171,23 @@
         }
       }
     },
+    "Apple Dictation" : {
+      "comment" : "The name of Apple's built-in speech recognizer as a speech model, in model lists and warnings. Keep Apple; name Dictation as macOS does in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictado de Apple"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування Apple"
+          }
+        }
+      }
+    },
     "Apple Dictation needs it on." : {
       "comment" : "Setup window, permissions: under the Dictation row — macOS Dictation must be on for Apple Dictation to work.",
       "localizations" : {
@@ -3268,7 +3285,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Як задано в Системні параметри › Звук."
+            "value" : "Як задано в Системних параметрах › Звук."
           }
         }
       }
@@ -3319,7 +3336,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо невдалих диктувань"
+            "value" : "Аудіо невдалих диктовок"
           }
         }
       }
@@ -3937,7 +3954,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель %@ у Налаштуваннях, щоб редагувати текст із ШІ."
+            "value" : "Виберіть модель %@ у Параметрах, щоб редагувати текст із ШІ."
           }
         }
       }
@@ -3971,7 +3988,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель для %@ у Налаштуваннях, щоб диктувати."
+            "value" : "Виберіть модель для %@ у Параметрах, щоб диктувати."
           }
         }
       }
@@ -3988,7 +4005,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель у Налаштування › Переписування з ШІ, щоб користуватися режимом ШІ"
+            "value" : "Виберіть модель у Параметрах › ШІ‑переписування, щоб користуватися режимом ШІ"
           }
         }
       }
@@ -4161,7 +4178,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Borrar historial"
+            "value" : "Borrar Historial"
           }
         },
         "uk" : {
@@ -4178,7 +4195,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Borrar historial…"
+            "value" : "Borrar Historial…"
           }
         },
         "uk" : {
@@ -4898,13 +4915,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Predeterminado: sigue Liquid Glass en Ajustes del Sistema › Apariencia."
+            "value" : "Predeterminado: sigue Liquid Glass en Ajustes del Sistema › Aspecto."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Типово — як Liquid Glass у Системні параметри › Вигляд."
+            "value" : "Типово — як Liquid Glass у Системних параметрах › Вигляд."
           }
         }
       }
@@ -5256,13 +5273,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dictar con Reescritura con IA"
+            "value" : "Dictar con IA"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Диктувати з Переписуванням з ШІ"
+            "value" : "Диктувати з ШІ‑переписуванням"
           }
         }
       }
@@ -5273,13 +5290,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dictar con IA · desactivado"
+            "value" : "Dictar con IA · inactivo"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Диктувати з ШІ · вимкнено"
+            "value" : "Диктувати з ШІ · вимк."
           }
         }
       }
@@ -5324,13 +5341,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ventana de dictado"
+            "value" : "Ventana de grabación"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вікно диктування"
+            "value" : "Вікно запису"
           }
         }
       }
@@ -5483,7 +5500,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Натисніть двічі, щоб лише впорядкувати текст."
+            "value" : "Натисніть двічі, щоб лише обробити текст."
           }
         }
       }
@@ -5523,7 +5540,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Завантажити %1$@ (%2$@) і показати в Налаштуваннях — потім повторити"
+            "value" : "Завантажити %1$@ (%2$@) і показати в Параметрах — потім повторити"
           }
         }
       }
@@ -5659,7 +5676,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетягніть у список «Універсальний доступ»"
+            "value" : "Перетягніть у список «Доступність»"
           }
         }
       }
@@ -5693,7 +5710,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прибирає «е-е-е», «м-м», протягнуті літери («тааак») і «...» в кінці. Слова-паразити на кшталт «ну» залишаються — їх прибирає Переписування з ШІ."
+            "value" : "Прибирає «е-е-е», «м-м», протягнуті літери («тааак») і «...» в кінці. Слова-паразити на кшталт «ну» залишаються — їх прибирає ШІ‑переписування."
           }
         }
       }
@@ -5834,19 +5851,19 @@
         }
       }
     },
-    "Edit Selection with AI" : {
-      "comment" : "Menu bar menu item. Rewrites the text selected in the app in front. Title case.",
+    "Edit Selection" : {
+      "comment" : "Menu bar menu item: rewrites the text selected in the app in front. Title case, as menu items are; the feature is called Edit selection everywhere else.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar selección con IA"
+            "value" : "Editar selección"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагувати виділене з ШІ"
+            "value" : "Редагувати виділене"
           }
         }
       }
@@ -5908,13 +5925,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar selección · desactivado"
+            "value" : "Editar selección · inactivo"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редагування виділеного · вимкнено"
+            "value" : "Редагування виділеного · вимк."
           }
         }
       }
@@ -6044,7 +6061,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esc funciona en tus apps como siempre. Para cancelar un dictado, haz clic en ✕ en el indicador."
+            "value" : "Esc funciona en tus apps como siempre. Para cancelar un dictado, haz clic en ✕ en la barra de dictado."
           }
         },
         "uk" : {
@@ -6461,7 +6478,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Передається рушію і Переписуванню з ШІ"
+            "value" : "Передається рушію і ШІ‑переписуванню"
           }
         }
       }
@@ -6716,7 +6733,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування історії"
+            "value" : "Параметри історії"
           }
         }
       }
@@ -6750,7 +6767,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримання"
+            "value" : "Затисніть"
           }
         }
       }
@@ -6773,7 +6790,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте %1$@ і двічі торкніться %2$@: запис іде без утримання, доки ви знову не натиснете %3$@."
+            "value" : "Затисніть %1$@ і двічі натисніть %2$@: запис іде без утримання, доки ви знову не натиснете %3$@."
           }
         }
       }
@@ -6790,7 +6807,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте скорочення й говоріть, потім відпустіть — текст з'явиться там, де курсор, у будь-якій програмі."
+            "value" : "Затисніть скорочення й говоріть, потім відпустіть — текст з'явиться там, де курсор, у будь-якій програмі."
           }
         }
       }
@@ -6807,30 +6824,13 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте скорочення, поки говорите"
-          }
-        }
-      }
-    },
-    "Hold to record" : {
-      "comment" : "Settings › Dictation › Recording: title of a gesture played as an animation, in hold-to-talk mode.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantén para grabar"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Утримуйте, щоб записувати"
+            "value" : "Затисніть скорочення, поки говорите"
           }
         }
       }
     },
     "Hold to talk" : {
-      "comment" : "The recording mode where the shortcut is held while speaking: a choice in Settings › Dictation › Recording and in setup.",
+      "comment" : "The recording mode where the shortcut is held while speaking: a choice in Settings › Dictation › Recording and in setup. Also the title of the hold gesture's animation in Settings › Dictation › Recording.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6841,7 +6841,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуйте, щоб говорити"
+            "value" : "Затисніть і говоріть"
           }
         }
       }
@@ -6875,7 +6875,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Як Переписування з ШІ вибирає промпт"
+            "value" : "Як ШІ‑переписування вибирає промпт"
           }
         }
       }
@@ -7005,7 +7005,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo se ven el indicador de grabación y la Ventana de grabación."
+            "value" : "Cómo se ven la barra de dictado y la Ventana de grabación."
           }
         },
         "uk" : {
@@ -7173,7 +7173,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Використовується"
+            "value" : "Вибрано"
           }
         }
       }
@@ -7360,7 +7360,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Це модель, що використовується. Переписування з ШІ вставлятиме ваші слова як сказано, доки ви не завантажите іншу."
+            "value" : "Це модель, що використовується. ШІ‑переписування вставлятиме ваші слова як сказано, доки ви не завантажите іншу."
           }
         }
       }
@@ -7377,7 +7377,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Це модель, що використовується. Переписування з ШІ перейде на %@."
+            "value" : "Це модель, що використовується. ШІ‑переписування перейде на %@."
           }
         }
       }
@@ -7655,7 +7655,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Просто говоріть або скажіть, що потрібно, — «ввічлива відповідь англійською», — і Переписування з ШІ вставить готовий текст."
+            "value" : "Просто говоріть або скажіть, що потрібно, — «ввічлива відповідь англійською», — і ШІ‑переписування вставить готовий текст."
           }
         }
       }
@@ -7825,7 +7825,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зберігаються, доки SpeechText не закриється. Головна й Використання рахують лише цей сеанс."
+            "value" : "Зберігаються, доки SpeechText не закриється. Головна й Облік рахують лише цей сеанс."
           }
         }
       }
@@ -7870,13 +7870,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Últimos 7 días"
+            "value" : "Últimos 7 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Останні 7 днів"
+            "value" : "Останні 7 днів"
           }
         }
       }
@@ -8080,7 +8080,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зафіксовано"
+            "value" : "Фіксація"
           }
         }
       }
@@ -8114,7 +8114,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Позначити налаштування як завершене. Усе, про що воно питає, є в Налаштуваннях."
+            "value" : "Позначити налаштування як завершене. Усе, про що воно питає, є в Параметрах."
           }
         }
       }
@@ -8477,7 +8477,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Потрібне Переписування з ШІ — %@."
+            "value" : "Потрібне ШІ‑переписування — %@."
           }
         }
       }
@@ -8939,7 +8939,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ще немає «Коли використовувати» — Переписування з ШІ не знає, коли він підходить."
+            "value" : "Ще немає «Коли використовувати» — ШІ‑переписування не знає, коли він підходить."
           }
         }
       }
@@ -8956,7 +8956,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Немає — лише впорядковано"
+            "value" : "Немає — лише оброблено"
           }
         }
       }
@@ -9078,7 +9078,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вставлено — універсальний доступ вимкнено"
+            "value" : "Не вставлено — вимкнено «Доступність»"
           }
         }
       }
@@ -9163,7 +9163,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ще не використовувався"
+            "value" : "Не використано"
           }
         }
       }
@@ -9174,7 +9174,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloc de notas"
+            "value" : "Notas"
           }
         },
         "uk" : {
@@ -9191,13 +9191,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toma de notas"
+            "value" : "Reuniones"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нотатки зустрічей"
+            "value" : "Зустрічі"
           }
         }
       }
@@ -9563,7 +9563,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тепер спробуйте ШІ-обробку: утримуйте"
+            "value" : "Тепер спробуйте ШІ‑обробку: затисніть"
           }
         }
       }
@@ -9580,7 +9580,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тепер спробуйте ШІ-обробку: натисніть"
+            "value" : "Тепер спробуйте ШІ‑обробку: натисніть"
           }
         }
       }
@@ -9818,7 +9818,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коли в Переписування з ШІ з'явиться провайдер — ключ або модель на цьому Mac, — воно читатиме, що ви сказали або про що попросили, і вибиратиме промпт, чиє «Коли використовувати» підходить."
+            "value" : "Коли ШІ‑переписування отримає провайдера (ключ або модель на цьому Mac), воно вибиратиме промпт, чиє «Коли використовувати» підходить до сказаного."
           }
         }
       }
@@ -9835,7 +9835,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коли в Переписування з ШІ з'явиться провайдер, йому передаватимуться ваші слова з кожним диктуванням із ШІ."
+            "value" : "Коли ШІ‑переписування отримає провайдера, йому передаватимуться ваші слова з кожним диктуванням із ШІ."
           }
         }
       }
@@ -10079,7 +10079,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрити Налаштування"
+            "value" : "Відкрити Параметри"
           }
         }
       }
@@ -10164,7 +10164,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрити Використання"
+            "value" : "Відкрити Облік"
           }
         }
       }
@@ -10255,7 +10255,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Необов'язково. Натисніть %1$@ замість %2$@, і ШІ перетворить сказане — або те, про що ви просите, — на чистий текст для програми, у якій ви працюєте."
+            "value" : "Необов'язково. Натисніть %1$@ замість %2$@ — і ШІ перетворить сказане на чистий текст для вашої програми."
           }
         }
       }
@@ -10706,7 +10706,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Натисніть скорочення ще раз, щоб вставити"
+            "value" : "Натисніть ще раз, щоб вставити"
           }
         }
       }
@@ -10751,13 +10751,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulsar para alternar"
+            "value" : "Pulsa para alternar"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Натискання вмикає й вимикає"
+            "value" : "Перемикання"
           }
         }
       }
@@ -10802,13 +10802,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Privado y gratis, pero lento en un Mac Intel. Una descarga de 3–19 GB."
+            "value" : "Privado y gratis, pero lento en un Mac Intel. Una descarga de 3–⁠19 GB."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Приватно й безкоштовно, але повільно на Mac з Intel. Завантаження 3–19 ГБ."
+            "value" : "Приватно й безкоштовно, але повільно на Mac з Intel. Завантаження 3–⁠19 ГБ."
           }
         }
       }
@@ -10836,13 +10836,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Privado y gratis. Una descarga de 3–19 GB, sin nada más que instalar."
+            "value" : "Privado y gratis. Una descarga de 3–⁠19 GB, sin nada más que instalar."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Приватно й безкоштовно. Завантаження 3–19 ГБ, більше нічого встановлювати не треба."
+            "value" : "Приватно й безкоштовно. Лише завантаження 3–⁠19 ГБ."
           }
         }
       }
@@ -11199,7 +11199,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Записує"
+            "value" : "Запис"
           }
         }
       }
@@ -11712,7 +11712,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписує текст, виділений у програмі на передньому плані. Скажіть інструкцію або натисніть скорочення двічі, щоб лише впорядкувати текст."
+            "value" : "Переписує текст, виділений у програмі на передньому плані. Скажіть інструкцію або натисніть скорочення двічі, щоб лише обробити текст."
           }
         }
       }
@@ -11746,7 +11746,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ"
+            "value" : "ШІ‑переписування"
           }
         }
       }
@@ -11763,7 +11763,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переписування з ШІ…"
+            "value" : "ШІ‑переписування…"
           }
         }
       }
@@ -11831,7 +11831,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Клацніть промпт правою кнопкою, щоб зробити його типовим, дублювати чи перемістити."
+            "value" : "Правий клік — зробити типовим, дублювати чи перемістити."
           }
         }
       }
@@ -11916,7 +11916,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скажіть будь-що — або прочитайте це вголос, — а потім відпустіть."
+            "value" : "Скажіть будь-що або прочитайте це вголос, а потім відпустіть."
           }
         }
       }
@@ -11933,7 +11933,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скажіть будь-що — або прочитайте це вголос, — а потім знову натисніть клавіші."
+            "value" : "Скажіть будь-що або прочитайте це вголос, а потім знову натисніть клавіші."
           }
         }
       }
@@ -12225,7 +12225,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Щоб користуватися режимом ШІ, додайте API-ключ LLM у Налаштуваннях"
+            "value" : "Щоб користуватися режимом ШІ, додайте API-ключ LLM у Параметрах"
           }
         }
       }
@@ -12262,7 +12262,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування"
+            "value" : "Параметри"
           }
         }
       }
@@ -12279,7 +12279,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування..."
+            "value" : "Параметри..."
           }
         }
       }
@@ -12296,7 +12296,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування…"
+            "value" : "Параметри…"
           }
         }
       }
@@ -12313,7 +12313,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка скорочень на Головній"
+            "value" : "Блок зі скороченнями на Головній"
           }
         }
       }
@@ -12330,7 +12330,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скорочення клавіш"
+            "value" : "Клавіатурні скорочення"
           }
         }
       }
@@ -12611,7 +12611,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пропустити поки що"
+            "value" : "Пропустити"
           }
         }
       }
@@ -12628,7 +12628,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пропустити перевірку й завершити налаштування"
+            "value" : "Пропустити й завершити"
           }
         }
       }
@@ -12747,7 +12747,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скажіть — і отримайте відшліфований текст"
+            "value" : "Скажіть — і отримайте оброблений текст"
           }
         }
       }
@@ -12764,7 +12764,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Говоріть — і текст надруковано"
+            "value" : "Говоріть — і текст готовий"
           }
         }
       }
@@ -12775,7 +12775,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Habla y verás"
+            "value" : "Habla y compruébalo"
           }
         },
         "uk" : {
@@ -12821,7 +12821,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Мовлення — %1$lld сл./хв, друк — %2$lld сл./хв"
+            "value" : "Мовлення — %1$lld сл./хв, друк — %2$lld сл./хв"
           }
         }
       }
@@ -12957,7 +12957,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Налаштування SpeechText"
+            "value" : "Параметри SpeechText"
           }
         }
       }
@@ -13314,7 +13314,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Почати користуватися SpeechText"
+            "value" : "Почати роботу"
           }
         }
       }
@@ -13535,7 +13535,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перейти на Переписування з ШІ"
+            "value" : "Перейти на ШІ‑переписування"
           }
         }
       }
@@ -13947,7 +13947,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "API-ключ відхилено. Перевірте його в Налаштуваннях."
+            "value" : "API-ключ відхилено. Перевірте його в Параметрах."
           }
         }
       }
@@ -14066,7 +14066,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка вгорі Головної, що показує кожне скорочення — Диктування, Переписування з ШІ та Редагування."
+            "value" : "Блок угорі Головної, що показує кожне скорочення — Диктування, ШІ‑переписування та Редагування."
           }
         }
       }
@@ -14083,7 +14083,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Картка вгорі сторінки «Промпти» з прикладами того, що ви кажете, і промпту, який цьому підходить."
+            "value" : "Блок угорі сторінки «Промпти» з прикладами того, що ви кажете, і промпту, який цьому підходить."
           }
         }
       }
@@ -14168,7 +14168,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Інструкції, за якими працює Переписування з ШІ, — по одній для кожного виду тексту, який ви диктуєте."
+            "value" : "Інструкції, за якими працює ШІ‑переписування, — по одній для кожного виду тексту, який ви диктуєте."
           }
         }
       }
@@ -14614,7 +14614,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ситуація, яку Переписування з ШІ розпізнає з того, що ви сказали, — відмінна від ситуацій усіх інших промптів."
+            "value" : "Ситуація, яку ШІ‑переписування розпізнає з того, що ви сказали, — відмінна від ситуацій усіх інших промптів."
           }
         }
       }
@@ -14937,13 +14937,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hoy"
+            "value" : "hoy"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сьогодні"
+            "value" : "сьогодні"
           }
         }
       }
@@ -15158,13 +15158,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pruébalo: mantén"
+            "value" : "Pruébalo: mantén pulsado"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Спробуйте: утримуйте"
+            "value" : "Спробуйте: затисніть"
           }
         }
       }
@@ -15249,7 +15249,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вимкнено. Неправильні написання все одно замінюються, а Переписування з ШІ все одно зберігає їх так, як написано."
+            "value" : "Вимкнено. Неправильні написання все одно замінюються, а ШІ‑переписування все одно зберігає їх так, як написано."
           }
         }
       }
@@ -15453,7 +15453,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Використання"
+            "value" : "Облік"
           }
         }
       }
@@ -15481,13 +15481,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usar %lld ppm"
+            "value" : "Usar %lld ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зберегти: %lld сл./хв"
+            "value" : "Зберегти: %lld сл./хв"
           }
         }
       }
@@ -15532,13 +15532,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usar la media, 40 ppm"
+            "value" : "Usar la media, 40 ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Взяти середню швидкість, 40 сл./хв"
+            "value" : "Взяти середню швидкість, 40 сл./хв"
           }
         }
       }
@@ -15751,7 +15751,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Хочете, щоб ШІ впорядковував ваш текст?"
+            "value" : "Упорядкувати текст із ШІ?"
           }
         }
       }
@@ -15870,7 +15870,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Що ще отримує Переписування з ШІ"
+            "value" : "Що ще отримує ШІ‑переписування"
           }
         }
       }
@@ -15921,7 +15921,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Що залишає цей Mac"
+            "value" : "Що надсилається з цього Mac"
           }
         }
       }
@@ -16068,7 +16068,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Dónde debe convertirse tu voz en texto?"
+            "value" : "¿Dónde pasar tu voz a texto?"
           }
         },
         "uk" : {
@@ -16148,7 +16148,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Утримуючи %1$@, натисніть %2$@, щоб перейти на Переписування з ШІ, і ще раз, щоб повернутися. Якщо почати з %3$@, %4$@ перемикає навпаки."
+            "value" : "Затиснувши %1$@, натисніть %2$@, щоб перейти на ШІ‑переписування, і ще раз, щоб повернутися. Якщо почати з %3$@, %4$@ перемикає навпаки."
           }
         }
       }
@@ -16171,7 +16171,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Під час запису натисніть %1$@, щоб перейти на Переписування з ШІ, і %2$@, щоб повернутися. Якщо почати з %3$@, усе працює навпаки."
+            "value" : "Під час запису натисніть %1$@, щоб перейти на ШІ‑переписування, і %2$@, щоб повернутися. Якщо почати з %3$@, усе працює навпаки."
           }
         }
       }
@@ -16188,7 +16188,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Поки видно накладку, Esc скасовує диктування — і до інших програм не доходить, доки вона не зникне."
+            "value" : "Поки видно панель, Esc скасовує диктування — і до інших програм не доходить, доки вона не зникне."
           }
         }
       }
@@ -16239,7 +16239,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Заміни застосовуються до того, що пише кожен рушій, перш ніж текст вставлено чи переписано, до відповідей Переписування з ШІ та Редагування, а також в Історії."
+            "value" : "Заміни застосовуються до того, що пише кожен рушій, перш ніж текст вставлено чи переписано, до відповідей ШІ‑переписування та Редагування, а також в Історії."
           }
         }
       }
@@ -16324,7 +16324,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Слова зберігаються на цьому Mac. До рушія мовлення чи Переписування з ШІ вони потрапляють лише разом із диктовкою — ніколи окремо."
+            "value" : "Слова зберігаються на цьому Mac. До рушія мовлення чи ШІ‑переписування вони потрапляють лише разом із диктовкою — ніколи окремо."
           }
         }
       }
@@ -16443,7 +16443,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Працюють у будь-якій програмі. Утримуйте, щоб говорити, відпустіть, щоб зупинити. Змінити їх можна будь-коли в %@."
+            "value" : "Працюють у будь-якій програмі. Затисніть і говоріть, відпустіть, щоб зупинити. Змінити їх можна будь-коли: %@."
           }
         }
       }
@@ -16460,7 +16460,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Працюють у будь-якій програмі. Натисніть раз, щоб почати, і ще раз, щоб зупинити. Змінити їх можна будь-коли в %@."
+            "value" : "Працюють у будь-якій програмі. Натисніть раз, щоб почати, і ще раз, щоб зупинити. Змінити їх можна будь-коли: %@."
           }
         }
       }
@@ -16562,7 +16562,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пишіть щось по-своєму щоразу, коли це сказано, — «кома» як «,», «мій підпис» як ваш підпис. Цілі слова, будь-який регістр. На відміну від слова вище, заміна не надсилається рушію чи Переписуванню з ШІ — вона лише виправляє текст."
+            "value" : "Записуйте сказане по-своєму — «кома» як «,», «мій підпис» як ваш підпис. Цілі слова, будь-який регістр. На відміну від слова вище, заміна не надсилається рушію чи ШІ‑переписуванню — вона лише виправляє текст."
           }
         }
       }
@@ -16664,7 +16664,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Увімкнути це можна пізніше в Налаштуваннях."
+            "value" : "Або увімкніть пізніше в Параметрах."
           }
         }
       }
@@ -16755,13 +16755,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escribes a %lld ppm"
+            "value" : "Escribes a %lld ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваша швидкість друку: %lld сл./хв"
+            "value" : "Ваша швидкість друку: %lld сл./хв"
           }
         }
       }
@@ -16880,7 +16880,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваші мови — для кращої точності"
+            "value" : "Ваші мови — для точності"
           }
         }
       }
@@ -17025,7 +17025,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш текст у Вікні запису. Увімкніть Універсальний доступ, щоб SpeechText міг друкувати за вас."
+            "value" : "Ваш текст у Вікні запису. Увімкніть «Доступність», щоб SpeechText міг друкувати за вас."
           }
         }
       }
@@ -17470,13 +17470,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "en los últimos 30 días"
+            "value" : "en los últimos 30 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "за останні 30 днів"
+            "value" : "за останні 30 днів"
           }
         }
       }
@@ -17487,13 +17487,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "en los últimos 7 días"
+            "value" : "en los últimos 7 días"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "за останні 7 днів"
+            "value" : "за останні 7 днів"
           }
         }
       }
@@ -17538,7 +17538,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Funciones rápidas de teclado), y puede tener prioridad."
+            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Atajos de teclado), y puede tener prioridad."
           }
         },
         "uk" : {
@@ -18015,13 +18015,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "frente a un mecanógrafo medio (%lld ppm)"
+            "value" : "frente a un mecanógrafo medio (%lld ppm)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "порівняно із середньою швидкістю друку (%lld сл./хв)"
+            "value" : "порівняно із середньою швидкістю друку (%lld сл./хв)"
           }
         }
       }
@@ -18032,13 +18032,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "frente a escribir a %lld ppm"
+            "value" : "frente a escribir a %lld ppm"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "порівняно з друком %lld сл./хв"
+            "value" : "порівняно з друком %lld сл./хв"
           }
         }
       }
@@ -18140,7 +18140,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«%@» буде передано рушію мовлення та Переписуванню з ШІ, щоб вони писали його по-вашому."
+            "value" : "«%@» буде передано рушію мовлення та ШІ‑переписуванню, щоб вони писали його по-вашому."
           }
         }
       }
@@ -18273,13 +18273,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "✓ Instalado"
+            "value" : "✓ Descargado"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "✓ Встановлено"
+            "value" : "✓ Завантажено"
           }
         }
       }

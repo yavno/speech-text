@@ -125,6 +125,10 @@ Match the surrounding code — its layout, its naming, its comment density, its 
 
 What is checked is a short list of swift-format's rules about constructs to avoid (a `.forEach` where a `for` loop reads better, two enum cases on one line, a block comment). Run `scripts/lint-swift.sh` before you push: it lints the Swift files your branch changes against `origin/main` and ignores every finding about layout. CI runs the same script as *Swift lint*. It reports findings on the lines you changed and nothing else: an old finding elsewhere in a file you touched is not yours to fix here (restyling pull requests are refused above). Its configuration is `.swift-format`.
 
+## Adding a language
+
+A new language comes with every screen of the app in that language: run `scripts/window-snapshots.sh --languages "en <code>"` and attach the folder it writes, zipped, to the pull request, with an assessment of each screen beside its English. Screens from anywhere else, or only some of them, do not count. It also comes with its terms: the language's table in [docs/translation-glossary.md](docs/translation-glossary.md), every row filled in, one word for one thing on every screen, and the names of macOS's own settings taken from macOS itself. This applies whether a person or an AI agent did the translating. [docs/translation-glossary.md](docs/translation-glossary.md) › *Adding a language* has both checks, and the terms each language must use.
+
 ## Language
 
 Everything in the repository is written in English: code, comments, commit messages, pull requests, issues and documentation — the same language as the app's UI. Words in other languages appear only as data, such as a non-English transcript a test or an explanation quotes.

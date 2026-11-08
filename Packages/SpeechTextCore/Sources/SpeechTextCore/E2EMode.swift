@@ -57,7 +57,7 @@ public enum E2EMode {
     }
 
     #if DEBUG
-    static var isActive: Bool { Bundle.main.bundleIdentifier == bundleIdentifier }
+    public static var isActive: Bool { Bundle.main.bundleIdentifier == bundleIdentifier }
 
     /// The clips `-SPTAudioInput` names, in order; nil when the argument is absent.
     public static let audioInputs: [URL]? = UserDefaults.standard.string(forKey: "SPTAudioInput").map { list in
@@ -123,7 +123,7 @@ public enum E2EMode {
         }
     }
     #else
-    static let isActive = false
+    public static let isActive = false
     static let closeStreamAfter: TimeInterval? = nil
     static let appleFailAfter: TimeInterval? = nil
     public static let audioInputs: [URL]? = nil

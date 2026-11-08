@@ -73,7 +73,7 @@ public struct LocalSTTModel: Identifiable, Hashable, Sendable {
     }
 
     public var downloadSizeDescription: String {
-        ByteCountFormatter.string(fromByteCount: downloadBytes, countStyle: .file)
+        HomeFormat.fileSize(downloadBytes)
     }
 
     /// Whether Settings and setup list the model and the recommendations may pick it: the
@@ -460,7 +460,7 @@ public enum LocalModelError: LocalizedError, Equatable, Sendable {
     }
 
     private static func size(_ bytes: UInt64) -> String {
-        ByteCountFormatter.string(fromByteCount: Int64(clamping: bytes), countStyle: .file)
+        HomeFormat.fileSize(Int64(clamping: bytes))
     }
 }
 

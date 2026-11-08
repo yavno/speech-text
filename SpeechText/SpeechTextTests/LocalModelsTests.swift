@@ -217,10 +217,10 @@ final class LocalModelDiskCheckTests: XCTestCase {
     func testTheRefusalSaysWhatToFree() throws {
         let message = try XCTUnwrap(localModelDiskShortfall(downloadBytes: chat.downloadBytes,
                                                              freeDiskBytes: 10 * gb)?.errorDescription)
-        XCTAssertTrue(message.contains(ByteCountFormatter.string(fromByteCount: chat.downloadBytes + Int64(gb),
-                                                                 countStyle: .file)), message)
-        XCTAssertTrue(message.contains(ByteCountFormatter.string(fromByteCount: Int64(10 * gb), countStyle: .file)),
-                      message)
+        // Sizes are written the app's way, not the Mac region's: "20.05 GB" in English.
+        XCTAssertTrue(message.contains(HomeFormat.fileSize(chat.downloadBytes + Int64(gb))), message)
+        XCTAssertTrue(message.contains(HomeFormat.fileSize(Int64(10 * gb))), message)
+        XCTAssertTrue(message.contains("10.74 GB"), message)
     }
 }
 

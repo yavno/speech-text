@@ -421,7 +421,7 @@ struct HomeIntroCard: View {
                 .tracking(compact ? -0.8 : -0.9)
                 .foregroundStyle(MainColor.ink)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.65)
                 .padding(.bottom, compact ? 8 : 10)
             Text(text)
                 .font(.system(size: compact ? 14 : 15))
@@ -1110,7 +1110,8 @@ private struct HomeEngineRow: View {
                     Text(title).font(.system(size: 14)).foregroundStyle(MainColor.ink2)
                 }
                 .padding(.horizontal, 16)
-                .frame(width: 170, alignment: .leading)
+                // Room for «ШІ-переписування» on one line, as for "AI Rewrite".
+                .frame(width: 188, alignment: .leading)
                 .frame(maxHeight: .infinity)
                 .overlay(alignment: .trailing) { Rectangle().fill(MainColor.separator).frame(width: 1) }
 

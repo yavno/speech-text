@@ -23,7 +23,7 @@ body:
     id: mode
     attributes:
       label: Which mode?
-      options: ["Inline recording", "AI recording", "Record Window", "Edit Selection with AI", "Settings / other"]
+      options: ["Inline recording", "AI recording", "Record Window", "Edit selection", "Settings / other"]
     validations:
       required: true
   - type: dropdown
