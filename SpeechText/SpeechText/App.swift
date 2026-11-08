@@ -823,14 +823,19 @@ final class AppState {
         guard !restartPending, !isHoldingWords else { return }
         restartPending = true
         Task { @MainActor [weak self] in
-            while PasteService.hasPendingCleanup {
-                try? await Task.sleep(for: .milliseconds(100))
+            while true {
+                // Checked last thing before the restart, with no suspension in between.
                 guard let self, !self.isHoldingWords else {
                     self?.restartPending = false
                     return
                 }
+                guard PasteService.hasPendingCleanup else {
+                    AppInstaller.restart()
+                    self.restartPending = false  // Only reached if the restart failed.
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(100))
             }
-            AppInstaller.restart()
         }
     }
 
