@@ -525,7 +525,7 @@ private struct ServerChatSettings: View {
 
     private var endpoint: ServerEndpoint? { ServerEndpoint(address: address) }
     private var isDraft: Bool { address != storedAddress }
-    private var selectedModel: String { draftModel ?? storedModel }
+    private var selectedModel: String { isDraft ? draftModel ?? storedModel : storedModel }
     private var key: String { isDraft ? draftKey : APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) }
     private var keyBinding: Binding<String> {
         Binding(get: { APIKeyStore.shared.value(for: SettingsKeys.serverChatAPIKey) },
@@ -564,7 +564,11 @@ private struct ServerChatSettings: View {
                 }
             }
         }
-        .onChange(of: address) { result = nil }
+        .onChange(of: address) {
+            result = nil
+            draftModel = nil
+            models = []
+        }
         // What the server lists now; no chat request until the user asks for a test.
         .task { await refreshModels() }
         if !models.isEmpty || (inUse && !selectedModel.isEmpty) {
@@ -635,10 +639,13 @@ private struct ServerChatSettings: View {
     private func test() async {
         guard let endpoint else { return }
         let pickWhenAsked = llmProvider
+        // What this test asks with is what it stores, whatever is typed while it runs.
+        let testedKey = key
+        let testedDraft = isDraft
         testing = true
         defer { testing = false }
         let ids: [String]
-        switch await ServerProbe.models(endpoint: endpoint, apiKey: key) {
+        switch await ServerProbe.models(endpoint: endpoint, apiKey: testedKey) {
         case .failure(let failure):
             result = failure.result
             models = []
@@ -653,11 +660,11 @@ private struct ServerChatSettings: View {
             result = .noModels
             return
         }
-        let outcome = await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: key)
+        let outcome = await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: testedKey)
         result = outcome
         // Another provider chosen while this ran stays chosen.
         guard case .answered = outcome, llmProvider == pickWhenAsked else { return }
-        if isDraft { APIKeyStore.shared.set(draftKey, for: SettingsKeys.serverChatAPIKey) }
+        if testedDraft { APIKeyStore.shared.set(testedKey, for: SettingsKeys.serverChatAPIKey) }
         storedAddress = address
         storedModel = model
         draftModel = nil
