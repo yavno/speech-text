@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Parakeet models no longer paste a stray `<unk>`.** Parakeet v3, Parakeet Ultra and Parakeet Redux sometimes put the marker `<unk>` into the text where they missed a word; it no longer appears.
 - **Dictations and edits into Chrome are pasted again.** Since Chrome 156, a dictation or an AI Rewrite into a web page was reported as pasted while the field stayed empty, and the Edit shortcut cut the selection and put nothing back in its place. SpeechText now presses ⌘ the way a person does around the ⌘V, ⌘C and ⌘X it sends, which Chrome accepts.
 - **History no longer says "Pasted" for a dictation saved offline.** When a dictation made with no connection was rewritten by AI Rewrite once the network was back, its AI output read *Pasted* though nothing had been pasted; it now reads *Not pasted*, and a rewrite that failed says the dictated text was kept rather than pasted.
 
