@@ -202,6 +202,23 @@ enum AppInstaller {
         }
     }
 
+    /// Quits and opens this copy again. The new process starts only once this one has gone,
+    /// so it never finds the shortcuts still held. For a change only a launch can apply.
+    @MainActor
+    static func restart() {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = ["-c", #"while kill -0 "$0" 2>/dev/null; do sleep 0.1; done; exec /usr/bin/open "$1""#,
+                             String(ProcessInfo.processInfo.processIdentifier), Bundle.main.bundlePath]
+        do {
+            try process.run()
+        } catch {
+            dlog("Install", "restart failed: \(error.localizedDescription)", level: .error)
+            return
+        }
+        NSApp.terminate(nil)
+    }
+
     @MainActor
     private static func relaunch(_ url: URL) {
         let configuration = NSWorkspace.OpenConfiguration()

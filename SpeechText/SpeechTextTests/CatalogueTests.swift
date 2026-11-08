@@ -84,6 +84,36 @@ final class RecordingConfigurationTests: XCTestCase {
         XCTAssertEqual(spokenLanguagesMigrating(from: nil), [])
     }
 
+    func testTheAppsLanguagesAreListedByTheirOwnNames() {
+        XCTAssertEqual(AppLanguage.choices(localizations: ["uk", "Base", "en", "es"]), ["en", "es", "uk"])
+        XCTAssertEqual(AppLanguage.name(of: "uk"), "Українська")
+        XCTAssertEqual(AppLanguage.name(of: "es"), "Español")
+        XCTAssertEqual(AppLanguage.name(of: "en"), "English")
+    }
+
+    func testAStoredPreferenceMatchesOnlyItsOwnLanguage() {
+        let all = ["en", "es", "uk"]
+        XCTAssertEqual(AppLanguage.match("uk-UA", in: all), "uk")
+        XCTAssertEqual(AppLanguage.match("es", in: all), "es")
+        XCTAssertNil(AppLanguage.match("fr", in: all), "not the development language")
+    }
+
+    func testAChoiceOutranksTheSystemsLanguages() {
+        let all = ["en", "es", "uk"]
+        XCTAssertEqual(AppLanguage.effective(choice: "uk", localizations: all, system: ["en-SE", "es"]), "uk")
+        XCTAssertEqual(AppLanguage.effective(choice: nil, localizations: all, system: ["es-MX", "en"]), "es")
+        XCTAssertEqual(AppLanguage.effective(choice: nil, localizations: all, system: ["fr-FR", "uk-UA"]), "uk")
+    }
+
+    /// The windows' language must not decide what the user is assumed to speak.
+    func testTheSpeechLocaleIsTheSystemsNotTheWindows() {
+        XCTAssertEqual(speechLocale(fromSystem: "en_SE", systemLanguages: ["uk-SE"]), "en-SE")
+        XCTAssertEqual(speechLocale(fromSystem: "uk_UA@calendar=gregorian", systemLanguages: ["en-US"]), "uk-UA")
+        XCTAssertEqual(speechLocale(fromSystem: nil, systemLanguages: ["fr-FR", "en-US"]), "fr-FR")
+        XCTAssertEqual(speechLocale(fromSystem: "", systemLanguages: ["fr-FR"]), "fr-FR")
+        XCTAssertEqual(speechLocale(fromSystem: nil, systemLanguages: []), "en-US")
+    }
+
     /// One named language is the only case that forces anything on an engine that can
     /// detect a language itself.
     func testOneLanguageIsForcedOnEveryTier() {

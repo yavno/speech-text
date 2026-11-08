@@ -166,12 +166,16 @@ private struct WelcomeScreen: View {
         StepColumns(copyWidth: 320, spacing: 36, insets: EdgeInsets(top: 44, leading: 40, bottom: 24, trailing: 32),
                     copyAlignment: .leading) {
             VStack(alignment: .leading, spacing: 0) {
-                Image(nsImage: NSApp.applicationIconImage)
-                    .resizable()
-                    .frame(width: 52, height: 52)
-                    .shadow(color: .black.opacity(0.18), radius: 3, y: 3)
-                    .padding(.leading, -4)
-                    .padding(.bottom, 14)
+                HStack(alignment: .top) {
+                    Image(nsImage: NSApp.applicationIconImage)
+                        .resizable()
+                        .frame(width: 52, height: 52)
+                        .shadow(color: .black.opacity(0.18), radius: 3, y: 3)
+                        .padding(.leading, -4)
+                    Spacer(minLength: 0)
+                    if AppLanguage.available.count > 1 { AppLanguageMenu() }
+                }
+                .padding(.bottom, 14)
                 Text("Talk instead of typing").setupTitle(44).padding(.bottom, 12)
                 Text("Press a shortcut, say what you want to write, and your words appear wherever your cursor is — in any app.")
                     .setupLead(15)
@@ -1766,7 +1770,7 @@ private struct DoneScreen: View {
                 Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
                 shortcut(.edit, model.aiIsSetUp ? "Edit selection" : "Edit selection · off", on: model.aiIsSetUp)
                 Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
-                shortcut(.recordWindow, "Dictation window", on: true)
+                shortcut(.recordWindow, "Record Window", on: true)
             }
             .padding(.vertical, 8)
             .background(RoundedRectangle(cornerRadius: 12).fill(.black.opacity(0.26)))

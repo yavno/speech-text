@@ -156,6 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var setupWindow: OnboardingWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppState.current = appState
         #if DEBUG
         if MainActor.assumeIsolated({ LocalChatSmoke.runIfAsked() }) { return }
         #endif
@@ -744,6 +745,10 @@ extension Notification.Name {
 
 @MainActor @Observable
 final class AppState {
+    /// The running app's state, for a view that has no path to it and only needs to know
+    /// whether a dictation is on.
+    @ObservationIgnored static weak var current: AppState?
+
     let speechEngine = SpeechEngine()
     let hotkeyManager = HotkeyManager()
 
@@ -764,6 +769,8 @@ final class AppState {
     private var statusDismissItem: DispatchWorkItem?
     private var directRecordingPanel: DirectRecordingPanelWindow?
     private var directRecordingSpeechEngine: SpeechEngine?
+    /// Engines of Record Windows now closed, watched until what they held has landed.
+    private var releasedRecordWindowEngines: [SpeechEngine] = []
     /// The open Record Window's text view, for a dictation handed to it while it is open.
     private var directRecordingInsertion: TextInsertionHandler?
     /// The block observer on the Record Window's `willClose`. Kept so it can be removed:
@@ -806,6 +813,41 @@ final class AppState {
     private(set) var showsLiveTranscript = false
     /// True while the LLM is rewriting the transcription — keeps the overlay spinning.
     private(set) var isRefining = false
+
+    private var restartPending = false
+
+    /// Restarts for a change only a launch can apply, once nothing is lost by it. What is
+    /// left to wait for here is the pasteboard's own cleanup, seconds at most; a dictation
+    /// begun meanwhile calls the restart off.
+    func restartWhenSettled() {
+        guard !restartPending, !isHoldingWords else { return }
+        restartPending = true
+        Task { @MainActor [weak self] in
+            while true {
+                // Checked last thing before the restart, with no suspension in between.
+                guard let self, !self.isHoldingWords else {
+                    self?.restartPending = false
+                    return
+                }
+                guard PasteService.hasPendingCleanup else {
+                    AppInstaller.restart()
+                    self.restartPending = false  // Only reached if the restart failed.
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+        }
+    }
+
+    /// Whether a restart would cost the user words: a dictation or its rewrite under way,
+    /// an edit whose selection is cut and not yet put back, or the Record Window open,
+    /// whose text and own rewrite live only in the window, or closed with its recording
+    /// still on its way to History.
+    var isHoldingWords: Bool {
+        speechEngine.phase != .idle || speechEngine.isTranscribing || isRefining || isEditMode
+            || editDeliveriesWaiting > 0 || directRecordingPanel != nil
+            || releasedRecordWindowEngines.contains { $0.phase != .idle || $0.isTranscribing }
+    }
     private var refinementTask: Task<Void, Never>?
     /// The task parked in `waitForTranscription()`. Cancelling the inline flow cancels
     /// it too: `cancelRecording()` moves the engine off `.finishing`, which resumes the
@@ -1539,6 +1581,8 @@ final class AppState {
     /// The overlay turns violet-filled with the pencil glyph; the dictation shortcuts
     /// cancel instead of acting.
     private(set) var isEditMode = false
+    /// Edits finished but waiting for their app to come to the front before the paste.
+    private var editDeliveriesWaiting = 0
     private var editGesture = EditHotkeyGesture()
     /// The selection being edited, once it has been read.
     private var editSelection: CapturedSelection?
@@ -2063,7 +2107,11 @@ final class AppState {
         }
         PasteService.activateApp(app)
         // Blind wait, as for every paste into an app brought back to the front.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { tryPaste() }
+        editDeliveriesWaiting += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            tryPaste()
+            self?.editDeliveriesWaiting -= 1
+        }
     }
 
     /// Abandons the edit wherever it is — cancelled, and says so.
@@ -2640,6 +2688,8 @@ final class AppState {
             } else if engine.isStartingEngine {
                 engine.cancelRecording()
             }
+            releasedRecordWindowEngines.removeAll { $0.phase == .idle && !$0.isTranscribing }
+            releasedRecordWindowEngines.append(engine)
         }
         directRecordingSpeechEngine = nil
     }

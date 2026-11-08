@@ -678,7 +678,7 @@
       set($("shortcuts"), [
         ["Q", "Dictate"],
         ["A", ai() ? "Dictate with AI" : '<span class="off">Dictate with AI · off</span>'],
-        ["W", "Dictation window"],
+        ["W", "Record Window"],
       ].map(([k, t]) => `<div class="shortcut">${caps3(k)}<span>${t}</span></div>`).join(""));
       const preparing = !!download();
       $("done-preparing").hidden = !preparing;

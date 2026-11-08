@@ -45,6 +45,7 @@ across a bundle-identifier rename.
 | `aiModeInRecordWindow` | Record Window ✨ toggle state | `false` |
 | `appSkin` | Appearance (`"techno"` or `"minimal"`) | `"techno"` |
 | `dockIconMode` | When the app shows a Dock / ⌘Tab icon (`"never"`, `"whileWindowOpen"`, `"always"`) — an agent's Settings window is otherwise unfindable once covered | `"always"` |
+| `AppleLanguages` | The language of the app's own windows, as a one-item list: the system's per-app key, written by Setup, Settings › General and System Settings › Language & Region › Applications alike. Absent follows the system. Read at launch, so a change restarts the app | absent |
 | `accentColor` | Minimal skin's tint, `#RRGGBB`; empty means neutral | `""` |
 | `glassTransparency` | The minimal skin's Transparency (`GlassTransparency`: `"most"`, `"more"`, `"standard"`, `"less"`, `"least"`); anything else reads as the default. In `portable` | `"standard"` |
 | `technoPhosphor` | Techno skin's display colour: a recommended set (`"green"`, `"amber"`, `"cyan"`, `"white"`) or any colour as `#RRGGBB`; anything else reads as green | `"green"` |
