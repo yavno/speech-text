@@ -1942,7 +1942,7 @@
       }
     },
     "A model you already run. Your text goes to the address you enter." : {
-
+      "comment" : "Settings › AI Rewrite: the sentence under the place cards while Your server is open"
     },
     "A molded handset with a dot-matrix LCD." : {
       "comment" : "Settings › Appearance: the description of the Techno skin.",
@@ -6192,7 +6192,7 @@
       }
     },
     "Fill in:" : {
-
+      "comment" : "Settings › Your server: before the names that fill in a server's default address"
     },
     "Filter..." : {
       "comment" : "Debug Log window: placeholder of the search field.",
@@ -8256,10 +8256,10 @@
       }
     },
     "Model" : {
-
+      "comment" : "Settings › Your server: the heading over the models the server lists"
     },
     "Model ID" : {
-
+      "comment" : "Settings › Your server: placeholder for typing a model's ID when the server lists none"
     },
     "Model on this Mac" : {
       "comment" : "Usage page, By engine: where a speech model ran.",
@@ -8823,7 +8823,7 @@
       }
     },
     "No model to test with." : {
-
+      "comment" : "Settings › Your server: the test could not run, the server listed no model"
     },
     "No models downloaded yet" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Models on this Mac: footer when none is on this Mac.",
@@ -8962,7 +8962,7 @@
       }
     },
     "Not an address yet. It starts with http:// or https://." : {
-
+      "comment" : "Settings › Your server: under an address that cannot be used"
     },
     "Not checked yet." : {
       "comment" : "About panel: the app hasn't looked for an update yet.",
@@ -9220,7 +9220,7 @@
       }
     },
     "Nothing answered at this address. Is the server running?" : {
-
+      "comment" : "Settings › Your server: the test found nothing at the address"
     },
     "Nothing dictated in this period." : {
       "comment" : "Usage page, By engine: shown when there is nothing.",
@@ -10533,7 +10533,7 @@
       }
     },
     "Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it." : {
-
+      "comment" : "Settings › Your server: warning for an unencrypted address off this Mac"
     },
     "Preparing %@ for your Mac…" : {
       "comment" : "Setup window, Try it step: under the progress bar. %@ is the speech model's name.",
@@ -11341,7 +11341,7 @@
       }
     },
     "Remove the server's key?" : {
-
+      "comment" : "Settings › Your server: asks before removing the stored key"
     },
     "Remove your %@ key?" : {
       "comment" : "Settings: title of the confirmation before removing an API key. %@ is the service's name.",
@@ -12211,7 +12211,7 @@
       }
     },
     "Server address" : {
-
+      "comment" : "Settings › Your server: the heading over the address field"
     },
     "Set an LLM API key in Settings to use AI mode" : {
       "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no API key.",
@@ -12248,7 +12248,7 @@
       }
     },
     "Set up your server in Settings to edit text with AI." : {
-
+      "comment" : "Edit selection: AI Rewrite is set to the user's server, which has no address or model"
     },
     "Settings" : {
       "comment" : "Settings — the window, and its place in the main window's sidebar.",
@@ -13828,10 +13828,10 @@
       }
     },
     "Test" : {
-
+      "comment" : "Settings › Your server: button that sends one request to the server"
     },
     "Testing…" : {
-
+      "comment" : "Settings › Your server: while the test request runs"
     },
     "Text" : {
       "comment" : "Settings › Dictation: group heading over how the text is written.",
@@ -14174,7 +14174,7 @@
       }
     },
     "The internet. Your words leave your network." : {
-
+      "comment" : "Settings › Your server: where the address leads"
     },
     "The lid is closed, so this microphone hears nothing." : {
       "comment" : "Settings › Dictation › Microphone: caption when the MacBook's own microphone is in use with the lid closed.",
@@ -14568,22 +14568,22 @@
       }
     },
     "The server answered, but not at this path. Most addresses end in /v1." : {
-
+      "comment" : "Settings › Your server: the test got HTTP 404"
     },
     "The server lists no models. Load one in it, or type its ID." : {
-
+      "comment" : "Settings › Your server: under the model ID field"
     },
     "The server refused the request (HTTP %lld)." : {
-
+      "comment" : "Settings › Your server: the test got another HTTP error. The number is the status code"
     },
     "The server refused the request without a key." : {
-
+      "comment" : "Settings › Your server: the test got HTTP 401 or 403"
     },
     "The server's address" : {
-
+      "comment" : "Settings › Your server: placeholder in the address field"
     },
     "The server's reply wasn't one SpeechText can read." : {
-
+      "comment" : "Settings › Your server: the test got an answer in an unexpected form"
     },
     "The service won't serve it to your key. The recording is in History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. under 'This model isn't available'.",
@@ -14756,7 +14756,7 @@
       }
     },
     "This Mac." : {
-
+      "comment" : "Settings › Your server: where the address leads"
     },
     "This build does not update itself." : {
       "comment" : "About panel: the app's update status.",
@@ -14810,7 +14810,7 @@
       }
     },
     "This key is sent in plain text." : {
-
+      "comment" : "Settings › Your server: warning under the key for an unencrypted address off this Mac"
     },
     "This model isn't available" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. the speech provider refused the selected model.",
@@ -16886,7 +16886,7 @@
       }
     },
     "Your network." : {
-
+      "comment" : "Settings › Your server: where the address leads"
     },
     "Your own prompts and changes are replaced by the three that come with SpeechText." : {
       "comment" : "Prompts page: message in the confirmation before the built-in prompts are restored. SpeechText is the app's name.",
@@ -16923,10 +16923,10 @@
       }
     },
     "Your server" : {
-
+      "comment" : "The place card for a model server the user runs, and that provider's name"
     },
     "Your server isn't set up. Pasted the raw transcription." : {
-
+      "comment" : "Notice after an AI dictation: the user's server has no address or model"
     },
     "Your shortcuts" : {
       "comment" : "Setup window, Done step: heading over the shortcuts.",
@@ -18231,7 +18231,7 @@
       }
     },
     "✓ Answered in %@ s." : {
-
+      "comment" : "Settings › Your server: the test succeeded. The value is seconds"
     },
     "✓ Done" : {
       "comment" : "Setup window, Try it step: chip after AI polish wrote its text.",
