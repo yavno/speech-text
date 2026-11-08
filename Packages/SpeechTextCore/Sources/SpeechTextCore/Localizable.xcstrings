@@ -1226,7 +1226,21 @@
       }
     },
     "Bark 3.0 that leaves out fillers and repeats. Otherwise as accurate as Phonon-2 on our tests." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Bark 3.0 is a model's name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Bark 3.0 is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bark 3.0 que omite muletillas y repeticiones. Por lo demás, igual de preciso que Phonon-2 en nuestras pruebas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bark 3.0, що пропускає слова-паразити й повтори. В іншому так само точна, як Phonon-2, у наших тестах."
+          }
+        }
+      }
     },
     "Built into macOS, nothing to download. Words appear as you speak." : {
       "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. For Apple's recognizer.",
@@ -2739,7 +2753,21 @@
       }
     },
     "Once wrote \"Yeah.\" for a cough." : {
-      "comment" : "A speech model's row: shown only to someone who speaks English. \"Yeah.\" is what the model wrote, quoted as it was."
+      "comment" : "A speech model's row: shown only to someone who speaks English. \"Yeah.\" is what the model wrote, quoted as it was.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una vez escribió “Yeah.” por una tos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якось написала «Yeah.» замість кашлю."
+          }
+        }
+      }
     },
     "OpenAI · Paid" : {
       "comment" : "Setup: under 'ChatGPT' on the AI card. OpenAI is the vendor's name.",
@@ -2810,7 +2838,21 @@
       }
     },
     "Parakeet v3 trained further, writing every word as said. As accurate as Phonon-2 on our tests." : {
-      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name."
+      "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3 con más entrenamiento, que escribe cada palabra tal como se dice. Igual de preciso que Phonon-2 en nuestras pruebas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parakeet v3 з додатковим навчанням, записує кожне слово так, як його сказано. Так само точна, як Phonon-2, у наших тестах."
+          }
+        }
+      }
     },
     "Parakeet v3 trained further: as accurate on our tests, just as quick." : {
       "comment" : "Settings › Speech to text and setup: a speech model's row, the line under its name. Parakeet v3 is a model's name.",
