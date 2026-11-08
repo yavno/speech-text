@@ -76,6 +76,10 @@ public final class AudioBufferWriter: @unchecked Sendable {
                                          commonFormat: source.processingFormat.commonFormat,
                                          interleaved: source.processingFormat.isInterleaved)
             try output.write(from: buffer)
+        } catch {
+            // Someone's voice, which nothing else would come back for.
+            try? FileManager.default.removeItem(at: copy)
+            throw error
         }
         return copy
     }

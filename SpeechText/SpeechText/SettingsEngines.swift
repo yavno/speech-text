@@ -534,6 +534,9 @@ private struct ServerEngineSettings: View {
     @AppStorage private var otherAddress: String
     @State private var address: String
     @State private var typedModel = ""
+    /// The server answered with no models, or has no list at all (whisper.cpp's): the
+    /// model is typed, and stays typable through a failed test.
+    @State private var listsNoModels = false
     /// A model picked from a draft server's list, which is no choice for the server in use.
     @State private var draftModel: String?
     /// A key typed for a draft server: the stored one is another server's, and neither is
@@ -579,16 +582,17 @@ private struct ServerEngineSettings: View {
                 resultLine
                 if showsKey {
                     if isDraft {
-                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4)
+                        ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4).disabled(testing)
                     } else {
                         SettingsKeyField(service: .server, value: keyBinding, showsHeader: false, showsGetKey: false)
                             .padding(.top, 4)
+                            .disabled(testing)
                     }
                     if endpoint?.isReadableOnTheWay == true {
                         warning("This key is sent in plain text.")
                     }
                 }
-                if result == .noModels {
+                if listsNoModels {
                     ServerAddressField(text: $typedModel, prompt: "Model ID").padding(.top, 4)
                     Text("The server lists no models. Load one in it, or type its ID.").rowNote()
                 }
@@ -598,6 +602,7 @@ private struct ServerEngineSettings: View {
             result = nil
             draftModel = nil
             models = []
+            listsNoModels = false
         }
         // What the server lists now; no chat request until the user asks for a test.
         .task { await refreshModels() }
@@ -710,8 +715,9 @@ private struct ServerEngineSettings: View {
             ids = listed
         }
         models = ids
+        listsNoModels = ids.isEmpty
         let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? typed
+        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? (typed.isEmpty ? selectedModel : typed)
         guard !model.isEmpty else {
             result = .noModels
             return
