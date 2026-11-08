@@ -769,6 +769,8 @@ final class AppState {
     private var statusDismissItem: DispatchWorkItem?
     private var directRecordingPanel: DirectRecordingPanelWindow?
     private var directRecordingSpeechEngine: SpeechEngine?
+    /// Engines of Record Windows now closed, watched until what they held has landed.
+    private var releasedRecordWindowEngines: [SpeechEngine] = []
     /// The open Record Window's text view, for a dictation handed to it while it is open.
     private var directRecordingInsertion: TextInsertionHandler?
     /// The block observer on the Record Window's `willClose`. Kept so it can be removed:
@@ -814,10 +816,12 @@ final class AppState {
 
     /// Whether a restart would cost the user words: a dictation or its rewrite under way,
     /// an edit whose selection is cut and not yet put back, or the Record Window open,
-    /// whose text and own rewrite live only in the window.
+    /// whose text and own rewrite live only in the window, or closed with its recording
+    /// still on its way to History.
     var isHoldingWords: Bool {
         speechEngine.phase != .idle || speechEngine.isTranscribing || isRefining || isEditMode
-            || directRecordingPanel != nil
+            || editDeliveriesWaiting > 0 || directRecordingPanel != nil
+            || releasedRecordWindowEngines.contains { $0.phase != .idle || $0.isTranscribing }
     }
     private var refinementTask: Task<Void, Never>?
     /// The task parked in `waitForTranscription()`. Cancelling the inline flow cancels
@@ -1552,6 +1556,8 @@ final class AppState {
     /// The overlay turns violet-filled with the pencil glyph; the dictation shortcuts
     /// cancel instead of acting.
     private(set) var isEditMode = false
+    /// Edits finished but waiting for their app to come to the front before the paste.
+    private var editDeliveriesWaiting = 0
     private var editGesture = EditHotkeyGesture()
     /// The selection being edited, once it has been read.
     private var editSelection: CapturedSelection?
@@ -2076,7 +2082,11 @@ final class AppState {
         }
         PasteService.activateApp(app)
         // Blind wait, as for every paste into an app brought back to the front.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { tryPaste() }
+        editDeliveriesWaiting += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            tryPaste()
+            self?.editDeliveriesWaiting -= 1
+        }
     }
 
     /// Abandons the edit wherever it is — cancelled, and says so.
@@ -2653,6 +2663,8 @@ final class AppState {
             } else if engine.isStartingEngine {
                 engine.cancelRecording()
             }
+            releasedRecordWindowEngines.removeAll { $0.phase == .idle && !$0.isTranscribing }
+            releasedRecordWindowEngines.append(engine)
         }
         directRecordingSpeechEngine = nil
     }
