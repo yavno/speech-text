@@ -55,8 +55,11 @@ public enum TextRefinementService {
         // ordinary characters for look-alikes — see `replacingConfusablePunctuation`.
         // The user's Dictionary and Replacements go in too: a model that rewrote
         // "SpeechText" back into "speech text" would otherwise undo them.
-        let text = polishedReply(parsed.text)
-        dlog("Refine", "preset=\(parsed.presetName ?? "—"), in=\(source.count) chars, out=\(text.count) chars")
+        // A command is exact: a Dictionary word or a Replacement in a path would break it.
+        let polished = request.commands == .atPrompt
+            ? polishedReply(parsed.text, dictionary: [], replacements: []) : polishedReply(parsed.text)
+        let text = RewriteModes.forPaste(polished, request: request)
+        dlog("Refine", "preset=\(parsed.presetName ?? "—"), terminal=\(context?.terminalFocus?.rawValue ?? "—"), in=\(source.count) chars, out=\(text.count) chars")
 
         guard !text.isEmpty else { throw LLMError.emptyResponse }
         return Result(text: text, presetName: parsed.presetName,

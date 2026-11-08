@@ -549,7 +549,7 @@ enum RewriteEvaluation {
             row.calls = [completion.call]
             row.raw = completion.reply
             row.generated = completion.generated
-            let read = RewriteChecks.read(completion.reply, fixture: fixture, presetNames: request.modeNames)
+            let read = RewriteChecks.read(completion.reply, fixture: fixture, presetNames: request.modeNames, request: request.request)
             row.reply = read.text
             row.mode = request.decidedMode ?? read.mode
             row.rawMode = read.rawMode
@@ -578,6 +578,7 @@ enum RewriteEvaluation {
         var user: String
         var modeNames: [String]
         var decidedMode: String?
+        var request: RewriteModes.Request?
     }
 
     static let editModeNames = [TextRefinementService.editDefaultModeName, TextRefinementService.editCustomModeName]
@@ -590,7 +591,7 @@ enum RewriteEvaluation {
             return Plan(system: system, user: user, modeNames: setup.presetNames)
         case .modes2026:
             let request = modesRequest(fixture)
-            return Plan(system: request.system, user: user, modeNames: request.modeNames, decidedMode: request.decidedMode)
+            return Plan(system: request.system, user: user, modeNames: request.modeNames, decidedMode: request.decidedMode, request: request)
         }
     }
 
@@ -602,14 +603,14 @@ enum RewriteEvaluation {
 
     static func focusContext(_ fixture: RewriteFixture) -> FocusContext? {
         fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
         }
     }
 
     /// The system prompt and user message `TextRefinementService` would send.
     static func messages(_ fixture: RewriteFixture, setup: Setup) -> (String, String) {
         let context = fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
         }
         let vocabulary = Vocabulary.promptBlock((fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) })
         if fixture.isEdit {
@@ -631,8 +632,11 @@ enum RewriteEvaluation {
         A good output does what the transcript asks — format, language, length, tone — and \
         nothing else; keeps every fact, name, number and link; invents nothing; reads as \
         finished text for that place, with no preamble or commentary; and fixes recognition \
-        errors and fillers. In a code editor, terminal or a prompt field for an AI, an \
-        instruction is written down as the user's request, not carried out.
+        errors and fillers. In a code editor, a program in a terminal or a prompt field for \
+        an AI, an instruction is written down as the user's request, not carried out. At a \
+        shell prompt, what the shell should do is written as that one command. Where \
+        <terminal> says it is not known which, it is written down unless the user asks for \
+        a command by name.
 
         Reply with JSON only: {"score": 1-5, "followed_request": true|false, "faithful": \
         true|false, "issues": "one short sentence, empty if none"}. 5: a careful editor would \
@@ -685,8 +689,14 @@ enum RewriteEvaluation {
         var blocks: [String] = []
         if let context = fixture.context {
             let focus = FocusContext(appName: context.appName, bundleID: context.bundleID,
-                                     windowTitle: context.windowTitle, fieldLabel: context.fieldLabel)
+                                     windowTitle: context.windowTitle, fieldLabel: context.fieldLabel, terminalFocus: context.terminalFocus)
             if !focus.isEmpty { blocks.append(focus.promptBlock) }
+            switch context.terminalFocus {
+            case .shellPrompt: blocks.append("<terminal>the cursor is at a shell prompt</terminal>")
+            case .program: blocks.append("<terminal>the cursor is in a program running in the terminal</terminal>")
+            case .unknown: blocks.append("<terminal>it is not known whether a shell or a program is at the cursor</terminal>")
+            case nil: break
+            }
         }
         if fixture.isEdit {
             blocks.append("<selected_text>\n\(fixture.selection ?? "")\n</selected_text>")
@@ -787,7 +797,9 @@ enum RewriteEvaluation {
             let names = (fixture.isEdit ? Array(Set(variant.presets.map(\.name) + Variant.current.presets.map(\.name))).sorted()
                          : variant.presets.map(\.name))
             let read = RewriteChecks.read(raw, fixture: fixture, presetNames: modes?.modeNames
-                ?? names + (fixture.isEdit ? editModeNames : []))
+                ?? names + (fixture.isEdit ? editModeNames : []), request: modes)
+            // A grade is of the text it was given: `gradeRows` regrades only what has none.
+            if row.reply != read.text { row.judges = nil; row.judge = nil }
             row.reply = read.text
             row.mode = modes?.decidedMode ?? read.mode
             row.rawMode = read.rawMode
@@ -896,7 +908,7 @@ enum RewriteEvaluation {
 
         guard let fixture = fixtures.first(where: { !$0.isEdit }) ?? fixtures.first else { return "no fixture" }
         let context = fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
         }
         let user = TextRefinementService.userMessage(transcript: fixture.transcript ?? "", context: context)
         var kwargs: [String: Any] = [:]

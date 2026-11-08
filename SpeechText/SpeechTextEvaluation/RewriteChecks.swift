@@ -28,6 +28,7 @@ struct RewriteFixture: Codable, Sendable {
         var bundleID: String?
         var windowTitle: String?
         var fieldLabel: String?
+        var terminalFocus: TerminalFocus?
     }
 
     /// A reply written by hand, with whether the text checks must pass it.
@@ -148,11 +149,13 @@ enum RewriteChecks {
 
     /// The reply through the app's parser and polish, with the fixture's Dictionary — the
     /// text the app would paste — and the marker as the model wrote it.
-    static func read(_ raw: String, fixture: RewriteFixture, presetNames: [String]) -> (text: String, mode: String?, rawMode: String?) {
+    static func read(_ raw: String, fixture: RewriteFixture, presetNames: [String],
+                     request: RewriteModes.Request? = nil) -> (text: String, mode: String?, rawMode: String?) {
         let parsed = TextRefinementService.parse(raw, presetNames: presetNames)
-        let dictionary = (fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) }
-        let text = TextRefinementService.polishedReply(parsed.text, dictionary: dictionary,
-                                                      replacements: [], dashStyle: .enDash)
+        let dictionary = request?.commands == .atPrompt ? [] : (fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) }
+        let polished = TextRefinementService.polishedReply(parsed.text, dictionary: dictionary,
+                                                           replacements: [], dashStyle: .enDash)
+        let text = request.map { RewriteModes.forPaste(polished, request: $0) } ?? polished
         return (text, parsed.presetName, rawMarkerName(raw))
     }
 

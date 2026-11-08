@@ -145,9 +145,10 @@ final class LocalChatConnection: @unchecked Sendable {
 
     /// Loads the model and reads the system prompts in the service: the user is speaking
     /// meanwhile, and the rewrite at the stop then starts from them (14 s cold for Gemma 4
-    /// 12B on an M1 Pro, 3 s warm). A dictation is sent one of two prompts, by where it
-    /// goes (`RewriteModes.request`); the one for an editor, a terminal or an AI's field
-    /// is read first, since most dictations go there, then the Edit shortcut's. Fire and
+    /// 12B on an M1 Pro, 3 s warm). Of the prompts a dictation can be sent, by where it
+    /// goes (`RewriteModes.request`), the one for an editor, a program in a terminal or an
+    /// AI's field is read first, since most dictations go there, then the routing prompt, then
+    /// the Edit shortcut's; a terminal's two for a shell wait for their first use. Fire and
     /// forget — a failure here is the request's own.
     func prewarm(_ model: LocalChatModel) {
         let path = localChatModelFile(for: model)
@@ -156,7 +157,7 @@ final class LocalChatConnection: @unchecked Sendable {
         let defaultID = PromptPresetStore.storedDefaultPresetID()
         var request = LocalChatRequest.rewrite(model: model, path: path, system: "", user: "")
         request.prefixes = [
-            RewriteModes.request(context: FocusContext(bundleID: "com.apple.Terminal"), presets: presets,
+            RewriteModes.request(context: FocusContext(bundleID: "com.apple.dt.Xcode"), presets: presets,
                                  defaultPresetID: defaultID).system,
             RewriteModes.request(context: nil, presets: presets, defaultPresetID: defaultID).system,
             TextRefinementService.buildEditSystemPrompt(presets: presets),

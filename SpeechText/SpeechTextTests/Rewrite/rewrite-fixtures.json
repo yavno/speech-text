@@ -700,7 +700,8 @@
     "context": {
       "appName": "Terminal",
       "bundleID": "com.apple.Terminal",
-      "windowTitle": "speech-text — zsh — 120×40"
+      "windowTitle": "speech-text — zsh — 120×40",
+      "terminalFocus": "shellPrompt"
     },
     "modes": [
       "Technical / Prompt",
@@ -723,12 +724,55 @@
   },
   {
     "id": "ctx-terminal-instruction",
-    "note": "An instruction in a terminal is written down, not turned into a command.",
+    "note": "At a shell prompt, what the shell should do becomes the command.",
     "transcript": "покажи всі файли більші за сто мегабайт у цій папці",
     "context": {
       "appName": "Terminal",
       "bundleID": "com.apple.Terminal",
-      "windowTitle": "Downloads — zsh — 120×40"
+      "windowTitle": "Downloads — zsh — 120×40",
+      "terminalFocus": "shellPrompt"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "any",
+    "mustKeep": [
+      "find",
+      "-size",
+      "100M"
+    ],
+    "mustNotAppear": [
+      "файл",
+      "мегабайт"
+    ],
+    "maxLengthRatio": 1.4,
+    "examples": [
+      {
+        "reply": "find . -size +100M",
+        "passes": true
+      },
+      {
+        "reply": "Покажи всі файли, більші за 100 мегабайт, у цій папці.",
+        "passes": false,
+        "note": "written down at a prompt"
+      }
+    ]
+  },
+  {
+    "id": "ctx-terminal-agent-instruction",
+    "note": "The same words to Claude Code in a terminal are the user's request, not a command.",
+    "transcript": "покажи всі файли більші за сто мегабайт у цій папці",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "speech-text — Claude Code — claude — 120×40",
+      "terminalFocus": "program"
     },
     "modes": [
       "Clean-up",
@@ -750,17 +794,100 @@
       "du -",
       "ls -"
     ],
-    "maxLengthRatio": 1.4,
-    "examples": [
-      {
-        "reply": "Покажи всі файли, більші за 100 мегабайт, у цій папці.",
-        "passes": true
-      },
-      {
-        "reply": "find . -size +100M",
-        "passes": false,
-        "note": "carried out"
-      }
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "ctx-terminal-unknown-instruction",
+    "note": "Behind ssh nothing says a shell is listening, so the words stay.",
+    "transcript": "покажи всі файли більші за сто мегабайт у цій папці",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "vlad@server: ~ — ssh vlad@server — 120×40",
+      "terminalFocus": "unknown"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "файл",
+      "мегабайт"
+    ],
+    "mustNotAppear": [
+      "find ",
+      "du -",
+      "ls -"
+    ],
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "ctx-terminal-unknown-asked-command",
+    "note": "Behind ssh, a command asked for by name is written.",
+    "transcript": "напиши команду яка покаже всі файли більші за сто мегабайт у цій папці",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "vlad@server: ~ — ssh vlad@server — 120×40",
+      "terminalFocus": "unknown"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "any",
+    "mustKeep": [
+      "find",
+      "-size",
+      "100M"
+    ],
+    "mustNotAppear": [
+      "файл",
+      "команду"
+    ],
+    "maxLengthRatio": 1.4
+  },
+  {
+    "id": "ctx-terminal-path-keeps-case",
+    "note": "A Dictionary word must not rewrite a path in a command.",
+    "transcript": "сі ді тільда слеш девелопмент слеш спіч дефіс текст",
+    "context": {
+      "appName": "Terminal",
+      "bundleID": "com.apple.Terminal",
+      "windowTitle": "hskv — -zsh — 120×40",
+      "terminalFocus": "shellPrompt"
+    },
+    "vocabulary": [
+      "SpeechText"
+    ],
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "any",
+    "mustKeep": [
+      "cd ",
+      "speech-text"
+    ],
+    "mustNotAppear": [
+      "SpeechText"
     ]
   },
   {
@@ -1368,11 +1495,13 @@
   },
   {
     "id": "dirty-conversational-terminal",
-    "note": "A spoken reply to an agent in a terminal: fillers and repeats, no command wanted.",
+    "note": "A remark at a shell prompt: fillers and repeats, no command wanted, so the words stay.",
     "transcript": "так ну окей тоді я зараз я можу створити нову сесію запустити там цей скрипт і все ну тобто все буде ок",
     "context": {
       "appName": "cmux",
-      "windowTitle": "speech-text — zsh"
+      "windowTitle": "speech-text — zsh",
+      "bundleID": "com.cmuxterm.app",
+      "terminalFocus": "shellPrompt"
     },
     "modes": [
       "Clean-up",
@@ -1764,12 +1893,13 @@
   },
   {
     "id": "en-terminal-instruction",
-    "note": "An English instruction in a terminal is written down, not turned into a command.",
+    "note": "At a shell prompt, an English request becomes the command.",
     "transcript": "list every file bigger than a hundred megabytes in this folder",
     "context": {
       "appName": "Terminal",
       "bundleID": "com.apple.Terminal",
-      "windowTitle": "speech-text — zsh — 120×40"
+      "windowTitle": "speech-text — zsh — 120×40",
+      "terminalFocus": "shellPrompt"
     },
     "modes": [
       "Clean-up",
@@ -1780,16 +1910,15 @@
         "Clean-up"
       ]
     },
-    "language": "en",
-    "noCode": true,
+    "language": "any",
     "mustKeep": [
-      "file",
-      "megabytes"
+      "find",
+      "-size",
+      "100M"
     ],
     "mustNotAppear": [
-      "find ",
-      "du -",
-      "ls -"
+      "every file",
+      "megabytes"
     ],
     "maxLengthRatio": 1.5
   },

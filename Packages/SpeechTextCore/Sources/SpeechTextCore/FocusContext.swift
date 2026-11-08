@@ -21,17 +21,21 @@ public struct FocusContext: Codable, Equatable, Sendable {
     public var windowTitle: String?
     /// The field's placeholder, accessibility description or title — "Message #general".
     public var fieldLabel: String?
+    /// In a terminal, what the cursor was talking to. Stored, unlike `kind`: a retry from
+    /// History cannot look at the terminal again.
+    public var terminalFocus: TerminalFocus?
 
     /// Long enough for a mail subject or a document path, short enough that a window
     /// title cannot turn into a second transcript.
     static let maxValueLength = 160
 
     public init(appName: String? = nil, bundleID: String? = nil,
-         windowTitle: String? = nil, fieldLabel: String? = nil) {
+         windowTitle: String? = nil, fieldLabel: String? = nil, terminalFocus: TerminalFocus? = nil) {
         self.appName = Self.clean(appName)
         self.bundleID = Self.clean(bundleID)
         self.windowTitle = Self.clean(windowTitle)
         self.fieldLabel = Self.clean(fieldLabel)
+        self.terminalFocus = terminalFocus
     }
 
     /// Apps whose windows are nobody's business but the user's. Nothing is read from
@@ -56,11 +60,18 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// A secure text field keeps the app's name and loses everything else: the window
     /// around a password prompt ("Sign in to bank.example — alice@…") says more than the
     /// app does, and the model needs neither to clean up a dictation.
+    ///
+    /// `foreground` is `TerminalFocus.foregroundJobs` for a terminal, read before the title
+    /// is cut to `maxValueLength`, since Terminal keeps the job at its end.
     public static func capture(appName: String?, bundleID: String?, windowTitle: String?,
-                        fieldLabels: [String?], isSecureField: Bool) -> FocusContext? {
+                        fieldLabels: [String?], isSecureField: Bool,
+                        foreground: [[String]] = []) -> FocusContext? {
         if let bundleID, excludedBundleIDs.contains(bundleID) { return nil }
 
         var context = FocusContext(appName: appName, bundleID: bundleID)
+        if context.kind == .terminal {
+            context.terminalFocus = TerminalFocus.read(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
+        }
         if !isSecureField {
             context.windowTitle = clean(windowTitle)
             context.fieldLabel = fieldLabels.lazy.compactMap(clean).first
@@ -72,8 +83,8 @@ public struct FocusContext: Codable, Equatable, Sendable {
 
     /// What kind of text the field takes, where the app or the field's label says so
     /// plainly: a prompt box for an AI, a code editor or a terminal. Text dictated into any
-    /// of them is for that program, so AI Rewrite writes it down and never carries it out
-    /// (`RewriteModes`, docs/specs/2026-11-03-rewrite-modes-and-router.md D3). An app such
+    /// of them is for that program, so AI Rewrite writes it down and does not carry it out
+    /// (a shell prompt alone excepted, `commandWriting`; `RewriteModes`, docs/specs/2026-11-03-rewrite-modes-and-router.md D3). An app such
     /// as T3 Code is newer than any model's training, so its name alone said nothing, and a
     /// dictation into it came out as a chat message, or carried out, rather than as the
     /// prompt it was. Cursor's and VS Code's agent pane and editor are one app, which once
@@ -142,6 +153,23 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// box — so an instruction in it is written down, never carried out (D3).
     public var takesTextForAnotherProgram: Bool { kind != nil }
 
+    /// Whether AI Rewrite may write a shell command here (docs/decisions.md › *A command
+    /// at a shell prompt*). A program in a terminal is told the user's words, so only the
+    /// shell gets one unasked; where nothing says which, only the words "a command" do.
+    var commandWriting: RewriteModes.CommandWriting {
+        guard kind == .terminal else { return .never }
+        switch terminalFocus {
+        case .shellPrompt: return .atPrompt
+        case .program: return .never
+        case .unknown, nil: return .whenAsked
+        }
+    }
+
+    /// Whether this is a terminal, the one kind `PasteService` reads processes for.
+    public static func isTerminal(bundleID: String?) -> Bool {
+        FocusContext(bundleID: bundleID).kind == .terminal
+    }
+
     public var isEmpty: Bool {
         appName == nil && bundleID == nil && windowTitle == nil && fieldLabel == nil
     }
@@ -155,7 +183,9 @@ public struct FocusContext: Codable, Equatable, Sendable {
         case let (nil, id?): lines.append("app: \(id)")
         case (nil, nil): break
         }
-        if let windowTitle { lines.append("window: \(windowTitle)") }
+        // A terminal's title can be set by a remote host, and text from there has no place
+        // beside a prompt that may write a command.
+        if let windowTitle, kind != .terminal { lines.append("window: \(windowTitle)") }
         if let fieldLabel { lines.append("field: \(fieldLabel)") }
         // Ours, not read off the screen, so it is a fact the model may lean on.
         if kind == .aiPrompt { lines.append("kind: a prompt to an AI assistant") }
