@@ -8,7 +8,7 @@ across a bundle-identifier rename.
 
 | Key | Purpose | Default |
 |-----|---------|---------|
-| `sttProvider` | STT backend (`"apple"`, `"groq"`, `"elevenlabs"`, `"openai"`, `"local"` — `local` covers both on-disk engines, chosen by `localSTTModel`) | `"apple"` |
+| `sttProvider` | STT backend (`"apple"`, `"groq"`, `"elevenlabs"`, `"openai"`, `"local"`, `"server"` — `local` covers both on-disk engines, chosen by `localSTTModel`) | `"apple"` |
 | `groqAPIKey` | Groq API key — like every `…APIKey`, held by `APIKeyStore`: the keychain in a build with the profile, UserDefaults otherwise; never in `portable` | empty |
 | `groqModel` | Groq Whisper model ID | `"whisper-large-v3-turbo"` |
 | `localSTTModel` | Model ID for the local engine — a WhisperKit variant or a Parakeet build (`parakeet-tdt-0.6b-v3`, `parakeet-ultra`, `parakeet-redux`, `phonon-2`, `bark-3.0`, `bark-3.0-clean`), the catalogue entry's `engine` deciding which runtime gets it (an ID the catalogue does not know is cleared at launch) | `"parakeet-tdt-0.6b-v3"` |
@@ -28,7 +28,7 @@ across a bundle-identifier rename.
 | `escapeCancelsDictation` | ⎋ cancels a dictation or an edit while the overlay is up; global for that time, so ⎋ reaches no other app | `false` |
 | `editHotkeyKeyCode` / `editHotkeyModifierFlags` | Edit-selection-with-AI hotkey | `14` (E) / Control+Shift |
 | `hotkeyLayoutVersion` | Shortcut-layout migration marker | `0` (unmigrated) |
-| `llmProvider` | LLM backend (`"groq"`, `"anthropic"`, `"openai"`, `"local"`); a stored `"ollama"` moves to `"local"` at launch | `"groq"` |
+| `llmProvider` | LLM backend (`"groq"`, `"anthropic"`, `"openai"`, `"local"`, `"server"`); a stored `"ollama"` moves to `"local"` at launch | `"groq"` |
 | `groqLLMModel` | Groq chat model ID | `"openai/gpt-oss-120b"` |
 | `serverChatAddress` | AI Rewrite through the user's own server: its base address, stored once a test has passed (`ServerEndpoint`). In `portable` | absent |
 | `serverChatModel` | The model that server listed and the user picked. In `portable`; never normalized, since the server's list is the user's | absent |
