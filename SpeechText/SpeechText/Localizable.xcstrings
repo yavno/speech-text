@@ -2533,22 +2533,8 @@
         }
       }
     },
-    "AI dictations and edits are sent to the address you entered. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
-      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los dictados con IA y las ediciones se envían a la dirección que indicaste. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo al que va el texto; un título de ventana puede mostrar el asunto de un correo. Nunca se leen los gestores de contraseñas ni los campos de contraseña."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Диктування з ШІ та редагування надсилаються на вказану вами адресу. Разом із ними — слова з вашого Словника, а також програма, назва вікна й поле, для яких текст. Назва вікна може містити тему листа. Менеджери паролів і поля паролів ніколи не зчитуються."
-          }
-        }
-      }
+    "AI dictations and edits are sent to the address you entered and nowhere else. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
+      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server"
     },
     "AI edit failed" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI provider returned an error, shown as the text.",
@@ -3629,23 +3615,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "окрім промпту, з кожною диктовкою з ШІ"
-          }
-        }
-      }
-    },
-    "Best choice for your Mac." : {
-      "comment" : "Setup window: a note on the recommended answer (on this Mac or online).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La mejor opción para tu Mac."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Найкращий вибір для вашого Mac."
           }
         }
       }
@@ -6018,39 +5987,11 @@
         }
       }
     },
-    "Each recording is sent to the address you entered, with your Dictionary's words. A retry from History sends it again." : {
-      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cada grabación se envía a la dirección que indicaste, con las palabras de tu Diccionario. Un reintento desde el Historial la envía de nuevo."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кожен запис надсилається на вказану вами адресу разом зі словами з вашого Словника. Повтор з Історії надсилає його ще раз."
-          }
-        }
-      }
+    "Each recording is sent to the address you entered and nowhere else, with your Dictionary's words. A retry from History sends it again." : {
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server"
     },
-    "Each recording is sent to the address you entered. A retry from History sends it again." : {
-      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cada grabación se envía a la dirección que indicaste. Un reintento desde el Historial la envía de nuevo."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кожен запис надсилається на вказану вами адресу. Повтор з Історії надсилає його ще раз."
-          }
-        }
-      }
+    "Each recording is sent to the address you entered and nowhere else. A retry from History sends it again." : {
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server"
     },
     "Each vendor's pay-as-you-go list price as of %@, applied to the minutes and tokens their replies reported. Free tiers, plans and price changes since then change what you pay — your provider's billing page has the real figure. Models on this Mac cost nothing." : {
       "comment" : "Usage page, How this is counted: the note on cost. %@ is when the prices were checked, e.g. November 2026.",
@@ -10531,23 +10472,6 @@
         }
       }
     },
-    "On this Mac or online — you can change it later." : {
-      "comment" : "Setup window, Speech step: lead under the question.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En este Mac o en línea: puedes cambiarlo después."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "На цьому Mac або онлайн — це можна змінити пізніше."
-          }
-        }
-      }
-    },
     "On this Mac · %@" : {
       "comment" : "Home page, Engines: the speech engine row for a model on this Mac. %@ is the model's name.",
       "localizations" : {
@@ -10581,6 +10505,9 @@
           }
         }
       }
+    },
+    "On this Mac, online, or a server you run — you can change it later." : {
+      "comment" : "Setup window, Speech step: the line under the title, about the three places speech can become text. Up to two lines in a narrow column."
     },
     "On your keyboards" : {
       "comment" : "Language picker: section heading over the languages of this Mac's keyboards.",
@@ -18091,6 +18018,9 @@
           }
         }
       }
+    },
+    "Works with any OpenAI-compatible server." : {
+      "comment" : "Setup window, Your server panel: the line under its heading. 'OpenAI-compatible' is the term the servers' own documentation uses."
     },
     "Write something your way whenever it is said — “кома” as “,”, “mail sign” as your signature. Whole words, any capitals. Unlike a word above, a replacement isn't sent to the engine or AI Rewrite; it only puts the text right." : {
       "comment" : "Dictionary page, Replacements: text under the heading. “кома” is the Ukrainian word for comma, an example of a spoken word written as a sign; the examples may be adapted to your language.",

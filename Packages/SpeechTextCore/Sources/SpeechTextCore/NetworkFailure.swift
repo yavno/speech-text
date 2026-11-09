@@ -41,6 +41,15 @@ public enum NetworkFailure {
             || underlying(of: error).map(isOffline) == true
     }
 
+    /// `isOffline`, for a request to the server the user runs: nothing answering there is
+    /// that server not running, which no network coming back would fix.
+    public static func isOffline(_ error: Error, reachingOwnServer: Bool) -> Bool {
+        guard reachingOwnServer else { return isOffline(error) }
+        let error = error as NSError
+        if error.domain == NSURLErrorDomain && error.code == URLError.cannotConnectToHost.rawValue { return false }
+        return isOffline(error)
+    }
+
     static func isOffline(domain: String, code: Int) -> Bool {
         switch domain {
         case NSURLErrorDomain: return offlineURLErrorCodes.contains(code)

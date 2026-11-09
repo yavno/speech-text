@@ -30,10 +30,10 @@ across a bundle-identifier rename.
 | `hotkeyLayoutVersion` | Shortcut-layout migration marker | `0` (unmigrated) |
 | `llmProvider` | LLM backend (`"groq"`, `"anthropic"`, `"openai"`, `"local"`, `"server"`); a stored `"ollama"` moves to `"local"` at launch | `"groq"` |
 | `groqLLMModel` | Groq chat model ID | `"openai/gpt-oss-120b"` |
-| `serverChatAddress` | AI Rewrite through the user's own server: its base address, stored once a test has passed (`ServerEndpoint`). In `portable` | absent |
+| `serverChatAddress` | AI Rewrite through the user's own server: its base address, stored once a test has passed, in Settings or at setup's Continue (`ServerEndpoint`). In `portable` | absent |
 | `serverChatModel` | The model that server listed and the user picked. In `portable`; never normalized, since the server's list is the user's | absent |
 | `serverChatAPIKey` | That server's key, only if it asks for one. Held by `APIKeyStore` in the keychain; never in `portable` | absent |
-| `serverSpeechAddress` | Dictation through the user's own server, often another program than AI Rewrite's: its base address, stored once a test has passed. In `portable` | absent |
+| `serverSpeechAddress` | Dictation through the user's own server, often another program than AI Rewrite's: its base address, stored once a test has passed, in Settings or at setup's Continue. In `portable` | absent |
 | `serverSpeechModel` | The model that server listed or the user typed. In `portable`; never normalized | absent |
 | `serverSpeechAPIKey` | That server's key, only if it asks for one. Held by `APIKeyStore` in the keychain; never in `portable` | absent |
 | `anthropicAPIKey` / `anthropicModel` | Anthropic key and model | empty / `"claude-sonnet-5-5"` |

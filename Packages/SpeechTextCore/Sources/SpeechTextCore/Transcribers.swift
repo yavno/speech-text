@@ -18,7 +18,7 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 
     var displayName: String {
         switch self {
-        case .server: "Your server"
+        case .server: localized("Your server")
         case .apple: "Apple"
         case .groq: "Groq Whisper"
         case .elevenlabs: "ElevenLabs Scribe"

@@ -126,7 +126,7 @@ public enum Provider: String, CaseIterable, Hashable, Identifiable, Codable, Sen
             // No key of its own to check and no catalogue: the address, the key if the
             // server asks for one and the model it lists are the user's, in settings of
             // their own (`LLMConfiguration.serverEndpoint`). Nothing to pin at launch.
-            ProviderDescriptor(displayName: "Your server", roles: [.speech, .chat], apiKey: nil,
+            ProviderDescriptor(displayName: localized("Your server"), roles: [.speech, .chat], apiKey: nil,
                                speechModel: ModelSetting(settingsKey: SettingsKeys.serverSpeechModel, defaultID: "",
                                                          normalized: false),
                                chatModel: ModelSetting(settingsKey: SettingsKeys.serverChatModel, defaultID: "",

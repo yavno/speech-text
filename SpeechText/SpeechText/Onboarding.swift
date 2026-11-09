@@ -64,7 +64,7 @@ final class DictationTest {
         case .success(let text): rewrite = .wrote(said: said, text: text)
         case .failure(let error):
             rewrite = .failed(said: said, reason: error.localizedDescription,
-                              offline: NetworkFailure.isOffline(error))
+                              offline: NetworkFailure.isOffline(error, reachingOwnServer: LLMConfiguration.providerType == .server))
         }
         // An AI dictation is also a dictation that worked.
         if outcome == nil || outcome == .nothingHeard { outcome = .typed(said) }
@@ -90,8 +90,8 @@ final class DictationTest {
 @Observable
 @MainActor
 final class OnboardingModel {
-    enum SpeechPath { case local, online }
-    enum AIPath { case none, local, online }
+    typealias SpeechPath = SetupSpeechPath
+    typealias AIPath = SetupAIPath
 
     enum KeyStatus: Equatable {
         case empty
@@ -148,11 +148,14 @@ final class OnboardingModel {
     var speechService = Provider.groq
     /// A model picked while another was still downloading, waiting for "Switch".
     var pendingSpeechSwitch: String?
+    private(set) var speechServer: ServerDraft
 
     // ③ AI
     var aiPath = AIPath.none
     var aiService = Provider.groq
     var aiModelID: String
+    private(set) var aiServer: ServerDraft
+    private var serverTests: [ServerRole: Task<Void, Never>] = [:]
 
     // Keys
     private(set) var keys: [Provider: KeyEntry] = [:]
@@ -200,11 +203,18 @@ final class OnboardingModel {
         speechModelID = recommendedLocalSTTModel(for: caps, languages: spoken)?.id
             ?? Provider.local.defaultSpeechModel
         aiModelID = recommendedLocalChatModel(for: caps)?.id ?? Provider.local.defaultChatModel
+        func storedServer(_ role: ServerRole) -> ServerDraft {
+            ServerDraft(role: role, address: defaults.string(forKey: role.addressKey) ?? "",
+                        model: defaults.string(forKey: role.modelKey) ?? "",
+                        key: APIKeyStore.shared.value(for: role.apiKeyName))
+        }
+        speechServer = storedServer(.speech)
+        aiServer = storedServer(.chat)
 
         // Setup run again: open on what is set up now.
         let storedEngine = STTProviderType(rawValue: defaults.string(forKey: SettingsKeys.sttProvider) ?? "")
+        speechPath = SetupSpeechPath.reopening(storedEngine)
         if let engine = storedEngine, let card = SetupCards.speechCard(reopening: engine) {
-            speechPath = .online
             speechService = card.service
         } else if storedEngine == .local,
                   let stored = defaults.string(forKey: SettingsKeys.localSTTModel), localSTTModel(id: stored) != nil {
@@ -214,17 +224,13 @@ final class OnboardingModel {
             speechUsesApple = true
         }
 
-        // The AI step, likewise — but only a pick that works: `llmProvider` reads as Groq
-        // when nothing was stored, and a Groq card with no key is no choice at all.
-        if LLMConfiguration.isConfigured {
-            let pick = LLMConfiguration.providerType
-            if let card = SetupCards.aiCard(reopening: pick) {
-                aiPath = .online
-                aiService = card.service
-            } else if pick == .local {
-                aiPath = .local
-                aiModelID = LLMConfiguration.model(for: .local)
-            }
+        // The AI step, likewise.
+        let pick = LLMConfiguration.providerType
+        aiPath = SetupAIPath.reopening(pick, isConfigured: LLMConfiguration.isConfigured)
+        if aiPath == .online, let card = SetupCards.aiCard(reopening: pick) {
+            aiService = card.service
+        } else if aiPath == .local {
+            aiModelID = LLMConfiguration.model(for: .local)
         }
 
         for service in Provider.allCases {
@@ -248,6 +254,7 @@ final class OnboardingModel {
         permissionsPoll = nil
         stopSystemSettingsHelpers()
         checks.values.forEach { $0.cancel() }
+        for test in serverTests.values { test.cancel() }
         appState.dictationTest.isActive = false
         appState.dictationTest.isBlocked = false
     }
@@ -334,7 +341,11 @@ final class OnboardingModel {
     }
 
     var speechCanContinue: Bool {
-        speechPath == .local || key(speechService).status.isUsable
+        switch speechPath {
+        case .local: true
+        case .online: key(speechService).status.isUsable
+        case .server: speechServer.canContinue
+        }
     }
 
     func continueFromSpeech() {
@@ -366,9 +377,73 @@ final class OnboardingModel {
                 // launch cleared takes the service's default, or Try it is refused.
                 defaults.set(setting.defaultID, forKey: key)
             }
+        case .server:
+            saveServer(.speech)
         }
-        dlog("Setup", "speech: \(speechPath == .online ? speechService.rawValue : speechUsesApple ? "apple" : "local \(speechModelID)")")
+        dlog("Setup", "speech: \(speechLogName)")
         go(.ai)
+    }
+
+    private var speechLogName: String {
+        switch speechPath {
+        case .local: speechUsesApple ? "apple" : "local \(speechModelID)"
+        case .online: speechService.rawValue
+        case .server: "server"
+        }
+    }
+
+    // MARK: Your server
+
+    func serverDraft(_ role: ServerRole) -> ServerDraft {
+        role == .speech ? speechServer : aiServer
+    }
+
+    func changeServer(_ role: ServerRole, _ change: (inout ServerDraft) -> Void) {
+        if role == .speech { change(&speechServer) } else { change(&aiServer) }
+    }
+
+    /// The other step's server, often the same one, offered to an empty address.
+    func offeredServerAddress(_ role: ServerRole) -> String? {
+        guard serverDraft(role).address.isEmpty else { return nil }
+        return serverDraft(role == .speech ? .chat : .speech).verifiedAddress
+    }
+
+    func testServer(_ role: ServerRole) {
+        var started = false
+        changeServer(role) { started = $0.beginTest() }
+        guard started, let endpoint = serverDraft(role).endpoint else { return }
+        let draft = serverDraft(role)
+        serverTests[role] = Task { [weak self] in
+            let run = await ServerProbe.test(role: role, endpoint: endpoint, selected: draft.model, unlisted: draft.model,
+                                             apiKey: draft.key)
+            guard let self, !Task.isCancelled else { return }
+            self.changeServer(role) { $0.finishTest(run) }
+            dlog("Setup", "server test (\(endpoint.place)): \(run.result)")
+        }
+    }
+
+    /// A model picked from the list: the test is what lets Continue save it.
+    func pickServerModel(_ role: ServerRole, _ id: String) {
+        changeServer(role) { $0.setModel(id) }
+        if !serverDraft(role).canContinue { testServer(role) }
+    }
+
+    /// A server already chosen, opened again: what it lists now, sent nothing of the user's.
+    func refreshServerModels(_ role: ServerRole) async {
+        let draft = serverDraft(role)
+        guard draft.canContinue, draft.models.isEmpty, let endpoint = draft.endpoint,
+              case .success(let ids) = await ServerProbe.models(endpoint: endpoint, apiKey: draft.key) else { return }
+        changeServer(role) { $0.refreshModels(ids, from: draft.address) }
+    }
+
+    /// Writes what passed the test and makes it the role's engine.
+    private func saveServer(_ role: ServerRole) {
+        guard let saved = serverDraft(role).saved else { return }
+        let defaults = UserDefaults.standard
+        defaults.set(saved.address, forKey: role.addressKey)
+        defaults.set(saved.model, forKey: role.modelKey)
+        APIKeyStore.shared.set(saved.key, for: role.apiKeyName)
+        defaults.set(role.providerValue, forKey: role.providerKey)
     }
 
     // MARK: ③ AI
@@ -402,6 +477,7 @@ final class OnboardingModel {
         case .none: return false
         case .online: return key(aiService).status.isUsable
         case .local: return localChatModel(id: aiModelID) != nil
+        case .server: return aiServer.canContinue
         }
     }
 
@@ -425,8 +501,10 @@ final class OnboardingModel {
             aiDownloadID = id
             defaults.set(LLMProviderType.local.rawValue, forKey: SettingsKeys.llmProvider)
             defaults.set(id, forKey: SettingsKeys.localLLMModel)
+        case .server:
+            saveServer(.chat)
         }
-        dlog("Setup", "AI: \(aiPath == .local ? "on this Mac \(aiModelID)" : aiService.rawValue)")
+        dlog("Setup", "AI: \(aiPath == .local ? "on this Mac \(aiModelID)" : aiPath == .server ? "server" : aiService.rawValue)")
         go(.permissions)
     }
 
