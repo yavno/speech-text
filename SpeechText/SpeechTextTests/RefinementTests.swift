@@ -427,6 +427,20 @@ final class RewriteModesTests: XCTestCase {
         // any other field neither names them nor sends an instruction there to Structured.
         XCTAssertFalse(prompt.contains("terminal"))
         XCTAssertFalse(prompt.contains("an AI coding tool"))
+
+        // Step two's prompts (#110) say each of the one-step prompt's three repeats once.
+        let names = builtIns.map(\.name)
+        let stepTwos = builtIns.map { RewriteRouter.stepTwo(mode: $0, names: names, forAnotherProgram: false, commands: .never).system }
+            + [RewriteRouter.stepTwo(mode: builtIns[0], names: names, forAnotherProgram: true, commands: .never).system,
+               RewriteRouter.stepTwo(mode: builtIns[0], names: names, forAnotherProgram: true, commands: .atPrompt).system]
+        for system in stepTwos {
+            let lowered = system.lowercased()
+            XCTAssertEqual(lowered.components(separatedBy: "output only").count - 1, 1, system)
+            XCTAssertEqual(lowered.components(separatedBy: "filler").count - 1, 1, system)
+            XCTAssertEqual(lowered.components(separatedBy: "invent nothing").count - 1, 1, system)
+            XCTAssertFalse(lowered.contains("add nothing"), system)
+            XCTAssertFalse(system.contains("<<mode:"), system)
+        }
     }
 
     func testTheRoutingPromptStaysWithinItsBudget() {
@@ -700,5 +714,253 @@ final class PromptPresetMigrationTests: XCTestCase {
     func testTheMoveIsIdempotent() {
         let once = PromptPresetStore.migrated(october + [own], defaultID: nil).presets
         XCTAssertEqual(PromptPresetStore.migrated(once, defaultID: nil).presets, once)
+    }
+}
+
+/// AI Rewrite's two steps (#110), with fakes for both models.
+final class RewriteRouterTests: XCTestCase {
+    private let builtIns = PromptPresetStore.builtInDefaults
+    private let gemma = "gemma-4-12b-it-qat-q4_0"
+    private let slack = FocusContext(appName: "Slack", bundleID: "com.tinyspeck.slackmacgap")
+    private let xcode = FocusContext(bundleID: "com.apple.dt.Xcode")
+    private let own = PromptPreset(name: "Haiku", whenToUse: "A haiku.", instructions: "Three lines.")
+
+    private final class Fake: ChatClient, @unchecked Sendable {
+        var systems: [String] = []
+        var users: [String] = []
+        var error: Error?
+
+        func complete(system: String, user: String) async throws -> ChatReply {
+            systems.append(system)
+            users.append(user)
+            if let error { throw error }
+            return ChatReply(text: "done", usage: nil)
+        }
+    }
+
+    private struct Boom: Error {}
+
+    /// One at the option picked, for each step, the rest zero.
+    private static func picking(_ picks: [Int], counts: [Int]) -> RewriteRouter.StepOneReading {
+        RewriteRouter.StepOneReading(probabilities: zip(picks, counts).map { pick, count in
+            (0..<count).map { $0 == pick ? 1 : 0 }
+        })
+    }
+
+    private func stepOne(model: String? = nil, timeout: Double? = 2,
+                         read: @escaping @Sendable (RewriteRouter.StepOneRequest) async throws -> RewriteRouter.StepOneReading)
+        -> RewriteRouter.StepOne {
+        RewriteRouter.StepOne(modelID: model ?? gemma, spokenLanguages: ["uk", "en"], timeout: timeout, read: read)
+    }
+
+    private func decide(_ transcript: String = "напиши листа", context: FocusContext? = nil, presets: [PromptPreset]? = nil,
+                        with step: RewriteRouter.StepOne) async -> RewriteRouter.Decision? {
+        await RewriteRouter.decide(transcript: transcript, context: context ?? slack, presets: presets ?? builtIns,
+                                   defaultPresetID: nil, stepOne: step)
+    }
+
+    /// The owner's rule: flipping this needs #114's measurement, and is a change someone meant.
+    func testUsersKeepTheOneStepPromptUntilItIsMeasured() {
+        XCTAssertFalse(RewriteRouter.twoStepsShip, "two steps ship only after #114")
+    }
+
+    func testStepOneAsksThreeQuestionsAndSendsOneMode() async throws {
+        let decision = await decide(with: stepOne { _ in Self.picking([1, 2, 1], counts: [3, 4, 3]) })
+        let made = try XCTUnwrap(decision)
+        XCTAssertEqual(made.request.decidedMode, "Message")
+        XCTAssertEqual(made.route.language, "en")
+        XCTAssertEqual(made.route.format, .list)
+        XCTAssertEqual(made.route.languageBy, .stepOne)
+        XCTAssertEqual(made.route.stepOneModel, gemma)
+        XCTAssertEqual(made.routeBlock, "<route>\nlanguage: English\nformat: list\n</route>")
+        XCTAssertTrue(made.request.system.contains("Invent no names"))
+        XCTAssertFalse(made.request.system.contains("Headings only when asked"), "another mode's instructions")
+    }
+
+    func testTheModifiersGoInTheUserMessageBeforeTheTranscript() async throws {
+        let fake = Fake()
+        let step = stepOne { _ in Self.picking([1, 2, 1], counts: [3, 4, 3]) }
+        let sent = try await TextRefinementService.send("текст", context: slack, presets: builtIns, defaultPresetID: nil,
+                                                        vocabulary: nil, stepOne: step, provider: fake)
+        XCTAssertNotNil(sent.route)
+        let user = try XCTUnwrap(fake.users.first)
+        XCTAssertLessThan(try XCTUnwrap(user.range(of: "<route>")).lowerBound, try XCTUnwrap(user.range(of: "<transcript>")).lowerBound)
+        XCTAssertFalse(try XCTUnwrap(fake.systems.first).contains("language: English"), "the system prompt stays one prefix")
+    }
+
+    func testEveryModeIsOneSavedPrefixWhateverTheModifiers() async {
+        let plain = await decide(with: stepOne { _ in Self.picking([0, 0, 0], counts: [3, 4, 3]) })
+        let listed = await decide(with: stepOne { _ in Self.picking([0, 2, 2], counts: [3, 4, 3]) })
+        XCTAssertEqual(plain?.request.system, listed?.request.system)
+        XCTAssertNil(plain?.routeBlock)
+    }
+
+    func testAModelStepOneWasNotMeasuredOnGetsOneStepUnasked() async {
+        for model in ["Qwen3.5-4B-Q4_K_M", "Qwen3.8-27B-Q4_K_M", "gpt-oss-20b-MXFP4", "openai/gpt-oss-20b"] {
+            let result = await decide(with: stepOne(model: model) { _ in XCTFail("read"); throw Boom() })
+            XCTAssertNil(result)
+        }
+    }
+
+    func testAStepOneFailureSendsTheOneStepPrompt() async throws {
+        let fake = Fake()
+        let step = stepOne { _ in throw Boom() }
+        let sent = try await TextRefinementService.send("текст", context: slack, presets: builtIns, defaultPresetID: nil,
+                                                        vocabulary: nil, stepOne: step, provider: fake)
+        XCTAssertNil(sent.route)
+        XCTAssertEqual(fake.systems, [RewriteModes.request(context: slack, presets: builtIns).system])
+        XCTAssertFalse(fake.users[0].contains("<route>"))
+    }
+
+    func testAStepOneOverItsTimeoutSendsTheOneStepPrompt() async {
+        let started = Date()
+        let result = await decide(with: stepOne(timeout: 0.05) { _ in
+            try await Task.sleep(nanoseconds: 30_000_000_000)
+            return Self.picking([0, 0, 0], counts: [3, 4, 3])
+        })
+        XCTAssertNil(result)
+        XCTAssertLessThan(Date().timeIntervalSince(started), 5)
+    }
+
+    func testAnAnswerThatIsNotOneOfTheOptionsSendsTheOneStepPrompt() async {
+        let short = await decide(with: stepOne { _ in RewriteRouter.StepOneReading(probabilities: [[1, 0, 0]]) })
+        XCTAssertNil(short)
+        let wrongCount = await decide(with: stepOne { _ in Self.picking([0, 0, 0], counts: [2, 4, 3]) })
+        XCTAssertNil(wrongCount)
+        let notNumbers = await decide(with: stepOne { _ in
+            RewriteRouter.StepOneReading(probabilities: [[.nan, 0, 0], [1, 0, 0, 0], [1, 0, 0]])
+        })
+        XCTAssertNil(notNumbers)
+    }
+
+    func testAStepTwoFailureIsThrownForTheTranscriptToBePasted() async {
+        let fake = Fake()
+        fake.error = Boom()
+        let step = stepOne { _ in Self.picking([0, 0, 0], counts: [3, 4, 3]) }
+        do {
+            _ = try await TextRefinementService.send("текст", context: slack, presets: builtIns, defaultPresetID: nil,
+                                                     vocabulary: nil, stepOne: step, provider: fake)
+            XCTFail("no error")
+        } catch {
+            XCTAssertTrue(error is Boom)
+        }
+    }
+
+    func testNoStepOneMeansTheOneStepPrompt() async throws {
+        let fake = Fake()
+        let sent = try await TextRefinementService.send("текст", context: xcode, presets: builtIns, defaultPresetID: nil,
+                                                        vocabulary: nil, stepOne: nil, provider: fake)
+        XCTAssertNil(sent.route)
+        XCTAssertEqual(fake.systems, [RewriteModes.request(context: xcode, presets: builtIns).system])
+    }
+
+    func testAFieldForAnotherProgramWithNoPromptsOfTheirOwnIsDecidedByCode() async throws {
+        let result = await decide(context: xcode, with: stepOne { _ in XCTFail("read"); throw Boom() })
+        let made = try XCTUnwrap(result)
+        XCTAssertEqual(made.request.decidedMode, "Clean-up")
+        XCTAssertNil(made.route.stepOneModel)
+        XCTAssertEqual(made.route.languageBy, .code)
+        XCTAssertEqual(made.route.formatBy, .code)
+        XCTAssertNil(made.routeBlock)
+    }
+
+    func testAFieldForAnotherProgramOffersCleanUpAndTheUsersOwnOnly() async throws {
+        let presets = builtIns + [own]
+        let box = RequestBox()
+        let step = stepOne { request in
+            await box.set(request)
+            return RewriteRouter.StepOneReading(probabilities: [[0, 1]])
+        }
+        let result = await decide(context: xcode, presets: presets, with: step)
+        let made = try XCTUnwrap(result)
+        XCTAssertEqual(made.request.decidedMode, "Haiku")
+        XCTAssertEqual(made.route.stepOneModel, gemma)
+        XCTAssertEqual(made.route.languageBy, .code)
+        let request = await box.request
+        XCTAssertEqual(request?.steps.map(\.letters), [["A", "D"]])
+        XCTAssertTrue(made.request.system.contains("is for that program"))
+        // D3: the same prefix as any other field, with the letters cut.
+        let elsewhere = RewriteRouter.stepOneSystem(presets: presets, defaultPresetID: nil, spokenLanguages: ["uk", "en"])
+        XCTAssertEqual(request?.system, elsewhere)
+    }
+
+    func testAShellPromptKeepsItsCommandRuleThroughStepTwo() async throws {
+        let shell = FocusContext(appName: "Terminal", bundleID: "com.apple.Terminal", terminalFocus: .shellPrompt)
+        let result = await decide(context: shell, with: stepOne { _ in XCTFail("read"); throw Boom() })
+        let made = try XCTUnwrap(result)
+        XCTAssertEqual(made.request.commands, .atPrompt)
+        XCTAssertTrue(made.request.system.contains("shell prompt on macOS"))
+    }
+
+    func testALanguageAskedForThatIsTheOneSpokenIsDroppedByCode() async throws {
+        let ukrainian = "Завтра зустріч переноситься на третю годину, бо Олена ще не повернулась із відрядження."
+        let result = await decide(ukrainian, with: stepOne { _ in Self.picking([0, 1, 0], counts: [3, 4, 3]) })
+        let made = try XCTUnwrap(result)
+        XCTAssertNil(made.route.language)
+        XCTAssertEqual(made.route.languageBy, .code)
+        XCTAssertNil(made.routeBlock)
+        let english = await decide(ukrainian, with: stepOne { _ in Self.picking([0, 2, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(english?.route.language, "en")
+        XCTAssertEqual(english?.route.languageBy, .stepOne)
+    }
+
+    func testAnotherLanguageIsLeftForStepTwoToRead() async throws {
+        let result = await decide(with: stepOne { _ in Self.picking([0, 3, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(result?.route.language, RewriteRouter.anotherLanguage)
+        XCTAssertEqual(result?.routeBlock, "<route>\nlanguage: the one the transcript asks for\n</route>")
+    }
+
+    func testTheStepOnePromptOffersEachSpokenLanguageAndSaysListIsListsOnly() throws {
+        let system = try XCTUnwrap(RewriteRouter.stepOneSystem(presets: builtIns, defaultPresetID: nil, spokenLanguages: ["pl"]))
+        XCTAssertTrue(system.contains("B — Polish"))
+        XCTAssertTrue(system.contains("C — English"))
+        XCTAssertTrue(system.contains("D — another"))
+        XCTAssertTrue(system.contains("and lists only"))
+        XCTAssertEqual(RewriteRouter.languageAnswers(spokenLanguages: []).count, 3, "none, English, another")
+    }
+
+    func testMorePromptsThanLettersGetOneStep() async {
+        let many = builtIns + (0..<30).map { PromptPreset(name: "P\($0)", whenToUse: "x", instructions: "y") }
+        let result = await decide(presets: many, with: stepOne { _ in XCTFail("read"); throw Boom() })
+        XCTAssertNil(result)
+    }
+
+    func testAMarkerStepTwoWasNotAskedForIsStillTakenOff() async throws {
+        let result = await decide(with: stepOne { _ in Self.picking([1, 0, 0], counts: [3, 4, 3]) })
+        let request = try XCTUnwrap(result?.request)
+        let read = RewriteModes.read("<<mode:Clean-up>>\nТекст", request: request)
+        XCTAssertEqual(read.text, "Текст")
+        XCTAssertEqual(read.presetName, "Message", "the mode is step one's")
+    }
+
+    func testAnEditedCleanUpIsSentAsTheUserWroteIt() {
+        var edited = builtIns[0]
+        edited.instructions = "Keep every filler."
+        let system = RewriteRouter.stepTwo(mode: edited, names: [edited.name], forAnotherProgram: false, commands: .never).system
+        XCTAssertTrue(system.contains("Keep every filler."))
+    }
+
+    func testHistoryKeepsTheRouteAndReadsRecordsFromBeforeIt() throws {
+        let old = #"{"inputText":"a","outputText":"b","provider":"local","model":"m"}"#
+        let decoded = try JSONDecoder().decode(TranscriptionRecord.Refinement.self, from: Data(old.utf8))
+        XCTAssertNil(decoded.route)
+        var refinement = decoded
+        refinement.route = RewriteRoute(language: "en", format: .list, languageBy: .stepOne, formatBy: .stepOne, stepOneModel: gemma)
+        let copy = try JSONDecoder().decode(TranscriptionRecord.Refinement.self, from: JSONEncoder().encode(refinement))
+        XCTAssertEqual(copy.route, refinement.route)
+    }
+
+    func testAnotherIsRightOnlyForALanguageOutsideTheRun() {
+        let spoken = ["uk", "en"]
+        XCTAssertTrue(RewriteRouter.languageAnswerIsRight(RewriteRouter.anotherLanguage, expected: "pl", spokenLanguages: spoken))
+        XCTAssertFalse(RewriteRouter.languageAnswerIsRight(RewriteRouter.anotherLanguage, expected: "en", spokenLanguages: spoken))
+        XCTAssertFalse(RewriteRouter.languageAnswerIsRight(RewriteRouter.anotherLanguage, expected: nil, spokenLanguages: spoken))
+        XCTAssertTrue(RewriteRouter.languageAnswerIsRight(nil, expected: nil, spokenLanguages: spoken))
+        XCTAssertTrue(RewriteRouter.languageAnswerIsRight("en", expected: "en", spokenLanguages: spoken))
+    }
+
+    private actor RequestBox {
+        var request: RewriteRouter.StepOneRequest?
+        func set(_ value: RewriteRouter.StepOneRequest) { request = value }
     }
 }

@@ -34,6 +34,11 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 /// measured against the live service is not re-derived by feel in two files. All of
 /// these were verified by probing the ElevenLabs API on 2026-08-29.
 public enum STTTuning {
+    /// AI Rewrite's step one, past which the dictation goes to the one-step prompt (D6 of
+    /// docs/specs/2026-11-03-rewrite-modes-and-router.md, the owner's call of 2026-11-03):
+    /// above the 1 s target because Gemma 4 12B's median sat at it (0.86–0.96 s, router v4).
+    public static let rewriteStepOneTimeoutSeconds: Double = 2
+
     /// Seconds of silence after which Scribe Realtime's VAD commits a segment — the
     /// server's own default. Each segment is transcribed on its own and punctuated as a
     /// finished sentence, so a pause this long mid-sentence leaves a full stop and a

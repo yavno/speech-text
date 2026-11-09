@@ -1374,7 +1374,7 @@ final class AppState {
                         id: recordID, input: aiInput, output: result.text,
                         presetName: result.presetName,
                         provider: result.provider, model: result.model,
-                        context: context, usage: result.usage, latency: result.latency
+                        context: context, usage: result.usage, latency: result.latency, route: result.route
                     )
                 }
             } catch {

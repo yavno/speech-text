@@ -49,6 +49,28 @@ struct LocalChatClient: ChatClient {
     }
 }
 
+/// AI Rewrite's step one, read off the model the rewrite uses. A cancel, which is how its
+/// timeout ends it, stops the job in the service like any request's.
+func readLocalStepOne(model: LocalChatModel, request: RewriteRouter.StepOneRequest) async throws -> RewriteRouter.StepOneReading {
+    let path = localChatModelFile(for: model)
+    guard FileManager.default.fileExists(atPath: path.path) else { throw LocalChatError.notInstalled(model) }
+    let sent = LocalChatRouteRequest(modelPath: path.path, family: model.family, system: request.system, user: request.user,
+                                     steps: request.steps.map { .init(lead: $0.lead, options: $0.letters) },
+                                     contextLength: LocalChatRequest.rewrite(model: model, path: path, system: "", user: "").contextLength)
+    let body = try JSONEncoder().encode(sent)
+    let response: LocalChatRouteResponse = try await LocalChatConnection.shared.call(cancelling: sent.id) { service, finish in
+        service.readRoute(body) { data, error in
+            if let data, let response = try? JSONDecoder().decode(LocalChatRouteResponse.self, from: data) {
+                finish(.success(response))
+            } else {
+                finish(.failure(LocalChatError.service(error ?? "no reply")))
+            }
+        }
+    }
+    return RewriteRouter.StepOneReading(probabilities: response.probabilities, promptTokens: response.promptTokens,
+                                        cachedPromptTokens: response.cachedPromptTokens, seconds: response.seconds)
+}
+
 enum LocalChatError: LocalizedError {
     case notInstalled(LocalChatModel)
     case service(String)
@@ -162,6 +184,11 @@ final class LocalChatConnection: @unchecked Sendable {
             RewriteModes.request(context: nil, presets: presets, defaultPresetID: defaultID).system,
             TextRefinementService.buildEditSystemPrompt(presets: presets),
         ]
+        if RewriteRouter.twoStepsShip, RewriteRouter.canReadStepOne(modelID: model.id) {
+            request.prefixes = RewriteRouter.prewarmSystems(presets: presets, defaultPresetID: defaultID,
+                                                            spokenLanguages: storedSpokenLanguages())
+                + [TextRefinementService.buildEditSystemPrompt(presets: presets)]
+        }
         guard let body = try? JSONEncoder().encode(request) else { return }
         (current().remoteObjectProxyWithErrorHandler { _ in } as? LocalChatServiceProtocol)?.prewarm(body) { error in
             if let error { dlog("LLM", "prewarm \(model.id) failed: \(error)", level: .error) }
@@ -218,6 +245,7 @@ func registerLocalChat() {
     LocalChat.clientFactory = { LocalChatClient(model: $0) }
     LocalChat.prewarm = { LocalChatConnection.shared.prewarm($0) }
     LocalChat.release = { LocalChatConnection.shared.release($0) }
+    LocalChat.readStepOne = { try await readLocalStepOne(model: $0, request: $1) }
 }
 
 #if DEBUG

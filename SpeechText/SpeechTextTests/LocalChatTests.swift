@@ -323,3 +323,13 @@ final class LocalChatCatalogTests: XCTestCase {
         XCTAssertTrue(path.hasSuffix("/SpeechText/Models/llm/\(model.id)/\(model.file)"), path)
     }
 }
+
+final class OptionLogitsTests: XCTestCase {
+    func testLogitsBecomeProbabilitiesOverTheOptionsAlone() {
+        let probabilities = OptionLogits.probabilities([1, 3, 2])
+        XCTAssertEqual(probabilities.reduce(0, +), 1, accuracy: 1e-9)
+        XCTAssertEqual(OptionLogits.best(probabilities), 1)
+        // A large logit does not overflow: they are taken relative to the top one.
+        XCTAssertEqual(OptionLogits.probabilities([2000, 2000]), [0.5, 0.5])
+    }
+}

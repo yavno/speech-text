@@ -75,6 +75,31 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
         }
     }
 
+    func readRoute(_ request: Data, reply: @escaping @Sendable (Data?, String?) -> Void) {
+        guard let request = try? JSONDecoder().decode(LocalChatRouteRequest.self, from: request) else {
+            reply(nil, LocalChatFailure.badRequest.wire); return
+        }
+        let id = request.id
+        begin()
+        Task {
+            defer { self.end(id) }
+            do {
+                try self.stopIfCancelled(id)
+                _ = try await self.load(LocalChatRequest(modelPath: request.modelPath, family: request.family, system: "", user: "",
+                                                         maxTokens: 0, contextLength: request.contextLength))
+                let read = try await runtime.chainedProbabilities(
+                    system: request.system, user: request.user, steps: request.steps.map { ($0.lead, $0.options) },
+                    shouldCancel: { self.isCancelled(id) })
+                let response = LocalChatRouteResponse(
+                    probabilities: read.map(\.probabilities), promptTokens: read.map(\.promptTokens).reduce(0, +),
+                    cachedPromptTokens: read.first?.cachedPromptTokens ?? 0, seconds: read.map(\.seconds).reduce(0, +))
+                reply(try JSONEncoder().encode(response), nil)
+            } catch {
+                reply(nil, Self.wire(error))
+            }
+        }
+    }
+
     /// A runtime failure by name, for the app to word in its own language
     /// (`LocalChatFailure`); anything else by its message.
     private static func wire(_ error: Error) -> String {

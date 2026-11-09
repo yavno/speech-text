@@ -117,7 +117,7 @@ final class HistoryRetry {
             let result = try await TextRefinementService.refine(text, context: context)
             history.recordRefinement(id: record.id, input: text, output: result.text,
                                      presetName: result.presetName, provider: result.provider, model: result.model,
-                                     context: context, usage: result.usage, latency: result.latency)
+                                     context: context, usage: result.usage, latency: result.latency, route: result.route)
             return result.text
         } catch {
             dlog("History", "retry \(record.id.uuidString.prefix(8)): rewrite failed: \(error.localizedDescription)", level: .error)

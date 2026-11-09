@@ -26,6 +26,8 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 `current` is the baseline it was held to: what the app sent until #109, one routing prompt (`buildSystemPrompt`) over the six built-ins of October 2026 (`PromptPresetStore.october2026`), the edits' prompt over them too. Its name is older than the variant after it and stays, since the fixtures' `modes` and every run kept are keyed to it.
 
+`route` and `two-step` are #110, whatever `RewriteRouter.twoStepsShip` says. `route` scores step one alone and writes nothing: the mode, the language asked for and the format, after the code rules, on Gemma 4 12B and Qwen3.5 9B, the local models step one can be read from; any other engine is a `no step one` row. Its summary counts all three right of the fixtures a model was asked about, apart from those D3 decided by rule, and how many took longer than the timeout. `two-step` sends step two with that one mode, as the app would, and is judged by the same text checks; an engine with no step one, or a step one that fails, gets the one-step prompt, and each row's `stepOne` says which happened (`read`, `by code`, `one step`). Step one is offered the run's `--spoken-languages` (`uk,en` by default) unless a fixture sets `spokenLanguages`, and *another* is right only for a language outside that list.
+
 `--reasoning-effort omit|<value>` overrides a model's reasoning switch. It is a measurement for the next prompt, not the baseline. A new way of prompting is a new case of `RewriteEvaluation.Variant`, judged by the same checks.
 
 ## Fixtures
