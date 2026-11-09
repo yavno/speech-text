@@ -3523,23 +3523,6 @@
         }
       }
     },
-    "The previous Haiku, at ten times the price." : {
-      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Haiku is a model's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El Haiku anterior, a diez veces el precio."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попередня Haiku, вдесятеро дорожча."
-          }
-        }
-      }
-    },
     "The previous Luna. Costs about twice as much." : {
       "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Luna is a model's name.",
       "localizations" : {

@@ -268,6 +268,20 @@ final class ModelLifecycleTests: XCTestCase {
         XCTAssertFalse(offeredChatModels(of: .groq).contains { $0.id == model.id })
     }
 
+    /// Haiku 4.5 was retired from the app before Anthropic announced a shutdown: a stored
+    /// pick moves to Haiku 5.5, and the model is out of the picker.
+    func testHaiku45MovesToHaiku55() throws {
+        let defaults = suite()
+        defaults.set("anthropic", forKey: SettingsKeys.llmProvider)
+        defaults.set("claude-haiku-4-5", forKey: SettingsKeys.anthropicModel)
+
+        normalizeStoredProviders(in: defaults, localModelOnDisk: { _ in false })
+
+        XCTAssertEqual(defaults.string(forKey: SettingsKeys.anthropicModel), "claude-haiku-5-5")
+        XCTAssertEqual(storedModelMigrations(in: defaults).last?.reason, .deprecated)
+        XCTAssertFalse(offeredChatModels(of: .anthropic).contains { $0.id == "claude-haiku-4-5" })
+    }
+
     /// An ID that leads nowhere — a model deleted before lifecycles existed — is cleared,
     /// not moved to the default, and not pinned back over: the user picks.
     func testAModelThatLeadsNowhereIsClearedAndNotPinned() {
