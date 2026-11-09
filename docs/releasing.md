@@ -217,6 +217,9 @@ to the descriptors.
    the script lists every pull request merged since the last tag whose entry is not
    settled yet. `## [Unreleased]` becomes the release notes, so an entry missing now is
    missing from the release: run the skill and merge its pull request first.
+   Likewise `python3 -B scripts/strings/check.py complete` passes: the release workflow
+   stops on a string missing from a supported language. Translations are added once a day
+   (the `translations` skill); to release sooner, run the skill and merge its pull request.
 2. `scripts/rebuild.sh --tag X.Y.Z` sets the version, dates the
    CHANGELOG section, commits and tags `vX.Y.Z`. Nothing is pushed.
 3. `git push && git push origin vX.Y.Z`. `main` takes changes only as squash-merged pull

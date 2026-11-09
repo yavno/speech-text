@@ -106,15 +106,15 @@ A missing translation does not break the app: macOS falls back to the developmen
 
 ## The translations pull request
 
-- **When:** on a schedule, at most once a day, and on `workflow_dispatch`, so a release does not have to wait for the schedule. Runs are serialized (`concurrency` with no parallel run).
+- **When:** on a schedule, at most once a day, and by hand, so a release does not have to wait for the schedule. One run at a time.
 - **Input:** the catalogs as they are on `main`: entries with no value, or no value for some plural form, in some supported language; and open issues labeled `translation`. The input is the state of the catalogs, not a list of merges, so a failed run needs no checkpoint: the next run sees the same gaps.
 - **One pull request at a time:** the job works on one branch, `translations`. If its pull request is still open, the run rebases that branch on `main` and updates it; otherwise it starts the branch again from `main`. Two pull requests never edit the same catalogs.
 - **Context:** the English text, its `comment`, and `docs/translation-glossary.md`, which fixes how the app's own terms are translated (dictation, AI Rewrite, Hold to talk, Record Window, …) so they read the same everywhere.
 - **Output:** only `*.xcstrings` and the glossary. Before pushing, the job checks that no other file is in the diff, that every catalog is valid JSON, and the placeholder check above. Every commit carries a `Signed-off-by` trailer for the identity that makes it, as *DCO sign-off* requires of any commit.
 - **The pull request:** titled *Translations for #N, #M*, listing the pull requests that added the strings, with a table of *key → one column per supported language* for review, closing reported issues with `Fixes #K`. Nothing to translate means no pull request.
-- **Model and cost:** the model, where the job runs and the secret that holds its key are chosen in *build*, and the cost of a run is measured on the first `es` and `uk` pass, before the schedule is turned on.
+- **Where it runs:** the `translations` skill (`.claude/skills/translations/`), run daily by a scheduled agent on the maintainer's Mac, on Claude Sonnet. It opens its pull request with the maintainer's own `gh` login, so the required checks run on it.
 - **Safety:**
-  - **Input:** strings and comments come from other people's pull requests, so the job treats them as untrusted text and writes nothing but the catalogs and the glossary. It runs on GitHub-hosted runners only, never on `pull_request_target`, and opens its pull request with a GitHub App token, because a pull request opened with `GITHUB_TOKEN` would not run the required checks.
+  - **Input:** strings and comments come from other people's pull requests, so the job treats them as untrusted text and writes nothing but the catalogs and the glossary. It works from `main` only and never checks out a pull request's branch.
   - **Output:** a translation can carry injected text too, such as a link or an instruction that is not in the source. The placeholder and Markdown check catches a new link; the review table is read for the rest.
 
 ## Reporting a wrong translation
@@ -134,7 +134,7 @@ A new issue template, `.github/ISSUE_TEMPLATE/translation_error.yml`, labeled `t
 2. **Test (#75):** strings run longer in Spanish and Ukrainian than in English. `scripts/window-snapshots.sh` draws Setup's steps, the main window's pages, Settings' categories and the Record Window in every language, side by side in one page (with `--double-length`, also in the double-length pseudolanguage); the overlay is looked at by hand, since it only shows while recording. The terminal needs the Screen Recording grant: without it a window is drawn by the app instead, and the main window's page comes out blank, so the script reports the run as incomplete and exits 1. Whoever reviews a run still looks at the pictures.
 3. **A language is turned on** only after the two checks in docs/translation-glossary.md › *Adding a language*: every window looked at beside English, with the assessment in the pull request, and every term right and the same everywhere.
 4. **Choosing a language:** a small button on Setup's first step and a row in Settings › General, listing `Bundle.main.localizations` by their own names, plus the system's language. It stores the system's per-app `AppleLanguages`; a change restarts the app, because Foundation reads it at launch.
-5. **Ship (#76):** `knownRegions` gains `es` and `uk`; the release check, the issue template and the glossary land; the scheduled job is turned on, with its manual run mentioned in `docs/releasing.md`; CONTRIBUTING.md › Language no longer says the repository is written in the UI's language; a `CHANGELOG.md` entry.
+5. **Ship (#76):** `knownRegions` gains `es` and `uk`; the release check, the issue template and the glossary land; the scheduled agent is turned on, with its manual run mentioned in `docs/releasing.md`; CONTRIBUTING.md › Language no longer says the repository is written in the UI's language; a `CHANGELOG.md` entry.
 
 ## Open
 
