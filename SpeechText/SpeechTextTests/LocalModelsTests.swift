@@ -793,6 +793,17 @@ final class CorpusMeasurementSummaryTests: XCTestCase {
                        [row("a", "new"), row("b", "old")])
     }
 
+    func testANarrowedRunCannotReplaceRows() {
+        func row(_ model: String, _ language: String, clips: Int) -> LocalSTTMeasurement {
+            LocalSTTMeasurement(model: model, language: language, clips: clips, wer: 0.1, seconds: 0.1, run: "r", mac: "Apple M1 Pro")
+        }
+        let earlier = [row("a", "uk", clips: 4), row("a", "en", clips: 3), row("b", "uk", clips: 4)]
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 4)], against: earlier), ["a"], "English would go")
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 2), row("a", "en", clips: 3)], against: earlier), ["a"])
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 5), row("a", "en", clips: 3)], against: earlier), [])
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("c", "uk", clips: 1)], against: earlier), [], "a new model replaces nothing")
+    }
+
     func testTheCommittedSummaryHoldsNoWords() {
         let rows = CorpusMeasurementSummary.rows(from: [result("uk-one"), result("uk-one", pass: "uk+en")], descriptions: descriptions, run: "2026-11-09", mac: "Apple M1 Pro")
         let source = CorpusMeasurementSummary.source(rows)

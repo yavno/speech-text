@@ -158,7 +158,9 @@ it, on the same clips, with the run's date and the Mac. Auto is the first pass a
 runner swaps models, and that cost is not one a person with one model loaded pays. Summarize
 on the Mac that ran it: the chip is read then, and rows from different Macs are not compared.
 A narrowed run (`SPEECHTEXT_CLIPS`) leaves it alone, since its means would
-cover fewer clips; a model the run did not have keeps its rows, under their own date.
+cover fewer clips, and `--summarize-run` refuses a run that would replace a model's rows
+with fewer clips or none for a language; a model the run did not have keeps its rows,
+under their own date.
 `SpeechTextEvaluation --summarize-run <run-dir>` writes the same file from a finished run.
 The diff is reviewed like any other: what it changes is in `LocalModelPickMatrixTests`.
 

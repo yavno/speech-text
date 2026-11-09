@@ -207,6 +207,8 @@ struct SpeechTextEvaluation {
                                                  run: String(run.lastPathComponent.prefix(10)),
                                                  mac: SystemCapabilities.current().chipName)
         guard !rows.isEmpty else { throw UsageError("\(run.path) has no local results to summarize") }
+        let narrowed = CorpusMeasurementSummary.narrowed(rows, against: localSTTMeasurements)
+        guard narrowed.isEmpty else { throw UsageError("\(run.path) covers fewer clips than the rows it would replace: \(narrowed.joined(separator: ", "))") }
         let source = CorpusMeasurementSummary.source(CorpusMeasurementSummary.merged(rows, into: localSTTMeasurements))
         let file = repository.appendingPathComponent(CorpusMeasurementSummary.file)
         try source.write(to: file, atomically: true, encoding: .utf8)

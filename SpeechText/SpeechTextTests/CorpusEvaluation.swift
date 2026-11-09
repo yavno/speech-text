@@ -535,6 +535,16 @@ enum CorpusMeasurementSummary {
             .sorted { ($0.model, $0.language) < ($1.model, $1.language) }
     }
 
+    /// The models whose rows `new` would replace with fewer clips, or none for a language:
+    /// a narrowed run, whose means cover other clips and whose missing language would drop
+    /// that language from the pick.
+    static func narrowed(_ new: [LocalSTTMeasurement], against earlier: [LocalSTTMeasurement]) -> [String] {
+        let measured = Set(new.map(\.model))
+        let clips = Dictionary(uniqueKeysWithValues: new.map { ("\($0.model) \($0.language)", $0.clips) })
+        let short = earlier.filter { measured.contains($0.model) && (clips["\($0.model) \($0.language)"] ?? 0) < $0.clips }
+        return Set(short.map(\.model)).sorted()
+    }
+
     static func source(_ rows: [LocalSTTMeasurement]) -> String {
         let lines = rows.map { row in
             String(format: "    LocalSTTMeasurement(model: \"%@\", language: \"%@\", clips: %d, wer: %.3f, seconds: %.3f, run: \"%@\", mac: \"%@\"),",
