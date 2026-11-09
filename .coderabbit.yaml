@@ -8,6 +8,12 @@ reviews:
   suggested_reviewers: false
   in_progress_fortune: false
 
+  auto_review:
+    # The default pauses reviews after 5 reviewed commits (seen on #202, 2026-11-08), and
+    # says so only by editing the summary comment, so an agent following a pull request
+    # (the contribute skill) would wait on a review that is not coming.
+    auto_pause_after_reviewed_commits: 0
+
   merge_risk_instructions: >-
     Higher risk: .github/workflows/ (release.yml signs and notarizes with the
     repository's secrets; no pull request may reach a self-hosted runner); the
