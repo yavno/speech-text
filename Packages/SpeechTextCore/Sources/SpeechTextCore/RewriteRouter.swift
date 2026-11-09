@@ -347,9 +347,9 @@ public enum RewriteRouter {
         - Without a language there: keep the dictated one, and a sentence that mixes \
         languages stays mixed. Terms, names and code stay as said. Without a format: \
         plain text.
-        - `markdown: renders here` in <route>: the destination shows Markdown, so a text \
-        with a form of its own may use headings, bold or tables unasked; dictated text \
-        stays plain.
+        - `markdown: renders here` in <route> is the exception to "only when asked" and \
+        "plain text" above: a text with a form of its own may use headings and bold \
+        unasked. Dictated text stays as dictated.
         - Do whatever else the transcript asks: length, tone, "rewrite it", "make it better".
         """
 

@@ -697,6 +697,35 @@
     "mustNotAppear": []
   },
   {
+    "id": "ctx-discord-plain-reply",
+    "note": "An app that renders Markdown does not turn a dictated reply into formatted text.",
+    "transcript": "добре тоді я гляну на це ввечері і відпишу в цьому каналі",
+    "context": {
+      "appName": "Discord",
+      "bundleID": "com.hnc.Discord",
+      "windowTitle": "#general"
+    },
+    "modes": [
+      "Clean-up",
+      "Email / Message"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up",
+        "Message"
+      ]
+    },
+    "language": "uk",
+    "mustKeep": [
+      "ввечері",
+      "каналі"
+    ],
+    "mustNotAppear": [
+      "Шановн"
+    ],
+    "maxLengthRatio": 2.0
+  },
+  {
     "id": "ctx-cursor-readme-content",
     "note": "Content dictated into a Markdown file in an editor.",
     "transcript": "щоб встановити застосунок відкрийте термінал і виконайте brew install мінус мінус cask speech-text",

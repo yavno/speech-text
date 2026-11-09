@@ -130,16 +130,18 @@ public struct FocusContext: Codable, Equatable, Sendable {
         "org.alacritty",
     ]
 
-    /// Apps that show Markdown as formatting, by bundle identifier prefix: the fact D5's
-    /// format rule turns on (#111). Checked 2026-11-09, each ID off the installed app and
-    /// each rendering off its maker: Discord 0.0.412 ("Discord also uses Markdown for its
-    /// message formatting", discord.com/blog), Obsidian 1.12.7 (notes are Markdown,
-    /// obsidian.md/help/syntax), T3 Code 0.1.7 (its composer renders it, the note in
-    /// `SelectionEdit`). Left out because the text is pasted and nothing confirms a paste:
-    /// Slack (its markup is opt-in and `*bold*`, no headings or tables, and "messages that
-    /// you copy and paste will appear in plain text", slack.com/help/articles/360039953113),
-    /// Notion (its help documents typed shortcuts and file import, not a paste), and the
-    /// prompt boxes of Claude and ChatGPT (nothing from either maker says they render).
+    /// Apps where the plain text we paste is Markdown, by bundle identifier prefix: the
+    /// fact D5's format rule turns on (#111). Checked 2026-11-09, each ID off the installed
+    /// app, and listed only where the text itself is read as Markdown, however it got
+    /// there: a Discord 0.0.412 message once sent ("Discord also uses Markdown for its
+    /// message formatting", discord.com/blog), an Obsidian 1.12.7 note, whose file is
+    /// Markdown (obsidian.md/help/syntax), T3 Code 0.1.7's composer, whose source is
+    /// Markdown (the note in `SelectionEdit`, this repository's, not its maker's).
+    /// Left out: Slack, whose markup is opt-in and `*bold*`, with no headings or tables,
+    /// and whose page says "Messages that you copy and paste will appear in plain text"
+    /// (slack.com/help/articles/360039953113); Notion, whose help documents shortcuts as
+    /// typed and file import, not a paste; the prompt boxes of Claude and ChatGPT, of
+    /// which neither maker says anything.
     static let markdownBundleIDPrefixes = [
         "com.hnc.Discord",                  // and DiscordPTB, DiscordCanary
         "com.t3tools.t3code",
