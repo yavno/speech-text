@@ -293,6 +293,7 @@
       }
     },
     "%@: on our test recordings it got about %lld%% of the words wrong in %@ and answered in %@ s." : {
+      "comment" : "Settings › Models on this Mac: why this model is recommended. The arguments are the model's name, a percentage, a language's name and a number of seconds.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
