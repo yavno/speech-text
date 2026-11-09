@@ -120,11 +120,8 @@ public struct ChatRates: Hashable, Sendable {
 /// went Enterprise-only on 2026-10-16 and is retired (#39).
 ///
 /// Anthropic: Fable 5.1 is left out on purpose: it is the slowest and most expensive
-/// model, and a dictation clean-up gains nothing from it. Haiku 4.5 is still active, its
-/// retirement "not sooner than 2026-10-15" (checked 2026-10-16); when it is deprecated it
-/// is marked `.deprecated` with its replacement, never dropped (docs/adding-a-provider.md
-/// › Retiring a model). `output_config.effort` is rejected by pre-4.6-era models such as
-/// Haiku 4.5; elsewhere `low` keeps latency down while leaving adaptive thinking
+/// model, and a dictation clean-up gains nothing from it. `output_config.effort` is
+/// rejected by pre-4.6-era models such as Haiku 4.5; elsewhere `low` keeps latency down while leaving adaptive thinking
 /// on (disabling it can leak `<thinking>` tags). The 5.5 family (#41) took
 /// `output_config.effort: low` and, Sonnet and Opus, `fallbacks: "default"` in one live
 /// call each on 2026-10-26; Haiku 5.5 has no server-side fallback. Since 2026-11-01 they
@@ -180,7 +177,7 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .anthropic, id: "claude-haiku-5-5", displayName: "Claude Haiku 5.5",
                         reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 0.10, cachedInput: 0.01, output: 0.50))),
-    // Superseded 2026-11-01 by their 5.5 successors (all three still Active on Anthropic's
+    // Superseded 2026-11-01 by their 5.5 successors (both still Active on Anthropic's
     // deprecations page that day, so not deprecated): offered, with Switch.
     ChatModelDescriptor(provider: .anthropic, id: "claude-sonnet-5", displayName: "Claude Sonnet 5",
                         reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
@@ -190,10 +187,16 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
                         reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: true,
                         price: .listed(.perMillion(input: 5, cachedInput: 0.50, output: 25)),
                         lifecycle: .superseded(by: "claude-opus-5-5")),
+    // Retired from the app 2026-11-09, at the owner's call, ahead of Anthropic: its
+    // deprecations page still had it Active that day, retirement "not sooner than
+    // 2026-10-15", no shutdown announced. Haiku 5.5 is the same tier at a tenth of the price.
     ChatModelDescriptor(provider: .anthropic, id: "claude-haiku-4-5", displayName: "Claude Haiku 4.5",
                         reasoningEffort: nil, reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 1, cachedInput: 0.10, output: 5)),
-                        lifecycle: .superseded(by: "claude-haiku-5-5")),
+                        lifecycle: .deprecated(Deprecation(
+                            announced: ModelRetirement.day(2026, 11, 9), shutdown: ModelRetirement.day(2026, 11, 9),
+                            replacement: "claude-haiku-5-5",
+                            source: URL(string: "https://github.com/yavno/speech-text/issues/41")!))),
 
     ChatModelDescriptor(provider: .openai, id: "gpt-6-luna", displayName: "GPT-6 Luna",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,

@@ -128,9 +128,9 @@ final class ChatModelCatalogTests: XCTestCase {
         XCTAssertEqual(offeredChatModels(of: .groq).map(\.displayName), ["GPT-OSS 120B", "GPT-OSS 20B (fastest)",
                                                      "Qwen3.8 27B (preview)"])
         XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.id), ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5",
-                                                        "claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
+                                                        "claude-sonnet-5", "claude-opus-5"])
         XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5.5", "Claude Opus 5.5", "Claude Haiku 5.5",
-                                                                "Claude Sonnet 5", "Claude Opus 5", "Claude Haiku 4.5"])
+                                                                "Claude Sonnet 5", "Claude Opus 5"])
         XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol",
                                                      "gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
         XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-6 Luna", "GPT-6.1 Terra", "GPT-6.1 Sol",
@@ -143,7 +143,7 @@ final class ChatModelCatalogTests: XCTestCase {
     func testPickersPutLegacyModelsLast() {
         let anthropic = modelPickerRuns(pickerChatModels(of: .anthropic, selected: "claude-sonnet-5"), lifecycle: \.lifecycle)
         XCTAssertEqual(anthropic.current.map(\.id), ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"])
-        XCTAssertEqual(anthropic.legacy.map(\.id), ["claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"])
+        XCTAssertEqual(anthropic.legacy.map(\.id), ["claude-sonnet-5", "claude-opus-5"])
 
         let openAI = modelPickerRuns(pickerChatModels(of: .openai, selected: "gpt-6-luna"), lifecycle: \.lifecycle)
         XCTAssertEqual(openAI.current.map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol"])
