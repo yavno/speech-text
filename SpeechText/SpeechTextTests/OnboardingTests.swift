@@ -46,6 +46,17 @@ final class ServerDraftTests: XCTestCase {
         XCTAssertTrue(draft.showsKey)
     }
 
+    func testTheStoredServerStillPassesAfterATestOfAnotherAddress() {
+        var draft = ServerDraft(role: .speech, address: address, model: "whisper", key: "secret")
+        draft.setAddress("http://192.168.1.20:8000/v1")
+        tested(&draft, answered("parakeet"))
+        XCTAssertTrue(draft.canContinue)
+        draft.setAddress(address)
+        XCTAssertTrue(draft.canContinue)
+        XCTAssertEqual(draft.saved?.model, "whisper")
+        XCTAssertEqual(draft.saved?.key, "secret")
+    }
+
     func testAStoredAddressWithNoModelHasNotPassed() {
         XCTAssertFalse(ServerDraft(role: .speech, address: address, model: "", key: "").canContinue)
     }

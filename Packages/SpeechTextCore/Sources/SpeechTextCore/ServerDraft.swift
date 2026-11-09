@@ -17,6 +17,7 @@ public struct ServerDraft: Equatable, Sendable {
 
     public let role: ServerRole
     private let stored: Choice
+    private let storedHasPassed: Bool
     private var current: Choice
     private var passed: Choice?
     /// What the server listed; empty until it has answered.
@@ -32,7 +33,8 @@ public struct ServerDraft: Equatable, Sendable {
         self.role = role
         stored = Choice(address: address, key: key, model: model)
         current = stored
-        passed = ServerEndpoint(address: address) != nil && !model.isEmpty ? stored : nil
+        storedHasPassed = ServerEndpoint(address: address) != nil && !model.isEmpty
+        passed = storedHasPassed ? stored : nil
     }
 
     public var address: String { current.address }
@@ -43,7 +45,11 @@ public struct ServerDraft: Equatable, Sendable {
     /// The key field: only once the server has asked for one, or when one is held.
     public var showsKey: Bool { serverAskedForKey || !current.key.isEmpty }
 
-    public var canContinue: Bool { !isTesting && passed == current }
+    /// A pass at another address does not take the stored server's away: typed back in,
+    /// it can still be kept with the server switched off.
+    public var canContinue: Bool {
+        !isTesting && (passed == current || (storedHasPassed && current == stored))
+    }
 
     /// The address the other role's panel may offer: one that has answered.
     public var verifiedAddress: String? { passed?.address }
