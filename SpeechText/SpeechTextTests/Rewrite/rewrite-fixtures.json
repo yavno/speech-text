@@ -667,6 +667,36 @@
     ]
   },
   {
+    "id": "ctx-obsidian-notes-markdown",
+    "note": "Notes in an app that renders Markdown: rich formatting is allowed, unasked.",
+    "transcript": "нотатки із зустрічі перше реліз переносимо на вівторок друге тести робить Олена третє питання бюджету лишається відкритим",
+    "context": {
+      "appName": "Obsidian",
+      "bundleID": "md.obsidian",
+      "windowTitle": "Зустрічі - Робота - Obsidian"
+    },
+    "modes": [
+      "Notes / Bullets"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Structured"
+      ]
+    },
+    "format": [
+      "plain",
+      "list"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "реліз",
+      "Олен",
+      "бюджет"
+    ],
+    "mustNotAppear": []
+  },
+  {
     "id": "ctx-cursor-readme-content",
     "note": "Content dictated into a Markdown file in an editor.",
     "transcript": "щоб встановити застосунок відкрийте термінал і виконайте brew install мінус мінус cask speech-text",

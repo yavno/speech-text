@@ -207,13 +207,14 @@ public enum RewriteRouter {
                               defaultPresetID: UUID?, stepOne: StepOne) async -> Decision? {
         guard canReadStepOne(modelID: stepOne.modelID) else { return nil }
         let commands = context?.commandWriting ?? .never
+        let markdownRenders = context?.rendersMarkdown == true
         if context?.takesTextForAnotherProgram == true {
             let cleanUpID = RewriteModes.builtIns[0].id
             let offered = RewriteModes.offeredToAnotherProgram(presets)
             if !offered.contains(where: { $0.id != cleanUpID }) {
                 let cleanUp = presets.first { $0.id == cleanUpID } ?? RewriteModes.builtIns[0]
                 return Decision(request: stepTwo(mode: cleanUp, names: [cleanUp.name], forAnotherProgram: true, commands: commands),
-                                routeBlock: nil,
+                                routeBlock: routeBlock(language: nil, format: .plain, markdownRenders: markdownRenders),
                                 route: RewriteRoute(language: nil, format: .plain, languageBy: .code, formatBy: .code, stepOneModel: nil))
             }
         }
@@ -232,6 +233,7 @@ public enum RewriteRouter {
             return nil
         }
         guard let decision = decision(from: reading, asked: asked, transcript: transcript, commands: commands,
+                                      markdownRenders: markdownRenders,
                                       spokenLanguages: stepOne.spokenLanguages, modelID: stepOne.modelID) else {
             dlog("Refine", "step one: unreadable answer, one step", level: .notice)
             return nil
@@ -241,7 +243,8 @@ public enum RewriteRouter {
     }
 
     private static func decision(from reading: StepOneReading, asked: Asked, transcript: String,
-                                 commands: RewriteModes.CommandWriting, spokenLanguages: [String], modelID: String) -> Decision? {
+                                 commands: RewriteModes.CommandWriting, markdownRenders: Bool,
+                                 spokenLanguages: [String], modelID: String) -> Decision? {
         let steps = asked.request.steps
         guard reading.probabilities.count == steps.count,
               zip(reading.probabilities, steps).allSatisfy({ $0.count == $1.letters.count && $0.allSatisfy(\.isFinite) && !$0.isEmpty })
@@ -253,7 +256,8 @@ public enum RewriteRouter {
         let mode = asked.modes[asked.offered[best(0)]]
         let names = asked.modes.map(\.name)
         guard asked.asksModifiers else {
-            return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: true, commands: commands), routeBlock: nil,
+            return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: true, commands: commands),
+                            routeBlock: routeBlock(language: nil, format: .plain, markdownRenders: markdownRenders),
                             route: RewriteRoute(language: nil, format: .plain, languageBy: .code, formatBy: .code, stepOneModel: modelID))
         }
         var language = asked.languages[best(1)]
@@ -265,7 +269,7 @@ public enum RewriteRouter {
         }
         let format = RewriteRoute.Format.allCases[best(2)]
         return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: false, commands: commands),
-                        routeBlock: routeBlock(language: language, format: format),
+                        routeBlock: routeBlock(language: language, format: format, markdownRenders: markdownRenders),
                         route: RewriteRoute(language: language, format: format, languageBy: languageBy, formatBy: .stepOne,
                                             stepOneModel: modelID))
     }
@@ -306,12 +310,15 @@ public enum RewriteRouter {
 
     /// D7: outside the system prompt, so each mode's prompt stays one saved prefix whatever
     /// the modifiers. Nil when there is nothing to say, the transcript's own default.
-    static func routeBlock(language: String?, format: RewriteRoute.Format) -> String? {
+    /// `markdownRenders` is a fact about the destination, code's and not step one's (D5,
+    /// #111), so History's `route` does not record it: `context` already says where it went.
+    static func routeBlock(language: String?, format: RewriteRoute.Format, markdownRenders: Bool) -> String? {
         var lines: [String] = []
         if let language {
             lines.append("language: " + (language == anotherLanguage ? "the one the transcript asks for" : languageName(language)))
         }
         if format != .plain { lines.append("format: \(format.rawValue)") }
+        if markdownRenders { lines.append("markdown: renders here") }
         return lines.isEmpty ? nil : "<route>\n\(lines.joined(separator: "\n"))\n</route>"
     }
 
@@ -340,7 +347,17 @@ public enum RewriteRouter {
         - Without a language there: keep the dictated one, and a sentence that mixes \
         languages stays mixed. Terms, names and code stay as said. Without a format: \
         plain text.
+        - `markdown: renders here` in <route>: the destination shows Markdown, so a text \
+        with a form of its own may use headings, bold or tables unasked; dictated text \
+        stays plain.
         - Do whatever else the transcript asks: length, tone, "rewrite it", "make it better".
+        """
+
+    /// D3 with D5's fact: the model still adds no format in a field for another program;
+    /// Markdown said aloud into a Markdown file is kept as dictated. A terminal is never told.
+    private static let stepTwoKeepsMarkdown = """
+        - `markdown: renders here` in <route>: Markdown the transcript spells out stays \
+        Markdown; add none of your own.
         """
 
     /// The instructions step two is given: for a built-in Clean-up as it ships, the text
@@ -361,11 +378,12 @@ public enum RewriteRouter {
         let instructions = stepTwoInstructions(mode, forAnotherProgram: forAnotherProgram)
         let system: String
         if forAnotherProgram {
+            let markdown = commands == .never ? "\n\(stepTwoKeepsMarkdown)" : ""
             system = """
                 \(RewriteModes.openingForAnotherProgram)
 
                 \(RewriteModes.rules)
-                \(RewriteModes.programRule(commands))
+                \(RewriteModes.programRule(commands))\(markdown)
 
                 \(instructions) Keep the language it was dictated in.
                 """

@@ -130,6 +130,41 @@ public struct FocusContext: Codable, Equatable, Sendable {
         "org.alacritty",
     ]
 
+    /// Apps that show Markdown as formatting, by bundle identifier prefix: the fact D5's
+    /// format rule turns on (#111). Checked 2026-11-09, each ID off the installed app and
+    /// each rendering off its maker: Discord 0.0.412 ("Discord also uses Markdown for its
+    /// message formatting", discord.com/blog), Obsidian 1.12.7 (notes are Markdown,
+    /// obsidian.md/help/syntax), T3 Code 0.1.7 (its composer renders it, the note in
+    /// `SelectionEdit`). Left out because the text is pasted and nothing confirms a paste:
+    /// Slack (its markup is opt-in and `*bold*`, no headings or tables, and "messages that
+    /// you copy and paste will appear in plain text", slack.com/help/articles/360039953113),
+    /// Notion (its help documents typed shortcuts and file import, not a paste), and the
+    /// prompt boxes of Claude and ChatGPT (nothing from either maker says they render).
+    static let markdownBundleIDPrefixes = [
+        "com.hnc.Discord",                  // and DiscordPTB, DiscordCanary
+        "com.t3tools.t3code",
+        "md.obsidian",
+    ]
+
+    /// Whether Markdown means something where this text lands: an app on the list, or an
+    /// editor whose window names a Markdown file. Goes only to the two-step path
+    /// (`RewriteRouter`): the one-step prompt may not change before #114.
+    var rendersMarkdown: Bool {
+        if let bundleID, Self.markdownBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) { return true }
+        return kind == .codeEditor && Self.namesMarkdownFile(windowTitle)
+    }
+
+    /// A word of the title that is a file name ending in `.md` or `.markdown`, wherever it
+    /// sits: editors put the project after it ("README.md — speech-text") and marks before
+    /// it ("● notes.md").
+    private static func namesMarkdownFile(_ title: String?) -> Bool {
+        guard let title else { return false }
+        return title.split(whereSeparator: \.isWhitespace).contains { word in
+            let name = word.trimmingCharacters(in: .punctuationCharacters).lowercased()
+            return name.hasSuffix(".md") || name.hasSuffix(".markdown")
+        }
+    }
+
     /// Derived, never stored: `Refinement.context` is kept in History, and a record from
     /// before the kind existed reads the same as one after. An AI's prompt box is told
     /// apart first, so an agent pane labelled as one stays a prompt in `promptBlock`.
