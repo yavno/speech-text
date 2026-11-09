@@ -63,15 +63,16 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
       needs nothing.
     - The review is done when the summary of the `CodeRabbit` check on the head commit
       starts with `Result: Success - Review completed`, the summary comment does not say
-      "Reviews paused", every finding is answered, and Tests, Swift lint and Checks are
-      green. A green `CodeRabbit` check is not enough: it is also green for a review
+      "Reviews paused", every finding is answered, and Tests, Swift lint and Checks have
+      passed or were skipped by CI's Changes job. A green `CodeRabbit` check is not enough: it is also green for a review
       skipped or rate limited. A clean review posts nothing new, it only edits the summary
       comment, so do not wait for one. To read the check:
       ```bash
       gh api "repos/yavno/speech-text/commits/<head-sha>/check-runs?check_name=CodeRabbit" --jq '.check_runs[].output.summary'
       ```
-      If CodeRabbit is still running when you are woken, say so and stop; a finding will
-      wake you.
+      If CodeRabbit is still running when you are woken, say so and stop. A finding will
+      wake you and a clean review will not, so the report stays "not confirmed" until
+      the next time you look at the pull request.
     - After five rounds with findings, stop and ask the maintainer. Merging is the
       maintainer's decision.
 
