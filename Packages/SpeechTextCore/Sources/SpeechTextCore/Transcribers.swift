@@ -34,6 +34,23 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 /// measured against the live service is not re-derived by feel in two files. All of
 /// these were verified by probing the ElevenLabs API on 2026-08-29.
 public enum STTTuning {
+    /// How much lower a model's word error rate must be than a standing local pick's to
+    /// replace it (`localSTTPick`). The owner's call of 2026-10-17 (#5, "let's try"): on
+    /// the corpus (M1 Pro, 2026-10-16) Ultra and v3 differ by 4–7% within a language, and
+    /// that is not a reason to change what someone is told to install.
+    static let localPickWERImprovement = 0.10
+
+    /// How much lower its latency must be instead — the owner's call of 2026-10-17, as
+    /// above. The same model's median moves by 10–20% between runs on a busy Mac (M1 Pro,
+    /// v3 on Ukrainian: 0.261 s on 2026-10-16, 0.288 s on 2026-11-09 in the Auto pass).
+    static let localPickLatencyImprovement = 0.30
+
+    /// How far above the lowest word error rate a model may be and still be the fast
+    /// *recommended* one. The same 10% as the replacement threshold, so a model that would
+    /// not count as clearly better is not counted as worse either. Not the owner's number
+    /// yet: #5 asks for "a tolerance" and leaves it open.
+    static let localPickWERTolerance = 0.10
+
     /// Seconds of silence after which Scribe Realtime's VAD commits a segment — the
     /// server's own default. Each segment is transcribed on its own and punctuated as a
     /// finished sentence, so a pause this long mid-sentence leaves a full stop and a

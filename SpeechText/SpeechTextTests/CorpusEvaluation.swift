@@ -491,6 +491,72 @@ struct CorpusRunFolder {
     }
 }
 
+/// The part of a run that is committed: WER and latency per local model and language
+/// (`LocalModelMeasurements.swift`), from which `localSTTPick` chooses. Only the numbers —
+/// a run's words and clip names stay in the run. WER from the Auto pass, because every clip
+/// has it and nobody's language list is assumed; latency from the pass after it, on the same
+/// clip, because Auto is the first pass after the runner swaps models and carries a cold-model
+/// cost someone with one model loaded never pays: on 2026-11-09 (M1 Pro, English) v3 took
+/// 0.39 s and Phonon-2 0.60 s in Auto, and 0.24 s and 0.24 s in the warm pass. The speech
+/// clips, because silence has no words to get wrong. A rerun for one model replaces that
+/// model's rows and leaves the others'.
+enum CorpusMeasurementSummary {
+    static let werPass = "auto"
+    static let latencyPass = "uk+en"
+    static let file = "Packages/SpeechTextCore/Sources/SpeechTextCore/LocalModelMeasurements.swift"
+
+    static func rows(from results: [CorpusResult], descriptions: [CorpusClip], run: String, mac: String) -> [LocalSTTMeasurement] {
+        let language = Dictionary(uniqueKeysWithValues: descriptions.map { ($0.name, $0) })
+        var cells: [String: [String: [(wer: Double, seconds: Double)]]] = [:]
+        let local = results.filter { $0.status == .ran && $0.engine.hasPrefix("local/") }
+        let warm = Dictionary(local.filter { $0.language == latencyPass }.map { ("\($0.engine) \($0.clip)", $0.stopToTextSeconds) },
+                              uniquingKeysWith: { first, _ in first })
+        for result in local where result.language == werPass {
+            let name = String(result.clip.prefix { $0 != "@" })
+            guard let clip = language[name], !clip.expectsNothing,
+                  let wer = result.wordErrorRate, let seconds = warm["\(result.engine) \(result.clip)"] ?? nil else { continue }
+            cells[String(result.engine.dropFirst("local/".count)), default: [:]][clip.language, default: []].append((wer, seconds))
+        }
+        return cells.flatMap { model, languages in
+            languages.map { language, clips in
+                let seconds = clips.map(\.seconds).sorted()
+                let middle = seconds.count / 2
+                let median = seconds.count % 2 == 1 ? seconds[middle] : (seconds[middle - 1] + seconds[middle]) / 2
+                return LocalSTTMeasurement(model: model, language: language, clips: clips.count,
+                                           wer: clips.map(\.wer).reduce(0, +) / Double(clips.count), seconds: median, run: run, mac: mac)
+            }
+        }
+    }
+
+    /// `new`, and the rows of every model `new` has nothing for.
+    static func merged(_ new: [LocalSTTMeasurement], into earlier: [LocalSTTMeasurement]) -> [LocalSTTMeasurement] {
+        let measured = Set(new.map(\.model))
+        return (new + earlier.filter { !measured.contains($0.model) })
+            .sorted { ($0.model, $0.language) < ($1.model, $1.language) }
+    }
+
+    static func source(_ rows: [LocalSTTMeasurement]) -> String {
+        let lines = rows.map { row in
+            String(format: "    LocalSTTMeasurement(model: \"%@\", language: \"%@\", clips: %d, wer: %.3f, seconds: %.3f, run: \"%@\", mac: \"%@\"),",
+                   row.model, row.language, row.clips, row.wer, row.seconds, row.run, row.mac)
+        }
+        return """
+        // SPDX-FileCopyrightText: 2026 Vladyslav Husakov
+        // SPDX-License-Identifier: GPL-3.0-or-later
+
+        // Written by `scripts/evaluate.sh`; do not edit by hand (docs/audio-corpus.md). Each row
+        // is one local model on the speech clips of one language: mean word error rate (Auto
+        // pass) and median seconds from the stop to the text (the warm pass after it).
+
+        /// What `localSTTPick` chooses from. A model with no row is not compared at all.
+        public let localSTTMeasurements: [LocalSTTMeasurement] = [
+        \(lines.joined(separator: "\n"))
+        ]
+
+        """
+    }
+}
+
 /// A run against the one before it: each cell — clip × engine × pass — judged
 /// against the same cell's earlier result, so every engine is held to its own past and
 /// no bound is set by hand. Worse is a word error rate up by more than 0.10, or a check

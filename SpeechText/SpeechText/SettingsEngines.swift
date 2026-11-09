@@ -239,6 +239,12 @@ struct SpeechEngineSettings: View {
             let heavy = listing.heavy
             // Once a render, not twice a row: a download renders the page ten times a second.
             let picks = LocalPicks(recommended: recommended?.id, bestQuality: bestQuality?.id)
+            Text(localSTTRecommendationReason(for: capabilities, languages: spoken))
+                .font(.system(size: 11.5))
+                .foregroundStyle(SetupColor.label2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
             ForEach(listing.picks) { localRow($0, picks: picks) }
             SetupRow(title: String(localized: "Apple Dictation"), subtitle: String(localized: "Built in"),
                      languageBadge: languageBadge(sttModel(vendor: .apple, id: appleSpeechModelID).languages, spoken: spoken),

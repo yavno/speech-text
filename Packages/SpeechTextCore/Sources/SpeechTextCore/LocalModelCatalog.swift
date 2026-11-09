@@ -293,7 +293,9 @@ public func localSTTModel(id: String) -> LocalSTTModel? {
 /// What a tier is offered: the model to install by default and the one to pick for the
 /// best result the hardware allows. Each is a list of candidates, not one ID — the first
 /// that clears the RAM floor and fits on disk wins — so a tier's pick degrades gracefully
-/// on a Mac at the bottom of its memory range, or with a nearly full disk.
+/// on a Mac at the bottom of its memory range, or with a nearly full disk. These are the
+/// *standing* picks: `localSTTPick` replaces one only for a model the corpus measured as
+/// clearly better.
 ///
 /// "Recommended" is the fastest model of good enough quality, not the best one: the user
 /// is waiting for the paste, and latency is the thing a dictation app is judged on.
@@ -333,11 +335,12 @@ func localSTTPicks(for tier: MacTier) -> TierPicks {
         // `pickable(for:languages:)`: the languages the user speaks, macOS, memory and disk. So
         // a list names every model that may be picked here, best first, and the filters
         // decide which of them a particular Mac and person gets — Phonon-2 first only for
-        // someone who speaks English alone (as accurate as v3 on our English recordings,
-        // smaller and quicker), Redux after v3 for a disk v3 no longer fits on (it is far
+        // someone who speaks English alone (as accurate as v3 on our English recordings, as
+        // quick, and smaller), Redux after v3 for a disk v3 no longer fits on (it is far
         // better in Ukrainian than Whisper Small, the next step down), and Whisper Turbo
         // for a language Parakeet does not know. `LocalModelPickMatrixTests` writes out
-        // who gets what.
+        // who gets what. Since stage 3 of #5 `localSTTPick` holds these against the corpus
+        // numbers (`localSTTMeasurements`), so an order here is what stands, not what is measured.
         return TierPicks(recommended: ["phonon-2", parakeetV3ModelID, "parakeet-redux", turbo] + sttFallback,
                          bestQuality: [parakeetV3ModelID, "parakeet-redux", turbo] + sttFallback)
     }
@@ -377,20 +380,18 @@ public func localModelDiskShortfall(downloadBytes: Int64, alreadyOnDisk: Int64 =
 
 /// The models a pick may land on: offered on this Mac, and knowing every language the
 /// user speaks. Memory and disk are `firstFitting`'s.
-private func pickable(for capabilities: SystemCapabilities, languages: [String]) -> [LocalSTTModel] {
+func pickable(for capabilities: SystemCapabilities, languages: [String]) -> [LocalSTTModel] {
     offeredLocalSTTModels(for: capabilities).filter { $0.knows(languages) }
 }
 
 /// `languages` is "Languages I speak" (`storedSpokenLanguages()`), passed in so the
 /// pick stays a pure function of the Mac and the person.
 public func recommendedLocalSTTModel(for capabilities: SystemCapabilities, languages: [String] = []) -> LocalSTTModel? {
-    firstFitting(localSTTPicks(for: MacTier(capabilities)).recommended, in: pickable(for: capabilities, languages: languages),
-                 id: \.id, floor: \.memoryFloorBytes, bytes: \.downloadBytes, capabilities: capabilities)
+    localSTTPick(.recommended, for: capabilities, languages: languages)?.model
 }
 
 public func bestQualityLocalSTTModel(for capabilities: SystemCapabilities, languages: [String] = []) -> LocalSTTModel? {
-    firstFitting(localSTTPicks(for: MacTier(capabilities)).bestQuality, in: pickable(for: capabilities, languages: languages),
-                 id: \.id, floor: \.memoryFloorBytes, bytes: \.downloadBytes, capabilities: capabilities)
+    localSTTPick(.bestQuality, for: capabilities, languages: languages)?.model
 }
 
 /// The local speech models as Settings and setup list them, in four runs: the two picks
@@ -426,22 +427,6 @@ public func localSTTListing(for capabilities: SystemCapabilities, languages: [St
 /// rather than hiding them, since the user may know better (a Mac that does nothing else).
 public func localModelFitsMemory(_ floorBytes: UInt64, _ capabilities: SystemCapabilities) -> Bool {
     capabilities.memoryBytes >= floorBytes
-}
-
-/// Why the recommendation landed where it did, in one sentence, for the Settings row.
-/// A recommendation the user cannot interrogate is one they have to take on faith.
-func localSTTRecommendationReason(for capabilities: SystemCapabilities, languages: [String] = []) -> String {
-    guard let model = recommendedLocalSTTModel(for: capabilities, languages: languages) else {
-        return localized("Not enough free disk space to install any local model.")
-    }
-    let tier = MacTier(capabilities)
-    if tier == .intel {
-        return localized("\(model.displayName) — Intel Macs have no Neural Engine, so the larger models run too slowly for dictation.")
-    }
-    if model.engine == .whisperKit, localSTTModel(id: parakeetV3ModelID)?.knows(languages) == false, !languages.isEmpty {
-        return localized("\(model.displayName) — Parakeet does not know every language you speak.")
-    }
-    return localized("\(model.displayName) for a \(tier.displayName) Mac.")
 }
 
 public enum LocalModelError: LocalizedError, Equatable, Sendable {
