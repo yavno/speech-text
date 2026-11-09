@@ -91,20 +91,20 @@ final class LlamaModel {
     /// recurrent layers cannot be rolled back to a position. One is kept per prompt a
     /// request can be sent, most recent first: the routing prompt, the one for an editor, a
     /// program in a terminal or an AI's field, a shell prompt's, a terminal where nothing
-    /// says which, and the Edit shortcut's; with two steps (#110, off until #114), step
-    /// one's, one per mode and the user's own as far as the limit goes. The prewarm at each dictation touches three of
+    /// says which, and the Edit shortcut's; `RewriteRouter.savedPromptStates` says how
+    /// many, more once two steps ship (#110, off until #114). The prewarm at each dictation touches three of
     /// them, so at three slots it pushed a terminal's prompt out every time, and a dictation
     /// there read it again: 3.5 s against 0.5 s restored. A state is about 147 MB for Gemma
     /// 4 12B, held only once its prompt has been used (M1 Pro, 2026-11-08).
     private var prefixes: [(tokens: [llama_token], state: [UInt8])] = []
-    static let savedPrefixes = 10
+    var savedPrefixes: Int
 
     /// Bytes held by the saved system prompts' states.
     var savedPrefixBytes: Int { prefixes.reduce(0) { $0 + $1.state.count } }
 
     /// `contextLength` is set, never left to the model: 0 means the model's own maximum
     /// (262 144 for Qwen3.5), whose KV cache alone would take gigabytes.
-    init(path: String, family: ChatTemplateFamily, contextLength: Int = 8192) throws {
+    init(path: String, family: ChatTemplateFamily, contextLength: Int = 8192, savedPrefixes: Int = 5) throws {
         LlamaBackend.start()
         var modelParams = llama_model_default_params()
         modelParams.n_gpu_layers = -1
@@ -124,6 +124,7 @@ final class LlamaModel {
         self.path = path
         self.family = family
         self.contextLength = contextLength
+        self.savedPrefixes = savedPrefixes
         self.model = model
         self.context = context
         self.vocab = llama_model_get_vocab(model)
@@ -297,7 +298,7 @@ final class LlamaModel {
         prefixes.removeAll { $0.tokens == prefix }
         if size > 0, llama_state_seq_get_data(context, &state, size, 0) == size {
             prefixes.insert((prefix, state), at: 0)
-            prefixes = Array(prefixes.prefix(Self.savedPrefixes))
+            prefixes = Array(prefixes.prefix(savedPrefixes))
         }
         return false
     }
@@ -368,13 +369,16 @@ final class LocalLlamaRuntime: @unchecked Sendable {
     /// Loads `path` unless it is already the model in memory; returns the seconds it took
     /// (0 when it was already loaded).
     @discardableResult
-    func load(path: String, family: ChatTemplateFamily, contextLength: Int = 8192) async throws -> Double {
+    func load(path: String, family: ChatTemplateFamily, contextLength: Int = 8192, savedPrefixes: Int = 5) async throws -> Double {
         try await run {
             if let loaded = self.loaded, loaded.path == path, loaded.family == family,
-               loaded.contextLength == contextLength { return 0 }
+               loaded.contextLength == contextLength {
+                loaded.savedPrefixes = savedPrefixes
+                return 0
+            }
             self.loaded = nil
             let start = Date()
-            self.loaded = try LlamaModel(path: path, family: family, contextLength: contextLength)
+            self.loaded = try LlamaModel(path: path, family: family, contextLength: contextLength, savedPrefixes: savedPrefixes)
             return Date().timeIntervalSince(start)
         }
     }

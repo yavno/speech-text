@@ -764,6 +764,11 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertFalse(RewriteRouter.twoStepsShip, "two steps ship only after #114")
     }
 
+    func testTheServiceKeepsFiveStatesWhileUsersHaveOneStep() {
+        XCTAssertEqual(RewriteRouter.savedPromptStates, 5)
+        XCTAssertGreaterThan(RewriteRouter.twoStepPromptStates, RewriteRouter.oneStepPromptStates)
+    }
+
     func testStepOneAsksThreeQuestionsAndSendsOneMode() async throws {
         let decision = await decide(with: stepOne { _ in Self.picking([1, 2, 1], counts: [3, 4, 3]) })
         let made = try XCTUnwrap(decision)
@@ -915,7 +920,7 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertTrue(system.contains("B — Polish"))
         XCTAssertTrue(system.contains("C — English"))
         XCTAssertTrue(system.contains("D — another"))
-        XCTAssertTrue(system.contains("and lists only"))
+        XCTAssertTrue(system.contains("and nothing more"))
         XCTAssertEqual(RewriteRouter.languageAnswers(spokenLanguages: []).count, 3, "none, English, another")
     }
 

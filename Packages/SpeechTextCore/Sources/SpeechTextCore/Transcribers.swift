@@ -30,9 +30,10 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 
 // MARK: - Tuning
 
-/// Every latency and quality knob the cloud STT providers use, in one place, so a value
-/// measured against the live service is not re-derived by feel in two files. All of
-/// these were verified by probing the ElevenLabs API on 2026-08-29.
+/// Every latency and quality knob of the speech and rewrite paths, in one place, so a
+/// value measured against the live service is not re-derived by feel in two files. Each
+/// says what it was measured against; the cloud STT ones were verified by probing the
+/// ElevenLabs API on 2026-08-29.
 public enum STTTuning {
     /// AI Rewrite's step one, past which the dictation goes to the one-step prompt (D6 of
     /// docs/specs/2026-11-03-rewrite-modes-and-router.md, the owner's call of 2026-11-03):

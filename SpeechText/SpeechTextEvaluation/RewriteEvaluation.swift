@@ -541,7 +541,9 @@ enum RewriteEvaluation {
         info.fileBytes = size
         print("loading \(model.displayName)…")
         let runtime = LocalLlamaRuntime()
-        info.loadSeconds = try await runtime.load(path: file.path, family: model.family, contextLength: contextLength)
+        info.loadSeconds = try await runtime.load(path: file.path, family: model.family, contextLength: contextLength,
+                                                  savedPrefixes: setup.variant == .route || setup.variant == .twoStep
+                                                      ? RewriteRouter.twoStepPromptStates : RewriteRouter.oneStepPromptStates)
         info.footprintAfterLoadMB = megabytes(processFootprintBytes())
         if let llamaServer {
             info.templateCheck = await templateCheck(model: model, file: file, server: llamaServer, runtime: runtime,

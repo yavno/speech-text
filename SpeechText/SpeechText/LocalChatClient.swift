@@ -56,7 +56,8 @@ func readLocalStepOne(model: LocalChatModel, request: RewriteRouter.StepOneReque
     guard FileManager.default.fileExists(atPath: path.path) else { throw LocalChatError.notInstalled(model) }
     let sent = LocalChatRouteRequest(modelPath: path.path, family: model.family, system: request.system, user: request.user,
                                      steps: request.steps.map { .init(lead: $0.lead, options: $0.letters) },
-                                     contextLength: LocalChatRequest.rewrite(model: model, path: path, system: "", user: "").contextLength)
+                                     contextLength: LocalChatRequest.rewrite(model: model, path: path, system: "", user: "").contextLength,
+                                     savedPrefixes: RewriteRouter.savedPromptStates)
     let body = try JSONEncoder().encode(sent)
     let response: LocalChatRouteResponse = try await LocalChatConnection.shared.call(cancelling: sent.id) { service, finish in
         service.readRoute(body) { data, error in
@@ -236,7 +237,7 @@ extension LocalChatRequest {
     /// (`ChatTemplates.replyTokens`), as far as the context goes.
     static func rewrite(model: LocalChatModel, path: URL, system: String, user: String) -> LocalChatRequest {
         LocalChatRequest(modelPath: path.path, family: model.family, system: system, user: user,
-                         maxTokens: 2048, contextLength: 8192)
+                         maxTokens: 2048, contextLength: 8192, savedPrefixes: RewriteRouter.savedPromptStates)
     }
 }
 

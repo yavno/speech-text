@@ -48,6 +48,8 @@ struct LocalChatRequest: Codable, Equatable {
     /// For a prewarm: system prompts to read ahead, so the requests that follow restore
     /// them (AI dictation's and the Edit shortcut's). Nil on a completion.
     var prefixes: [String]? = nil
+    /// The system prompts' states to keep (`RewriteRouter.savedPromptStates`).
+    var savedPrefixes = 5
     /// What a cancel names, so it stops this request and no other (`LocalChatActivity`).
     var id = UUID().uuidString
 }
@@ -67,6 +69,7 @@ struct LocalChatRouteRequest: Codable, Equatable {
     var steps: [Step]
     /// The rewrite's own, or the model would be loaded again for it.
     var contextLength: Int
+    var savedPrefixes = 5
     var id = UUID().uuidString
 }
 

@@ -86,7 +86,8 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
             do {
                 try self.stopIfCancelled(id)
                 _ = try await self.load(LocalChatRequest(modelPath: request.modelPath, family: request.family, system: "", user: "",
-                                                         maxTokens: 0, contextLength: request.contextLength))
+                                                         maxTokens: 0, contextLength: request.contextLength,
+                                                         savedPrefixes: request.savedPrefixes))
                 let read = try await runtime.chainedProbabilities(
                     system: request.system, user: request.user, steps: request.steps.map { ($0.lead, $0.options) },
                     shouldCancel: { self.isCancelled(id) })
@@ -142,7 +143,7 @@ final class LocalChatService: NSObject, LocalChatServiceProtocol, @unchecked Sen
         let headroom: UInt64 = 3 * 1_073_741_824
         guard ProcessInfo.processInfo.physicalMemory >= bytes + headroom else { throw LocalChatServiceError.notEnoughMemory }
         return try await runtime.load(path: request.modelPath, family: request.family,
-                                      contextLength: request.contextLength)
+                                      contextLength: request.contextLength, savedPrefixes: request.savedPrefixes)
     }
 
     // MARK: - Idle exit
