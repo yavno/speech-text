@@ -25,26 +25,31 @@ import SpeechTextCore
 /// menu's actions, the Settings form — is already on the main thread, which is where
 /// Sparkle requires its updater to be used.
 ///
-/// It is also the standard user driver's delegate, for one hook: see
-/// `standardUserDriverWillShowModalAlert`. Sparkle holds that delegate weakly; `shared`
-/// is what keeps it alive.
+/// It is also the standard user driver's delegate, for the two hooks that bring Sparkle's
+/// alerts and its "available" window forward. Sparkle holds that delegate weakly; `shared`
+/// is what keeps it alive. The stages after Install Update have no delegate hook at all,
+/// which is what `ReportingUserDriver` below is for.
 ///
 /// Main-actor, as Sparkle requires; its delegate methods are called on main, which the
 /// `@preconcurrency` conformance checks as they come in.
 @MainActor
-final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelegate {
+final class UpdateChecker: NSObject, ObservableObject, @preconcurrency SPUStandardUserDriverDelegate {
     static let shared = UpdateChecker()
 
-    /// Assigned after `super.init()`, because the controller is handed `self` as its
+    /// Assigned after `super.init()`, because the user driver is handed `self` as its
     /// delegate.
-    private var controller: SPUStandardUpdaterController?
+    private var updater: SPUUpdater?
+    private var userDriver: ReportingUserDriver?
+
+    /// What Settings shows about an update the user agreed to.
+    @Published private(set) var installStatus: UpdateInstallStatus = .idle
 
     /// Whether this build can check for updates at all. False in a source checkout that
     /// has no signing key yet: Sparkle's own answer to a missing key is a modal alert a
     /// second after launch, on every launch, which is worse than a menu item that isn't
     /// there. See `docs/releasing.md` for generating the key. Also false in a
     /// development build — see `isDevelopmentBuild`.
-    var isConfigured: Bool { controller != nil }
+    var isConfigured: Bool { updater != nil }
 
     /// The feed the app follows, for the Debug Log and for the settings row's subtitle.
     var feedURL: String? { Self.infoValue("SUFeedURL") }
@@ -53,13 +58,13 @@ final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelega
     /// Writing it goes into the app's own defaults domain, which is why a development
     /// build never touches it — see `isDevelopmentBuild`.
     var checksAutomatically: Bool {
-        get { controller?.updater.automaticallyChecksForUpdates ?? false }
-        set { controller?.updater.automaticallyChecksForUpdates = newValue }
+        get { updater?.automaticallyChecksForUpdates ?? false }
+        set { updater?.automaticallyChecksForUpdates = newValue }
     }
 
     /// When the last check happened, so Settings can say something more useful than a
     /// bare switch.
-    var lastCheckDate: Date? { controller?.updater.lastUpdateCheckDate }
+    var lastCheckDate: Date? { updater?.lastUpdateCheckDate }
 
     /// A build that was not made by `scripts/rebuild.sh` or the release workflow: no
     /// commit stamped into `Info.plist`, and the build number Xcode leaves behind is 1.
@@ -84,14 +89,25 @@ final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelega
             dlog("Update", "development build — no updater started")
             return
         }
-        // Sparkle's standard controller owns the updater, the update windows and the
-        // background schedule; starting it here means the first check happens on its own.
+        // What `SPUStandardUpdaterController` builds, built here because it cannot be
+        // given another user driver. Starting the updater here means the first check
+        // happens on its own.
         // A scheduled check that fails says nothing — Sparkle's default, kept on purpose:
         // `SPUScheduledUpdateDriver` aborts with `showErrorToUser: _showedUpdate`, so an
         // error reaches the user only once an update had already been put in front of them.
-        controller = SPUStandardUpdaterController(startingUpdater: true,
-                                                  updaterDelegate: nil,
-                                                  userDriverDelegate: self)
+        let driver = ReportingUserDriver(hostBundle: .main, delegate: self)
+        driver.onStatusChange = { [weak self] status in self?.installStatus = status }
+        let updater = SPUUpdater(hostBundle: .main, applicationBundle: .main, userDriver: driver, delegate: nil)
+        do {
+            try updater.start()
+        } catch {
+            // The controller's answer is a modal alert a second after launch. As for a
+            // missing key above: no menu item is better, and the log says why.
+            dlog("Update", "updater failed to start (\((error as NSError).code)) — updates are off in this build")
+            return
+        }
+        self.updater = updater
+        userDriver = driver
         dlog("Update", "updater started (feed \(feedURL ?? "?"), automatic \(checksAutomatically))")
     }
 
@@ -103,9 +119,14 @@ final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelega
     /// `activationPolicy == .accessory`); with Settings open behind another app it has
     /// one, and only this call brings it forward.
     func checkForUpdates() {
-        guard let controller else { return }
+        guard let updater else { return }
         Self.activateApp()
-        controller.updater.checkForUpdates()
+        updater.checkForUpdates()
+    }
+
+    /// Settings' Install and Relaunch: the same answer as the button in Sparkle's window.
+    func installReadyUpdate() {
+        userDriver?.installReadyUpdate()
     }
 
     /// Sparkle's "Update Error!", "You're up to date!" and "Update Installed" alerts are
@@ -191,5 +212,110 @@ final class UpdateChecker: NSObject, @preconcurrency SPUStandardUserDriverDelega
         let trimmed = value.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty, !trimmed.hasPrefix("$(") else { return nil }
         return trimmed
+    }
+}
+
+/// Sparkle's own windows, reporting as they go. Bytes received and the "ready to install"
+/// reply reach only the user driver: no delegate of either kind is told them.
+///
+/// A subclass rather than a wrapper around the standard driver: `SPUUpdater` also probes
+/// its driver for private selectors (the gentle-reminder timing, 2.10), which a wrapper
+/// would silently lose. Every override calls `super`, so the windows behave as before.
+@MainActor
+private final class ReportingUserDriver: SPUStandardUserDriver {
+    var onStatusChange: ((UpdateInstallStatus) -> Void)?
+
+    private var progress = UpdateInstallProgress() {
+        didSet {
+            guard progress.status != oldValue.status else { return }
+            onStatusChange?(progress.status)
+        }
+    }
+    /// Sparkle's reply to "ready to install", until one of the two buttons has used it.
+    private var installReply: ((SPUUserUpdateChoice) -> Void)?
+    /// Sparkle keeps one status window through all three stages and reports none of them.
+    private weak var statusWindow: NSWindow?
+
+    override func showDownloadInitiated(cancellation: @escaping () -> Void) {
+        bringingStatusWindowForward { super.showDownloadInitiated(cancellation: cancellation) }
+        progress.downloadStarted()
+    }
+
+    override func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
+        super.showDownloadDidReceiveExpectedContentLength(expectedContentLength)
+        progress.expectedLengthReceived(expectedContentLength)
+    }
+
+    override func showDownloadDidReceiveData(ofLength length: UInt64) {
+        super.showDownloadDidReceiveData(ofLength: length)
+        progress.dataReceived(length)
+    }
+
+    override func showDownloadDidStartExtractingUpdate() {
+        bringingStatusWindowForward { super.showDownloadDidStartExtractingUpdate() }
+        progress.extractionStarted()
+    }
+
+    override func showExtractionReceivedProgress(_ progress: Double) {
+        super.showExtractionReceivedProgress(progress)
+        self.progress.extractionProgressed(progress)
+    }
+
+    override func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        installReply = reply
+        // Sparkle's button goes through the same one-shot as Settings', so a click on each
+        // answers Sparkle once.
+        bringingStatusWindowForward {
+            super.showReady { [weak self] _ in self?.installReadyUpdate() }
+        }
+        progress.readyToInstall()
+    }
+
+    override func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool,
+                                       retryTerminatingApplication: @escaping () -> Void) {
+        super.showInstallingUpdate(withApplicationTerminated: applicationTerminated,
+                                   retryTerminatingApplication: retryTerminatingApplication)
+        progress.installationStarted()
+    }
+
+    override func showUpdaterError(_ error: Error, acknowledgement: @escaping () -> Void) {
+        progress.reset()
+        super.showUpdaterError(error, acknowledgement: acknowledgement)
+    }
+
+    override func dismissUpdateInstallation() {
+        installReply = nil
+        statusWindow = nil
+        progress.reset()
+        super.dismissUpdateInstallation()
+    }
+
+    func installReadyUpdate() {
+        guard let reply = installReply else { return }
+        installReply = nil
+        reply(.install)
+    }
+
+    /// The stages after Install Update, which Sparkle opens with a plain `orderFront` when
+    /// the app is not active, so behind whatever the user went back to; and the later two
+    /// reuse the window and do not order it at all.
+    ///
+    /// Ordered in front of everyone else's windows without activating the app, on purpose:
+    /// these stages arrive on their own while the user may be typing or dictating into
+    /// another app, and taking focus from it would move the paste. A click on the window
+    /// activates the app as usual. The window is told from the others by being the one the
+    /// call created, and left alone if the user minimized it.
+    private func bringingStatusWindowForward(_ show: () -> Void) {
+        let known = Set(NSApp.windows.map(ObjectIdentifier.init))
+        show()
+        if let created = NSApp.windows.first(where: { !known.contains(ObjectIdentifier($0)) }) {
+            statusWindow = created
+        }
+        guard let statusWindow, !statusWindow.isMiniaturized else {
+            dlog("Update", "status window \(statusWindow == nil ? "not found" : "minimized")")
+            return
+        }
+        statusWindow.orderFrontRegardless()
+        dlog("Update", "status window ordered front, app \(NSApp.isActive ? "active" : "not active")")
     }
 }
