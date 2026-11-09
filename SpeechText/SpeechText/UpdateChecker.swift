@@ -215,8 +215,9 @@ final class UpdateChecker: NSObject, ObservableObject, @preconcurrency SPUStanda
     }
 }
 
-/// Sparkle's own windows, reporting as they go. Bytes received and the "ready to install"
-/// reply reach only the user driver: no delegate of either kind is told them.
+/// Sparkle's own windows, reporting as they go. `SPUUpdaterDelegate` is told the stages
+/// (Sparkle 2.10), but the bytes received and the reply to the "ready to install" window
+/// reach only the user driver.
 ///
 /// A subclass rather than a wrapper around the standard driver: `SPUUpdater` also probes
 /// its driver for private selectors (the gentle-reminder timing, 2.10), which a wrapper
