@@ -268,3 +268,33 @@ final class E2EKeysFileTests: XCTestCase {
     }
     #endif
 }
+
+/// `scripts/window-snapshots.sh --only`: which of a snapshot run's windows it draws.
+final class WindowSnapshotSelectionTests: XCTestCase {
+    private let names = [
+        "setup-welcome", "setup-speech", "setup-done", "main-home",
+        "settings-ai", "settings-apiKeys", "record-window",
+    ]
+
+    func testNoWordsDrawEveryWindow() {
+        for text in [nil, "", "  "] {
+            let selection = WindowSnapshotSelection(text)
+            XCTAssertTrue(names.allSatisfy(selection.includes))
+            XCTAssertEqual(selection.unmatched(in: names), [])
+        }
+    }
+
+    func testNamesAreMatchedWholeAndAWordEndingInADashAsAPrefix() {
+        let selection = WindowSnapshotSelection("setup-  settings-ai,record-window")
+        XCTAssertEqual(names.filter(selection.includes),
+                       ["setup-welcome", "setup-speech", "setup-done", "settings-ai", "record-window"])
+        XCTAssertEqual(selection.unmatched(in: names), [])
+    }
+
+    func testAWordThatNamesNoWindowIsReported() {
+        // Not a prefix without its dash: "settings-a" would otherwise take both categories.
+        let selection = WindowSnapshotSelection("settings-a main-home setup notetaker-")
+        XCTAssertEqual(names.filter(selection.includes), ["main-home"])
+        XCTAssertEqual(selection.unmatched(in: names), ["settings-a", "setup", "notetaker-"])
+    }
+}

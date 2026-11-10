@@ -195,12 +195,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if setupGate == .show {
             // Setup asks for the microphone and Accessibility itself, on a screen that
             // says what they are for — not in two unexplained alerts at launch.
-            DispatchQueue.main.async { [weak self] in self?.openSetup() }
+            DispatchQueue.main.async { [weak self] in
+                #if DEBUG
+                // A snapshot run asked for no step of Setup does not flash its window.
+                guard MainActor.assumeIsolated({ WindowSnapshots.drawsSetup }) else { return }
+                #endif
+                self?.openSetup()
+            }
         } else {
             // Request microphone access on launch — but not for an end-to-end run, which
             // records from a file and whose prompt would take the focus from the document
-            // the script dictates into.
-            if E2EMode.audioInputs == nil {
+            // the script dictates into, nor for a snapshot run, which never records.
+            var asksForMicrophone = E2EMode.audioInputs == nil
+            #if DEBUG
+            if E2EMode.isActive, MainActor.assumeIsolated({ WindowSnapshots.isAsked }) { asksForMicrophone = false }
+            #endif
+            if asksForMicrophone {
                 appState.speechEngine.requestMicrophoneAccess { granted in
                     if !granted {
                         dlog("App", "Microphone access denied", level: .error)
@@ -2772,19 +2782,61 @@ struct ObservedOverlay: View {
 /// windows can be looked over side by side (docs/specs/2026-11-04-localization.md ›
 /// Stages, *test*). Drawn with `cacheDisplay`, which needs no Screen Recording grant;
 /// glass that samples what is behind a window draws plain.
+///
+/// `-SPTSnapshotsOnly "<names>"` (the script's `--only`) draws only those windows and
+/// never opens the others, so they do not flash on screen (`WindowSnapshotSelection`). A
+/// word that names no window draws nothing: the run writes `<folder>/only.unknown`, the
+/// words and then every name there is, for the script to report.
 @MainActor
 enum WindowSnapshots {
-    static func runIfAsked(_ app: AppDelegate) {
+    /// Every window a run draws, by the name of its picture, in the order drawn.
+    static let names: [String] =
+        (OnboardingStep.named + [.done]).map(setupName) + MainPage.rail.map(mainName)
+        + SettingsCategory.allCases.map(settingsName) + [recordWindowName]
+
+    nonisolated static func setupName(_ step: OnboardingStep) -> String { "setup-\(step.rawValue)" }
+    nonisolated static func mainName(_ page: MainPage) -> String { "main-\(page.rawValue)" }
+    nonisolated static func settingsName(_ category: SettingsCategory) -> String { "settings-\(category.rawValue)" }
+    static let recordWindowName = "record-window"
+
+    /// Read from the launch arguments, as `-SPTSnapshots` is: through `UserDefaults` the
+    /// argument domain would parse the value as an old-style property list.
+    private static func argument(_ flag: String) -> String? {
         let arguments = ProcessInfo.processInfo.arguments
-        guard let flag = arguments.firstIndex(of: "-SPTSnapshots"), arguments.count > flag + 1 else { return }
+        guard let index = arguments.firstIndex(of: flag), arguments.count > index + 1 else { return nil }
+        return arguments[index + 1]
+    }
+
+    static var isAsked: Bool { argument("-SPTSnapshots") != nil }
+
+    static let selection = WindowSnapshotSelection(argument("-SPTSnapshotsOnly"))
+
+    /// Whether the window setup opens at launch, in a new install such as every snapshot
+    /// run, is one this run wants. Any launch but a snapshot run's opens it as ever.
+    static var drawsSetup: Bool {
+        guard E2EMode.isActive, isAsked else { return true }
+        guard selection.unmatched(in: names).isEmpty else { return false }
+        return (OnboardingStep.named + [.done]).contains { selection.includes(setupName($0)) }
+    }
+
+    static func runIfAsked(_ app: AppDelegate) {
+        guard let path = argument("-SPTSnapshots") else { return }
         guard E2EMode.isActive else {
             dlog("Snapshots", "-SPTSnapshots needs the end-to-end build, which keeps its own settings and data", level: .error)
             return
         }
-        let folder = URL(fileURLWithPath: arguments[flag + 1], isDirectory: true)
+        let folder = URL(fileURLWithPath: path, isDirectory: true)
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let unknown = selection.unmatched(in: names)
+        guard unknown.isEmpty else {
+            dlog("Snapshots", "\(unknown.count) of -SPTSnapshotsOnly's names match no window", level: .error)
+            let report = unknown.joined(separator: " ") + "\n" + names.joined(separator: " ") + "\n"
+            try? report.write(to: folder.appendingPathComponent("only.unknown"), atomically: true, encoding: .utf8)
+            NSApp.terminate(nil)
+            return
+        }
         Task { @MainActor in
-            await app.drawSnapshots(into: folder)
+            await app.drawSnapshots(into: folder, only: selection)
             NSApp.terminate(nil)
         }
     }
@@ -2876,37 +2928,35 @@ enum WindowSnapshots {
 
 extension AppDelegate {
     @MainActor
-    fileprivate func drawSnapshots(into folder: URL) async {
-        openSetup()
-        for step in OnboardingStep.named {
+    fileprivate func drawSnapshots(into folder: URL, only selection: WindowSnapshotSelection) async {
+        // Not one of the steps the bar names, but a screen of its own.
+        let steps = (OnboardingStep.named + [.done]).filter { selection.includes(WindowSnapshots.setupName($0)) }
+        for step in steps {
             if setupWindow == nil { openSetup() }  // Closed during the run: every step is still wanted.
             setupWindow?.model.step = step
-            await WindowSnapshots.capture(setupWindow, "setup-\(step.rawValue)", into: folder)
+            await WindowSnapshots.capture(setupWindow, WindowSnapshots.setupName(step), into: folder)
         }
-        // Not one of the steps the bar names, but a screen of its own.
-        if setupWindow == nil { openSetup() }
-        setupWindow?.model.step = .done
-        await WindowSnapshots.capture(setupWindow, "setup-\(OnboardingStep.done.rawValue)", into: folder)
         setupWindow?.close()
 
-        for page in MainPage.rail {
+        for page in MainPage.rail where selection.includes(WindowSnapshots.mainName(page)) {
             showMainWindow(on: page)
-            await WindowSnapshots.capture(mainWindow, "main-\(page.rawValue)", into: folder)
+            await WindowSnapshots.capture(mainWindow, WindowSnapshots.mainName(page), into: folder)
         }
 
-        for category in SettingsCategory.allCases {
+        for category in SettingsCategory.allCases where selection.includes(WindowSnapshots.settingsName(category)) {
             showSettings(category: category)
-            await WindowSnapshots.capture(settingsWindow, "settings-\(category.rawValue)", into: folder)
+            await WindowSnapshots.capture(settingsWindow, WindowSnapshots.settingsName(category), into: folder)
         }
         settingsWindow?.close()
         mainWindow?.close()
 
+        guard selection.includes(WindowSnapshots.recordWindowName) else { return }
         // Opened on text, as from History's "Open in Record Window": a Record Window opened
         // empty starts recording, and the snapshots never use the microphone.
         appState.showDirectRecordingPanel(
             withText: String(localized: "Hi Josh, thanks for the update. I'll send you the report on Friday. Talk soon."))
         await WindowSnapshots.capture(NSApp.windows.first { $0 is DirectRecordingPanelWindow },
-                                      "record-window", into: folder)
+                                      WindowSnapshots.recordWindowName, into: folder)
     }
 }
 #endif
