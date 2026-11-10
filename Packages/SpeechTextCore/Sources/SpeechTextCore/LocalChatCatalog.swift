@@ -167,6 +167,10 @@ public enum LocalChat {
     /// Drops a removed download from the service's memory, if it is the model loaded
     /// there — removing another one must not cost the model in use a cold load.
     public nonisolated(unsafe) static var release: (LocalChatModel) -> Void = { _ in }
+    /// AI Rewrite's step one, read off the model in the service. Unfilled it throws, and
+    /// the dictation goes to the one-step prompt.
+    public nonisolated(unsafe) static var readStepOne: @Sendable (LocalChatModel, RewriteRouter.StepOneRequest) async throws
+        -> RewriteRouter.StepOneReading = { _, _ in throw LLMError.noLocalModel }
 }
 
 struct UnavailableLocalChatClient: ChatClient {

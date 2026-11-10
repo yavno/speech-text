@@ -65,6 +65,8 @@ struct RewriteFixture: Codable, Sendable {
     var askedLanguage: String?
     /// The formats a right answer may pick: `plain`, `list` or `markdown`. Absent: plain.
     var format: [String]?
+    /// The languages step one offers for this fixture, instead of the run's `--spoken-languages`.
+    var spokenLanguages: [String]?
     /// Prompts of the user's own beside the built-ins, for a variant that sends them; `current`
     /// sends the built-ins alone.
     var presets: [Preset]?
@@ -97,7 +99,9 @@ struct RewriteFixture: Codable, Sendable {
 
     /// The modes a right answer may report under `variant`, or nil when the fixture says nothing.
     func expectedModes(for variant: String) -> [String]? {
-        if let modes = variantModes?[variant] { return modes }
+        // `route` and `two-step` choose among the same three modes.
+        let key = variant == "route" || variant == "two-step" ? "2026-11" : variant
+        if let modes = variantModes?[key] { return modes }
         return variant == "current" ? modes : nil
     }
 }

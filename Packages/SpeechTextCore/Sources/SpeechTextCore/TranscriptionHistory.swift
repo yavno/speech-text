@@ -40,6 +40,9 @@ public struct TranscriptionRecord: Identifiable, Codable, Equatable, Sendable {
         /// prices. Nil for a pass that never got a reply, and for entries written before
         /// it was kept, which Usage estimates from their words.
         var usage: ChatUsage? = nil
+        /// What step one decided (D10 of the 2026-11-03 spec). Nil for one request, and
+        /// for entries older than it; `presetName` stays the mode.
+        public var route: RewriteRoute? = nil
 
         public var isSelectionEdit: Bool { editsSelection == true }
         public var succeeded: Bool { errorMessage == nil && !outputText.isEmpty }
@@ -327,10 +330,10 @@ public final class TranscriptionHistory {
     /// Attaches the result of the AI step to an existing transcription entry.
     public func recordRefinement(id: UUID, input: String, output: String, presetName: String?,
                           provider: String, model: String, context: FocusContext? = nil,
-                          usage: ChatUsage? = nil, latency: Double? = nil) {
+                          usage: ChatUsage? = nil, latency: Double? = nil, route: RewriteRoute? = nil) {
         updateRefinement(id: id, TranscriptionRecord.Refinement(
             inputText: input, outputText: output, presetName: presetName,
-            provider: provider, model: model, errorMessage: nil, context: context, usage: usage
+            provider: provider, model: model, errorMessage: nil, context: context, usage: usage, route: route
         ), latency: latency)
     }
 

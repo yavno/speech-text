@@ -26,6 +26,8 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 `current` is the baseline it was held to: what the app sent until #109, one routing prompt (`buildSystemPrompt`) over the six built-ins of October 2026 (`PromptPresetStore.october2026`), the edits' prompt over them too. Its name is older than the variant after it and stays, since the fixtures' `modes` and every run kept are keyed to it.
 
+`route` and `two-step` are #110, whatever `RewriteRouter.twoStepsShip` says. `route` scores step one alone and writes nothing: the mode, the language asked for and the format, after the code rules, on Gemma 4 12B and Qwen3.5 9B, the local models step one can be read from; any other engine is a `no step one` row. Its summary counts all three right of the fixtures a model was asked about, apart from those D3 decided by rule, and how many took longer than the timeout. `two-step` sends step two with that one mode, as the app would, and is judged by the same text checks; an engine with no step one, or a step one that fails, gets the one-step prompt, and each row's `stepOne` says which happened (`read`, `by code`, `one step`). Step one is offered the run's `--spoken-languages` (`uk,en` by default) unless a fixture sets `spokenLanguages`, and *another* is right only for a language outside that list.
+
 `--reasoning-effort omit|<value>` overrides a model's reasoning switch. It is a measurement for the next prompt, not the baseline. A new way of prompting is a new case of `RewriteEvaluation.Variant`, judged by the same checks.
 
 ## Fixtures
@@ -46,6 +48,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
     - and, always: no preamble, no leaked marker, no reasoning, not wrapped in quotes.
   - **Modes**: `modes` for the `current` baseline (the first is the expected one), `variantModes` for another set of modes, since a variant may rename or merge them. `variantModes["2026-11"]` holds the three modes the app has (Clean-up, Message, Structured), Clean-up alone in an editor, a terminal or an AI's field, and the fixture's own `presets` by name.
   - **The route**, for the variants that pick a mode and its modifiers first: `askedLanguage`, an ISO 639-1 code (absent when the dictation asks for no language), and `format`, the formats a right answer may pick (`plain`, `list`, `markdown`; absent means plain). An edit is not routed and has neither.
+  - **Whether Markdown renders where the text lands** is not a fixture field: `two-step` reads it from `context`, as the app does (`FocusContext.rendersMarkdown`), and step two gets it in `<route>`. So a fixture where the form allows rich formatting there sets `markdown: true`, and one of dictated text leaves it out and fails if the fact formats it (`ctx-discord-plain-reply`). `route` is not told: it reads what the dictation asks for.
 - **The user's own prompts:** `presets` (name, when to use, instructions), for a variant that sends them beside the built-ins. `current` sends its built-ins alone, and an edit is sent the built-ins alone under either variant, where the app's Edit prompt lists the user's prompts too.
 - **Examples:** `examples`, replies written by hand that the checks must pass or fail.
 

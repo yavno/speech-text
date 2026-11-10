@@ -239,6 +239,7 @@ struct SettingsView: View {
                         }
                 }
                 SettingsDivider()
+                UpdateInstallRow()
             }
             VersionRow()
             SettingsDivider()
@@ -1414,6 +1415,45 @@ private struct VersionRow: View {
         let reset = DispatchWorkItem { copied = false }
         resetCopied = reset
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: reset)
+    }
+}
+
+/// Settings › General › Updates: an update the user agreed to, from the download to the
+/// relaunch. Sparkle's window says the same, but it can be covered or minimized, and this
+/// is where someone looks for it. Nothing at all while no update is under way.
+private struct UpdateInstallRow: View {
+    @ObservedObject private var updates = UpdateChecker.shared
+
+    private var holdingWords: Bool { AppState.current?.isHoldingWords ?? false }
+
+    var body: some View {
+        switch updates.installStatus {
+        case .idle:
+            EmptyView()
+        case .downloading(let percent):
+            row(title: "Downloading update", detail: percent.map { Text("\($0)% downloaded") })
+        case .extracting:
+            row(title: "Extracting update", detail: nil)
+        case .readyToInstall:
+            SettingsRow(title: "Update ready to install",
+                        detail: "SpeechText relaunches to finish installing it.") {
+                Button("Install and Relaunch") { updates.installReadyUpdate() }
+                    .buttonStyle(SetupButtonStyle(kind: .primary, height: 28))
+                    .disabled(holdingWords)
+                    .help(holdingWords ? Text("Finish the dictation and close the Record Window first.") : Text(verbatim: ""))
+            }
+            SettingsDivider()
+        case .installing:
+            row(title: "Installing update", detail: Text("SpeechText relaunches when it’s done."))
+        }
+    }
+
+    @ViewBuilder
+    private func row(title: LocalizedStringKey, detail: Text?) -> some View {
+        SettingsRow(title: title, detailText: detail) {
+            SetupProgressBar(fraction: updates.installStatus.fraction).frame(width: 160)
+        }
+        SettingsDivider()
     }
 }
 
