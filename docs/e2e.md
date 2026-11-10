@@ -48,6 +48,7 @@ sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
 ```sh
 scripts/e2e.sh                                   # every scenario, on Groq's upload
 scripts/e2e.sh --engine scribe-realtime          # … or gpt-live, apple
+scripts/e2e.sh --engine server                   # your own servers (below)
 scripts/e2e.sh --no-build --only hold,edit       # skip the build; some scenarios
 scripts/e2e.sh --traces --engine gpt-live        # also record dictation traces
 ```
@@ -67,9 +68,49 @@ The exit status is non-zero when a scenario failed.
 | Variable | Default |
 |---|---|
 | `SPEECHTEXT_CORPUS` | none — required: the folder of corpus WAVs, outside the repository |
-| `SPT_E2E_KEYS` | `~/.config/speech-text/test-keys.env` (`GROQ_API_KEY=…`, `OPENAI_API_KEY=…`, `ELEVENLABS_API_KEY=…`) |
+| `SPT_E2E_KEYS` | `~/.config/speech-text/test-keys.env` (`GROQ_API_KEY=…`, `OPENAI_API_KEY=…`, `ELEVENLABS_API_KEY=…`); the server engine runs without it |
 | `SPT_E2E_DERIVED_DATA` | `/tmp/st-dd-e2e` |
 | `SPT_SIGN_IDENTITY` | the first `Developer ID Application` certificate in the keychain |
+| `SPT_E2E_SERVER_SPEECH` | `http://127.0.0.1:9932/v1`: the speech server for `--engine server` |
+| `SPT_E2E_SERVER_SPEECH_MODEL` | `whisper`; whisper-server ignores it and lists none |
+| `SPT_E2E_SERVER_CHAT` | `http://127.0.0.1:9931/v1`: the chat server, when `ai`, `switch-to-ai`, `switch-to-plain` or `edit` runs |
+| `SPT_E2E_SERVER_CHAT_MODEL` | the first model the chat server lists |
+
+## Your own server
+
+`--engine server` points the build at a speech server and a chat server you start
+yourself, as a user of *Your server* would: `sttProvider` and, when a scenario rewrites,
+`llmProvider` are `server`, with the addresses and models above. The run stops before it
+quits your app when a server does not answer, or answers 503 while it loads its model.
+
+Checked on 2026-11-10 with whisper.cpp 1.9.5 and llama.cpp b11960 from Homebrew:
+
+```sh
+brew install whisper-cpp llama.cpp
+mkdir -p ~/llm-eval-models
+curl -L -o ~/llm-eval-models/ggml-large-v3-turbo-q5_0.bin \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin
+whisper-server -m ~/llm-eval-models/ggml-large-v3-turbo-q5_0.bin --host 127.0.0.1 --port 9932 \
+  --inference-path /v1/audio/transcriptions -l auto
+llama-server -m ~/llm-eval-models/gemma-4-12b-it-qat-q4_0.gguf --alias gemma-4-12b \
+  --host 127.0.0.1 --port 9931 -c 8192
+```
+
+- whisper-server answers at `/inference` unless told otherwise; `--inference-path` gives
+  it OpenAI's path. It has no `/v1/models` (404), which the app's test request allows.
+- It transcribes in English when a request names no language, and `edit` names none
+  (its languages are Ukrainian and English): `-l auto` makes it detect instead. A request
+  that names one, as `uk-UA`, is heard in that language.
+- Any multilingual ggml model works; the corpus is Ukrainian, so never an `.en` one.
+- Gemma 4 thinks before it answers, on llama-server's default `--reasoning auto`. The
+  app's 8192 `max_tokens` leaves it room, but each rewrite and edit took 16–24 s on an
+  M1 Pro, about 300 tokens of thought each; `ai` and `edit` wait 60 s for it.
+- `--alias` gives the model a short ID; without it llama-server lists the file's path.
+- Bound to anything but loopback, a `.local` address makes macOS ask the build for Local
+  Network access; the prompt takes the front and the scenario fails with "pasted into
+  UserNotificationCenter" until it is answered.
+
+Stop both servers when the run is done.
 
 ## What it keeps apart from your own app
 
