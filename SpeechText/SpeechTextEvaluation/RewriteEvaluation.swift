@@ -12,7 +12,8 @@ import SpeechTextCore
 ///
 ///     SpeechTextEvaluation --rewrite <fixtures.json> --runs <dir>
 ///                          [--engines provider/model,…] [--fixtures id,…] [--repeat n]
-///                          [--variant current|2026-11] [--reasoning-effort default|omit|<value>] [--concurrency n]
+///                          [--variant current|2026-11|route|two-step] [--spoken-languages uk,en]
+///                          [--reasoning-effort default|omit|<value>] [--concurrency n]
 ///                          [--judge provider/model,…] [--models <dir>] [--llama-server <path>] [--greedy]
 ///     SpeechTextEvaluation --self-check <fixtures.json>
 ///
@@ -24,8 +25,10 @@ import SpeechTextCore
 /// fixture's Dictionary — and `current` is the baseline it was held to, the prompt the app
 /// sent until #109. Both go through the client
 /// `LLMConfiguration.makeChatClient(model:apiKey:)` builds, with each model's catalogue
-/// switches unless `--reasoning-effort` says otherwise. Later variants (#109, #110) are new
-/// cases of `Variant`, judged by the same checks.
+/// switches unless `--reasoning-effort` says otherwise. `route` scores step one of #110
+/// alone, writing nothing, and only on the local models it can be read from; `two-step`
+/// runs both steps as the app would, an engine with no step one getting the one-step
+/// prompt. Neither depends on `RewriteRouter.twoStepsShip`.
 ///
 /// Engines are `groq/<id>`, `anthropic/<id>`, `openai/<id>` and `local/<id>`; the default
 /// is the six agreed for #114. Cloud keys come from the environment only
@@ -54,6 +57,8 @@ enum RewriteEvaluation {
         "anthropic/claude-sonnet-5-5", "anthropic/claude-haiku-5-5",
         "openai/gpt-6-luna", "local/gemma-4-12b-it-qat-q4_0",
     ]
+    /// D12's list for a run that states none.
+    static let defaultSpokenLanguages = ["uk", "en"]
     static let llamaBuild = "b11696"
     static let contextLength = 8192
     /// The reply's own budget on this Mac; `ChatTemplates.reasoningAllowance` comes on top for Harmony.
@@ -127,12 +132,18 @@ enum RewriteEvaluation {
         /// key of the fixtures' `variantModes`. An edit is sent the Edit prompt over the
         /// three modes (#106 rewrites it).
         case modes2026 = "2026-11"
+        /// Step one alone (#110, D12 of the same spec): the mode, the language asked for
+        /// and the format, each scored; no text is written. Local engines only.
+        case route
+        /// Step one, then step two with that mode alone (`RewriteRouter`), the one-step
+        /// prompt where step one fails or cannot run. Judged by the same checks.
+        case twoStep = "two-step"
 
         /// The built-ins this variant sends, its edits' included.
         var presets: [PromptPreset] {
             switch self {
             case .current: PromptPresetStore.october2026
-            case .modes2026: PromptPresetStore.builtInDefaults
+            case .modes2026, .route, .twoStep: PromptPresetStore.builtInDefaults
             }
         }
     }
@@ -183,6 +194,10 @@ enum RewriteEvaluation {
         /// The mode was chosen by code, not by the model (`2026-11`, a field for another
         /// program), so it is right by construction and is not counted as routing.
         var modeByCode: Bool?
+        /// `two-step`: `read`, `by code`, or `one step` (no step one, or it failed).
+        var stepOne: String?
+        /// `route`: what step one answered, scored.
+        var route: RouteAnswer?
         var verdict: RewriteVerdict?
         var error: String?
         var calls: [Call] = []
@@ -194,16 +209,29 @@ enum RewriteEvaluation {
 
         var grades: [JudgeVerdict] { judges ?? judge.map { [$0] } ?? [] }
 
-        var ran: Bool { status != "not installed" && status != "no key" }
+        var ran: Bool { status != "not installed" && status != "no key" && status != "no step one" }
         /// The text checks passed. The mode is counted apart: it depends on the variant.
         var passed: Bool { status == "ok" && verdict?.passed == true }
-        var markerless: Bool { status == "ok" && rawMode == nil && modeByCode != true }
+        var markerless: Bool { status == "ok" && rawMode == nil && modeByCode != true && stepOne != "read" }
         /// A marker was written but named no preset — usually an abbreviation.
         var abbreviated: Bool { status == "ok" && rawMode != nil && mode == nil }
         var cost: Double? { calls.isEmpty ? nil : calls.compactMap(\.cost).reduce(0, +) }
         var requestSeconds: Double? { calls.isEmpty ? nil : calls.map(\.seconds).reduce(0, +) }
         var inputTokens: Int? { calls.isEmpty ? nil : calls.compactMap(\.inputTokens).reduce(0, +) }
         var outputTokens: Int? { calls.isEmpty ? nil : calls.compactMap(\.outputTokens).reduce(0, +) }
+    }
+
+    /// Step one's answer for one fixture, after the code rules of D3 and D4.
+    struct RouteAnswer: Codable, Sendable {
+        var mode: String?
+        var language: String?
+        var format: String
+        var modeRight: Bool
+        var languageRight: Bool
+        var formatRight: Bool
+        /// D3 decided it and no model was asked.
+        var byRule: Bool
+        var allRight: Bool { modeRight && languageRight && formatRight }
     }
 
     struct EngineInfo: Codable, Sendable {
@@ -228,6 +256,8 @@ enum RewriteEvaluation {
         var editSystemPromptCharacters: Int
         /// A variant with more than one system prompt: each one's length, by name.
         var promptCharacters: [String: Int]?
+        /// `route` and `two-step`: the languages step one offers, unless a fixture says otherwise.
+        var spokenLanguages: [String]?
         var llamaBuild: String
         var sampling: LlamaSampling
         var contextLength: Int
@@ -250,6 +280,7 @@ enum RewriteEvaluation {
         /// Requests in flight at once to each cloud engine, and to each judge.
         var concurrency: Int = 4
         var keys: [String: String]
+        var spokenLanguages: [String] = RewriteEvaluation.defaultSpokenLanguages
 
         var presetNames: [String] { presets.map(\.name) }
         func key(for engine: Engine) -> String {
@@ -275,6 +306,7 @@ enum RewriteEvaluation {
         var variant = Variant.modes2026
         var effortArgument = "default"
         var judgeSpecs: [String] = []
+        var spokenLanguages = defaultSpokenLanguages
         func value(_ flag: String) throws -> String {
             guard let value = arguments.popFirst() else { throw SpeechTextEvaluation.UsageError("\(flag) needs a value") }
             return value
@@ -298,6 +330,7 @@ enum RewriteEvaluation {
                 variant = chosen
             case "--reasoning-effort": effortArgument = try value(argument)
             case "--judge": judgeSpecs = try value(argument).split(separator: ",").map(String.init)
+            case "--spoken-languages": spokenLanguages = try value(argument).split(separator: ",").map(String.init)
             default: throw SpeechTextEvaluation.UsageError("unknown argument \(argument)")
             }
         }
@@ -320,18 +353,23 @@ enum RewriteEvaluation {
         let environment = ProcessInfo.processInfo.environment
         let setup = Setup(
             variant: variant, presets: presets,
-            system: variant == .modes2026
+            system: variant != .current
                 ? RewriteModes.request(context: nil, presets: presets).system
                 : TextRefinementService.buildSystemPrompt(presets: presets, defaultPresetID: nil),
             editSystem: TextRefinementService.buildEditSystemPrompt(presets: presets),
             repeats: repeats, reasoningEffort: effort, judges: judges, concurrency: concurrency,
-            keys: environment.filter { $0.key.hasSuffix("_API_KEY") })
+            keys: environment.filter { $0.key.hasSuffix("_API_KEY") }, spokenLanguages: spokenLanguages)
 
+        var promptSizes: [String: Int]? = variant == .current ? nil
+            : ["routing": setup.system.count, "clean-up only": RewriteModes.cleanUpOnlyPrompt.count]
+        if variant == .route || variant == .twoStep {
+            promptSizes?["step one"] = RewriteRouter.stepOneSystem(presets: presets, defaultPresetID: nil, spokenLanguages: spokenLanguages)?.count
+        }
         let report = Report(date: Date(), machine: machineDescription(), variant: variant.rawValue,
                             reasoningEffort: effortArgument, judge: nil, judgeList: judges.map(\.spec),
                             systemPromptCharacters: setup.system.count, editSystemPromptCharacters: setup.editSystem.count,
-                            promptCharacters: variant == .modes2026
-                                ? ["routing": setup.system.count, "clean-up only": RewriteModes.cleanUpOnlyPrompt.count] : nil,
+                            promptCharacters: promptSizes,
+                            spokenLanguages: variant == .route || variant == .twoStep ? spokenLanguages : nil,
                             llamaBuild: llamaBuild, sampling: sampling, contextLength: contextLength,
                             engines: [], rows: [])
         let sink = ReportSink(report: report, fixtures: fixtures, folder: folder)
@@ -379,6 +417,15 @@ enum RewriteEvaluation {
 
     static func runCloud(_ engine: Engine, fixtures: [RewriteFixture], setup: Setup, sink: ReportSink) async {
         await sink.add(EngineInfo(engine: engine.spec, name: engine.name, family: engine.family))
+        // Step one is read off a local model only (#110).
+        if setup.variant == .route {
+            for fixture in fixtures where !fixture.isEdit {
+                await sink.add(Row(fixture: fixture.id, engine: engine.spec, variant: setup.variant.rawValue,
+                                   attempt: 1, status: "no step one"))
+            }
+            print("\(engine.spec): no step one")
+            return
+        }
         let key = setup.key(for: engine)
         let model = setup.model(for: engine)
         let jobs = fixtures.flatMap { fixture in (1...setup.repeats).map { (fixture, $0) } }
@@ -494,7 +541,9 @@ enum RewriteEvaluation {
         info.fileBytes = size
         print("loading \(model.displayName)…")
         let runtime = LocalLlamaRuntime()
-        info.loadSeconds = try await runtime.load(path: file.path, family: model.family, contextLength: contextLength)
+        info.loadSeconds = try await runtime.load(path: file.path, family: model.family, contextLength: contextLength,
+                                                  savedPrefixes: setup.variant == .route || setup.variant == .twoStep
+                                                      ? RewriteRouter.twoStepPromptStates : RewriteRouter.oneStepPromptStates)
         info.footprintAfterLoadMB = megabytes(processFootprintBytes())
         if let llamaServer {
             info.templateCheck = await templateCheck(model: model, file: file, server: llamaServer, runtime: runtime,
@@ -502,10 +551,34 @@ enum RewriteEvaluation {
             print("template check \(engine.spec): \(info.templateCheck ?? "—")")
         }
         var peak = processFootprintBytes()
-        for fixture in fixtures {
+        if setup.variant == .route, !RewriteRouter.canReadStepOne(modelID: engine.id) {
+            for fixture in fixtures where !fixture.isEdit {
+                await sink.add(Row(fixture: fixture.id, engine: engine.spec, variant: setup.variant.rawValue,
+                                   attempt: 1, status: "no step one"))
+            }
+            info.templateCheck = "no step one"
+            await sink.add(info)
+            await runtime.unload()
+            print("\(engine.spec): no step one")
+            return
+        }
+        for fixture in fixtures where setup.variant != .route || !fixture.isEdit {
             for attempt in 1...setup.repeats {
                 let start = Date()
-                var row = await outcome(fixture, engine: engine, attempt: attempt, setup: setup) { system, user in
+                if setup.variant == .route {
+                    var row = await routeOutcome(fixture, engine: engine, attempt: attempt, setup: setup, runtime: runtime)
+                    row.totalSeconds = Date().timeIntervalSince(start)
+                    print(line(row))
+                    await sink.add(row)
+                    continue
+                }
+                var decision: RewriteRouter.Decision?, stepOneCall: Call?
+                if setup.variant == .twoStep, !fixture.isEdit {
+                    (decision, stepOneCall) = await stepOneDecision(fixture, engine: engine, setup: setup, runtime: runtime,
+                                                                   timeout: STTTuning.rewriteStepOneTimeoutSeconds)
+                }
+                var row = await outcome(fixture, engine: engine, attempt: attempt, setup: setup, decision: decision,
+                                        stepOneCall: stepOneCall) { system, user in
                     let completion = try await runtime.complete(system: system, user: user, maxTokens: maxTokens, sampling: sampling)
                     let call = Call(engine: engine.spec, inputTokens: completion.promptTokens,
                                     cachedInputTokens: completion.cachedPromptTokens, outputTokens: completion.outputTokens,
@@ -538,22 +611,26 @@ enum RewriteEvaluation {
     /// The fixture through `setup.variant`: its requests sent with `complete`, the reply read
     /// as the app reads it and held to the checks.
     static func outcome(_ fixture: RewriteFixture, engine: Engine, attempt: Int, setup: Setup,
+                        decision: RewriteRouter.Decision? = nil, stepOneCall: Call? = nil,
                         complete: @Sendable (String, String) async throws -> Completion) async -> Row {
         var row = Row(fixture: fixture.id, engine: engine.spec, variant: setup.variant.rawValue,
                       attempt: attempt, status: "ok")
         do {
-            // Both variants make one request; they differ in what it holds and how its marker
-            // is read.
-            let request = plan(fixture, variant: setup.variant, setup: setup)
+            // Every variant writes with one request; they differ in what it holds and how
+            // its marker is read.
+            let request = plan(fixture, variant: setup.variant, setup: setup, decision: decision)
             let completion = try await complete(request.system, request.user)
-            row.calls = [completion.call]
+            row.calls = (stepOneCall.map { [$0] } ?? []) + [completion.call]
             row.raw = completion.reply
             row.generated = completion.generated
             let read = RewriteChecks.read(completion.reply, fixture: fixture, presetNames: request.modeNames, request: request.request)
             row.reply = read.text
             row.mode = request.decidedMode ?? read.mode
             row.rawMode = read.rawMode
-            if request.decidedMode != nil { row.modeByCode = true }
+            if setup.variant == .twoStep, !fixture.isEdit {
+                row.stepOne = decision == nil ? "one step" : decision?.route.stepOneModel == nil ? "by code" : "read"
+            }
+            if request.decidedMode != nil, row.stepOne != "read" { row.modeByCode = true }
             var verdict = RewriteChecks.check(fixture, text: read.text, raw: completion.reply)
             if let generated = completion.generated, RewriteChecks.leaksReasoning(completion.reply)
                 || (read.text.isEmpty && RewriteChecks.leaksReasoning(generated)) {
@@ -583,22 +660,76 @@ enum RewriteEvaluation {
 
     static let editModeNames = [TextRefinementService.editDefaultModeName, TextRefinementService.editCustomModeName]
 
-    static func plan(_ fixture: RewriteFixture, variant: Variant, setup: Setup) -> Plan {
-        let (system, user) = messages(fixture, setup: setup)
+    static func plan(_ fixture: RewriteFixture, variant: Variant, setup: Setup,
+                     decision: RewriteRouter.Decision? = nil) -> Plan {
+        let (system, user) = messages(fixture, setup: setup, route: decision?.routeBlock)
         if fixture.isEdit { return Plan(system: system, user: user, modeNames: setup.presetNames + editModeNames) }
         switch variant {
         case .current:
             return Plan(system: system, user: user, modeNames: setup.presetNames)
-        case .modes2026:
-            let request = modesRequest(fixture)
+        case .modes2026, .route, .twoStep:
+            let request = decision?.request ?? modesRequest(fixture)
             return Plan(system: request.system, user: user, modeNames: request.modeNames, decidedMode: request.decidedMode, request: request)
         }
     }
 
     static func modesRequest(_ fixture: RewriteFixture) -> RewriteModes.Request {
-        RewriteModes.request(context: focusContext(fixture), presets: Variant.modes2026.presets + (fixture.presets ?? []).map {
+        RewriteModes.request(context: focusContext(fixture), presets: modesPresets(fixture))
+    }
+
+    static func modesPresets(_ fixture: RewriteFixture) -> [PromptPreset] {
+        Variant.modes2026.presets + (fixture.presets ?? []).map {
             PromptPreset(name: $0.name, whenToUse: $0.whenToUse, instructions: $0.instructions)
-        })
+        }
+    }
+
+    /// Step one for a fixture, its prompt read ahead as a dictation's would be while the
+    /// user speaks, and the wait as a `Call`.
+    static func stepOneDecision(_ fixture: RewriteFixture, engine: Engine, setup: Setup, runtime: LocalLlamaRuntime,
+                                timeout: Double?) async -> (RewriteRouter.Decision?, Call) {
+        let presets = modesPresets(fixture)
+        let spoken = fixture.spokenLanguages ?? setup.spokenLanguages
+        if let system = RewriteRouter.stepOneSystem(presets: presets, defaultPresetID: nil, spokenLanguages: spoken) {
+            try? await runtime.cache(systems: [system])
+        }
+        let sent = Date()
+        let stepOne = RewriteRouter.StepOne(modelID: engine.id, spokenLanguages: spoken, timeout: timeout) { request in
+            let read = try await runtime.chainedProbabilities(system: request.system, user: request.user,
+                                                              steps: request.steps.map { ($0.lead, $0.letters) })
+            return RewriteRouter.StepOneReading(probabilities: read.map(\.probabilities),
+                                                promptTokens: read.map(\.promptTokens).reduce(0, +),
+                                                cachedPromptTokens: read.first?.cachedPromptTokens ?? 0,
+                                                seconds: read.map(\.seconds).reduce(0, +))
+        }
+        let decision = await RewriteRouter.decide(transcript: fixture.transcript ?? "", context: focusContext(fixture),
+                                                  presets: presets, defaultPresetID: nil, stepOne: stepOne)
+        return (decision, Call(engine: engine.spec, seconds: Date().timeIntervalSince(sent), cost: 0))
+    }
+
+    /// `route`: step one alone, scored after the code rules, with no timeout so a slow
+    /// reading is measured rather than dropped.
+    static func routeOutcome(_ fixture: RewriteFixture, engine: Engine, attempt: Int, setup: Setup,
+                             runtime: LocalLlamaRuntime) async -> Row {
+        var row = Row(fixture: fixture.id, engine: engine.spec, variant: setup.variant.rawValue, attempt: attempt, status: "ok")
+        let (decision, call) = await stepOneDecision(fixture, engine: engine, setup: setup, runtime: runtime, timeout: nil)
+        row.calls = [call]
+        guard let decision else {
+            row.status = "error"
+            row.error = "step one gave no answer"
+            return row
+        }
+        let spoken = fixture.spokenLanguages ?? setup.spokenLanguages
+        let byRule = decision.route.stepOneModel == nil
+        row.mode = decision.request.decidedMode
+        row.modeByCode = byRule ? true : nil
+        row.routed = RewriteChecks.modeMatches(fixture, variant: setup.variant.rawValue, mode: row.mode)
+        let language = decision.route.language
+        row.route = RouteAnswer(mode: row.mode, language: language, format: decision.route.format.rawValue,
+                                modeRight: row.routed ?? false,
+                                languageRight: RewriteRouter.languageAnswerIsRight(language, expected: fixture.askedLanguage, spokenLanguages: spoken),
+                                formatRight: (fixture.format ?? ["plain"]).contains(decision.route.format.rawValue),
+                                byRule: byRule)
+        return row
     }
 
     static func focusContext(_ fixture: RewriteFixture) -> FocusContext? {
@@ -608,7 +739,7 @@ enum RewriteEvaluation {
     }
 
     /// The system prompt and user message `TextRefinementService` would send.
-    static func messages(_ fixture: RewriteFixture, setup: Setup) -> (String, String) {
+    static func messages(_ fixture: RewriteFixture, setup: Setup, route: String? = nil) -> (String, String) {
         let context = fixture.context.map {
             FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
         }
@@ -618,7 +749,7 @@ enum RewriteEvaluation {
                 selection: fixture.selection ?? "", instruction: fixture.instruction, context: context, vocabulary: vocabulary))
         }
         return (setup.system, TextRefinementService.userMessage(transcript: fixture.transcript ?? "", context: context,
-                                                                vocabulary: vocabulary))
+                                                                vocabulary: vocabulary, route: route))
     }
 
     // MARK: - Judge
@@ -788,7 +919,9 @@ enum RewriteEvaluation {
         // A fixture removed since the run takes its rows with it.
         report.rows.removeAll { byID[$0.fixture] == nil }
         report.rows = report.rows.map { row in
-            guard row.status == "ok" || row.status == "failed", let raw = row.raw, let fixture = byID[row.fixture] else { return row }
+            // A two-step row's request came from its step one, which cannot be rebuilt here.
+            guard row.status == "ok" || row.status == "failed", row.variant != Variant.twoStep.rawValue,
+                  let raw = row.raw, let fixture = byID[row.fixture] else { return row }
             var row = row
             let modes = row.variant == Variant.modes2026.rawValue && !fixture.isEdit ? modesRequest(fixture) : nil
             // A `2026-11` edit made before #109 shipped was sent the October names, so an edit
@@ -954,7 +1087,40 @@ enum RewriteEvaluation {
 
     // MARK: - Summary
 
+    /// `route` writes nothing, so its table is step one's: all three answers right, of
+    /// the fixtures a model was asked about.
+    static func routeSummary(_ report: Report, fixtures: [RewriteFixture]) -> String {
+        var out = "# AI Rewrite — variant `route`\n\n\(ISO8601DateFormatter().string(from: report.date)) · \(report.machine)"
+        out += " · spoken languages \((report.spokenLanguages ?? []).joined(separator: ","))\n\n"
+        out += "| Engine | all three right | mode | language | format | by rule | no answer | median s | p90 s | over \(STTTuning.rewriteStepOneTimeoutSeconds) s |\n"
+        out += "|---|---|---|---|---|---|---|---|---|---|\n"
+        for engine in report.engines.sorted(by: { $0.engine < $1.engine }) {
+            let rows = report.rows.filter { $0.engine == engine.engine && $0.ran }
+            guard !rows.isEmpty else {
+                out += "| \(engine.name) | \(engine.templateCheck ?? "not run") | | | | | | | | |\n"
+                continue
+            }
+            let answers = rows.compactMap(\.route)
+            let asked = answers.filter { !$0.byRule }
+            func count(_ right: (RouteAnswer) -> Bool) -> String { "\(asked.filter(right).count)/\(asked.count)" }
+            let times = rows.filter { $0.route?.byRule != true }.compactMap(\.requestSeconds).sorted()
+            func pct(_ p: Double) -> String {
+                times.isEmpty ? "—" : String(format: "%.2f", times[min(times.count - 1, Int(Double(times.count - 1) * p))])
+            }
+            let over = times.filter { $0 > STTTuning.rewriteStepOneTimeoutSeconds }.count
+            out += "| \(engine.name) | \(count(\.allRight)) | \(count(\.modeRight)) | \(count(\.languageRight)) | \(count(\.formatRight))"
+            out += " | \(answers.count - asked.count) | \(rows.count - answers.count) | \(pct(0.5)) | \(pct(0.9)) | \(over) |\n"
+        }
+        out += "\n## Wrong answers\n\n"
+        for row in report.rows {
+            guard let answer = row.route, !answer.allRight else { continue }
+            out += "- **\(row.fixture)** · \(row.engine): mode \(answer.mode ?? "—"), language \(answer.language ?? "none"), format \(answer.format)\n"
+        }
+        return out
+    }
+
     static func summary(_ report: Report, fixtures: [RewriteFixture]) -> String {
+        if report.variant == Variant.route.rawValue { return routeSummary(report, fixtures: fixtures) }
         var out = "# AI Rewrite — variant `\(report.variant)`\n\n"
         out += "\(ISO8601DateFormatter().string(from: report.date)) · \(report.machine) · reasoning effort: \(report.reasoningEffort)"
         if let sizes = report.promptCharacters {
@@ -1053,7 +1219,8 @@ enum RewriteEvaluation {
     }
 
     static func line(_ row: Row) -> String {
-        let mark = row.passed ? "✓" : "❌ \(row.status == "ok" ? row.verdict?.failures.joined(separator: "; ") ?? "" : row.status)"
+        let mark = row.route.map { $0.allRight ? "✓" : "❌ route" }
+            ?? (row.passed ? "✓" : "❌ \(row.status == "ok" ? row.verdict?.failures.joined(separator: "; ") ?? "" : row.status)")
         return "\(row.fixture) · \(row.engine) #\(row.attempt): \(mark)"
             + (row.mode.map { " [\($0)]" } ?? "") + (row.totalSeconds.map { String(format: " %.1fs", $0) } ?? "")
             + (row.error.map { " — \($0)" } ?? "")

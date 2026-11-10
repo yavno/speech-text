@@ -21,6 +21,8 @@ public enum TextRefinementService {
         public var usage: ChatUsage? = nil
         /// Seconds the request took, for Usage's speed figures.
         public var latency: Double? = nil
+        /// What step one decided, when the rewrite went through two steps.
+        public var route: RewriteRoute? = nil
     }
 
     public static var isConfigured: Bool { LLMConfiguration.isConfigured }
@@ -30,7 +32,10 @@ public enum TextRefinementService {
     /// `context` is where the text is going, read when the recording started. The Record
     /// Window passes none: it is our own surface, and its text as often ends up on the
     /// clipboard as in the app that was in front before it opened.
-    public static func refine(_ transcript: String, context: FocusContext? = nil) async throws -> Result {
+    ///
+    /// `twoSteps` is false for the Record Window, which keeps one request whatever #114 finds.
+    public static func refine(_ transcript: String, context: FocusContext? = nil,
+                              twoSteps: Bool = RewriteRouter.twoStepsShip) async throws -> Result {
         let source = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
         let providerType = LLMConfiguration.providerType
         let modelID = LLMConfiguration.model(for: providerType)
@@ -40,14 +45,16 @@ public enum TextRefinementService {
         }
 
         let provider = try LLMConfiguration.makeChatClient()
-        let request = RewriteModes.request(context: context, presets: PromptPresetStore.load(),
-                                           defaultPresetID: PromptPresetStore.storedDefaultPresetID())
+        var stepOne: RewriteRouter.StepOne?
+        if twoSteps, providerType == .local, let local = localChatModel(id: modelID) {
+            let read = LocalChat.readStepOne
+            stepOne = RewriteRouter.StepOne(modelID: modelID, spokenLanguages: storedSpokenLanguages()) { try await read(local, $0) }
+        }
         let sent = Date()
-        let reply = try await provider.complete(
-            system: request.system,
-            user: userMessage(transcript: source, context: context,
-                              vocabulary: Vocabulary.promptBlock(Vocabulary.load()))
-        )
+        let (request, reply, route) = try await send(
+            source, context: context, presets: PromptPresetStore.load(),
+            defaultPresetID: PromptPresetStore.storedDefaultPresetID(),
+            vocabulary: Vocabulary.promptBlock(Vocabulary.load()), stepOne: stepOne, provider: provider)
 
         let parsed = RewriteModes.read(reply.text, request: request)
         // Models love "—" as much as Scribe does, and the prompt cannot be trusted to stop
@@ -64,7 +71,26 @@ public enum TextRefinementService {
         guard !text.isEmpty else { throw LLMError.emptyResponse }
         return Result(text: text, presetName: parsed.presetName,
                       provider: providerType.rawValue, model: modelID, usage: reply.usage,
-                      latency: Date().timeIntervalSince(sent))
+                      latency: Date().timeIntervalSince(sent), route: route)
+    }
+
+    /// One dictation's requests: step one when it is given and answers (`RewriteRouter`),
+    /// else the one-step prompt. A failure of the request that writes is thrown, and the
+    /// caller pastes the transcript as dictated.
+    static func send(_ source: String, context: FocusContext?, presets: [PromptPreset], defaultPresetID: UUID?,
+                     vocabulary: String?, stepOne: RewriteRouter.StepOne?, provider: ChatClient) async throws
+        -> (request: RewriteModes.Request, reply: ChatReply, route: RewriteRoute?) {
+        var decision: RewriteRouter.Decision?
+        if let stepOne {
+            decision = await RewriteRouter.decide(transcript: source, context: context, presets: presets,
+                                                  defaultPresetID: defaultPresetID, stepOne: stepOne)
+        }
+        let request = decision?.request ?? RewriteModes.request(context: context, presets: presets, defaultPresetID: defaultPresetID)
+        let reply = try await provider.complete(
+            system: request.system,
+            user: userMessage(transcript: source, context: context, vocabulary: vocabulary, route: decision?.routeBlock)
+        )
+        return (request, reply, decision?.route)
     }
 
     /// Rewrites `selection` — text the user selected in another app — as `instruction`
@@ -232,10 +258,13 @@ public enum TextRefinementService {
     /// The transcript, preceded by where it is going when that is known and by the
     /// user's Dictionary (`Vocabulary.promptBlock`) when it has words. Data only — what
     /// may be done with it is the system prompt's business.
-    public static func userMessage(transcript: String, context: FocusContext?, vocabulary: String? = nil) -> String {
+    /// `route` is what step one decided, as lines (`RewriteRouter.routeBlock`).
+    public static func userMessage(transcript: String, context: FocusContext?, vocabulary: String? = nil,
+                                   route: String? = nil) -> String {
         var blocks: [String] = []
         if let context, !context.isEmpty { blocks.append(context.promptBlock) }
         if let vocabulary { blocks.append(vocabulary) }
+        if let route { blocks.append(route) }
         blocks.append("<transcript>\n\(transcript)\n</transcript>")
         return blocks.joined(separator: "\n\n")
     }
