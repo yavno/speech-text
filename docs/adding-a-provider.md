@@ -232,6 +232,9 @@ Read the streaming entries in docs/decisions.md › Key patterns first. The rule
   user's settings, one set for each role (`ServerEndpoint`,
   `LLMConfiguration.makeServerChatClient`, `ServerTranscriber`), and
   `chatModel(provider:id:)` and `sttModel(vendor:id:)` describe whatever ID the server lists.
+  Settings and setup share its test (`ServerProbe.test`), and setup holds its answers in a
+  `ServerDraft` until Continue. It has no card in `SetupCards` but a place of its own, so
+  `SetupSpeechPath` and `SetupAIPath` are what reopen setup on it.
 
 ## 7. The key
 

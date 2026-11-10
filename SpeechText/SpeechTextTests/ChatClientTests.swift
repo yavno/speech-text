@@ -427,6 +427,56 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertTrue(client.staysOnOrigin)
     }
 
+    private func run(_ role: ServerRole, selected: String = "", unlisted: String = "",
+                     list: Result<[String], ServerTestFailure>) async -> (ServerTestRun, [String]) {
+        let asked = LockedList()
+        let run = await ServerProbe.run(role: role, selected: selected, unlisted: unlisted, list: { list }, ask: { model in
+            asked.append(model)
+            return .answered(seconds: 0.1)
+        })
+        return (run, asked.values)
+    }
+
+    func testTheTestAsksForTheSelectedModelIfListedElseTheFirst() async {
+        let (kept, askedKept) = await run(.chat, selected: "b", list: .success(["a", "b"]))
+        XCTAssertEqual(kept.model, "b")
+        XCTAssertEqual(askedKept, ["b"])
+        let (first, _) = await run(.chat, selected: "gone", list: .success(["a", "b"]))
+        XCTAssertEqual(first.model, "a")
+    }
+
+    func testAFailedListEndsTheTest() async {
+        let (result, asked) = await run(.chat, list: .failure(ServerTestFailure(.needsKey)))
+        XCTAssertNil(result.listed)
+        XCTAssertEqual(result.result, .needsKey)
+        XCTAssertEqual(asked, [])
+    }
+
+    /// whisper.cpp has no `/models`: for speech a 404 there leaves a typed model to try.
+    func testASpeechServerWithNoListUsesTheTypedModel() async {
+        let (typed, asked) = await run(.speech, unlisted: "ggml", list: .failure(ServerTestFailure(.wrongPath)))
+        XCTAssertEqual(typed.listed, [])
+        XCTAssertEqual(asked, ["ggml"])
+        let (none, _) = await run(.speech, list: .failure(ServerTestFailure(.wrongPath)))
+        XCTAssertEqual(none.result, .noModels)
+        let (chat, _) = await run(.chat, unlisted: "x", list: .failure(ServerTestFailure(.wrongPath)))
+        XCTAssertEqual(chat.result, .wrongPath)
+        XCTAssertNil(chat.listed)
+    }
+
+    func testARefusedConnectionToYourServerIsNotBeingOffline() {
+        XCTAssertFalse(NetworkFailure.isOffline(URLError(.cannotConnectToHost), reachingOwnServer: true))
+        XCTAssertTrue(NetworkFailure.isOffline(URLError(.cannotConnectToHost), reachingOwnServer: false))
+        XCTAssertTrue(NetworkFailure.isOffline(URLError(.notConnectedToInternet), reachingOwnServer: true))
+    }
+
+    func testAServerIsNotPricedAndHistoryNamesIt() {
+        XCTAssertEqual(UsagePrices.speech(provider: "server", model: "whisper"), .notPriced)
+        XCTAssertEqual(UsagePrices.speech(provider: "server", model: nil), .notPriced)
+        XCTAssertEqual(UsagePrices.chat(provider: "server", model: "openai/gpt-oss-120b"), .notPriced)
+        XCTAssertEqual(HistoryFormat.engine("server"), "Your server")
+    }
+
     func testAStatusOnTheUploadSaysWhatWentWrong() {
         XCTAssertEqual(ServerProbe.speechResult(forStatus: 404), .noTranscription)
         XCTAssertEqual(ServerProbe.speechResult(forStatus: 415), .audioRefused)
@@ -496,4 +546,13 @@ final class ServerEndpointTests: XCTestCase {
         XCTAssertEqual(Array(UnsafeBufferPointer(start: copied, count: Int(frames))),
                        Array(UnsafeBufferPointer(start: samples, count: Int(frames))))
     }
+}
+
+/// What a test's closure saw, from whichever executor ran it.
+private final class LockedList: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: [String] = []
+
+    var values: [String] { lock.withLock { stored } }
+    func append(_ value: String) { lock.withLock { stored.append(value) } }
 }

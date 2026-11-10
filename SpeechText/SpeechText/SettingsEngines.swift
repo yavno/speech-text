@@ -23,11 +23,11 @@ enum EnginePlace: Hashable {
         }
     }
 
-    var glyph: SetupChoiceCard.Glyph {
+    var symbol: String {
         switch self {
-        case .thisMac: .mac
-        case .online: .cloud
-        case .server: .server
+        case .thisMac: "laptopcomputer"
+        case .online: "cloud"
+        case .server: "server.rack"
         }
     }
 }
@@ -45,7 +45,8 @@ struct EnginePlaceCards: View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 8) {
                 ForEach(places, id: \.place) { item in
-                    EnginePlaceCard(place: item.place, inUse: inUse == item.place, isSelected: place == item.place) {
+                    EnginePlaceCard(place: item.place, note: inUse == item.place ? String(localized: "In use") : nil,
+                                    isSelected: place == item.place) {
                         place = item.place
                     }
                 }
@@ -61,40 +62,71 @@ struct EnginePlaceCards: View {
     }
 }
 
-private struct EnginePlaceCard: View {
+/// One place. Settings has the width to set the glyph beside the name; setup's column of
+/// three (`SetupPlaceCards`) sets it above.
+struct EnginePlaceCard: View {
     let place: EnginePlace
-    let inUse: Bool
+    /// One word in the accent under the name: "In use", "Ready".
+    let note: String?
     let isSelected: Bool
+    var stacked = false
     let action: () -> Void
     @Environment(\.setupTint) private var tint
     @State private var hovering = false
 
+    private var glyph: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(isSelected
+                  ? AnyShapeStyle(LinearGradient(colors: tint.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
+                  : AnyShapeStyle(SetupColor.panel))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isSelected ? .clear : SetupColor.panelBorder, lineWidth: 0.5))
+            .frame(width: 34, height: 34)
+            .overlay {
+                Image(systemName: place.symbol)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
+            }
+    }
+
+    @ViewBuilder private var noteLine: some View {
+        if let note {
+            Text(verbatim: note).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(tint.accent)
+        }
+    }
+
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected
-                          ? AnyShapeStyle(LinearGradient(colors: tint.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
-                          : AnyShapeStyle(SetupColor.panel))
-                    .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isSelected ? .clear : SetupColor.panelBorder, lineWidth: 0.5))
-                    .frame(width: 34, height: 34)
-                    .overlay {
-                        Image(systemName: place.glyph.symbol)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
+            Group {
+                if stacked {
+                    VStack(spacing: 5) {
+                        glyph
+                        // Two lines, centred: a translated name is often longer than the column.
+                        Text(verbatim: place.name)
+                            .font(.system(size: 12.5, weight: .semibold))
+                            .foregroundStyle(SetupColor.label)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                        noteLine
+                        Spacer(minLength: 0)
                     }
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(verbatim: place.name)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(SetupColor.label)
-                        .lineLimit(1)
-                    if inUse {
-                        Text("In use").font(.system(size: 10.5, weight: .semibold)).foregroundStyle(tint.accent)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 10)
+                } else {
+                    HStack(spacing: 10) {
+                        glyph
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(verbatim: place.name)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(SetupColor.label)
+                                .lineLimit(1)
+                            noteLine
+                        }
+                        Spacer(minLength: 0)
                     }
+                    .padding(12)
                 }
-                Spacer(minLength: 0)
             }
-            .padding(12)
             .background(RoundedRectangle(cornerRadius: 16).fill(SetupColor.control))
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
@@ -509,25 +541,7 @@ struct SpeechEngineSettings: View {
 /// it asks for one, its key. A typed address is a draft until a test passes, so one half
 /// written never takes over the rewrites (docs/specs/2026-11-07-own-model-server.md).
 private struct ServerEngineSettings: View {
-    enum Role {
-        case speech, chat
-
-        var providerKey: String { self == .speech ? SettingsKeys.sttProvider : SettingsKeys.llmProvider }
-        var addressKey: String { self == .speech ? SettingsKeys.serverSpeechAddress : SettingsKeys.serverChatAddress }
-        var modelKey: String { self == .speech ? SettingsKeys.serverSpeechModel : SettingsKeys.serverChatModel }
-        var apiKeyName: String { self == .speech ? SettingsKeys.serverSpeechAPIKey : SettingsKeys.serverChatAPIKey }
-        var otherAddressKey: String { self == .speech ? SettingsKeys.serverChatAddress : SettingsKeys.serverSpeechAddress }
-
-        /// Each server's documented default address (the spec's table), under the role it
-        /// can do: LM Studio does not transcribe.
-        var presets: [(String, String)] {
-            let shared = [("Ollama", "http://localhost:11434/v1"), ("llama.cpp", "http://localhost:9931/v1")]
-            return shared + (self == .speech ? [("Speaches", "http://localhost:8000/v1")]
-                                             : [("LM Studio", "http://localhost:1234/v1")])
-        }
-    }
-
-    let role: Role
+    let role: ServerRole
     @AppStorage private var provider: String
     @AppStorage private var storedAddress: String
     @AppStorage private var storedModel: String
@@ -546,7 +560,7 @@ private struct ServerEngineSettings: View {
     @State private var testing = false
     @State private var result: ServerTestResult?
 
-    init(role: Role) {
+    init(role: ServerRole) {
         self.role = role
         _provider = AppStorage(wrappedValue: "", role.providerKey)
         _storedAddress = AppStorage(wrappedValue: "", role.addressKey)
@@ -569,7 +583,9 @@ private struct ServerEngineSettings: View {
     var body: some View {
         SettingsGroup(title: "Server address", inset: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                if address.isEmpty && !otherAddress.isEmpty { offer }
+                if address.isEmpty && !otherAddress.isEmpty {
+                    ServerOfferRow(role: role, address: otherAddress) { address = otherAddress }
+                }
                 HStack(spacing: 6) {
                     // The test stores the address it asked: not one typed while it ran.
                     ServerAddressField(text: $address).disabled(testing)
@@ -578,8 +594,12 @@ private struct ServerEngineSettings: View {
                         .font(.system(size: 12))
                         .disabled(endpoint == nil || testing)
                 }
-                if address.isEmpty { presetRow } else { whereItGoes }
-                resultLine
+                if address.isEmpty {
+                    ServerPresetRow(role: role) { address = $0 }
+                } else {
+                    ServerWhereItGoes(endpoint: endpoint)
+                }
+                ServerTestResultLine(role: role, testing: testing, result: result)
                 if showsKey {
                     if isDraft {
                         ServerAddressField(text: $draftKey, prompt: "The server's key").padding(.top, 4).disabled(testing)
@@ -589,7 +609,7 @@ private struct ServerEngineSettings: View {
                             .disabled(testing)
                     }
                     if endpoint?.isReadableOnTheWay == true {
-                        warning("This key is sent in plain text.")
+                        ServerWarning(text: "This key is sent in plain text.")
                     }
                 }
                 if listsNoModels {
@@ -617,37 +637,88 @@ private struct ServerEngineSettings: View {
             .padding(.top, 8)
         }
         if role == .speech && !address.isEmpty && storedSpokenLanguages().count > 1 {
-            Text("You speak more than one language, so none is sent and the server detects it. Some servers, such as whisper.cpp, assume English instead.")
-                .rowNote()
-                .fixedSize(horizontal: false, vertical: true)
+            ServerLanguagesNote()
                 .padding(.horizontal, 5)
                 .padding(.top, 8)
         }
     }
 
-    /// The other role's server, often the same one, offered rather than copied.
-    private var offer: some View {
+    private func refreshModels() async {
+        guard let endpoint, case .success(let ids) = await ServerProbe.models(endpoint: endpoint, apiKey: key) else { return }
+        models = ids
+    }
+
+    /// Asks what the server lists, then sends one short request to the chosen model. Only
+    /// a request that was answered stores the address and puts the server in use.
+    private func test() async {
+        guard let endpoint else { return }
+        let pickWhenAsked = provider
+        // What this test asks with is what it stores, whatever is typed while it runs.
+        let testedKey = key
+        let testedDraft = isDraft
+        testing = true
+        defer { testing = false }
+        let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
+        let run = await ServerProbe.test(role: role, endpoint: endpoint, selected: selectedModel,
+                                         unlisted: typed.isEmpty && !testedDraft ? selectedModel : typed, apiKey: testedKey)
+        result = run.result
+        guard let ids = run.listed else {
+            models = []
+            return
+        }
+        models = ids
+        listsNoModels = ids.isEmpty
+        // Another provider chosen while this ran stays chosen.
+        guard case .answered = run.result, provider == pickWhenAsked, let model = run.model else { return }
+        if testedDraft { APIKeyStore.shared.set(testedKey, for: role.apiKeyName) }
+        storedAddress = address
+        storedModel = model
+        draftModel = nil
+        draftKey = ""
+        provider = LLMProviderType.server.rawValue
+    }
+}
+
+// MARK: The form's parts, shared with setup
+
+/// The other role's server, often the same one, offered rather than copied.
+struct ServerOfferRow: View {
+    let role: ServerRole
+    let address: String
+    let use: () -> Void
+
+    var body: some View {
         HStack(spacing: 8) {
             (role == .speech ? Text("Use the AI Rewrite server?") : Text("Use the speech server?")).rowNote()
-            Text(verbatim: otherAddress)
+            Text(verbatim: address)
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(SetupColor.label)
                 .lineLimit(1)
             Spacer(minLength: 0)
-            Button("Use") { address = otherAddress }.buttonStyle(SetupInlineLinkStyle())
+            Button("Use", action: use).buttonStyle(SetupInlineLinkStyle())
         }
     }
+}
 
-    private var presetRow: some View {
+struct ServerPresetRow: View {
+    let role: ServerRole
+    let fill: (String) -> Void
+
+    var body: some View {
         HStack(spacing: 10) {
             Text("Fill in:").rowNote()
-            ForEach(role.presets, id: \.0) { name, url in
-                Button { address = url } label: { Text(verbatim: name) }.buttonStyle(SetupInlineLinkStyle())
+            ForEach(role.presets, id: \.name) { preset in
+                Button { fill(preset.address) } label: { Text(verbatim: preset.name) }.buttonStyle(SetupInlineLinkStyle())
             }
         }
     }
+}
 
-    @ViewBuilder private var whereItGoes: some View {
+/// Where the words go, read off the address.
+struct ServerWhereItGoes: View {
+    let endpoint: ServerEndpoint?
+
+    var body: some View {
         switch endpoint?.place {
         case nil: Text("Not an address yet. It starts with http:// or https://.").rowNote()
         case .thisMac: Text("This Mac.").rowNote()
@@ -655,18 +726,36 @@ private struct ServerEngineSettings: View {
         case .internet: Text("The internet. Your words leave your network.").rowNote()
         }
         if endpoint?.isReadableOnTheWay == true {
-            warning("Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it.")
+            ServerWarning(text: "Plain HTTP: anyone on this network can read what's sent. Use https:// if the server has it.")
         }
     }
+}
 
-    private func warning(_ text: LocalizedStringKey) -> some View {
+struct ServerWarning: View {
+    let text: LocalizedStringKey
+
+    var body: some View {
         Label { Text(text) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
             .font(.system(size: 11))
             .foregroundStyle(SetupColor.warn)
             .fixedSize(horizontal: false, vertical: true)
     }
+}
 
-    @ViewBuilder private var resultLine: some View {
+struct ServerLanguagesNote: View {
+    var body: some View {
+        Text("You speak more than one language, so none is sent and the server detects it. Some servers, such as whisper.cpp, assume English instead.")
+            .rowNote()
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+struct ServerTestResultLine: View {
+    let role: ServerRole
+    let testing: Bool
+    let result: ServerTestResult?
+
+    var body: some View {
         if testing {
             HStack(spacing: 6) { ProgressView().controlSize(.mini); Text("Testing…").rowNote() }
         } else {
@@ -686,58 +775,9 @@ private struct ServerEngineSettings: View {
             }
         }
     }
-
-    private func refreshModels() async {
-        guard let endpoint, case .success(let ids) = await ServerProbe.models(endpoint: endpoint, apiKey: key) else { return }
-        models = ids
-    }
-
-    /// Asks what the server lists, then sends one short request to the chosen model. Only
-    /// a request that was answered stores the address and puts the server in use.
-    private func test() async {
-        guard let endpoint else { return }
-        let pickWhenAsked = provider
-        // What this test asks with is what it stores, whatever is typed while it runs.
-        let testedKey = key
-        let testedDraft = isDraft
-        testing = true
-        defer { testing = false }
-        let ids: [String]
-        switch await ServerProbe.models(endpoint: endpoint, apiKey: testedKey) {
-        // whisper.cpp's server has no list to give; its model is typed.
-        case .failure(let failure) where role == .speech && failure.result == .wrongPath:
-            ids = []
-        case .failure(let failure):
-            result = failure.result
-            models = []
-            return
-        case .success(let listed):
-            ids = listed
-        }
-        models = ids
-        listsNoModels = ids.isEmpty
-        let typed = typedModel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let model = ids.contains(selectedModel) ? selectedModel : ids.first ?? (typed.isEmpty && !testedDraft ? selectedModel : typed)
-        guard !model.isEmpty else {
-            result = .noModels
-            return
-        }
-        let outcome = role == .speech
-            ? await ServerProbe.transcription(endpoint: endpoint, model: model, apiKey: testedKey)
-            : await ServerProbe.chat(endpoint: endpoint, model: model, apiKey: testedKey)
-        result = outcome
-        // Another provider chosen while this ran stays chosen.
-        guard case .answered = outcome, provider == pickWhenAsked else { return }
-        if testedDraft { APIKeyStore.shared.set(testedKey, for: role.apiKeyName) }
-        storedAddress = address
-        storedModel = model
-        draftModel = nil
-        draftKey = ""
-        provider = LLMProviderType.server.rawValue
-    }
 }
 
-private struct ServerAddressField: View {
+struct ServerAddressField: View {
     @Binding var text: String
     var prompt: LocalizedStringKey = "The server's address"
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 9) }

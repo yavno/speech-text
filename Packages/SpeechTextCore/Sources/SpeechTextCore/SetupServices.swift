@@ -99,6 +99,35 @@ public struct AIServiceCard: Sendable {
     }
 }
 
+/// The answer on setup's Speech step.
+public enum SetupSpeechPath: Equatable, Sendable {
+    case local, online, server
+
+    /// Where setup opens when run again with this engine stored. A server has no service
+    /// card, and read as "On this Mac" Continue would replace it with a local engine.
+    public static func reopening(_ engine: STTProviderType?) -> SetupSpeechPath {
+        guard let engine else { return .local }
+        if engine == .server { return .server }
+        return SetupCards.speechCard(reopening: engine) == nil ? .local : .online
+    }
+}
+
+/// The answer on setup's AI step; `none` until one is picked.
+public enum SetupAIPath: Equatable, Sendable {
+    case none, local, online, server
+
+    /// Where setup opens when run again — only on a pick that works: `llmProvider` reads
+    /// as Groq when nothing was stored, and a Groq card with no key is no choice at all.
+    public static func reopening(_ pick: LLMProviderType, isConfigured: Bool) -> SetupAIPath {
+        guard isConfigured else { return .none }
+        switch pick {
+        case .local: return .local
+        case .server: return .server
+        case .groq, .anthropic, .openai: return SetupCards.aiCard(reopening: pick) == nil ? .none : .online
+        }
+    }
+}
+
 /// Which online services get a card in setup — the maintainer's choice, not every
 /// provider — in card order. Every service setup can hold comes from one of these lists,
 /// so the look-ups below find a card; the first card is what a stored value that should

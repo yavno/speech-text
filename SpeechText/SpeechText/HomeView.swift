@@ -1048,7 +1048,9 @@ struct HomeEngines: View {
 
     private func cloudEngine(_ provider: STTProviderType, model id: String) -> Text {
         guard id != clearedModelChoice else { return Text("\(provider.vendor.displayName) · Choose a model") }
-        return Text(verbatim: "\(provider.vendor.displayName) · \(Self.plainName(sttModel(vendor: provider.vendor, id: id).displayName))")
+        // A server's model is the ID it was named, which a picker note's shape must not cut.
+        let name = provider == .server ? id : Self.plainName(sttModel(vendor: provider.vendor, id: id).displayName)
+        return Text(verbatim: "\(provider.vendor.displayName) · \(name)")
     }
 
     private var languages: Text {

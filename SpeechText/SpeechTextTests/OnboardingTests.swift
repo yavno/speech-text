@@ -4,6 +4,151 @@
 import XCTest
 @testable import SpeechTextCore
 
+final class ServerDraftTests: XCTestCase {
+    private let address = "http://localhost:11434/v1"
+
+    private func answered(_ model: String, listed: [String]? = nil) -> ServerTestRun {
+        ServerTestRun(listed: listed ?? [model], model: model, result: .answered(seconds: 0.2))
+    }
+
+    private func tested(_ draft: inout ServerDraft, _ run: ServerTestRun) {
+        XCTAssertTrue(draft.beginTest())
+        draft.finishTest(run)
+    }
+
+    func testContinueWaitsForAPassedTest() {
+        var draft = ServerDraft(role: .chat, address: "", model: "", key: "")
+        XCTAssertFalse(draft.canContinue)
+        draft.setAddress(address)
+        XCTAssertFalse(draft.canContinue)
+        XCTAssertTrue(draft.beginTest())
+        XCTAssertFalse(draft.canContinue, "a running test is not a passed one")
+        draft.finishTest(answered("gemma4:12b"))
+        XCTAssertTrue(draft.canContinue)
+        XCTAssertEqual(draft.saved?.address, address)
+        XCTAssertEqual(draft.saved?.model, "gemma4:12b")
+    }
+
+    func testAFailedTestSavesNothing() {
+        var draft = ServerDraft(role: .chat, address: address, model: "", key: "")
+        tested(&draft, ServerTestRun(listed: nil, model: nil, result: .noAnswer))
+        XCTAssertFalse(draft.canContinue)
+        XCTAssertNil(draft.saved)
+        XCTAssertEqual(draft.result, .noAnswer)
+    }
+
+    /// Setup run again with the server stopped keeps it: it has passed before.
+    func testWhatIsStoredAlreadyPassed() {
+        let draft = ServerDraft(role: .speech, address: address, model: "whisper", key: "secret")
+        XCTAssertTrue(draft.canContinue)
+        XCTAssertEqual(draft.saved?.key, "secret")
+        XCTAssertEqual(draft.modelRows, ["whisper"])
+        XCTAssertTrue(draft.showsKey)
+    }
+
+    func testTheStoredServerStillPassesAfterATestOfAnotherAddress() {
+        var draft = ServerDraft(role: .speech, address: address, model: "whisper", key: "secret")
+        draft.setAddress("http://192.168.1.20:8000/v1")
+        tested(&draft, answered("parakeet"))
+        XCTAssertTrue(draft.canContinue)
+        draft.setAddress(address)
+        XCTAssertTrue(draft.canContinue)
+        XCTAssertEqual(draft.saved?.model, "whisper")
+        XCTAssertEqual(draft.saved?.key, "secret")
+    }
+
+    func testAStoredAddressWithNoModelHasNotPassed() {
+        XCTAssertFalse(ServerDraft(role: .speech, address: address, model: "", key: "").canContinue)
+    }
+
+    func testTheKeyFieldWaitsForTheServerToAsk() {
+        var draft = ServerDraft(role: .chat, address: address, model: "", key: "")
+        XCTAssertFalse(draft.showsKey)
+        tested(&draft, ServerTestRun(listed: nil, model: nil, result: .noAnswer))
+        XCTAssertFalse(draft.showsKey)
+        tested(&draft, ServerTestRun(listed: nil, model: nil, result: .needsKey))
+        XCTAssertTrue(draft.showsKey)
+        tested(&draft, ServerTestRun(listed: nil, model: nil, result: .noAnswer))
+        XCTAssertTrue(draft.showsKey, "it stays once the server has asked")
+    }
+
+    /// A stored key is never sent to another address, and comes back with its own.
+    func testAnotherAddressStartsWithoutTheStoredKeyOrModel() {
+        var draft = ServerDraft(role: .chat, address: address, model: "gemma", key: "secret")
+        draft.setAddress("http://studio.local:8000/v1")
+        XCTAssertEqual(draft.key, "")
+        XCTAssertEqual(draft.model, "")
+        XCTAssertFalse(draft.canContinue)
+        draft.setAddress(address)
+        XCTAssertEqual(draft.key, "secret")
+        XCTAssertEqual(draft.model, "gemma")
+        XCTAssertTrue(draft.canContinue)
+    }
+
+    func testAChangeAfterAPassedTestNeedsAnother() {
+        var draft = ServerDraft(role: .chat, address: address, model: "", key: "")
+        tested(&draft, answered("a", listed: ["a", "b"]))
+        draft.setModel("b")
+        XCTAssertFalse(draft.canContinue)
+        draft.setModel("a")
+        XCTAssertTrue(draft.canContinue, "back on what passed")
+        draft.setKey("new")
+        XCTAssertFalse(draft.canContinue)
+    }
+
+    func testNothingChangesWhileATestRuns() {
+        var draft = ServerDraft(role: .chat, address: address, model: "", key: "")
+        XCTAssertTrue(draft.beginTest())
+        XCTAssertFalse(draft.beginTest())
+        draft.setAddress("http://other:1/v1")
+        draft.setKey("k")
+        draft.setModel("m")
+        XCTAssertEqual(draft.address, address)
+        XCTAssertEqual(draft.key, "")
+        XCTAssertEqual(draft.model, "")
+    }
+
+    func testNoTestWithoutAnAddress() {
+        var draft = ServerDraft(role: .chat, address: "not an address", model: "", key: "")
+        XCTAssertFalse(draft.beginTest())
+    }
+
+    func testAServerWithNoListGetsATypedModel() {
+        var draft = ServerDraft(role: .speech, address: address, model: "", key: "")
+        tested(&draft, ServerTestRun(listed: [], model: nil, result: .noModels))
+        XCTAssertTrue(draft.listsNoModels)
+        XCTAssertEqual(draft.modelRows, [])
+        draft.setModel("ggml-large")
+        tested(&draft, ServerTestRun(listed: [], model: "ggml-large", result: .answered(seconds: 1)))
+        XCTAssertTrue(draft.canContinue)
+        XCTAssertEqual(draft.saved?.model, "ggml-large")
+    }
+
+    /// The other step offers only an address that has answered.
+    func testOnlyAVerifiedAddressIsOffered() {
+        var draft = ServerDraft(role: .speech, address: "", model: "", key: "")
+        draft.setAddress(address)
+        XCTAssertNil(draft.verifiedAddress)
+        tested(&draft, answered("m"))
+        XCTAssertEqual(draft.verifiedAddress, address)
+    }
+
+    func testAListForAnotherAddressIsDropped() {
+        var draft = ServerDraft(role: .chat, address: address, model: "m", key: "")
+        draft.refreshModels(["x"], from: "http://other:1/v1")
+        XCTAssertEqual(draft.modelRows, ["m"])
+        draft.refreshModels(["m", "n"], from: address)
+        XCTAssertEqual(draft.modelRows, ["m", "n"])
+    }
+
+    func testTheSavedAddressIsTrimmed() {
+        var draft = ServerDraft(role: .chat, address: "", model: "", key: "")
+        draft.setAddress("  \(address) ")
+        tested(&draft, answered("m"))
+        XCTAssertEqual(draft.saved?.address, address)
+    }
+}
+
 final class OnboardingGateTests: XCTestCase {
     func testANewInstallSeesSetup() {
         XCTAssertEqual(OnboardingGate.decide(completed: nil, hasUsedTheAppBefore: false), .show)
@@ -251,6 +396,24 @@ final class SetupCardsTests: XCTestCase {
                 XCTAssertNil(card, pick.rawValue)
             }
         }
+    }
+
+    /// The bug this guards: a stored server has no card, read as "On this Mac", and
+    /// Continue replaced it with a local engine.
+    func testAStoredServerReopensOnYourServerNeverOnThisMac() {
+        XCTAssertEqual(SetupSpeechPath.reopening(.server), .server)
+        XCTAssertEqual(SetupSpeechPath.reopening(.local), .local)
+        XCTAssertEqual(SetupSpeechPath.reopening(.apple), .local)
+        XCTAssertEqual(SetupSpeechPath.reopening(.openai), .online)
+        XCTAssertEqual(SetupSpeechPath.reopening(nil), .local)
+    }
+
+    func testTheAIStepReopensOnlyOnAPickThatWorks() {
+        XCTAssertEqual(SetupAIPath.reopening(.server, isConfigured: true), .server)
+        XCTAssertEqual(SetupAIPath.reopening(.local, isConfigured: true), .local)
+        XCTAssertEqual(SetupAIPath.reopening(.anthropic, isConfigured: true), .online)
+        XCTAssertEqual(SetupAIPath.reopening(.server, isConfigured: false), .none)
+        XCTAssertEqual(SetupAIPath.reopening(.groq, isConfigured: false), .none)
     }
 
     /// A service with no card falls back to the first, Groq, as it always did.

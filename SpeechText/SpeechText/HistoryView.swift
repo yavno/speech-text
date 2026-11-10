@@ -1083,6 +1083,7 @@ private struct HistoryDetail: View {
     private var engine: String { historyEngine(record) }
 
     private func modelName(_ refinement: TranscriptionRecord.Refinement) -> String {
+        if refinement.provider == LLMProviderType.server.rawValue { return refinement.model }
         let name = LLMProviderType(rawValue: refinement.provider)
             .map { chatModel(provider: $0, id: refinement.model).displayName }
         return HomeEngines.plainName(name ?? refinement.model)

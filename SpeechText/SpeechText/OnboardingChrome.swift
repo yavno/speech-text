@@ -515,78 +515,38 @@ struct SetupCenteredScroll<Content: View>: View {
     }
 }
 
-/// One answer of a step's question, as a card in a radio group.
-struct SetupChoiceCard: View {
-    enum Glyph {
-        case mac, cloud, server
-
-        var symbol: String {
-            switch self {
-            case .mac: "laptopcomputer"
-            case .cloud: "cloud"
-            case .server: "server.rack"
-            }
-        }
+/// A step's answers, as Settings draws its places: three equal columns with a glyph and a
+/// name, and the open one's sentence under the row. Three cards with their sentences do not
+/// fit a step's column under its title.
+struct SetupPlaceCards: View {
+    struct Item {
+        let place: EnginePlace
+        var note: String?
+        let facts: String
     }
-    let glyph: Glyph
-    let name: String
-    var badge: String?
-    var why: String?
-    let facts: String
-    let isSelected: Bool
-    let action: () -> Void
-    @Environment(\.setupTint) private var tint
-    @State private var hovering = false
+
+    let selected: EnginePlace?
+    let items: [Item]
+    let pick: (EnginePlace) -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(alignment: .top, spacing: 12) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected
-                          ? AnyShapeStyle(LinearGradient(colors: tint.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
-                          : AnyShapeStyle(SetupColor.panel))
-                    .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isSelected ? .clear : SetupColor.panelBorder, lineWidth: 0.5))
-                    .frame(width: 34, height: 34)
-                    .overlay {
-                        Image(systemName: glyph.symbol)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 8) {
+                ForEach(items, id: \.place) { item in
+                    EnginePlaceCard(place: item.place, note: item.note, isSelected: selected == item.place, stacked: true) {
+                        pick(item.place)
                     }
-                VStack(alignment: .leading, spacing: 1) {
-                    HStack(spacing: 8) {
-                        Text(name).font(.system(size: 14, weight: .semibold)).foregroundStyle(SetupColor.label)
-                        if let badge { SetupBadge(text: badge, kind: .recommended) }
-                    }
-                    if let why {
-                        Text(why).font(.system(size: 12, weight: .medium)).foregroundStyle(tint.accent)
-                    }
-                    Text(facts)
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(SetupColor.label2)
-                        .lineSpacing(2)
-                        .padding(.top, 3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .background(RoundedRectangle(cornerRadius: 16).fill(SetupColor.control))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(isSelected ? tint.accent : hovering ? tint.accent.opacity(0.4) : SetupColor.panelBorder,
-                                  lineWidth: isSelected ? 1.5 : 1)
-            }
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 20).fill(tint.glow.opacity(0.32)).padding(-4)
                 }
             }
-            .contentShape(RoundedRectangle(cornerRadius: 16))
+            .fixedSize(horizontal: false, vertical: true)
+            // The height of three lines, so opening a card does not move the title above.
+            Text(verbatim: items.first { $0.place == selected }?.facts ?? "")
+                .font(.system(size: 11.5))
+                .foregroundStyle(SetupColor.label2)
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: 48, alignment: .topLeading)
         }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

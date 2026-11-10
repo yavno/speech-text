@@ -80,6 +80,29 @@ final class SameOriginRedirects: NSObject, URLSessionTaskDelegate, Sendable {
     }
 }
 
+/// What a server is used for. Each has its own address, key and model (the spec's D1),
+/// because chat and transcription often run in different programs.
+public enum ServerRole: Hashable, Sendable {
+    case speech, chat
+
+    public var providerKey: String { self == .speech ? SettingsKeys.sttProvider : SettingsKeys.llmProvider }
+    public var addressKey: String { self == .speech ? SettingsKeys.serverSpeechAddress : SettingsKeys.serverChatAddress }
+    public var modelKey: String { self == .speech ? SettingsKeys.serverSpeechModel : SettingsKeys.serverChatModel }
+    public var apiKeyName: String { self == .speech ? SettingsKeys.serverSpeechAPIKey : SettingsKeys.serverChatAPIKey }
+    public var otherAddressKey: String { self == .speech ? SettingsKeys.serverChatAddress : SettingsKeys.serverSpeechAddress }
+    /// What `sttProvider` or `llmProvider` stores for a server: the same word in both.
+    public var providerValue: String { self == .speech ? STTProviderType.server.rawValue : LLMProviderType.server.rawValue }
+
+    /// Each server's documented default address (the spec's table), under the role it
+    /// can do: LM Studio does not transcribe.
+    public var presets: [(name: String, address: String)] {
+        let shared = [(name: "Ollama", address: "http://localhost:11434/v1"),
+                      (name: "llama.cpp", address: "http://localhost:9931/v1")]
+        return shared + (self == .speech ? [(name: "Speaches", address: "http://localhost:8000/v1")]
+                                         : [(name: "LM Studio", address: "http://localhost:1234/v1")])
+    }
+}
+
 /// How a test of the server ended, in the words Settings gives it.
 public enum ServerTestResult: Equatable, Sendable {
     case answered(seconds: Double)
@@ -103,6 +126,15 @@ public enum ServerTestResult: Equatable, Sendable {
     }
 }
 
+/// One run of the test, in the shape both Settings and setup keep it.
+public struct ServerTestRun: Equatable, Sendable {
+    /// What the server listed; nil when asking failed, and the test ended there.
+    public let listed: [String]?
+    /// The model the test asked for; nil when there was none to ask.
+    public let model: String?
+    public let result: ServerTestResult
+}
+
 /// Asks a server what it serves and whether it answers. Sends a fixed sentence, never the
 /// user's words.
 public enum ServerProbe {
@@ -113,6 +145,36 @@ public enum ServerProbe {
         config.timeoutIntervalForResource = 120
         return URLSession(configuration: config)
     }()
+
+    /// The test request: what the server lists, then one short request to a model.
+    /// `selected` is asked for if the server lists it; `unlisted` when the list is empty.
+    public static func test(role: ServerRole, endpoint: ServerEndpoint, selected: String, unlisted: String,
+                            apiKey: String) async -> ServerTestRun {
+        await run(role: role, selected: selected, unlisted: unlisted,
+                  list: { await models(endpoint: endpoint, apiKey: apiKey) },
+                  ask: { model in
+                      role == .speech ? await transcription(endpoint: endpoint, model: model, apiKey: apiKey)
+                                      : await chat(endpoint: endpoint, model: model, apiKey: apiKey)
+                  })
+    }
+
+    static func run(role: ServerRole, selected: String, unlisted: String,
+                    list: () async -> Result<[String], ServerTestFailure>,
+                    ask: (String) async -> ServerTestResult) async -> ServerTestRun {
+        let ids: [String]
+        switch await list() {
+        // whisper.cpp's server has no list to give; its model is typed.
+        case .failure(let failure) where role == .speech && failure.result == .wrongPath:
+            ids = []
+        case .failure(let failure):
+            return ServerTestRun(listed: nil, model: nil, result: failure.result)
+        case .success(let listed):
+            ids = listed
+        }
+        let model = ids.contains(selected) ? selected : ids.first ?? unlisted
+        guard !model.isEmpty else { return ServerTestRun(listed: ids, model: nil, result: .noModels) }
+        return ServerTestRun(listed: ids, model: model, result: await ask(model))
+    }
 
     /// `GET /models`: the IDs it lists, or how asking failed.
     public static func models(endpoint: ServerEndpoint, apiKey: String) async -> Result<[String], ServerTestFailure> {

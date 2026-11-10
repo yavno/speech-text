@@ -539,24 +539,29 @@ private struct SpeechScreen: View {
         StepColumns {
             VStack(alignment: .leading, spacing: 0) {
                 Text("Where should your speech become text?").setupTitle(32).padding(.bottom, 10)
-                Text("On this Mac or online — you can change it later.").setupLead().padding(.bottom, 22)
-                VStack(spacing: 12) {
-                    SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
-                                    why: appleSilicon && model.recommendedSpeechModel != nil
-                                        ? String(localized: "Best choice for your Mac.") : nil,
-                                    facts: appleSilicon
-                                        ? String(localized: "Private and free. Your voice stays on your Mac; works offline after one download.")
-                                        : intelSpeechPlaceFacts,
-                                    isSelected: model.speechPath == .local) { model.speechPath = .local }
-                    SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
-                                    why: appleSilicon ? nil : String(localized: "Best choice for your Mac."),
-                                    facts: String(localized: "Works on any Mac. Needs internet and a free account; your recording is sent to the service."),
-                                    isSelected: model.speechPath == .online) { model.speechPath = .online }
-                }
+                Text("On this Mac, online, or a server you run — you can change it later.").setupLead().padding(.bottom, 22)
+                SetupPlaceCards(
+                    selected: model.speechPath.place,
+                    items: [
+                        .init(place: .thisMac,
+                              note: appleSilicon && model.recommendedSpeechModel != nil ? String(localized: "Recommended") : nil,
+                              facts: appleSilicon
+                                  ? String(localized: "Private and free. Your voice stays on your Mac; works offline after one download.")
+                                  : intelSpeechPlaceFacts),
+                        .init(place: .online, note: appleSilicon ? nil : String(localized: "Recommended"),
+                              facts: String(localized: "Works on any Mac. Needs internet and a free account; your recording is sent to the service.")),
+                        .init(place: .server,
+                              facts: String(localized: "A model you already run. Your recording goes to the address you enter.")),
+                    ],
+                    pick: { model.speechPath = SetupSpeechPath(place: $0) })
             }
         } panel: {
             SetupPanel {
-                if model.speechPath == .local { localDetails } else { onlineDetails }
+                switch model.speechPath {
+                case .local: localDetails
+                case .online: onlineDetails
+                case .server: SetupServerPanel(model: model, role: .speech)
+                }
             }
         }
     }
@@ -714,6 +719,120 @@ private extension Text {
     }
 }
 
+// MARK: - Your server
+
+private extension SetupSpeechPath {
+    var place: EnginePlace {
+        switch self {
+        case .local: .thisMac
+        case .online: .online
+        case .server: .server
+        }
+    }
+
+    init(place: EnginePlace) {
+        switch place {
+        case .thisMac: self = .local
+        case .online: self = .online
+        case .server: self = .server
+        }
+    }
+}
+
+private extension SetupAIPath {
+    var place: EnginePlace? {
+        switch self {
+        case .none: nil
+        case .local: .thisMac
+        case .online: .online
+        case .server: .server
+        }
+    }
+
+    init(place: EnginePlace) {
+        switch place {
+        case .thisMac: self = .local
+        case .online: self = .online
+        case .server: self = .server
+        }
+    }
+}
+
+/// The panel beside a step's "Your server" card: Settings' form, held as a draft until the
+/// step's Continue. The key field comes only when the server asks for one, the models once
+/// it has answered.
+private struct SetupServerPanel: View {
+    @Bindable var model: OnboardingModel
+    let role: ServerRole
+
+    private var draft: ServerDraft { model.serverDraft(role) }
+
+    private func binding(_ value: @escaping (ServerDraft) -> String,
+                         _ change: @escaping (inout ServerDraft, String) -> Void) -> Binding<String> {
+        let model = model, role = role
+        return Binding(get: { value(model.serverDraft(role)) },
+                       set: { text in model.changeServer(role) { change(&$0, text) } })
+    }
+
+    var body: some View {
+        let draft = draft
+        SetupCenteredScroll {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Your server").font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label)
+                Text("Works with any OpenAI-compatible server.")
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(SetupColor.label2)
+                    .padding(.bottom, 6)
+                if let other = model.offeredServerAddress(role) {
+                    ServerOfferRow(role: role, address: other) { model.changeServer(role) { $0.setAddress(other) } }
+                }
+                HStack(spacing: 6) {
+                    ServerAddressField(text: binding(\.address) { $0.setAddress($1) }).disabled(draft.isTesting)
+                    Button("Test") { model.testServer(role) }
+                        .buttonStyle(SetupButtonStyle(kind: .secondary, height: 30))
+                        .font(.system(size: 12))
+                        .disabled(draft.endpoint == nil || draft.isTesting)
+                }
+                if draft.address.isEmpty {
+                    ServerPresetRow(role: role) { address in model.changeServer(role) { $0.setAddress(address) } }
+                } else {
+                    ServerWhereItGoes(endpoint: draft.endpoint)
+                }
+                ServerTestResultLine(role: role, testing: draft.isTesting, result: draft.result)
+                if draft.showsKey {
+                    ServerAddressField(text: binding(\.key) { $0.setKey($1) }, prompt: "The server's key")
+                        .padding(.top, 4)
+                        .disabled(draft.isTesting)
+                    if draft.endpoint?.isReadableOnTheWay == true {
+                        ServerWarning(text: "This key is sent in plain text.")
+                    }
+                }
+                if draft.listsNoModels {
+                    ServerAddressField(text: binding(\.model) { $0.setModel($1) }, prompt: "Model ID").padding(.top, 4)
+                    Text("The server lists no models. Load one in it, or type its ID.").rowNote()
+                }
+                if !draft.modelRows.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(draft.modelRows, id: \.self) { id in
+                            SetupRow(title: id, isSelected: id == draft.model, compact: true) {
+                                model.pickServerModel(role, id)
+                            } extra: { EmptyView() }
+                        }
+                    }
+                    .padding(.top, 6)
+                    .disabled(draft.isTesting)
+                }
+                if role == .speech && !draft.address.isEmpty && model.spokenLanguages.count > 1 {
+                    ServerLanguagesNote().padding(.top, 6)
+                }
+            }
+            .padding(EdgeInsets(top: 14, leading: 14, bottom: 12, trailing: 14))
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .task { await model.refreshServerModels(role) }
+    }
+}
+
 // MARK: - ③ AI
 
 private struct AIScreen: View {
@@ -733,17 +852,20 @@ private struct AIScreen: View {
                 Text("Optional. Press \(kbd(shortcutText(for: .ai))) instead of \(kbd(shortcutText(for: .inline))) and AI turns what you say — or what you ask for — into clean text for the app you're in.")
                     .setupLead(14.5)
                     .padding(.bottom, 16)
-                VStack(spacing: 10) {
-                    SetupChoiceCard(glyph: .mac, name: String(localized: "On this Mac"),
-                                    facts: model.capabilities.isAppleSilicon
-                                        ? String(localized: "Private and free. A 3–19 GB download, nothing else to install.")
-                                        : String(localized: "Private and free, but slow on an Intel Mac. A 3–19 GB download."),
-                                    isSelected: model.aiPath == .local) { model.chooseAIPath(.local) }
-                    SetupChoiceCard(glyph: .cloud, name: String(localized: "Online service"),
-                                    badge: Provider.allCases.contains(where: model.keyReadyFromSpeech) ? String(localized: "Ready") : nil,
-                                    facts: String(localized: "Fast on any Mac. Needs an account — Groq has a free plan."),
-                                    isSelected: model.aiPath == .online) { model.chooseAIPath(.online) }
-                }
+                SetupPlaceCards(
+                    selected: model.aiPath.place,
+                    items: [
+                        .init(place: .thisMac,
+                              facts: model.capabilities.isAppleSilicon
+                                  ? String(localized: "Private and free. A 3–19 GB download, nothing else to install.")
+                                  : String(localized: "Private and free, but slow on an Intel Mac. A 3–19 GB download.")),
+                        .init(place: .online,
+                              note: Provider.allCases.contains(where: model.keyReadyFromSpeech) ? String(localized: "Ready") : nil,
+                              facts: String(localized: "Fast on any Mac. Needs an account — Groq has a free plan.")),
+                        .init(place: .server,
+                              facts: String(localized: "A model you already run. Your text goes to the address you enter.")),
+                    ],
+                    pick: { model.chooseAIPath(SetupAIPath(place: $0)) })
                 .padding(.bottom, 36)
             }
         } panel: {
@@ -753,6 +875,7 @@ private struct AIScreen: View {
                     case .none: example
                     case .local: localDetails
                     case .online: onlineDetails
+                    case .server: SetupServerPanel(model: model, role: .chat)
                     }
                 }
                 .background(LinearGradient(colors: [SetupColor.ai.opacity(0.09), .clear], startPoint: .topLeading, endPoint: UnitPoint(x: 0.5, y: 0.6))

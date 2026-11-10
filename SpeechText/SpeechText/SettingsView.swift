@@ -725,8 +725,8 @@ struct SettingsView: View {
             return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
         case .server:
             return sendVocabulary
-                ? Text("Each recording is sent to the address you entered, with your Dictionary's words. A retry from History sends it again.")
-                : Text("Each recording is sent to the address you entered. A retry from History sends it again.")
+                ? Text("Each recording is sent to the address you entered and nowhere else, with your Dictionary's words. A retry from History sends it again.")
+                : Text("Each recording is sent to the address you entered and nowhere else. A retry from History sends it again.")
         case .groq, .elevenlabs, .openai:
             let vendor = stt.vendor.displayName
             return sendVocabulary
@@ -742,7 +742,7 @@ struct SettingsView: View {
             return Text("Stays on this Mac. A model is downloaded once; after that nothing goes online.")
         }
         if llm == .server {
-            return Text("AI dictations and edits are sent to the address you entered. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
+            return Text("AI dictations and edits are sent to the address you entered and nowhere else. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
         }
         return Text("AI dictations and edits are sent to \(llm.vendor.displayName). With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read.")
     }
@@ -807,6 +807,7 @@ struct SettingsView: View {
     /// is picked.
     private var hasLLMKey: Bool {
         _ = (llmProvider, localLLMModel)
+        if llm == .server { return LLMConfiguration.isConfigured }
         let value = llm.vendor.descriptor.apiKey.map { keys.value(for: $0.settingsKey) }
             ?? LLMConfiguration.model(for: llm)
         return !value.trimmingCharacters(in: .whitespaces).isEmpty

@@ -782,12 +782,15 @@ private struct UsageEngines: View {
     private func name(_ engine: UsageSummary.EngineUse) -> String {
         switch engine.step {
         case .speech:
-            if let model = engine.provider, let type = STTProviderType(rawValue: engine.key) {
+            if engine.key == STTProviderType.server.rawValue, let model = engine.provider {
+                model
+            } else if let model = engine.provider, let type = STTProviderType(rawValue: engine.key) {
                 HomeEngines.plainName(sttModel(vendor: type.vendor, id: model).displayName)
             } else {
                 HistoryFormat.engine(engine.key)
             }
-        case .ai: UsageView.chatModelName(engine.key)
+        // A server's model keeps the name the server gave it, even one a catalogue also lists.
+        case .ai: engine.provider == LLMProviderType.server.rawValue ? engine.key : UsageView.chatModelName(engine.key)
         }
     }
 
@@ -912,8 +915,9 @@ private struct UsageRequests: View {
 
     private func name(_ use: UsageSummary.RequestUse) -> String {
         switch use.step {
+        case .speech where use.vendor == .server: use.model
         case .speech: HomeEngines.plainName(sttModel(vendor: use.vendor, id: use.model).displayName)
-        case .ai: UsageView.chatModelName(use.model)
+        case .ai: use.vendor == .server ? use.model : UsageView.chatModelName(use.model)
         }
     }
 
