@@ -23,6 +23,10 @@ let localChatServiceName = "app.speech-text.SpeechText.LLM"
     /// Loads the model ahead of the first request — a cold load takes seconds — and reads
     /// the request's `prefixes`, the system prompts, which take seconds more.
     func prewarm(_ request: Data, reply: @escaping @Sendable (String?) -> Void)
+    /// AI Rewrite's step one: a JSON `LocalChatRouteRequest` read as next-token
+    /// probabilities, nothing generated. `reply` gets a `LocalChatRouteResponse`, or nil
+    /// and the error.
+    func readRoute(_ request: Data, reply: @escaping @Sendable (Data?, String?) -> Void)
     /// Stops the completion with this `LocalChatRequest.id`: before its model loads, before
     /// it reads its prompt, or at its next token — and no other.
     func cancel(_ requestID: String)
@@ -44,8 +48,36 @@ struct LocalChatRequest: Codable, Equatable {
     /// For a prewarm: system prompts to read ahead, so the requests that follow restore
     /// them (AI dictation's and the Edit shortcut's). Nil on a completion.
     var prefixes: [String]? = nil
+    /// The system prompts' states to keep (`RewriteRouter.savedPromptStates`).
+    var savedPrefixes = 5
     /// What a cancel names, so it stops this request and no other (`LocalChatActivity`).
     var id = UUID().uuidString
+}
+
+/// Step one's questions: `ChatTemplates.render`'s prompt, then each step's `lead` read and
+/// its `options`, single tokens, weighed (`LlamaModel.chainedProbabilities`).
+struct LocalChatRouteRequest: Codable, Equatable {
+    struct Step: Codable, Equatable {
+        var lead: String
+        var options: [String]
+    }
+
+    var modelPath: String
+    var family: ChatTemplateFamily
+    var system: String
+    var user: String
+    var steps: [Step]
+    /// The rewrite's own, or the model would be loaded again for it.
+    var contextLength: Int
+    var savedPrefixes = 5
+    var id = UUID().uuidString
+}
+
+struct LocalChatRouteResponse: Codable, Equatable {
+    var probabilities: [[Double]]
+    var promptTokens: Int
+    var cachedPromptTokens: Int
+    var seconds: Double
 }
 
 struct LocalChatResponse: Codable, Equatable {

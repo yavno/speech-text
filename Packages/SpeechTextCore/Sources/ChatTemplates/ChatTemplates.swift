@@ -281,3 +281,19 @@ public func strippingReasoning(_ text: String) -> String {
     }
     return trimmed
 }
+
+/// A choice between single-token options read off a model's logits: pure, so it is tested
+/// without one (`LlamaModel.chainedProbabilities`).
+public enum OptionLogits {
+    /// The options' softmax, over them alone.
+    public static func probabilities(_ logits: [Double]) -> [Double] {
+        let top = logits.max() ?? 0
+        let exponents = logits.map { exp($0 - top) }
+        let sum = exponents.reduce(0, +)
+        return exponents.map { $0 / sum }
+    }
+
+    public static func best(_ probabilities: [Double]) -> Int {
+        probabilities.indices.max { probabilities[$0] < probabilities[$1] } ?? 0
+    }
+}

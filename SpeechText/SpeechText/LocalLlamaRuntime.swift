@@ -46,6 +46,14 @@ struct LlamaSampling: Codable, Equatable, Sendable {
     static let rewrite = LlamaSampling()
 }
 
+/// A decision read off the model: each option's probability as the next token.
+struct NextTokenProbabilities: Sendable {
+    var probabilities: [Double]
+    var promptTokens: Int
+    var cachedPromptTokens: Int
+    var seconds: Double
+}
+
 enum LlamaError: LocalizedError, Equatable {
     case loadFailed(String)
     case contextFailed
@@ -83,19 +91,20 @@ final class LlamaModel {
     /// recurrent layers cannot be rolled back to a position. One is kept per prompt a
     /// request can be sent, most recent first: the routing prompt, the one for an editor, a
     /// program in a terminal or an AI's field, a shell prompt's, a terminal where nothing
-    /// says which, and the Edit shortcut's. The prewarm at each dictation touches three of
+    /// says which, and the Edit shortcut's; `RewriteRouter.savedPromptStates` says how
+    /// many, more once two steps ship (#110, off until #114). The prewarm at each dictation touches three of
     /// them, so at three slots it pushed a terminal's prompt out every time, and a dictation
     /// there read it again: 3.5 s against 0.5 s restored. A state is about 147 MB for Gemma
     /// 4 12B, held only once its prompt has been used (M1 Pro, 2026-11-08).
     private var prefixes: [(tokens: [llama_token], state: [UInt8])] = []
-    static let savedPrefixes = 5
+    var savedPrefixes: Int
 
     /// Bytes held by the saved system prompts' states.
     var savedPrefixBytes: Int { prefixes.reduce(0) { $0 + $1.state.count } }
 
     /// `contextLength` is set, never left to the model: 0 means the model's own maximum
     /// (262 144 for Qwen3.5), whose KV cache alone would take gigabytes.
-    init(path: String, family: ChatTemplateFamily, contextLength: Int = 8192) throws {
+    init(path: String, family: ChatTemplateFamily, contextLength: Int = 8192, savedPrefixes: Int = 5) throws {
         LlamaBackend.start()
         var modelParams = llama_model_default_params()
         modelParams.n_gpu_layers = -1
@@ -115,6 +124,7 @@ final class LlamaModel {
         self.path = path
         self.family = family
         self.contextLength = contextLength
+        self.savedPrefixes = savedPrefixes
         self.model = model
         self.context = context
         self.vocab = llama_model_get_vocab(model)
@@ -220,6 +230,47 @@ final class LlamaModel {
             finished: finished)
     }
 
+    /// Several decisions read one after another in one pass, nothing generated: the prompt,
+    /// then for each step its options' probabilities at the end of what was read, the most
+    /// likely option and the next step's lead-in read after it, no state copied (AI
+    /// Rewrite's step one, #110). The options are single tokens.
+    func chainedProbabilities(prompt: String, cacheablePrefix: String?, steps: [(lead: String, options: [llama_token])],
+                              shouldCancel: () -> Bool = { false }) throws -> [NextTokenProbabilities] {
+        if shouldCancel() { throw LlamaError.cancelled }
+        let tokens = try tokenize(prompt)
+        guard tokens.count + 1 < contextLength else {
+            throw LlamaError.promptTooLong(tokens: tokens.count, context: contextLength)
+        }
+        let start = Date()
+        var read = 0
+        var cached = 0
+        if let cacheablePrefix, case let prefix = try tokenize(cacheablePrefix),
+           !prefix.isEmpty, prefix.count < tokens.count, tokens.starts(with: prefix) {
+            if try restoreOrRead(prefix) { cached = prefix.count }
+            read = prefix.count
+        } else {
+            llama_memory_clear(llama_get_memory(context), true)
+        }
+        var pending = Array(tokens[read...])
+        var results: [NextTokenProbabilities] = []
+        var stepStart = start
+        for (index, step) in steps.enumerated() {
+            if shouldCancel() { throw LlamaError.cancelled }
+            pending += try tokenize(step.lead)
+            try decode(pending)
+            llama_synchronize(context)
+            guard let logits = llama_get_logits_ith(context, -1) else { throw LlamaError.decodeFailed(-1) }
+            let probabilities = OptionLogits.probabilities(step.options.map { Double(logits[Int($0)]) })
+            let now = Date()
+            results.append(NextTokenProbabilities(probabilities: probabilities, promptTokens: pending.count,
+                                                  cachedPromptTokens: index == 0 ? cached : 0,
+                                                  seconds: now.timeIntervalSince(stepStart)))
+            stepStart = now
+            pending = [step.options[OptionLogits.best(probabilities)]]
+        }
+        return results
+    }
+
     /// Reads the cacheable prefix of a prompt ahead of it — while the user is still
     /// speaking — so the request that follows restores it instead.
     func cache(prefix text: String) throws {
@@ -247,7 +298,7 @@ final class LlamaModel {
         prefixes.removeAll { $0.tokens == prefix }
         if size > 0, llama_state_seq_get_data(context, &state, size, 0) == size {
             prefixes.insert((prefix, state), at: 0)
-            prefixes = Array(prefixes.prefix(Self.savedPrefixes))
+            prefixes = Array(prefixes.prefix(savedPrefixes))
         }
         return false
     }
@@ -318,13 +369,16 @@ final class LocalLlamaRuntime: @unchecked Sendable {
     /// Loads `path` unless it is already the model in memory; returns the seconds it took
     /// (0 when it was already loaded).
     @discardableResult
-    func load(path: String, family: ChatTemplateFamily, contextLength: Int = 8192) async throws -> Double {
+    func load(path: String, family: ChatTemplateFamily, contextLength: Int = 8192, savedPrefixes: Int = 5) async throws -> Double {
         try await run {
             if let loaded = self.loaded, loaded.path == path, loaded.family == family,
-               loaded.contextLength == contextLength { return 0 }
+               loaded.contextLength == contextLength {
+                loaded.savedPrefixes = savedPrefixes
+                return 0
+            }
             self.loaded = nil
             let start = Date()
-            self.loaded = try LlamaModel(path: path, family: family, contextLength: contextLength)
+            self.loaded = try LlamaModel(path: path, family: family, contextLength: contextLength, savedPrefixes: savedPrefixes)
             return Date().timeIntervalSince(start)
         }
     }
@@ -367,6 +421,28 @@ final class LocalLlamaRuntime: @unchecked Sendable {
                                       cacheablePrefix: ChatTemplates.cacheablePrefix(model.family, system: system, date: date),
                                       maxTokens: maxTokens + ChatTemplates.reasoningAllowance(model.family),
                                       sampling: sampling, shouldCancel: shouldCancel)
+        }
+    }
+
+    /// `LlamaModel.chainedProbabilities` for a system and user message; each step's lead-in
+    /// is read in the reply, its options single tokens of this model's vocabulary.
+    func chainedProbabilities(system: String, user: String, steps: [(String, [String])], date: Date = Date(),
+                              shouldCancel: @escaping @Sendable () -> Bool = { false }) async throws -> [NextTokenProbabilities] {
+        // Sendable copies of the labels: the closure below crosses to the queue.
+        let leads = steps.map(\.0), options = steps.map(\.1)
+        return try await run {
+            guard let model = self.loaded else { throw LlamaError.loadFailed("no model loaded") }
+            let resolved = try zip(leads, options).map { lead, options -> (lead: String, options: [llama_token]) in
+                (lead, try options.map { option -> llama_token in
+                    let token = try model.tokenize(option)
+                    guard token.count == 1 else { throw LlamaError.tokenizeFailed }
+                    return token[0]
+                })
+            }
+            return try model.chainedProbabilities(
+                prompt: ChatTemplates.render(model.family, system: system, user: user, date: date),
+                cacheablePrefix: ChatTemplates.cacheablePrefix(model.family, system: system, date: date),
+                steps: resolved, shouldCancel: shouldCancel)
         }
     }
 

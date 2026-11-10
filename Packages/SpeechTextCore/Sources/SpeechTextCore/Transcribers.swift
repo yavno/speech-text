@@ -30,9 +30,10 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 
 // MARK: - Tuning
 
-/// Every latency and quality knob the cloud STT providers use, in one place, so a value
-/// measured against the live service is not re-derived by feel in two files. All of
-/// these were verified by probing the ElevenLabs API on 2026-08-29.
+/// Every latency and quality knob of the speech and rewrite paths, in one place, so a
+/// value measured against the live service is not re-derived by feel in two files. Each
+/// says what it was measured against; the cloud STT ones were verified by probing the
+/// ElevenLabs API on 2026-08-29.
 public enum STTTuning {
     /// How much lower a model's word error rate must be than a standing local pick's to
     /// replace it (`localSTTPick`). The owner's call of 2026-10-17 (#5, "let's try"): on
@@ -50,6 +51,11 @@ public enum STTTuning {
     /// not count as clearly better is not counted as worse either. Not the owner's number
     /// yet: #5 asks for "a tolerance" and leaves it open.
     static let localPickWERTolerance = 0.10
+
+    /// AI Rewrite's step one, past which the dictation goes to the one-step prompt (D6 of
+    /// docs/specs/2026-11-03-rewrite-modes-and-router.md, the owner's call of 2026-11-03):
+    /// above the 1 s target because Gemma 4 12B's median sat at it (0.86–0.96 s, router v4).
+    public static let rewriteStepOneTimeoutSeconds: Double = 2
 
     /// Seconds of silence after which Scribe Realtime's VAD commits a segment — the
     /// server's own default. Each segment is transcribed on its own and punctuated as a

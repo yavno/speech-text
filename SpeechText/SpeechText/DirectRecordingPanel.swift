@@ -961,7 +961,7 @@ struct DirectRecordingPanelView: View {
                 }
             }
             do {
-                let result = try await TextRefinementService.refine(source)
+                let result = try await TextRefinementService.refine(source, twoSteps: false)
                 guard !Task.isCancelled else { return }
 
                 if TextRefinementService.isCollapse(input: source, output: result.text,
