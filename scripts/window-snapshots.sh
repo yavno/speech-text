@@ -20,10 +20,11 @@
 # window's page comes out blank. The windows flash on screen meanwhile. index.html puts
 # the languages side by side.
 #
-# --only takes the names of the pictures a full run writes (setup-speech, main-home,
-# settings-general, record-window), separated by spaces or commas; a name ending in "-"
-# takes every one that starts with it (setup- for all of Setup's steps). The app then
-# opens those windows and no other. A name that matches no window stops the run and lists
+# --only takes window names, as a full run names its pictures (setup-speech, main-home,
+# settings-general, record-window; a long page's later screens, main-history-2.png, come
+# with their window), separated by spaces or commas; a name ending in "-" takes every one
+# that starts with it (setup- for all of Setup's steps). The app then opens those windows
+# and no other. A name that matches no window stops the run and lists
 # the names there are. For a pull request's screenshot:
 #   scripts/window-snapshots.sh --languages en --only settings-speech
 #
@@ -60,7 +61,7 @@ while [ $# -gt 0 ]; do
     --languages) LANGUAGES=$2; shift ;;
     --only) ONLY=$2; ONLY_GIVEN=1; shift ;;
     --defaults) DEFAULTS=$2; shift ;;
-    -h|--help) sed -n '4,41p' "$0"; exit 0 ;;
+    -h|--help) sed -n '4,42p' "$0"; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
   shift

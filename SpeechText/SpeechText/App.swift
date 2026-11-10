@@ -192,6 +192,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             OfflineRetry.shared.start()
         }
 
+        // A snapshot run draws windows and quits: it never records, and leaves nothing
+        // behind on the Mac — no login item, no row in Accessibility's list — whatever
+        // settings `--defaults` started it on.
+        #if DEBUG
+        let isSnapshotRun = E2EMode.isActive && MainActor.assumeIsolated { WindowSnapshots.isAsked }
+        #else
+        let isSnapshotRun = false
+        #endif
+
         if setupGate == .show {
             // Setup asks for the microphone and Accessibility itself, on a screen that
             // says what they are for — not in two unexplained alerts at launch.
@@ -205,12 +214,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             // Request microphone access on launch — but not for an end-to-end run, which
             // records from a file and whose prompt would take the focus from the document
-            // the script dictates into, nor for a snapshot run, which never records.
-            var asksForMicrophone = E2EMode.audioInputs == nil
-            #if DEBUG
-            if E2EMode.isActive, MainActor.assumeIsolated({ WindowSnapshots.isAsked }) { asksForMicrophone = false }
-            #endif
-            if asksForMicrophone {
+            // the script dictates into, nor for a snapshot run.
+            if E2EMode.audioInputs == nil, !isSnapshotRun {
                 appState.speechEngine.requestMicrophoneAccess { granted in
                     if !granted {
                         dlog("App", "Microphone access denied", level: .error)
@@ -221,7 +226,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             // No alert at launch for a missing Accessibility grant: Home says so, and a
             // dictation that could not be pasted offers the way to turn it on. Listed
             // quietly, so the switch is there to find.
-            if !PasteService.isAccessibilityGranted {
+            if !PasteService.isAccessibilityGranted, !isSnapshotRun {
                 SystemSettingsGuide.registerQuietly()
             }
         }
@@ -310,7 +315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Auto-register as login item on first launch (default: ON) — unless setup is
         // open, whose Permissions step turns it on where the switch for it is, rather
         // than with a "Login Item Added" notification before anything was explained.
-        if setupGate != .show, !UserDefaults.standard.bool(forKey: SettingsKeys.hasRegisteredLaunchAtLogin) {
+        if setupGate != .show, !isSnapshotRun, !UserDefaults.standard.bool(forKey: SettingsKeys.hasRegisteredLaunchAtLogin) {
             UserDefaults.standard.set(true, forKey: SettingsKeys.hasRegisteredLaunchAtLogin)
             try? SMAppService.mainApp.register()
         }
@@ -2931,6 +2936,7 @@ extension AppDelegate {
     fileprivate func drawSnapshots(into folder: URL, only selection: WindowSnapshotSelection) async {
         // Not one of the steps the bar names, but a screen of its own.
         let steps = (OnboardingStep.named + [.done]).filter { selection.includes(WindowSnapshots.setupName($0)) }
+        if !steps.isEmpty { openSetup() }
         for step in steps {
             if setupWindow == nil { openSetup() }  // Closed during the run: every step is still wanted.
             setupWindow?.model.step = step
