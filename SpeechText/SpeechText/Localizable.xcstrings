@@ -1789,7 +1789,21 @@
       }
     },
     "%lld%% downloaded" : {
-      "comment" : "Settings › General › Updates: caption under 'Downloading update'. %lld is the percent done; keep the % sign. One short line."
+      "comment" : "Settings › General › Updates: caption under 'Downloading update'. %lld is the percent done; keep the % sign. One short line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% descargado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% завантажено"
+          }
+        }
+      }
     },
     "%llds" : {
       "comment" : "Usage page, typing test: seconds since the first key, short, e.g. 12s.",
@@ -5801,7 +5815,21 @@
       }
     },
     "Downloading update" : {
-      "comment" : "Settings › General › Updates: row title while an update the user agreed to is downloading, beside a progress bar."
+      "comment" : "Settings › General › Updates: row title while an update the user agreed to is downloading, beside a progress bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando actualización"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантаження оновлення"
+          }
+        }
+      }
     },
     "Downloading · %lld%%" : {
       "comment" : "A model's download status. %lld is the percent done; keep the % sign.",
@@ -6399,7 +6427,21 @@
       }
     },
     "Extracting update" : {
-      "comment" : "Settings › General › Updates: row title while the downloaded update is unpacked, beside a progress bar."
+      "comment" : "Settings › General › Updates: row title while the downloaded update is unpacked, beside a progress bar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extrayendo actualización"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розпакування оновлення"
+          }
+        }
+      }
     },
     "Failed" : {
       "comment" : "Home and History: a row's tag for a failed dictation.",
@@ -7735,7 +7777,21 @@
       }
     },
     "Install and Relaunch" : {
-      "comment" : "Settings › General › Updates: button that installs the downloaded update and restarts the app. Short; it sits beside the row's title."
+      "comment" : "Settings › General › Updates: button that installs the downloaded update and restarts the app. Short; it sits beside the row's title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar y reiniciar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встановити й перезапустити"
+          }
+        }
+      }
     },
     "Install it, then retry from History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. under '%@ isn't installed'.",
@@ -7755,7 +7811,21 @@
       }
     },
     "Installing update" : {
-      "comment" : "Settings › General › Updates: row title once the user chose to install, just before the app restarts."
+      "comment" : "Settings › General › Updates: row title once the user chose to install, just before the app restarts.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando actualización"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встановлення оновлення"
+          }
+        }
+      }
     },
     "Installing…" : {
       "comment" : "The Install button while the model downloads.",
@@ -14150,10 +14220,38 @@
       }
     },
     "SpeechText relaunches to finish installing it." : {
-      "comment" : "Settings › General › Updates: caption under 'Update ready to install'. SpeechText is the app's name. 'It' is the update."
+      "comment" : "Settings › General › Updates: caption under 'Update ready to install'. SpeechText is the app's name. 'It' is the update.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText se reinicia para terminar de instalarla."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText перезапуститься, щоб завершити встановлення."
+          }
+        }
+      }
     },
     "SpeechText relaunches when it’s done." : {
-      "comment" : "Settings › General › Updates: caption under 'Installing update'. SpeechText is the app's name; 'it' is the installation."
+      "comment" : "Settings › General › Updates: caption under 'Installing update'. SpeechText is the app's name; 'it' is the installation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText se reinicia al terminar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText перезапуститься після завершення."
+          }
+        }
+      }
     },
     "SpeechText restarts to switch to this language." : {
       "comment" : "Settings › General › App language: row text after choosing a language that is not showing yet, beside the Restart button.",
@@ -16869,7 +16967,21 @@
       }
     },
     "Update ready to install" : {
-      "comment" : "Settings › General › Updates: row title once the update is downloaded and waits for the Install and Relaunch button."
+      "comment" : "Settings › General › Updates: row title once the update is downloaded and waits for the Install and Relaunch button.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización lista para instalar"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновлення готове до встановлення"
+          }
+        }
+      }
     },
     "Updates" : {
       "comment" : "Settings › General: group heading over the update settings.",
