@@ -9,16 +9,21 @@
 #   scripts/e2e.sh --setup                 build, launch once, say which permissions to give
 #   scripts/e2e.sh                         every scenario, on the Groq upload engine
 #   scripts/e2e.sh --engine scribe-realtime --only plain,hold
+#   scripts/e2e.sh --engine server         your own servers (docs/e2e.md › Your own server)
 #   scripts/e2e.sh --list                  the scenarios
 #
-# Options: --engine groq|scribe-realtime|gpt-live|apple  --only a,b  --traces
+# Options: --engine groq|scribe-realtime|gpt-live|apple|server  --only a,b  --traces
 #          (Debug Log › Record traces on)  --no-build  --keep (leave the
 #          documents open)
 #
 # Environment: SPEECHTEXT_CORPUS (the folder of corpus WAVs, outside the repository;
 # required), SPT_E2E_KEYS (default ~/.config/speech-text/test-keys.env),
 # SPT_E2E_DERIVED_DATA (default /tmp/st-dd-e2e), SPT_E2E_OUT (default
-# /tmp/speechtext-e2e/<time>), SPT_SIGN_IDENTITY (default: the Developer ID certificate).
+# /tmp/speechtext-e2e/<time>), SPT_SIGN_IDENTITY (default: the Developer ID certificate);
+# with --engine server, SPT_E2E_SERVER_SPEECH (default http://127.0.0.1:9932/v1),
+# SPT_E2E_SERVER_SPEECH_MODEL (default whisper), SPT_E2E_SERVER_CHAT (default
+# http://127.0.0.1:9931/v1) and SPT_E2E_SERVER_CHAT_MODEL (default: the first model the
+# chat server lists).
 #
 # Isolation, as decided with the harness: the build is stamped app.speech-text.SpeechText.e2e, so
 # it has its own preferences domain (reset before every scenario) and its own data folder
@@ -45,6 +50,12 @@ CLIPS_JSON="$REPO_ROOT/SpeechText/SpeechTextTests/Audio"
 DATA="$HOME/Library/Application Support/SpeechText-e2e"
 OUT="${SPT_E2E_OUT:-/tmp/speechtext-e2e/$(date +%Y-%m-%d_%H-%M-%S)}"
 KEYS="$WORK/keys"
+KEY_ARGS=()   # the key file, when there is one: the server engine runs without it
+# The servers --engine server points the build at; docs/e2e.md says how to start them.
+SERVER_SPEECH="${SPT_E2E_SERVER_SPEECH:-http://127.0.0.1:9932/v1}"
+SERVER_SPEECH_MODEL="${SPT_E2E_SERVER_SPEECH_MODEL:-whisper}"
+SERVER_CHAT="${SPT_E2E_SERVER_CHAT:-http://127.0.0.1:9931/v1}"
+SERVER_CHAT_MODEL="${SPT_E2E_SERVER_CHAT_MODEL:-}"
 
 ALL_SCENARIOS="plain hold double-tap tap-cancels ai switch-to-ai switch-to-plain esc-cancel two-in-a-row switch-app stream-drop apple-error edit smoke-plain-text smoke-script-editor"
 
@@ -58,7 +69,7 @@ while [ $# -gt 0 ]; do
         --setup) SETUP=1; shift ;;
         --keep) KEEP=1; shift ;;
         --list) echo "$ALL_SCENARIOS" | tr ' ' '\n'; exit 0 ;;
-        -h|--help) sed -n '5,32p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '5,36p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown option $1" >&2; exit 2 ;;
     esac
 done
@@ -66,14 +77,39 @@ done
 die() { printf '%s\n' "$*" >&2; exit 1; }
 
 case "$ENGINE" in
-    groq|scribe-realtime|gpt-live|apple) ;;
-    *) die "unknown engine $ENGINE (groq, scribe-realtime, gpt-live, apple)" ;;
+    groq|scribe-realtime|gpt-live|apple|server) ;;
+    *) die "unknown engine $ENGINE (groq, scribe-realtime, gpt-live, apple, server)" ;;
 esac
-[ -f "$KEYS_FILE" ] || die "no key file at $KEYS_FILE (GROQ_API_KEY=…, OPENAI_API_KEY=…, ELEVENLABS_API_KEY=…)"
+# The server engine sends nothing to a cloud service, so it needs no key file.
+[ -f "$KEYS_FILE" ] || [ "$ENGINE" = server ] || die "no key file at $KEYS_FILE (GROQ_API_KEY=…, OPENAI_API_KEY=…, ELEVENLABS_API_KEY=…)"
 [ -n "$CORPUS" ] || die "SPEECHTEXT_CORPUS must name the folder of corpus WAVs"
 [ -d "$CORPUS" ] || die "no corpus at $CORPUS — set SPEECHTEXT_CORPUS"
 
 mkdir -p "$WORK" "$OUT"
+[ -f "$KEYS_FILE" ] && KEY_ARGS=(-SPTKeysFile "$KEYS_FILE")
+
+# The servers are the user's, so the run checks they answer before it quits the installed
+# app. Any status but 503 will do: whisper-server has no `/models` and answers it with 404,
+# and llama-server answers 503 while it is still loading its model. AI Rewrite goes to
+# the chat server only when a scenario that rewrites is selected.
+if [ "$ENGINE" = server ]; then
+    answers() {
+        case "$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$1/models")" in 000|503) return 1 ;; esac
+    }
+    answers "$SERVER_SPEECH" || die "no speech server answers at $SERVER_SPEECH — docs/e2e.md › Your own server"
+    USES_CHAT=0
+    for name in ${ONLY:-ai}; do
+        case ",$name," in *,ai,*|*,switch-to-ai,*|*,switch-to-plain,*|*,edit,*) USES_CHAT=1 ;; esac
+    done
+    if [ "$USES_CHAT" -eq 1 ]; then
+        answers "$SERVER_CHAT" || die "no chat server answers at $SERVER_CHAT — docs/e2e.md › Your own server"
+        if [ -z "$SERVER_CHAT_MODEL" ]; then
+            SERVER_CHAT_MODEL="$(curl -s --max-time 5 "$SERVER_CHAT/models" |
+                python3 -c 'import json,sys; print(json.load(sys.stdin)["data"][0]["id"])' 2>/dev/null)" ||
+                die "the chat server at $SERVER_CHAT lists no model — set SPT_E2E_SERVER_CHAT_MODEL"
+        fi
+    fi
+fi
 
 # MARK: Build
 
@@ -196,8 +232,18 @@ prepare_domain() {  # prepare_domain [key type value]...
         gpt-live)
             defaults write "$DOMAIN" sttProvider -string openai
             defaults write "$DOMAIN" openAISTTModel -string gpt-live-transcribe ;;
+        server)
+            defaults write "$DOMAIN" sttProvider -string server
+            defaults write "$DOMAIN" serverSpeechAddress -string "$SERVER_SPEECH"
+            defaults write "$DOMAIN" serverSpeechModel -string "$SERVER_SPEECH_MODEL" ;;
     esac
-    defaults write "$DOMAIN" llmProvider -string groq
+    if [ "$ENGINE" = server ] && [ "$USES_CHAT" -eq 1 ]; then
+        defaults write "$DOMAIN" llmProvider -string server
+        defaults write "$DOMAIN" serverChatAddress -string "$SERVER_CHAT"
+        defaults write "$DOMAIN" serverChatModel -string "$SERVER_CHAT_MODEL"
+    else
+        defaults write "$DOMAIN" llmProvider -string groq
+    fi
     while [ $# -ge 3 ]; do
         defaults write "$DOMAIN" "$1" "-$2" "$3"
         shift 3
@@ -232,7 +278,7 @@ launch() {  # launch <scenario> <clip>[,<clip>…]
     LOG_PID=$!
     sleep 1
     # Through `open`, so launchd starts it and TCC asks about the app, not this shell.
-    open -n "$APP" --args -SPTAudioInput "$inputs" -SPTKeysFile "$KEYS_FILE" ${LAUNCH_ARGS[@]+"${LAUNCH_ARGS[@]}"}
+    open -n "$APP" --args -SPTAudioInput "$inputs" ${KEY_ARGS[@]+"${KEY_ARGS[@]}"} ${LAUNCH_ARGS[@]+"${LAUNCH_ARGS[@]}"}
     LAUNCH_ARGS=()
     for _ in $(seq 30); do [ -n "$(e2e_pids)" ] && break; sleep 0.2; done
     [ -n "$(e2e_pids)" ] || die "the e2e build did not start"
@@ -284,11 +330,14 @@ doc_text() {  # doc_text "app|handle"
 }
 
 # Waits for the document to differ from what it held and then stay put for two seconds.
-wait_for_change() {  # wait_for_change <doc> <initial> <timeout>
+# `--not-empty` waits past an emptied document too: an edit cuts the selection before the
+# rewrite comes back, and a server on this Mac can take longer than two seconds to answer.
+wait_for_change() {  # wait_for_change <doc> <initial> <timeout> [--not-empty]
     local doc="$1" initial="$2" deadline=$((SECONDS + $3)) last="" stable=0 now
+    local not_empty="${4:-}"
     while [ $SECONDS -lt $deadline ]; do
         now="$(doc_text "$doc")"
-        if [ "$now" != "$initial" ]; then
+        if [ "$now" != "$initial" ] && { [ -z "$not_empty" ] || [ -n "$now" ]; }; then
             if [ "$now" = "$last" ]; then
                 stable=$((stable + 1))
                 [ $stable -ge 4 ] && return 0
@@ -512,7 +561,7 @@ scenario_edit() {
     begin edit "$instruction" spokenLanguages string uk,en
     doc="$(new_doc textedit "$original")"; OPEN_DOCS+=("$doc")
     "$KEYS" tap:cmd+a sleep:0.4 tap:ctrl+shift+e "sleep:$(echo "$dur + 1" | bc)" tap:ctrl+shift+e
-    wait_for_change "$doc" "$original" 60
+    wait_for_change "$doc" "$original" 60 --not-empty
     verdict edit "$doc" --edit --original "$original"
 }
 
@@ -544,7 +593,7 @@ scenario_smoke_script_editor() {
 if [ "$SETUP" -eq 1 ]; then
     prepare_domain
     rm -rf "$DATA"
-    open -n "$APP" --args -SPTAudioInput "$(clip_path uk-short)" -SPTKeysFile "$KEYS_FILE"
+    open -n "$APP" --args -SPTAudioInput "$(clip_path uk-short)" ${KEY_ARGS[@]+"${KEY_ARGS[@]}"}
     cat <<EOF
 
 The e2e build is running ($APP).
