@@ -87,6 +87,7 @@ Checked on 2026-11-10 with whisper.cpp 1.9.5 and llama.cpp b11960 from Homebrew:
 
 ```sh
 brew install whisper-cpp llama.cpp
+mkdir -p ~/llm-eval-models
 curl -L -o ~/llm-eval-models/ggml-large-v3-turbo-q5_0.bin \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin
 whisper-server -m ~/llm-eval-models/ggml-large-v3-turbo-q5_0.bin --host 127.0.0.1 --port 9932 \
