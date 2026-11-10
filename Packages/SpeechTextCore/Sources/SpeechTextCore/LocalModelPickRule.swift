@@ -140,13 +140,7 @@ func localSTTRecommendationReason(for capabilities: SystemCapabilities, language
     if model.engine == .whisperKit, localSTTModel(id: parakeetV3ModelID)?.knows(languages) == false, !languages.isEmpty {
         return localized("\(model.displayName) — Parakeet does not know every language you speak.")
     }
-    // Not with nothing stated: "wrong in Ukrainian" would tell someone who named no language
-    // that one of them is the default.
-    if let score = pick.score, !languages.isEmpty {
-        let percent = Int((score.wer * 100).rounded())
-        let language = languageDisplayName(score.werLanguage)
-        let seconds = score.seconds.formatted(.number.precision(.fractionLength(1)).locale(numberLocale))
-        return localized("\(model.displayName): on our test recordings it got about \(percent)% of the words wrong in \(language) and answered in \(seconds) s.")
-    }
+    // The pick's numbers stay out of it, at the owner's call of 2026-11-10: they come from
+    // clips made hard on purpose, and "17% of the words wrong" read as a warning.
     return localized("\(model.displayName) for a \(tier.displayName) Mac.")
 }

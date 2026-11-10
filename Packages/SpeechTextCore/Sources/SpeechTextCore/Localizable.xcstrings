@@ -292,17 +292,6 @@
         }
       }
     },
-    "%@: on our test recordings it got about %lld%% of the words wrong in %@ and answered in %@ s." : {
-      "comment" : "Settings › Models on this Mac: why this model is recommended. The arguments are the model's name, a percentage, a language's name and a number of seconds.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@: on our test recordings it got about %2$lld%% of the words wrong in %3$@ and answered in %4$@ s."
-          }
-        }
-      }
-    },
     "%lld dictations since %@ · %@" : {
       "comment" : "Settings › History: what History holds. %lld is the number of dictations, the first %@ the day of the oldest (e.g. 14 September), the second their size on disk.",
       "localizations" : {

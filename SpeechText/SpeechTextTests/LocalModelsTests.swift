@@ -729,16 +729,16 @@ final class LocalModelPickRuleTests: XCTestCase {
         XCTAssertEqual(pick(.bestQuality, rows, on: mac(ram: 32)), "openai_whisper-large-v3-v20240930")
     }
 
-    func testTheExplanationSaysTheNumbersBehindThePick() {
+    /// The explanation names the computed pick and the Mac's class, never the pick's numbers:
+    /// they come from clips made hard on purpose (the owner's call, 2026-11-10).
+    func testTheExplanationNamesThePickButNotItsNumbers() {
         let rows = [row(Self.v3, wer: 0.171, seconds: 0.26)]
-        let reason = localSTTRecommendationReason(for: mac(ram: 16), languages: ["uk"], measurements: rows)
-        XCTAssertTrue(reason.contains("Parakeet v3"), reason)
-        XCTAssertTrue(reason.contains("17%"), reason)
-        XCTAssertTrue(reason.contains("0.3"), reason)
-        XCTAssertFalse(localSTTRecommendationReason(for: mac(ram: 16), languages: ["de"], measurements: rows).contains("%"))
-        // With nothing stated no language is named: none is the default.
-        let enUK = rows + [row(Self.v3, "en", wer: 0.04)]
-        XCTAssertTrue(localSTTRecommendationReason(for: mac(ram: 16), languages: [], measurements: enUK).contains("16 GB class"))
+        for languages in [["uk"], ["de"], []] {
+            let reason = localSTTRecommendationReason(for: mac(ram: 16), languages: languages, measurements: rows)
+            XCTAssertTrue(reason.contains("Parakeet v3"), reason)
+            XCTAssertTrue(reason.contains("16 GB class"), reason)
+            XCTAssertFalse(reason.contains("%"), reason)
+        }
     }
 
     /// Every row of the committed summary names a model the catalogue still has: a row for a
