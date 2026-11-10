@@ -793,6 +793,12 @@ final class CorpusMeasurementSummaryTests: XCTestCase {
                        [row("a", "new"), row("b", "old")])
     }
 
+    func testAnAutoPassWithoutItsWarmPassIsReported() {
+        XCTAssertEqual(CorpusMeasurementSummary.unpaired([result("uk-one")], descriptions: descriptions),
+                       ["\(result("uk-one").engine) uk-one"])
+        XCTAssertEqual(CorpusMeasurementSummary.unpaired([result("uk-one"), result("uk-one", pass: "uk+en")], descriptions: descriptions), [])
+    }
+
     func testANarrowedRunCannotReplaceRows() {
         func row(_ model: String, _ language: String, clips: Int) -> LocalSTTMeasurement {
             LocalSTTMeasurement(model: model, language: language, clips: clips, wer: 0.1, seconds: 0.1, run: "r", mac: "Apple M1 Pro")

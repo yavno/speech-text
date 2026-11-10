@@ -528,6 +528,19 @@ enum CorpusMeasurementSummary {
         }
     }
 
+    /// The speech clips whose Auto pass ran with no warm pass beside it, as "engine clip":
+    /// `rows` leaves them out, so a run cut short between the two passes would be summarized
+    /// on fewer clips without a word.
+    static func unpaired(_ results: [CorpusResult], descriptions: [CorpusClip]) -> [String] {
+        let speech = Set(descriptions.filter { !$0.expectsNothing }.map(\.name))
+        let local = results.filter { $0.status == .ran && $0.engine.hasPrefix("local/") }
+        let warm = Set(local.filter { $0.language == latencyPass && $0.stopToTextSeconds != nil }.map { "\($0.engine) \($0.clip)" })
+        return local.filter { $0.language == werPass && speech.contains(String($0.clip.prefix { $0 != "@" })) }
+            .map { "\($0.engine) \($0.clip)" }
+            .filter { !warm.contains($0) }
+            .sorted()
+    }
+
     /// `new`, and the rows of every model `new` has nothing for.
     static func merged(_ new: [LocalSTTMeasurement], into earlier: [LocalSTTMeasurement]) -> [LocalSTTMeasurement] {
         let measured = Set(new.map(\.model))

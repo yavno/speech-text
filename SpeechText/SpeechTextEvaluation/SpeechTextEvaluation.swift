@@ -203,7 +203,10 @@ struct SpeechTextEvaluation {
     /// was built with supplies the rows of the models the run did not have.
     private static func summarize(_ run: URL) throws {
         let descriptions = try CorpusClip.load(from: repository.appendingPathComponent("SpeechText/SpeechTextTests/Audio"))
-        let rows = CorpusMeasurementSummary.rows(from: try CorpusRunFolder(url: run).allResults(), descriptions: descriptions,
+        let results = try CorpusRunFolder(url: run).allResults()
+        let unpaired = CorpusMeasurementSummary.unpaired(results, descriptions: descriptions)
+        guard unpaired.isEmpty else { throw UsageError("\(run.path) has an Auto pass with no warm pass for \(unpaired.count) clip(s): \(unpaired.joined(separator: ", "))") }
+        let rows = CorpusMeasurementSummary.rows(from: results, descriptions: descriptions,
                                                  run: String(run.lastPathComponent.prefix(10)),
                                                  mac: SystemCapabilities.current().chipName)
         guard !rows.isEmpty else { throw UsageError("\(run.path) has no local results to summarize") }
