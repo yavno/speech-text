@@ -49,6 +49,18 @@
         }
       }
     },
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "macOS permission prompt: why the app asks for Local Network access, shown the first time it reaches a model server the user entered at an address on their network. SpeechText is the app's name.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SpeechText connects to the model server you entered in Settings."
+          }
+        }
+      }
+    },
     "NSMicrophoneUsageDescription" : {
       "comment" : "macOS permission prompt: why the app asks for the microphone. SpeechText is the app's name.",
       "extractionState" : "extracted_with_value",
