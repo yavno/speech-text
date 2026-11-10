@@ -131,7 +131,9 @@ A new language comes with every screen of the app in that language: run `scripts
 
 ## Language
 
-Everything in the repository is written in English: code, comments, commit messages, pull requests, issues and documentation — the same language as the app's UI. Words in other languages appear only as data, such as a non-English transcript a test or an explanation quotes.
+Everything in the repository is written in English: code, comments, commit messages, pull requests, issues and documentation. Words in other languages appear only as data, such as a non-English transcript a test or an explanation quotes, and in the String Catalogs.
+
+The app's own text is written in English too, and you do not translate it: a scheduled agent adds every new string to every supported language in a pull request of its own. A translation that reads wrong is reported with the *Translation error* issue form.
 
 ## Setting up
 
