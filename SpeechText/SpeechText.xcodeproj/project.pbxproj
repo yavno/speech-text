@@ -101,6 +101,7 @@
 		D8000002000000000000A002 /* CorpusEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8000001000000000000A002 /* CorpusEvaluation.swift */; };
 		E9C0E0020000000000000001 /* CatalogueExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C0E0010000000000000001 /* CatalogueExport.swift */; };
 		E9C0E0030000000000000001 /* CatalogueExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C0E0010000000000000001 /* CatalogueExport.swift */; };
+		E9C0E0020000000000000003 /* UpdateInstallProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C0E0010000000000000003 /* UpdateInstallProgressTests.swift */; };
 		E9C0E0020000000000000002 /* CatalogueExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C0E0010000000000000002 /* CatalogueExportTests.swift */; };
 		D8000002000000000000A003 /* LiveDictation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8000001000000000000A003 /* LiveDictation.swift */; };
 		D8000002000000000000A004 /* LocalSTTRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8000001000000000000A004 /* LocalSTTRuntime.swift */; };
@@ -204,6 +205,7 @@
 		D8000001000000000000A001 /* LiveProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveProviderTests.swift; sourceTree = "<group>"; };
 		D8000001000000000000A002 /* CorpusEvaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorpusEvaluation.swift; sourceTree = "<group>"; };
 		E9C0E0010000000000000001 /* CatalogueExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogueExport.swift; sourceTree = "<group>"; };
+		E9C0E0010000000000000003 /* UpdateInstallProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateInstallProgressTests.swift; sourceTree = "<group>"; };
 		E9C0E0010000000000000002 /* CatalogueExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogueExportTests.swift; sourceTree = "<group>"; };
 		D8000001000000000000A003 /* LiveDictation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveDictation.swift; sourceTree = "<group>"; };
 		D8000001000000000000A004 /* LocalSTTRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSTTRuntime.swift; sourceTree = "<group>"; };
@@ -368,6 +370,7 @@
 				D8000001000000000000A003 /* LiveDictation.swift */,
 				D8000001000000000000A002 /* CorpusEvaluation.swift */,
 				E9C0E0010000000000000001 /* CatalogueExport.swift */,
+				E9C0E0010000000000000003 /* UpdateInstallProgressTests.swift */,
 				E9C0E0010000000000000002 /* CatalogueExportTests.swift */,
 				D8000001000000000000A001 /* LiveProviderTests.swift */,
 				B20000010000000000000001 /* PureLogicTests.swift */,
@@ -624,6 +627,7 @@
 				D8000002000000000000A003 /* LiveDictation.swift in Sources */,
 				D8000002000000000000A002 /* CorpusEvaluation.swift in Sources */,
 				E9C0E0020000000000000001 /* CatalogueExport.swift in Sources */,
+				E9C0E0020000000000000003 /* UpdateInstallProgressTests.swift in Sources */,
 				E9C0E0020000000000000002 /* CatalogueExportTests.swift in Sources */,
 				D8000002000000000000A001 /* LiveProviderTests.swift in Sources */,
 				F7A003000000000000000004 /* HomeSummaryTests.swift in Sources */,

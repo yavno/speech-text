@@ -1788,6 +1788,9 @@
         }
       }
     },
+    "%lld%% downloaded" : {
+      "comment" : "Settings › General › Updates: caption under 'Downloading update'. %lld is the percent done; keep the % sign. One short line."
+    },
     "%llds" : {
       "comment" : "Usage page, typing test: seconds since the first key, short, e.g. 12s.",
       "localizations" : {
@@ -5797,6 +5800,9 @@
         }
       }
     },
+    "Downloading update" : {
+      "comment" : "Settings › General › Updates: row title while an update the user agreed to is downloading, beside a progress bar."
+    },
     "Downloading · %lld%%" : {
       "comment" : "A model's download status. %lld is the percent done; keep the % sign.",
       "localizations" : {
@@ -6391,6 +6397,9 @@
           }
         }
       }
+    },
+    "Extracting update" : {
+      "comment" : "Settings › General › Updates: row title while the downloaded update is unpacked, beside a progress bar."
     },
     "Failed" : {
       "comment" : "Home and History: a row's tag for a failed dictation.",
@@ -7725,6 +7734,9 @@
         }
       }
     },
+    "Install and Relaunch" : {
+      "comment" : "Settings › General › Updates: button that installs the downloaded update and restarts the app. Short; it sits beside the row's title."
+    },
     "Install it, then retry from History." : {
       "comment" : "Notice beside the dictation overlay: text under the title. under '%@ isn't installed'.",
       "localizations" : {
@@ -7741,6 +7753,9 @@
           }
         }
       }
+    },
+    "Installing update" : {
+      "comment" : "Settings › General › Updates: row title once the user chose to install, just before the app restarts."
     },
     "Installing…" : {
       "comment" : "The Install button while the model downloads.",
@@ -14134,6 +14149,12 @@
         }
       }
     },
+    "SpeechText relaunches to finish installing it." : {
+      "comment" : "Settings › General › Updates: caption under 'Update ready to install'. SpeechText is the app's name. 'It' is the update."
+    },
+    "SpeechText relaunches when it’s done." : {
+      "comment" : "Settings › General › Updates: caption under 'Installing update'. SpeechText is the app's name; 'it' is the installation."
+    },
     "SpeechText restarts to switch to this language." : {
       "comment" : "Settings › General › App language: row text after choosing a language that is not showing yet, beside the Restart button.",
       "localizations" : {
@@ -16846,6 +16867,9 @@
           }
         }
       }
+    },
+    "Update ready to install" : {
+      "comment" : "Settings › General › Updates: row title once the update is downloaded and waits for the Install and Relaunch button."
     },
     "Updates" : {
       "comment" : "Settings › General: group heading over the update settings.",
