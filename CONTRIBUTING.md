@@ -101,7 +101,7 @@ Short on purpose. Anything a machine can refuse for you is not on it:
 
 - One concern per PR. Don't mix an unrelated fix into a feature.
 - Logic you want tested goes in `Packages/SpeechTextCore/Sources/SpeechTextCore/`, which needs no project edit; views and anything that touches `AppState` or `SpeechEngine` stay in `SpeechText/SpeechText/` (see [docs/development.md](docs/development.md#tests)). A type the app uses is `public` there — the compiler says so, but as `cannot find 'X' in scope` in an app file, which reads like a missing import.
-- UI changes include a before/after screenshot. Anything with motion or timing includes a short video.
+- UI changes include a before/after screenshot. Anything with motion or timing includes a short video. `scripts/window-snapshots.sh --languages en --only settings-speech` takes that one window and nothing else on screen (`--only setup-` for every step of Setup), and `--defaults f.plist` starts it on stored settings, such as a chosen server; `-h` has the rest.
 - The description says what changed and why, under *Users will notice* what changes for someone using the app (or "Nothing"), and under *Needs a real-app run* what only a person can check in the running app (or "None").
 - Leave `CHANGELOG.md` alone. The maintainer writes its entry from *Users will notice* after the merge, in a pull request of its own: the release notes keep one voice, and open pull requests do not conflict over `[Unreleased]`.
 

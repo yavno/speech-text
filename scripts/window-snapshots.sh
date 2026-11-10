@@ -2,9 +2,11 @@
 # SPDX-FileCopyrightText: 2026 Vladyslav Husakov
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Draws the app's windows in every language it has, to look the translations over.
+# Draws the app's windows in every language it has, to look the translations over, or
+# only the ones a pull request needs to show.
 #
 #   scripts/window-snapshots.sh [--no-build] [--languages "en es uk"] [--double-length]
+#                               [--only "setup-speech settings-general"] [--defaults f.plist]
 #
 # Builds Debug, stamps a copy as the end-to-end build (app.speech-text.SpeechText.e2e: its
 # own preferences and data folder, never the user's — see E2EMode), and launches it once
@@ -18,9 +20,26 @@
 # window's page comes out blank. The windows flash on screen meanwhile. index.html puts
 # the languages side by side.
 #
+# --only takes window names, as a full run names its pictures (setup-speech, main-home,
+# settings-general, record-window; a long page's later screens, main-history-2.png, come
+# with their window), separated by spaces or commas; a name ending in "-" takes every one
+# that starts with it (setup- for all of Setup's steps). The app then opens those windows
+# and no other. A name that matches no window stops the run and lists
+# the names there are. For a pull request's screenshot:
+#   scripts/window-snapshots.sh --languages en --only settings-speech
+#
+# Every launch starts from empty settings: the e2e domain is deleted first. --defaults
+# imports a property list into it after that (defaults import), so a picture can show a
+# stored state, such as a chosen server; write one with
+#   defaults export app.speech-text.SpeechText.e2e f.plist
+# after setting it up in an e2e build, or by hand (docs/settings-keys.md names the keys).
+# The user's own domain is never read or written. API keys are refused: they live in the
+# keychain, and an e2e run takes them only from -SPTKeysFile (scripts/e2e.sh).
+#
 # Output: /tmp/speechtext-snapshots/<time>/ (SPT_SNAPSHOTS_OUT changes it; its language
 # folders are replaced). Needs a logged-in session; never CI. Exits 1, after writing
-# index.html, when a run was cut short or a window could not be captured.
+# index.html, when a run was cut short or a window could not be captured; 2 for a wrong
+# argument, an --only name that matches no window or a --defaults file it will not take.
 
 set -euo pipefail
 
@@ -31,17 +50,39 @@ OUT="${SPT_SNAPSHOTS_OUT:-/tmp/speechtext-snapshots/$(date +%Y-%m-%d_%H-%M-%S)}"
 LANGUAGES="en es uk"
 BUILD=1
 DOUBLE=0
+ONLY=""
+ONLY_GIVEN=0
+DEFAULTS=""
 
 while [ $# -gt 0 ]; do
   case $1 in
     --no-build) BUILD=0 ;;
     --double-length) DOUBLE=1 ;;
     --languages) LANGUAGES=$2; shift ;;
-    -h|--help) sed -n '4,23p' "$0"; exit 0 ;;
+    --only) ONLY=$2; ONLY_GIVEN=1; shift ;;
+    --defaults) DEFAULTS=$2; shift ;;
+    -h|--help) sed -n '4,42p' "$0"; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
   shift
 done
+
+if [ "$ONLY_GIVEN" -eq 1 ] && [ -z "${ONLY//[ ,]/}" ]; then
+  echo "--only needs at least one window name (setup-speech, settings-, …)" >&2; exit 2
+fi
+if [ -n "$DEFAULTS" ]; then
+  [ -f "$DEFAULTS" ] || { echo "--defaults: no file at $DEFAULTS" >&2; exit 2; }
+  # A dictionary at the top, as defaults import takes: a lone word is a property list too.
+  /usr/bin/plutil -convert xml1 -o - "$DEFAULTS" 2>/dev/null | grep -qxE '<dict/?>' \
+    || { echo "--defaults: $DEFAULTS is not a property list of settings" >&2; exit 2; }
+  # Every key setting's name ends in APIKey (SettingsKeys). A key in the preferences domain
+  # would be taken for a newer one than the keychain holds; this run never takes keys.
+  if /usr/bin/plutil -p "$DEFAULTS" | grep -qE '"[^"]*APIKey" =>'; then
+    echo "--defaults: $DEFAULTS holds an API key; leave keys out (they are never written here)" >&2; exit 2
+  fi
+fi
+ONLY_ARGS=()
+if [ "$ONLY_GIVEN" -eq 1 ]; then ONLY_ARGS=(-SPTSnapshotsOnly "$ONLY"); fi
 
 APP="$DD/snapshots/SpeechText.app"
 mkdir -p "$OUT" "$DD/snapshots"
@@ -64,10 +105,11 @@ run() {  # name, extra arguments…
   local name=$1; shift
   echo "Drawing ${name}…"
   defaults delete "$DOMAIN" >/dev/null 2>&1 || true
+  if [ -n "$DEFAULTS" ]; then defaults import "$DOMAIN" "$DEFAULTS"; fi
   # A picture left by an earlier run would pass for this one's.
   rm -rf "${OUT:?}/$name"
   mkdir -p "$OUT/$name"
-  "$APP/Contents/MacOS/SpeechText" "$@" -SPTSnapshots "$OUT/$name" >/dev/null 2>&1 &
+  "$APP/Contents/MacOS/SpeechText" "$@" ${ONLY_ARGS[@]+"${ONLY_ARGS[@]}"} -SPTSnapshots "$OUT/$name" >/dev/null 2>&1 &
   local pid=$! start=$SECONDS request id status=0
   # The app names each window it has open (<snapshot>.window) and waits for its picture:
   # screencapture -l takes that window alone, nothing else on the screen.
@@ -84,6 +126,17 @@ run() {  # name, extra arguments…
     if [ $((SECONDS - start)) -ge 180 ]; then kill "$pid" 2>/dev/null || true; problem "$name: timed out, its windows are incomplete"; break; fi
   done
   wait "$pid" 2>/dev/null || status=$?
+  # Written in place of any picture when an --only name matches no window.
+  if [ -e "$OUT/$name/only.unknown" ]; then
+    {
+      echo "--only: no window is named $(sed -n 1p "$OUT/$name/only.unknown")"
+      echo "The names are: $(sed -n 2p "$OUT/$name/only.unknown")"
+      echo "A name ending in - takes every one that starts with it, such as setup-."
+    } >&2
+    rm -rf "${OUT:?}/$name"
+    defaults delete "$DOMAIN" >/dev/null 2>&1 || true
+    exit 2
+  fi
   for request in "$OUT/$name"/*.missing; do
     [ -e "$request" ] || continue
     problem "$name/$(basename "${request%.missing}"): its window was not open"
@@ -117,6 +170,9 @@ done | sort -u)
   echo 'img{width:520px;border:1px solid #ccc;background:#fff}.none{color:#888}'
   echo '.problems{background:#fff3cd;padding:8px 12px;white-space:pre-wrap}</style>'
   if [ -n "$PROBLEMS" ]; then printf '<div class=problems><b>Incomplete run</b>\n%s</div>\n' "$PROBLEMS"; fi
+  # What a reader needs to take the same pictures again.
+  if [ "$ONLY_GIVEN" -eq 1 ]; then echo "<p>Only the windows <code>--only \"$ONLY\"</code> names.</p>"; fi
+  if [ -n "$DEFAULTS" ]; then echo "<p>Settings imported from <code>--defaults $(basename "$DEFAULTS")</code>.</p>"; fi
   echo '<table><tr><th></th>'
   for c in $columns; do echo "<th>$c</th>"; done
   echo '</tr>'
