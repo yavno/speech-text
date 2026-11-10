@@ -137,15 +137,17 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// message formatting", discord.com/blog), an Obsidian 1.12.7 note, whose file is
     /// Markdown (obsidian.md/help/syntax), T3 Code 0.1.7's composer, whose source is
     /// Markdown (the note in `SelectionEdit`, this repository's, not its maker's).
-    /// Left out: Slack, whose markup is opt-in and `*bold*`, with no headings or tables,
-    /// and whose page says "Messages that you copy and paste will appear in plain text"
-    /// (slack.com/help/articles/360039953113); Notion, whose help documents shortcuts as
-    /// typed and file import, not a paste; the prompt boxes of Claude and ChatGPT, of
-    /// which neither maker says anything.
+    /// Slack 4.53 and Notion 7.42: the owner pasted Markdown into each on 2026-11-10 and it
+    /// rendered, though Slack's help says a paste "will appear in plain text"
+    /// (slack.com/help/articles/360039953113) and Notion's documents typed shortcuts only.
+    /// Left out: the prompt boxes of Claude and ChatGPT, which the same paste showed do not
+    /// render it. An editor counts through its window title, below.
     static let markdownBundleIDPrefixes = [
         "com.hnc.Discord",                  // and DiscordPTB, DiscordCanary
         "com.t3tools.t3code",
+        "com.tinyspeck.slackmacgap",
         "md.obsidian",
+        "notion.id",
     ]
 
     /// Whether Markdown means something where this text lands: an app on the list, or an

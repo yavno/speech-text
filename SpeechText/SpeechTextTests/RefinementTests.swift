@@ -169,18 +169,20 @@ final class ModeMarkerBoundaryTests: XCTestCase {
 final class FocusContextTests: XCTestCase {
 
     /// Checked apps only (#111); see the comment on `markdownBundleIDPrefixes` for why
-    /// Slack, Notion and the AI apps' own prompt boxes are not here.
+    /// the AI apps' own prompt boxes are not here.
     func testMarkdownRendersInTheListedAppsAndNoOthers() {
-        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code"] {
+        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code", "com.tinyspeck.slackmacgap", "notion.id"] {
             XCTAssertTrue(FocusContext(bundleID: id).rendersMarkdown, id)
         }
-        for id in ["com.tinyspeck.slackmacgap", "notion.id", "com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
+        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
             XCTAssertFalse(FocusContext(bundleID: id).rendersMarkdown, id)
         }
         XCTAssertFalse(FocusContext(appName: "Obsidian").rendersMarkdown, "known by its ID, not a name")
     }
 
     func testAnEditorRendersMarkdownOnlyWhereItsWindowNamesAMarkdownFile() {
+        XCTAssertTrue(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "README.md — speech-text").rendersMarkdown)
+        XCTAssertFalse(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "App.swift — speech-text").rendersMarkdown)
         let cursor = "com.todesktop.230313mzl4w4u92"
         for title in ["README.md — speech-text", "● notes.md - Project", "CHANGES.MARKDOWN", "docs/plan.md (Working Tree)"] {
             XCTAssertTrue(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
@@ -758,6 +760,8 @@ final class RewriteRouterTests: XCTestCase {
     private let builtIns = PromptPresetStore.builtInDefaults
     private let gemma = "gemma-4-12b-it-qat-q4_0"
     private let slack = FocusContext(appName: "Slack", bundleID: "com.tinyspeck.slackmacgap")
+    /// An app off the Markdown list, so a route block holds only what step one decided.
+    private let mail = FocusContext(appName: "Mail", bundleID: "com.apple.mail")
     private let xcode = FocusContext(bundleID: "com.apple.dt.Xcode")
     private let own = PromptPreset(name: "Haiku", whenToUse: "A haiku.", instructions: "Three lines.")
 
@@ -791,7 +795,7 @@ final class RewriteRouterTests: XCTestCase {
 
     private func decide(_ transcript: String = "напиши листа", context: FocusContext? = nil, presets: [PromptPreset]? = nil,
                         with step: RewriteRouter.StepOne) async -> RewriteRouter.Decision? {
-        await RewriteRouter.decide(transcript: transcript, context: context ?? slack, presets: presets ?? builtIns,
+        await RewriteRouter.decide(transcript: transcript, context: context ?? mail, presets: presets ?? builtIns,
                                    defaultPresetID: nil, stepOne: step)
     }
 
@@ -945,7 +949,7 @@ final class RewriteRouterTests: XCTestCase {
         let plain = await decide(with: choice)
         XCTAssertEqual(renders?.request.system, plain?.request.system)
         XCTAssertEqual(renders?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
-        XCTAssertNil(plain?.routeBlock, "Slack is not on the list")
+        XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
     }
 
     func testTheMarkdownFactFollowsTheFormatInTheRouteBlock() {
