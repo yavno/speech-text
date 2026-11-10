@@ -35,6 +35,23 @@ public enum STTProviderType: String, CaseIterable, Identifiable, Sendable {
 /// says what it was measured against; the cloud STT ones were verified by probing the
 /// ElevenLabs API on 2026-08-29.
 public enum STTTuning {
+    /// How much lower a model's word error rate must be than a standing local pick's to
+    /// replace it (`localSTTPick`). The owner's call of 2026-10-17 (#5, "let's try"): on
+    /// the corpus (M1 Pro, 2026-10-16) Ultra and v3 differ by 4–7% within a language, and
+    /// that is not a reason to change what someone is told to install.
+    static let localPickWERImprovement = 0.10
+
+    /// How much lower its latency must be instead — the owner's call of 2026-10-17, as
+    /// above. The same model's median moves by 10–20% between runs on a busy Mac (M1 Pro,
+    /// v3 on Ukrainian: 0.261 s on 2026-10-16, 0.288 s on 2026-11-09 in the Auto pass).
+    static let localPickLatencyImprovement = 0.30
+
+    /// How far above the lowest word error rate a model may be and still be the fast
+    /// *recommended* one. The same 10% as the replacement threshold, so a model that would
+    /// not count as clearly better is not counted as worse either. Not the owner's number
+    /// yet: #5 asks for "a tolerance" and leaves it open.
+    static let localPickWERTolerance = 0.10
+
     /// AI Rewrite's step one, past which the dictation goes to the one-step prompt (D6 of
     /// docs/specs/2026-11-03-rewrite-modes-and-router.md, the owner's call of 2026-11-03):
     /// above the 1 s target because Gemma 4 12B's median sat at it (0.86–0.96 s, router v4).

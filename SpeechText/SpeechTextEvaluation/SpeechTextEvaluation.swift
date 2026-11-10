@@ -25,6 +25,11 @@ import SpeechTextCore
 /// bundle it can load the voice activity detector (FluidAudio), so its cloud rows are
 /// judged as the app judges them.
 ///
+///     SpeechTextEvaluation --summarize-run <run-dir>
+///
+/// writes a run's WER and latency per local model and language into the committed
+/// `LocalModelMeasurements.swift`, and nothing else (`CorpusMeasurementSummary`).
+///
 ///     SpeechTextEvaluation --export-catalogue [<file>]
 ///
 /// writes the speech and chat catalogues as JSON (`CatalogueExport`) to the file, or to
@@ -42,6 +47,11 @@ struct SpeechTextEvaluation {
                 guard arguments.index(after: flag) < arguments.endIndex else { throw UsageError("--self-check needs a fixtures file") }
                 let url = URL(fileURLWithPath: arguments[arguments.index(after: flag)])
                 exit(try RewriteEvaluation.selfCheck(url) == 0 ? 0 : 1)
+            }
+            if let flag = arguments.firstIndex(of: "--summarize-run") {
+                guard arguments.index(after: flag) < arguments.endIndex else { throw UsageError("--summarize-run needs a run folder") }
+                try summarize(URL(fileURLWithPath: arguments[arguments.index(after: flag)], isDirectory: true))
+                return
             }
             if arguments.contains("--recheck") {
                 try await RewriteEvaluation.recheck(arguments)
@@ -99,6 +109,7 @@ struct SpeechTextEvaluation {
         init(_ message: String) { self.message = message }
         var errorDescription: String? {
             message + "\nusage: SpeechTextEvaluation --corpus <dir> --runs <dir> [--run-dir <dir>] [--engines vendor/model,…] [--clips a,…] [--cloud] [--no-local] [--install]"
+                + "\n       SpeechTextEvaluation --summarize-run <run-dir>"
                 + "\n       SpeechTextEvaluation --export-catalogue [<file>]"
         }
     }
@@ -186,6 +197,25 @@ struct SpeechTextEvaluation {
         }
         print("\(folder.url.path)/summary.md")
         if results.values.joined().contains(where: { !$0.passed }) { exit(1) }
+    }
+
+    /// The run's date is its folder's name (`CorpusRunFolder.new`). The table this tool
+    /// was built with supplies the rows of the models the run did not have.
+    private static func summarize(_ run: URL) throws {
+        let descriptions = try CorpusClip.load(from: repository.appendingPathComponent("SpeechText/SpeechTextTests/Audio"))
+        let results = try CorpusRunFolder(url: run).allResults()
+        let unpaired = CorpusMeasurementSummary.unpaired(results, descriptions: descriptions)
+        guard unpaired.isEmpty else { throw UsageError("\(run.path) has an Auto pass with no warm pass for \(unpaired.count) clip(s): \(unpaired.joined(separator: ", "))") }
+        let rows = CorpusMeasurementSummary.rows(from: results, descriptions: descriptions,
+                                                 run: String(run.lastPathComponent.prefix(10)),
+                                                 mac: SystemCapabilities.current().chipName)
+        guard !rows.isEmpty else { throw UsageError("\(run.path) has no local results to summarize") }
+        let narrowed = CorpusMeasurementSummary.narrowed(rows, against: localSTTMeasurements)
+        guard narrowed.isEmpty else { throw UsageError("\(run.path) covers fewer clips than the rows it would replace: \(narrowed.joined(separator: ", "))") }
+        let source = CorpusMeasurementSummary.source(CorpusMeasurementSummary.merged(rows, into: localSTTMeasurements))
+        let file = repository.appendingPathComponent(CorpusMeasurementSummary.file)
+        try source.write(to: file, atomically: true, encoding: .utf8)
+        print("\(file.path): \(Set(rows.map(\.model)).count) models from \(run.lastPathComponent)")
     }
 
     private static func runtime(_ engine: CorpusEngine) -> LocalSTTRuntime? {

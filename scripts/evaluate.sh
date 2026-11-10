@@ -19,13 +19,16 @@
 # other keys than the app's. An engine without its key is a "no key" row, not a failure.
 # Optional: SPEECHTEXT_ENGINES=openAI/gpt-live-transcribe,… and SPEECHTEXT_CLIPS=a,b.
 #
+# A run of the local engines over the whole corpus also rewrites the committed
+# LocalModelMeasurements.swift: WER and latency per model and language, no transcripts.
+#
 # The cloud half costs cents and takes about as long as the clips; the local half needs
 # the models installed (Settings › Local), and a model's first load after a build may
 # take minutes — it is reported apart from the stop-to-text time.
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  sed -n '5,24p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '5,27p' "$0" | sed 's/^# \{0,1\}//'
   exit 64
 fi
 
@@ -72,6 +75,12 @@ esac
 [ -n "${SPEECHTEXT_CLIPS:-}" ] && args+=(--clips "$SPEECHTEXT_CLIPS")
 echo "▸ Engines…"
 "$derived/Build/Products/Release/SpeechTextEvaluation" "${args[@]}" | tee "$run_dir/evaluation.log" || status=1
+
+# Not with SPEECHTEXT_CLIPS: a row's WER is the mean over a language's clips, and a
+# narrowed run would replace it with a mean over fewer. A failed check still measured.
+if [ "$mode" != "--cloud" ] && [ -z "${SPEECHTEXT_CLIPS:-}" ]; then
+  "$derived/Build/Products/Release/SpeechTextEvaluation" --summarize-run "$run_dir" || status=1
+fi
 
 echo
 echo "Summary: $run_dir/summary.md"

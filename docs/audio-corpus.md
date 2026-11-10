@@ -12,6 +12,7 @@ produces that from audio.
 | Clip descriptions: expected text, language, tags, bounds | `SpeechText/SpeechTextTests/Audio/<clip>.json` | yes |
 | The recordings, `<clip>.wav` and `<clip>@<variant>.wav` | a folder of your own, passed as `<corpus-dir>` | **no** — it is someone's voice |
 | A run: `summary.md`, `results-*.json`, `traces/`, the `xcodebuild` logs | `$SPEECHTEXT_RUNS/<date>/`, a folder of your own outside the repository | **no** — it holds what the engines heard in someone's voice |
+| What the local picks read: WER and latency per model and language, no words | `Packages/SpeechTextCore/Sources/SpeechTextCore/LocalModelMeasurements.swift` | yes |
 
 A description:
 
@@ -147,6 +148,25 @@ A streaming run also writes its `DictationTrace` to `traces/`: a
 regression found live becomes an offline test by copying that file into the
 private traces folder (`scripts/import-trace.sh NAME FILE`) and setting
 `expectedDocument`.
+
+## The local model picks
+
+A run of the local engines over the whole corpus rewrites `LocalModelMeasurements.swift`
+(`CorpusMeasurementSummary`): for each model and clip language, the mean word error rate
+of the speech clips' Auto pass and the median stop-to-text seconds of the warm pass after
+it, on the same clips, with the run's date and the Mac. Auto is the first pass after the
+runner swaps models, and that cost is not one a person with one model loaded pays. Summarize
+on the Mac that ran it: the chip is read then, and rows from different Macs are not compared.
+A narrowed run (`SPEECHTEXT_CLIPS`) leaves it alone, since its means would
+cover fewer clips, and `--summarize-run` refuses a run that would replace a model's rows
+with fewer clips or none for a language; a model the run did not have keeps its rows,
+under their own date.
+`SpeechTextEvaluation --summarize-run <run-dir>` writes the same file from a finished run.
+The diff is reviewed like any other: what it changes is in `LocalModelPickMatrixTests`.
+
+`localSTTPick` chooses from those rows (docs/decisions.md › Tiers pick two models, and
+candidates step down). `mixed` clips are in the file for a reader and in no pick, because
+nobody states "mixed" as a language they speak.
 
 ## Recording a clip
 

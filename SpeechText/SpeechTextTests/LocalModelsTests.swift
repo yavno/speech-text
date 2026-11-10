@@ -394,7 +394,8 @@ final class LocalSTTReasonTests: XCTestCase {
     func testReasonNamesTheCase() {
         XCTAssertTrue(localSTTRecommendationReason(for: mac(ram: 64, appleSilicon: false)).contains("Neural Engine"))
         XCTAssertTrue(localSTTRecommendationReason(for: mac(ram: 32, disk: 1)).contains("disk"))
-        XCTAssertTrue(localSTTRecommendationReason(for: mac(ram: 8)).contains("8 GB class"))
+        // A language the corpus has no recordings of: the sentence is the Mac's, not the numbers'.
+        XCTAssertTrue(localSTTRecommendationReason(for: mac(ram: 8), languages: ["de"]).contains("8 GB class"))
     }
 }
 
@@ -627,5 +628,194 @@ final class LocalModelPickMatrixTests: XCTestCase {
         let kept = localSTTListing(for: mac(ram: 8), languages: ["uk"], inSight: { $0.id == large })
         XCTAssertFalse(kept.heavy.contains { $0.id == large })
         XCTAssertTrue((kept.others + kept.lackingLanguage).contains { $0.id == large })
+    }
+}
+
+/// The rule of #5 against numbers written here, so a new corpus run changes none of it.
+/// What the real numbers decide is `LocalModelPickMatrixTests`.
+final class LocalModelPickRuleTests: XCTestCase {
+
+    private static let ultra = parakeetUltraModelID, v3 = parakeetV3ModelID
+
+    private func row(_ model: String, _ language: String = "uk", wer: Double, seconds: Double = 0.3, clips: Int = 20) -> LocalSTTMeasurement {
+        LocalSTTMeasurement(model: model, language: language, clips: clips, wer: wer, seconds: seconds, run: "2026-11-09", mac: "Apple M1 Pro")
+    }
+
+    private func pick(_ kind: LocalSTTPickKind, _ rows: [LocalSTTMeasurement], languages: [String] = ["uk"],
+                      on capabilities: SystemCapabilities = mac(ram: 16)) -> String? {
+        localSTTPick(kind, for: capabilities, languages: languages, measurements: rows)?.model.id
+    }
+
+    func testASmallWERImprovementDoesNotReplaceTheStandingPick() {
+        // 9.5% lower, below the 10% the owner set.
+        let rows = [row(Self.v3, wer: 0.200), row(Self.ultra, wer: 0.181)]
+        XCTAssertEqual(pick(.recommended, rows), Self.v3)
+        XCTAssertEqual(pick(.bestQuality, rows), Self.v3)
+    }
+
+    func testAClearWERImprovementReplacesIt() {
+        let rows = [row(Self.v3, wer: 0.200), row(Self.ultra, wer: 0.179)]
+        XCTAssertEqual(pick(.recommended, rows), Self.ultra)
+        XCTAssertEqual(pick(.bestQuality, rows), Self.ultra)
+    }
+
+    func testLatencyReplacesTheRecommendedPickOnlyAt30Percent() {
+        let close = [row(Self.v3, wer: 0.200, seconds: 0.30), row(Self.ultra, wer: 0.205, seconds: 0.22)]
+        XCTAssertEqual(pick(.recommended, close), Self.v3, "27% faster")
+        let clear = [row(Self.v3, wer: 0.200, seconds: 0.30), row(Self.ultra, wer: 0.205, seconds: 0.20)]
+        XCTAssertEqual(pick(.recommended, clear), Self.ultra, "33% faster, WER within the tolerance")
+        XCTAssertEqual(pick(.bestQuality, clear), Self.v3, "fast is not better quality when the WER is higher")
+    }
+
+    func testAFastModelOutsideTheToleranceIsNotRecommended() {
+        let rows = [row(Self.v3, wer: 0.200, seconds: 0.30), row(Self.ultra, wer: 0.260, seconds: 0.05)]
+        XCTAssertEqual(pick(.recommended, rows), Self.v3)
+    }
+
+    func testATieStaysWithTheStandingPick() {
+        let rows = [row(Self.ultra, "en", wer: 0.037), row("phonon-2", "en", wer: 0.037), row(Self.v3, "en", wer: 0.037)]
+        XCTAssertEqual(pick(.recommended, rows, languages: ["en"]), "phonon-2")
+        XCTAssertEqual(pick(.bestQuality, rows, languages: ["en"]), Self.v3)
+    }
+
+    func testTheWorstLanguageDecides() {
+        let rows = [row(Self.v3, "uk", wer: 0.20), row(Self.v3, "en", wer: 0.04),
+                    row(Self.ultra, "uk", wer: 0.30), row(Self.ultra, "en", wer: 0.01)]
+        XCTAssertEqual(pick(.bestQuality, rows, languages: ["uk", "en"]), Self.v3)
+        let nothingStated = localSTTPick(.bestQuality, for: mac(ram: 16), measurements: rows)
+        XCTAssertEqual(nothingStated?.score?.werLanguage, "uk", "with nothing stated, every language the corpus has")
+    }
+
+    func testMixedClipsAreNotALanguage() {
+        let rows = [row(Self.v3, "uk", wer: 0.20), row(Self.v3, "mixed", wer: 0.90),
+                    row(Self.ultra, "uk", wer: 0.20), row(Self.ultra, "mixed", wer: 0.10)]
+        XCTAssertEqual(pick(.bestQuality, rows, languages: []), Self.v3)
+    }
+
+    func testAStandingPickWithoutNumbersIsNotDisplaced() {
+        // Small stands on this disk; Tiny has numbers and Small has none.
+        let tight = SystemCapabilities(chipName: "Apple M5", isAppleSilicon: true, cores: 10, memoryBytes: 16 * gb,
+                                       freeDiskBytes: gb + gb * 2 / 5, systemMajorVersion: 14)
+        let rows = [row("openai_whisper-tiny", wer: 0.01, seconds: 0.01)]
+        XCTAssertEqual(pick(.recommended, rows, on: tight), "openai_whisper-small_216MB")
+        XCTAssertNil(localSTTPick(.recommended, for: tight, languages: ["uk"], measurements: rows)?.score)
+    }
+
+    func testALanguageTheCorpusHasNotKeepsTheList() {
+        let rows = [row(Self.v3, wer: 0.2), row(Self.ultra, wer: 0.01)]
+        XCTAssertEqual(pick(.recommended, rows, languages: ["de"]), Self.v3)
+        XCTAssertEqual(pick(.recommended, rows, languages: ["uk", "de"]), Self.v3, "numbers for one of two languages are not enough")
+    }
+
+    func testRowsFromDifferentClipCountsAreNotCompared() {
+        let rows = [row(Self.v3, wer: 0.2, clips: 29), row(Self.ultra, wer: 0.01, clips: 17)]
+        XCTAssertEqual(pick(.recommended, rows), Self.v3)
+    }
+
+    func testRowsFromDifferentMacsAreNotCompared() {
+        let rows = [row(Self.v3, wer: 0.2),
+                    LocalSTTMeasurement(model: Self.ultra, language: "uk", clips: 20, wer: 0.01, seconds: 0.01, run: "2026-11-09", mac: "Apple M5")]
+        XCTAssertEqual(pick(.recommended, rows), Self.v3)
+    }
+
+    func testAnIntelMacIgnoresNumbersMeasuredOnAppleSilicon() {
+        let rows = [row("openai_whisper-base", wer: 0.5), row("openai_whisper-tiny", wer: 0.01, seconds: 0.01)]
+        XCTAssertEqual(pick(.recommended, rows, on: mac(ram: 64, appleSilicon: false)), "openai_whisper-base")
+    }
+
+    func testAModelThatDoesNotFitThisMacCannotTakeThePick() {
+        let rows = [row(Self.v3, wer: 0.2), row("openai_whisper-large-v3-v20240930", wer: 0.01)]
+        XCTAssertEqual(pick(.bestQuality, rows, on: mac(ram: 8)), Self.v3, "Large v3 needs 24 GB")
+        XCTAssertEqual(pick(.bestQuality, rows, on: mac(ram: 32)), "openai_whisper-large-v3-v20240930")
+    }
+
+    /// The explanation names the computed pick and the Mac's class, never the pick's numbers:
+    /// they come from clips made hard on purpose (the owner's call, 2026-11-10).
+    func testTheExplanationNamesThePickButNotItsNumbers() {
+        let rows = [row(Self.v3, wer: 0.171, seconds: 0.26)]
+        for languages in [["uk"], ["de"], []] {
+            let reason = localSTTRecommendationReason(for: mac(ram: 16), languages: languages, measurements: rows)
+            XCTAssertTrue(reason.contains("Parakeet v3"), reason)
+            XCTAssertTrue(reason.contains("16 GB class"), reason)
+            XCTAssertFalse(reason.contains("%"), reason)
+        }
+    }
+
+    /// Every row of the committed summary names a model the catalogue still has: a row for a
+    /// model that left would compete for nothing and read as if it did.
+    func testTheCommittedSummaryNamesCatalogueModels() {
+        for row in localSTTMeasurements {
+            XCTAssertNotNil(localSTTModel(id: row.model), row.model)
+            XCTAssertGreaterThan(row.clips, 0, row.model)
+        }
+    }
+}
+
+final class CorpusMeasurementSummaryTests: XCTestCase {
+
+    private let descriptions = [CorpusClip(name: "uk-one", expected: "раз два", language: "uk"),
+                                CorpusClip(name: "en-one", expected: "one two", language: "en"),
+                                CorpusClip(name: "silence", expected: "", language: "uk")]
+
+    private func result(_ clip: String, engine: String = "local/parakeet-tdt-0.6b-v3", pass: String = "auto",
+                        status: CorpusResult.Status = .ran, wer: Double? = 0.5, seconds: Double? = 0.3) -> CorpusResult {
+        var result = CorpusResult(clip: clip, engine: engine, engineName: engine, language: pass, status: status)
+        result.pasted = "сказане слово"
+        result.wordErrorRate = wer
+        result.stopToTextSeconds = seconds
+        return result
+    }
+
+    func testARowIsTheAutoPassOfALanguagesSpeechClips() {
+        let rows = CorpusMeasurementSummary.rows(from: [
+            result("uk-one", wer: 0.25, seconds: 9),
+            result("uk-one", pass: "uk+en", wer: 1.0, seconds: 1),
+            result("uk-one@builtin", wer: 0.75, seconds: 9),
+            result("uk-one@builtin", pass: "uk+en", wer: 1.0, seconds: 3),
+            result("silence", wer: 1.0),
+            result("uk-one", engine: "local/openai_whisper-base", status: .notInstalled, wer: nil, seconds: nil),
+            result("uk-one", engine: "openAI/gpt-live-transcribe", wer: 0.9),
+        ], descriptions: descriptions, run: "2026-11-09", mac: "Apple M1 Pro")
+        XCTAssertEqual(rows, [LocalSTTMeasurement(model: parakeetV3ModelID, language: "uk", clips: 2, wer: 0.5, seconds: 2,
+                                                  run: "2026-11-09", mac: "Apple M1 Pro")])
+    }
+
+    func testAClipWithoutAWarmPassIsLeftOut() {
+        XCTAssertTrue(CorpusMeasurementSummary.rows(from: [result("uk-one")], descriptions: descriptions,
+                                                    run: "2026-11-09", mac: "Apple M1 Pro").isEmpty)
+    }
+
+    func testARunReplacesOnlyTheModelsItMeasured() {
+        func row(_ model: String, _ run: String) -> LocalSTTMeasurement {
+            LocalSTTMeasurement(model: model, language: "uk", clips: 1, wer: 0.1, seconds: 0.1, run: run, mac: "Apple M1 Pro")
+        }
+        XCTAssertEqual(CorpusMeasurementSummary.merged([row("a", "new")], into: [row("a", "old"), row("b", "old")]),
+                       [row("a", "new"), row("b", "old")])
+    }
+
+    func testAnAutoPassWithoutItsWarmPassIsReported() {
+        XCTAssertEqual(CorpusMeasurementSummary.unpaired([result("uk-one")], descriptions: descriptions),
+                       ["\(result("uk-one").engine) uk-one"])
+        XCTAssertEqual(CorpusMeasurementSummary.unpaired([result("uk-one"), result("uk-one", pass: "uk+en")], descriptions: descriptions), [])
+    }
+
+    func testANarrowedRunCannotReplaceRows() {
+        func row(_ model: String, _ language: String, clips: Int) -> LocalSTTMeasurement {
+            LocalSTTMeasurement(model: model, language: language, clips: clips, wer: 0.1, seconds: 0.1, run: "r", mac: "Apple M1 Pro")
+        }
+        let earlier = [row("a", "uk", clips: 4), row("a", "en", clips: 3), row("b", "uk", clips: 4)]
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 4)], against: earlier), ["a"], "English would go")
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 2), row("a", "en", clips: 3)], against: earlier), ["a"])
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("a", "uk", clips: 5), row("a", "en", clips: 3)], against: earlier), [])
+        XCTAssertEqual(CorpusMeasurementSummary.narrowed([row("c", "uk", clips: 1)], against: earlier), [], "a new model replaces nothing")
+    }
+
+    func testTheCommittedSummaryHoldsNoWords() {
+        let rows = CorpusMeasurementSummary.rows(from: [result("uk-one"), result("uk-one", pass: "uk+en")], descriptions: descriptions, run: "2026-11-09", mac: "Apple M1 Pro")
+        let source = CorpusMeasurementSummary.source(rows)
+        XCTAssertFalse(source.contains("сказане"))
+        XCTAssertFalse(source.contains("раз два"))
+        XCTAssertFalse(source.contains("uk-one"))
+        XCTAssertTrue(source.contains("LocalSTTMeasurement(model: \"parakeet-tdt-0.6b-v3\", language: \"uk\", clips: 1, wer: 0.500, seconds: 0.300, run: \"2026-11-09\", mac: \"Apple M1 Pro\"),"), source)
     }
 }
