@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Vladyslav Husakov
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import CryptoKit
 import XCTest
 @testable import SpeechTextCore
 
@@ -166,6 +167,43 @@ final class ModeMarkerBoundaryTests: XCTestCase {
 // MARK: - Focus context (FocusContext.swift, TextRefinementService prompt)
 
 final class FocusContextTests: XCTestCase {
+
+    /// Checked apps only (#111); see the comment on `markdownBundleIDPrefixes` for why
+    /// the AI apps' own prompt boxes are not here.
+    func testMarkdownRendersInTheListedAppsAndNoOthers() {
+        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code", "com.tinyspeck.slackmacgap", "notion.id"] {
+            XCTAssertTrue(FocusContext(bundleID: id).rendersMarkdown, id)
+        }
+        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
+            XCTAssertFalse(FocusContext(bundleID: id).rendersMarkdown, id)
+        }
+        XCTAssertFalse(FocusContext(appName: "Obsidian").rendersMarkdown, "known by its ID, not a name")
+    }
+
+    func testAnEditorRendersMarkdownOnlyWhereItsWindowNamesAMarkdownFile() {
+        XCTAssertTrue(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "README.md — speech-text").rendersMarkdown)
+        XCTAssertFalse(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "App.swift — speech-text").rendersMarkdown)
+        let cursor = "com.todesktop.230313mzl4w4u92"
+        for title in ["README.md — speech-text", "● notes.md - Project", "CHANGES.MARKDOWN", "docs/plan.md (Working Tree)"] {
+            XCTAssertTrue(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
+        }
+        for title in ["App.swift — speech-text", "cmd.mdx", ".md", "Markdown guide", "md"] {
+            XCTAssertFalse(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
+        }
+        XCTAssertFalse(FocusContext(bundleID: cursor).rendersMarkdown, "no title")
+        XCTAssertFalse(FocusContext(bundleID: "com.apple.TextEdit", windowTitle: "notes.md").rendersMarkdown, "not an editor")
+        XCTAssertFalse(FocusContext(bundleID: "com.apple.Terminal", windowTitle: "vim notes.md").rendersMarkdown, "a terminal")
+    }
+
+    func testTheMarkdownFactIsDerivedNotStored() throws {
+        let data = try JSONEncoder().encode(FocusContext(bundleID: "md.obsidian"))
+        XCTAssertFalse(String(decoding: data, as: UTF8.self).contains("rendersMarkdown"))
+    }
+
+    func testTheMarkdownFactStaysOutOfTheContextBlock() {
+        let block = FocusContext(appName: "Obsidian", bundleID: "md.obsidian").promptBlock
+        XCTAssertFalse(block.lowercased().contains("markdown"), "the one-step prompt carries this block")
+    }
 
     private func capture(bundleID: String? = "com.tinyspeck.slackmacgap",
                          windowTitle: String? = "#backend - Acme",
@@ -722,6 +760,8 @@ final class RewriteRouterTests: XCTestCase {
     private let builtIns = PromptPresetStore.builtInDefaults
     private let gemma = "gemma-4-12b-it-qat-q4_0"
     private let slack = FocusContext(appName: "Slack", bundleID: "com.tinyspeck.slackmacgap")
+    /// An app off the Markdown list, so a route block holds only what step one decided.
+    private let mail = FocusContext(appName: "Mail", bundleID: "com.apple.mail")
     private let xcode = FocusContext(bundleID: "com.apple.dt.Xcode")
     private let own = PromptPreset(name: "Haiku", whenToUse: "A haiku.", instructions: "Three lines.")
 
@@ -755,7 +795,7 @@ final class RewriteRouterTests: XCTestCase {
 
     private func decide(_ transcript: String = "напиши листа", context: FocusContext? = nil, presets: [PromptPreset]? = nil,
                         with step: RewriteRouter.StepOne) async -> RewriteRouter.Decision? {
-        await RewriteRouter.decide(transcript: transcript, context: context ?? slack, presets: presets ?? builtIns,
+        await RewriteRouter.decide(transcript: transcript, context: context ?? mail, presets: presets ?? builtIns,
                                    defaultPresetID: nil, stepOne: step)
     }
 
@@ -857,6 +897,88 @@ final class RewriteRouterTests: XCTestCase {
                                                         vocabulary: nil, stepOne: nil, provider: fake)
         XCTAssertNil(sent.route)
         XCTAssertEqual(fake.systems, [RewriteModes.request(context: xcode, presets: builtIns).system])
+    }
+
+    /// The owner's rule: the prompt users get does not change before #114. These are the
+    /// SHA-256 of what the service sent with no step one, as `twoStepsShip == false` sends
+    /// it, read at 40ac8ad7, the commit before #111 added the Markdown fact. Frozen values,
+    /// so a change to the fact's path that reached this request cannot also change the
+    /// expectation; apps on the list and off it, and an editor on a Markdown file.
+    func testTheOneStepRequestIsTheOneSentBeforeMarkdownWasKnown() async throws {
+        let contexts: [(FocusContext, String)] = [
+            (slack, "e16b5bf42515ce84ca9f4a86914ecac1743ac8f83aea3816631267aca7f4b06a"),
+            (FocusContext(appName: "Discord", bundleID: "com.hnc.Discord", windowTitle: "#general"), "070688eb4c0dfc23adef1df9da4cb00ee67464ab3c98c555fd4c9cacf473e81e"),
+            (FocusContext(appName: "Obsidian", bundleID: "md.obsidian", windowTitle: "Notes.md - Vault"), "f1643524c91eaa17ce130fc47b723b7994e75ad39a81c392f8cba3ac7335ced6"),
+            (FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text"), "32a7c2f3cc89ac31ece20e1173038a792cb4e59e6c4dfcf350b67c02fa08e61e"),
+            (FocusContext(appName: "T3 Code", bundleID: "com.t3tools.t3code"), "c9a0ad1842afccec26d9bb3ef85c235a34827c0f1a3141e92ea5bbfe0059f8c5"),
+            (FocusContext(appName: "Claude", bundleID: "com.anthropic.claudefordesktop"), "9b518599aac02ac7eef93416ef6d98991db3502b2764965e78391cf634027279"),
+        ]
+        for (context, expected) in contexts {
+            let fake = Fake()
+            let sent = try await TextRefinementService.send("текст", context: context, presets: builtIns, defaultPresetID: nil,
+                                                            vocabulary: nil, stepOne: nil, provider: fake)
+            XCTAssertNil(sent.route)
+            let bytes = Data((try XCTUnwrap(fake.systems.first) + "\u{0}" + (try XCTUnwrap(fake.users.first))).utf8)
+            let hash = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
+            XCTAssertEqual(hash, expected, context.appName ?? "")
+        }
+    }
+
+    func testAnAppThatRendersMarkdownIsToldSoInTheRouteBlock() async throws {
+        let obsidian = FocusContext(appName: "Obsidian", bundleID: "md.obsidian")
+        let fake = Fake()
+        let box = RequestBox()
+        let step = stepOne { request in
+            await box.set(request)
+            return Self.picking([2, 0, 0], counts: [3, 4, 3])
+        }
+        let sent = try await TextRefinementService.send("текст", context: obsidian, presets: builtIns, defaultPresetID: nil,
+                                                        vocabulary: nil, stepOne: step, provider: fake)
+        XCTAssertEqual(sent.route?.format, .plain, "a fact about the destination, not a format anyone asked for")
+        let user = try XCTUnwrap(fake.users.first)
+        XCTAssertTrue(user.contains("<route>\nmarkdown: renders here\n</route>"), user)
+        XCTAssertLessThan(try XCTUnwrap(user.range(of: "<route>")).lowerBound, try XCTUnwrap(user.range(of: "<transcript>")).lowerBound)
+        let asked = await box.request
+        XCTAssertFalse(try XCTUnwrap(asked).user.contains("renders"), "step one's measured prompt is not told")
+        XCTAssertFalse(try XCTUnwrap(asked).system.contains("renders"))
+    }
+
+    func testTheMarkdownFactLeavesEveryModeOneSavedPrefix() async {
+        let choice = stepOne { _ in Self.picking([2, 0, 0], counts: [3, 4, 3]) }
+        let renders = await decide(context: FocusContext(bundleID: "md.obsidian"), with: choice)
+        let plain = await decide(with: choice)
+        XCTAssertEqual(renders?.request.system, plain?.request.system)
+        XCTAssertEqual(renders?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+        XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
+    }
+
+    func testTheMarkdownFactFollowsTheFormatInTheRouteBlock() {
+        XCTAssertEqual(RewriteRouter.routeBlock(language: "en", format: .list, markdownRenders: true),
+                       "<route>\nlanguage: English\nformat: list\nmarkdown: renders here\n</route>")
+    }
+
+    func testAnEditorOnAMarkdownFileIsToldYetStaysPlainByCode() async throws {
+        let readme = FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text")
+        let result = await decide(context: readme, with: stepOne { _ in XCTFail("read"); throw Boom() })
+        let made = try XCTUnwrap(result)
+        XCTAssertEqual(made.request.decidedMode, "Clean-up")
+        XCTAssertEqual(made.route.format, .plain)
+        XCTAssertEqual(made.route.formatBy, .code)
+        XCTAssertEqual(made.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+        XCTAssertTrue(made.request.system.contains("add none of your own"))
+
+        let withOwn = await decide(context: readme, presets: builtIns + [own], with: stepOne { _ in
+            RewriteRouter.StepOneReading(probabilities: [[0, 1]])
+        })
+        XCTAssertEqual(withOwn?.request.decidedMode, "Haiku")
+        XCTAssertEqual(withOwn?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+    }
+
+    func testATerminalIsNeverToldAboutMarkdown() {
+        for commands: RewriteModes.CommandWriting in [.whenAsked, .atPrompt] {
+            let system = RewriteRouter.stepTwo(mode: builtIns[0], names: [], forAnotherProgram: true, commands: commands).system
+            XCTAssertFalse(system.contains("renders here"), system)
+        }
     }
 
     func testAFieldForAnotherProgramWithNoPromptsOfTheirOwnIsDecidedByCode() async throws {
