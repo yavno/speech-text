@@ -2551,7 +2551,21 @@
       }
     },
     "AI dictations and edits are sent to the address you entered and nowhere else. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
-      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server"
+      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los dictados y las ediciones con IA se envían a la dirección que indicaste y a ningún otro sitio. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo a los que va destinado el texto: el título de una ventana puede mostrar el asunto de un correo. Los gestores de contraseñas y los campos de contraseña nunca se leen."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування й редагування з ШІ надсилаються на вказану вами адресу й більше нікуди. Разом із ними йдуть слова з вашого Словника, а також застосунок, заголовок вікна й поле, для яких призначено текст — заголовок вікна може показувати тему листа. Менеджери паролів і поля паролів ніколи не читаються."
+          }
+        }
+      }
     },
     "AI edit failed" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI provider returned an error, shown as the text.",
@@ -6022,10 +6036,38 @@
       }
     },
     "Each recording is sent to the address you entered and nowhere else, with your Dictionary's words. A retry from History sends it again." : {
-      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server"
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada grabación se envía a la dirección que indicaste y a ningún otro sitio, junto con las palabras de tu Diccionario. Un reintento desde el Historial la envía de nuevo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен запис надсилається на вказану вами адресу й більше нікуди, разом зі словами з вашого Словника. Повтор з Історії надсилає його ще раз."
+          }
+        }
+      }
     },
     "Each recording is sent to the address you entered and nowhere else. A retry from History sends it again." : {
-      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server"
+      "comment" : "Settings › Privacy & Data: where a dictation goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada grabación se envía a la dirección que indicaste y a ningún otro sitio. Un reintento desde el Historial la envía de nuevo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кожен запис надсилається на вказану вами адресу й більше нікуди. Повтор з Історії надсилає його ще раз."
+          }
+        }
+      }
     },
     "Each vendor's pay-as-you-go list price as of %@, applied to the minutes and tokens their replies reported. Free tiers, plans and price changes since then change what you pay — your provider's billing page has the real figure. Models on this Mac cost nothing." : {
       "comment" : "Usage page, How this is counted: the note on cost. %@ is when the prices were checked, e.g. November 2026.",
@@ -10592,7 +10634,21 @@
       }
     },
     "On this Mac, online, or a server you run — you can change it later." : {
-      "comment" : "Setup window, Speech step: the line under the title, about the three places speech can become text. Up to two lines in a narrow column."
+      "comment" : "Setup window, Speech step: the line under the title, about the three places speech can become text. Up to two lines in a narrow column.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En este Mac, en línea o en un servidor tuyo: puedes cambiarlo más tarde."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На цьому Mac, онлайн чи на вашому сервері — це можна змінити пізніше."
+          }
+        }
+      }
     },
     "On your keyboards" : {
       "comment" : "Language picker: section heading over the languages of this Mac's keyboards.",
@@ -18156,7 +18212,21 @@
       }
     },
     "Works with any OpenAI-compatible server." : {
-      "comment" : "Setup window, Your server panel: the line under its heading. 'OpenAI-compatible' is the term the servers' own documentation uses."
+      "comment" : "Setup window, Your server panel: the line under its heading. 'OpenAI-compatible' is the term the servers' own documentation uses.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciona con cualquier servidor compatible con OpenAI."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Працює з будь-яким сервером, сумісним з OpenAI."
+          }
+        }
+      }
     },
     "Write something your way whenever it is said — “кома” as “,”, “mail sign” as your signature. Whole words, any capitals. Unlike a word above, a replacement isn't sent to the engine or AI Rewrite; it only puts the text right." : {
       "comment" : "Dictionary page, Replacements: text under the heading. “кома” is the Ukrainian word for comma, an example of a spoken word written as a sign; the examples may be adapted to your language.",
