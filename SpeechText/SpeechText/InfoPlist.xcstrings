@@ -58,6 +58,18 @@
             "state" : "new",
             "value" : "SpeechText connects to the model server you entered in Settings."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText se conecta al servidor de modelos que indicaste en Ajustes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SpeechText підключається до сервера моделей, який ви вказали в Параметрах."
+          }
         }
       }
     },
