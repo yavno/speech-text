@@ -1428,7 +1428,7 @@ final class AppState {
                     self.showStatus(
                         icon: "sparkles.slash",
                         title: String(localized: "AI processing failed"),
-                        detail: error.localizedDescription + " " + String(localized: "Pasted the raw transcription."),
+                        detail: String(localized: "\(error.localizedDescription) Pasted the raw transcription."),
                         tint: .orange,
                         duration: 10,
                         action: StatusOverlayAction(title: String(localized: "Open Settings")) {

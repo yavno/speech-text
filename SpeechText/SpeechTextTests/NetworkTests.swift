@@ -94,7 +94,8 @@ final class LocalNetworkFailureTests: XCTestCase {
 
 private final class ThrowingBatchTranscriber: BatchTranscriber, @unchecked Sendable {
     let error: Error
-    init(_ error: Error) { self.error = error }
+    let meter: UsageMeter?
+    init(_ error: Error, meter: UsageMeter? = nil) { self.error = error; self.meter = meter }
     func transcribe(audioFileURL: URL, language: String?) async throws -> String { throw error }
 }
 
@@ -143,7 +144,8 @@ final class OfflineOutcomeTests: XCTestCase {
     /// Kept in History with its audio, said as Local Network, and not offline, so it is
     /// not queued for the back-online retry.
     func testALocalNetworkDenialKeepsItsAudioAndIsNotOffline() async throws {
-        let session = BatchRecognitionSession(provider: ThrowingBatchTranscriber(TranscriptionError.localNetworkDenied),
+        let meter = UsageMeter(vendor: .server, model: "whisper")
+        let session = BatchRecognitionSession(provider: ThrowingBatchTranscriber(TranscriptionError.localNetworkDenied, meter: meter),
                                               writer: audibleWriter(), language: nil, languages: [])
         let outcome = await session.finish()
         let file = try XCTUnwrap(outcome.audioFileURL)
@@ -153,6 +155,14 @@ final class OfflineOutcomeTests: XCTestCase {
         XCTAssertFalse(outcome.offline)
         XCTAssertNotNil(outcome.error)
         XCTAssertEqual(outcome.usage, [])
+
+        // The same meter does count a failure that reached the server, so the empty
+        // usage above is the denial's doing.
+        let timedOut = await BatchRecognitionSession(provider: ThrowingBatchTranscriber(URLError(.timedOut), meter: meter),
+                                                     writer: audibleWriter(), language: nil, languages: []).finish()
+        timedOut.audioFileURL.map(AudioBufferWriter.cleanup(fileURL:))
+        XCTAssertEqual(timedOut.usage.count, 1)
+        XCTAssertEqual(timedOut.usage.first?.succeeded, false)
     }
 }
 

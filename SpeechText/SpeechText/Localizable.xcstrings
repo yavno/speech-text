@@ -35,6 +35,9 @@
         }
       }
     },
+    "%@ Pasted the raw transcription." : {
+      "comment" : "Notice after AI Rewrite on the user's own server failed because macOS kept SpeechText off the local network. %@ is the reason (a full sentence). A few lines at most in the floating notice."
+    },
     "%@ billed" : {
       "comment" : "Usage page, Requests: audio a vendor billed. %@ is a duration, e.g. 12 min.",
       "localizations" : {
