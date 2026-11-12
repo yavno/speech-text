@@ -1124,7 +1124,7 @@
       }
     },
     "Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-
+      "comment" : "A dictation, AI Rewrite or edit failed: macOS hasn't let SpeechText reach the user's server on the local network. Use macOS's own names for the System Settings path."
     },
     "Anthropic · Paid" : {
       "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name.",

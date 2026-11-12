@@ -2965,7 +2965,7 @@
       }
     },
     "Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-
+      "comment" : "Notice beside the dictation overlay: text under 'Local Network access needed — saved to History'. Use macOS's own names for the System Settings path."
     },
     "Allowed" : {
       "comment" : "Setup window, permissions: shown after ✓ when a permission is granted.",
@@ -8236,10 +8236,10 @@
       }
     },
     "Local Network access needed — saved to History" : {
-
+      "comment" : "Notice beside the dictation overlay: title, one short line. a dictation to the user's server on another device failed because macOS hasn't allowed Local Network access; its audio is in History. 'Local Network' is macOS's name for the privacy setting."
     },
     "Local Network access needed. Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-
+      "comment" : "Settings › Speech to text / AI Rewrite and Setup: the result of testing the user's server when macOS hasn't allowed Local Network access. Use macOS's own names for the System Settings path."
     },
     "Local models take no list of words — the replacements still put them right." : {
       "comment" : "Dictionary page, What a word does: row text when a local speech model is in use.",
