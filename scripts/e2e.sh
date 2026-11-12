@@ -222,11 +222,12 @@ cleanup() {
             fi
         done
     fi
-    local path
+    local path reopened=1
     for path in "${INSTALLED_PATHS[@]+"${INSTALLED_PATHS[@]}"}"; do
-        open "$path" && echo "Reopened $path."
+        if open "$path"; then echo "Reopened $path."; else reopened=0; fi
     done
-    if [ -n "$CLEANUP_DONE" ]; then : > "$CLEANUP_DONE"; fi
+    # A failed reopen leaves the marker out, so the watcher tries once more.
+    if [ -n "$CLEANUP_DONE" ] && [ "$reopened" -eq 1 ]; then : > "$CLEANUP_DONE"; fi
 }
 
 # MARK: Settings and launch
