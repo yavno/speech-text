@@ -1724,6 +1724,9 @@
         }
       }
     },
+    "For a Tailscale address, use the https:// address “tailscale serve” gives the server." : {
+      "comment" : "A request to the user's server was refused as plain HTTP, and the address is a Tailscale one: said after “macOS allows only https:// to this address.” “tailscale serve” is a command and stays as it is."
+    },
     "Forever" : {
       "comment" : "Settings › History: the last stop on the slider for how long History keeps dictations.",
       "localizations" : {
@@ -4095,6 +4098,9 @@
           }
         }
       }
+    },
+    "macOS allows only https:// to this address." : {
+      "comment" : "A request to the user's server (the test in Settings or Setup, a dictation, AI Rewrite) was refused because the address is plain http://. “https://” stays as it is."
     },
     "make it sound more sure" : {
       "comment" : "Home: the intro animation's edit example: the instruction said about the selected text. Lowercase, as spoken.",

@@ -778,6 +778,7 @@ struct ServerTestResultLine: View {
             case .audioRefused: Text("The server refused the test recording. It may not take this model, or WAV.").rowNote(bad: true)
             case .refused(let status): Text("The server refused the request (HTTP \(status)).").rowNote(bad: true)
             case .badReply: Text("The server's reply wasn't one SpeechText can read.").rowNote(bad: true)
+            case .httpsOnly(let refusal): Text(refusal.errorDescription ?? "").rowNote(bad: true)
             }
         }
     }
