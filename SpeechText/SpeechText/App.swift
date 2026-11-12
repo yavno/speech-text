@@ -1229,6 +1229,10 @@ final class AppState {
                         rewrite: isAIMode, context: isAIMode ? focusContext : nil))
                 }
                 showSavedOffline(recordID)
+            } else if speechEngine.failedForLocalNetwork {
+                // Online, but macOS keeps SpeechText off the local network: the recording
+                // is in History, and no network coming back would change it.
+                showLocalNetworkNeeded()
             } else if speechEngine.failedForModel {
                 // Not "switched off": the same reply means a key without access. The
                 // vendor's words are in History (a tap opens it), with the audio to retry
@@ -1418,6 +1422,19 @@ final class AppState {
                     let notice = modelChoiceNotice(settingsKey: key, role: .chat,
                                                    migrations: storedModelMigrations(in: .standard))
                     self.show(notice, detail: notice.detail + " " + String(localized: "Pasted the raw transcription."))
+                } else if case LLMError.localNetworkDenied? = error as? LLMError {
+                    // The server is on another device and macOS keeps SpeechText off the
+                    // local network (#228): the setting, not the network, is what to fix.
+                    self.showStatus(
+                        icon: "sparkles.slash",
+                        title: String(localized: "AI processing failed"),
+                        detail: error.localizedDescription + " " + String(localized: "Pasted the raw transcription."),
+                        tint: .orange,
+                        duration: 10,
+                        action: StatusOverlayAction(title: String(localized: "Open Settings")) {
+                            NSWorkspace.shared.open(localNetworkSettingsURL)
+                        }
+                    )
                 } else {
                     self.showStatus(
                         icon: "sparkles.slash",
@@ -2385,6 +2402,22 @@ final class AppState {
             duration: 15,
             action: StatusOverlayAction(title: String(localized: "Retry")) { [weak self] in
                 self?.retrySavedOffline(recordID)
+            }
+        )
+    }
+
+    /// A dictation to the user's server on another device, refused because macOS has not
+    /// let SpeechText reach the local network (`NetworkFailure.isLocalNetworkDenied`). Its
+    /// audio is in History, retried there by hand once access is allowed (#228).
+    private func showLocalNetworkNeeded() {
+        showStatus(
+            icon: "network.slash",
+            title: String(localized: "Local Network access needed — saved to History"),
+            detail: String(localized: "Allow SpeechText in System Settings › Privacy & Security › Local Network."),
+            tint: .orange,
+            duration: 15,
+            action: StatusOverlayAction(title: String(localized: "Open Settings")) {
+                NSWorkspace.shared.open(localNetworkSettingsURL)
             }
         )
     }

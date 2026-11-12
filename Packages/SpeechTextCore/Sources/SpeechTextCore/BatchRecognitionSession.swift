@@ -100,11 +100,17 @@ public final class BatchRecognitionSession: RecognitionSession {
                 AudioBufferWriter.cleanup(fileURL: fileURL)
                 return .cancelled
             }
-            return RecognitionOutcome(text: "", error: error.localizedDescription,
-                                      audioFileURL: fileURL, cancelled: false,
-                                      offline: NetworkFailure.isOffline(error),
-                                      modelUnavailable: (error as? TranscriptionError)?.isModelUnavailable == true,
-                                      usage: NetworkFailure.isOffline(error) ? [] : event(nil, succeeded: false))
+            var outcome = RecognitionOutcome(text: "", error: error.localizedDescription,
+                                             audioFileURL: fileURL, cancelled: false,
+                                             offline: NetworkFailure.isOffline(error),
+                                             modelUnavailable: (error as? TranscriptionError)?.isModelUnavailable == true,
+                                             usage: NetworkFailure.isOffline(error) ? [] : event(nil, succeeded: false))
+            if case TranscriptionError.localNetworkDenied = error {
+                // Nothing left the Mac, so nothing is counted, as offline.
+                outcome.localNetworkDenied = true
+                outcome.usage = []
+            }
+            return outcome
         }
     }
 

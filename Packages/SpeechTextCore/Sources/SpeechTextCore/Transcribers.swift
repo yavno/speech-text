@@ -507,6 +507,10 @@ public enum TranscriptionError: LocalizedError, Sendable {
     /// Nothing listened at the user's server. Not "no network": the Mac's connection is
     /// fine, and it coming back would not start the server (`OfflineRetry`).
     case serverNoAnswer
+    /// The user's server is on another device and macOS has not let SpeechText reach the
+    /// local network (`NetworkFailure.isLocalNetworkDenied`). Not "no network": nothing
+    /// retries it by itself.
+    case localNetworkDenied
 
     public var errorDescription: String? {
         switch self {
@@ -516,6 +520,7 @@ public enum TranscriptionError: LocalizedError, Sendable {
         case .realtime(let provider, let code, let detail): "\(provider.displayName) realtime \(code): \(detail)"
         case .noServerAddress: localized("Set your server's address in Settings › Speech to text.")
         case .serverNoAnswer: localized("Your server didn't answer.")
+        case .localNetworkDenied: localized("Allow SpeechText in System Settings › Privacy & Security › Local Network.")
         }
     }
 }

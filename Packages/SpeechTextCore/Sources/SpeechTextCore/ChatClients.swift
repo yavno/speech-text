@@ -351,6 +351,9 @@ public enum LLMError: LocalizedError, Sendable {
     /// The choice of model was cleared because the one stored leads to no model on offer
     /// (`clearedModelChoice`), and the user has not picked another.
     case noModelChosen(LLMProviderType)
+    /// AI Rewrite's server is on another device and macOS has not let SpeechText reach the
+    /// local network (`NetworkFailure.isLocalNetworkDenied`).
+    case localNetworkDenied
 
     public var errorDescription: String? {
         switch self {
@@ -366,6 +369,7 @@ public enum LLMError: LocalizedError, Sendable {
         case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › AI Rewrite")
         case .noServerAddress: localized("Set your server's address in Settings › AI Rewrite")
         case .noModelChosen(let p): localized("No model chosen for \(p.displayName) — choose one in Settings")
+        case .localNetworkDenied: localized("Allow SpeechText in System Settings › Privacy & Security › Local Network.")
         }
     }
 }
@@ -471,7 +475,14 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
 
         let start = CFAbsoluteTimeGetCurrent()
         dlog("LLM", "\(label): sending request, model=\(model.id), input=\(user.count) chars")
-        let (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
+        } catch where staysOnOrigin
+                    && NetworkFailure.isLocalNetworkDenied(error, endpoint: ServerEndpoint(address: baseURL.absoluteString)) {
+            // Only the user's server stays on its origin.
+            throw LLMError.localNetworkDenied
+        }
         let elapsed = CFAbsoluteTimeGetCurrent() - start
         // Before the status check: a 429 carries the limit that was hit.
         RateLimitStore.shared.record(vendor: model.provider.vendor, model: model.id, response: response)

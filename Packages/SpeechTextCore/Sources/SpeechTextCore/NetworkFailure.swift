@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
+import os
 
 // MARK: - What counts as "no connection"
 
@@ -60,6 +61,49 @@ public enum NetworkFailure {
 
     private static func underlying(of error: Error) -> Error? {
         (error as NSError).userInfo[NSUnderlyingErrorKey] as? Error
+    }
+}
+
+// MARK: - Local Network access
+
+extension NetworkFailure {
+    /// Whether a request to the user's server failed because macOS has not let SpeechText
+    /// reach the local network, rather than because there is no network. Pure logic.
+    ///
+    /// macOS answers a request to another device with -1009 ("not connected") while the
+    /// Local Network prompt is pending or was denied, though the Mac is online (#228). So
+    /// it is told apart by the network path: -1009 with `NWPathMonitor` reporting a
+    /// satisfied path, to a host that is not loopback — loopback needs no permission.
+    /// It is not offline: the network never went away, so nothing retries it by itself,
+    /// and the user is pointed at the setting instead.
+    public static func isLocalNetworkDenied(_ error: Error, endpoint: ServerEndpoint?, pathSatisfied: Bool) -> Bool {
+        guard let endpoint, endpoint.place != .thisMac, pathSatisfied else { return false }
+        return isNotConnected(error)
+    }
+
+    /// `isLocalNetworkDenied`, with the path as `NetworkPath` last heard it.
+    public static func isLocalNetworkDenied(_ error: Error, endpoint: ServerEndpoint?) -> Bool {
+        isLocalNetworkDenied(error, endpoint: endpoint, pathSatisfied: NetworkPath.isSatisfied)
+    }
+
+    private static func isNotConnected(_ error: Error) -> Bool {
+        let ns = error as NSError
+        if ns.domain == NSURLErrorDomain, ns.code == URLError.notConnectedToInternet.rawValue { return true }
+        return underlying(of: error).map(isNotConnected) == true
+    }
+}
+
+/// The Mac's network path as `NWPathMonitor` last reported it, for the requests that need
+/// it (`NetworkFailure.isLocalNetworkDenied`). `OfflineRetry` owns the monitor and writes
+/// here from its queue. Unknown until the first report, and read as not satisfied then,
+/// which keeps a -1009 "No connection".
+public enum NetworkPath {
+    private static let satisfied = OSAllocatedUnfairLock<Bool?>(initialState: nil)
+
+    public static var isSatisfied: Bool { satisfied.withLock { $0 == true } }
+
+    public static func update(isSatisfied: Bool) {
+        satisfied.withLock { $0 = isSatisfied }
     }
 }
 
