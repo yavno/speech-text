@@ -373,8 +373,7 @@ struct PasteService {
         }
 
         let length = (document as NSString?)?.length ?? 0
-        guard range.location + range.length <= length,
-              !(range.location == 0 && range.length == 0 && length > 0) else {
+        guard AXTextProbe.canTestSelection(location: range.location, length: range.length, documentLength: length) else {
             dlog("Span", "probe: selection \(range.location)+\(range.length) in \(length) characters is not trusted — not written back")
             return probe
         }

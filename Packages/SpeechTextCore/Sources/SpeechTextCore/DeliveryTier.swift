@@ -28,6 +28,20 @@ public struct AXTextProbe: Equatable, Sendable {
 
     /// Everything needed to find text again and re-select it.
     var supportsReplacement: Bool { valueReadable && rangeReadable && rangeReadsBack }
+
+    /// Whether writing back the selection a field reports can prove anything: only a range
+    /// inside text the field actually holds. A caret at 0 of a field with text is how
+    /// Chromium answers when it knows nothing. An empty value is how VS Code answers: the
+    /// focused element is Monaco's hidden textarea, which holds no text and reports 0+0
+    /// whatever is selected in the editor, and reads 0+0 back. Taken for Tier A, the
+    /// selection read through AX held no words and the Edit shortcut said "No text
+    /// selected" with text selected (VS Code 1.146, 2026-11-13); refused here, it is read
+    /// with a ⌘C.
+    public static func canTestSelection(location: Int, length: Int, documentLength: Int) -> Bool {
+        guard documentLength > 0, location >= 0, length >= 0 else { return false }
+        guard location + length <= documentLength else { return false }
+        return !(location == 0 && length == 0)
+    }
 }
 
 /// How far the Accessibility API can be trusted in the field in front. The Edit shortcut
