@@ -952,6 +952,16 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
     }
 
+    func testAMessageIsNotToldAboutMarkdownButStillGetsAFormatAskedFor() async {
+        let message = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(message?.request.decidedMode, "Message")
+        XCTAssertNil(message?.routeBlock, "a chat reply stays plain text where Markdown renders")
+        let asked = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 2], counts: [3, 4, 3]) })
+        XCTAssertEqual(asked?.routeBlock, "<route>\nformat: markdown\n</route>")
+        let notes = await decide(context: slack, with: stepOne { _ in Self.picking([2, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(notes?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+    }
+
     func testTheMarkdownFactFollowsTheFormatInTheRouteBlock() {
         XCTAssertEqual(RewriteRouter.routeBlock(language: "en", format: .list, markdownRenders: true),
                        "<route>\nlanguage: English\nformat: list\nmarkdown: renders here\n</route>")

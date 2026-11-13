@@ -268,8 +268,12 @@ public enum RewriteRouter {
             languageBy = .code
         }
         let format = RewriteRoute.Format.allCases[best(2)]
+        // A Message is not told: a chat reply is plain text where Markdown renders too.
+        // Told, Gemma 4 12B and Qwen3.5 9B headed or bolded plain Slack replies that one
+        // step left plain (#114, 2026-11-10); a format asked for still reaches it above.
+        let toldMarkdown = markdownRenders && mode.id != RewriteModes.builtIns[1].id
         return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: false, commands: commands),
-                        routeBlock: routeBlock(language: language, format: format, markdownRenders: markdownRenders),
+                        routeBlock: routeBlock(language: language, format: format, markdownRenders: toldMarkdown),
                         route: RewriteRoute(language: language, format: format, languageBy: languageBy, formatBy: .stepOne,
                                             stepOneModel: modelID))
     }
