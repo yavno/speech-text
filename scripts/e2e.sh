@@ -29,7 +29,8 @@
 # it has its own preferences domain (reset before every scenario) and its own data folder
 # (Application Support/SpeechText-e2e); the API keys come from the key file into memory
 # only; the installed SpeechText is quit for the run and reopened afterwards, Ctrl-C
-# included. Needs a logged-in session — never CI.
+# included, and by scripts/e2e/reopen-watcher.sh when the script is killed outright.
+# Needs a logged-in session — never CI.
 #
 # Verdicts are structural (check.py): pasted once, after the stop, into the document the
 # script opened; a cancel leaves it empty; an edit replaces the selection. WER is shown,
@@ -157,6 +158,20 @@ swiftc -O "$E2E_DIR/keys.swift" -o "$KEYS" 2> "$WORK/keys-build.log" || die "cou
 
 e2e_pids() { pgrep -f "$APP/Contents/MacOS/SpeechText" 2>/dev/null || true; }
 
+# cleanup is skipped when the script is killed with SIGKILL — an aborted tool call kills
+# its process group so (#229) — so a watcher does it then: in a session of its own, not
+# this process group, and adopted by launchd, so neither a group nor a tree kill reaches
+# it. It is started before the installed app is quit and does nothing once cleanup has
+# written CLEANUP_DONE.
+CLEANUP_DONE=""
+start_watcher() {
+    CLEANUP_DONE="$WORK/cleanup-done.$$"
+    rm -f "$CLEANUP_DONE"
+    ( python3 -c 'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])' \
+        bash "$E2E_DIR/reopen-watcher.sh" "$$" "$CLEANUP_DONE" "$APP" ${INSTALLED_PATHS[@]+"${INSTALLED_PATHS[@]}"} \
+        < /dev/null >> "$OUT/reopen-watcher.log" 2>&1 & )
+}
+
 INSTALLED_PATHS=()
 stop_installed() {
     local pid path
@@ -165,8 +180,10 @@ stop_installed() {
         case "$path" in "$APP"/*|"") continue ;; esac
         INSTALLED_PATHS+=("${path%/Contents/MacOS/*}")
     done
+    start_watcher
     [ ${#INSTALLED_PATHS[@]} -eq 0 ] && return 0
     echo "Quitting the installed SpeechText for the run (it is reopened at the end)."
+    echo "If the run is cut off and it stays closed: open$(printf " '%s'" "${INSTALLED_PATHS[@]}")"
     osascript -e "tell application id \"$INSTALLED_ID\" to quit" > /dev/null 2>&1 || true
     for _ in $(seq 20); do
         pgrep -x SpeechText > /dev/null 2>&1 || break
@@ -205,10 +222,12 @@ cleanup() {
             fi
         done
     fi
-    local path
+    local path reopened=1
     for path in "${INSTALLED_PATHS[@]+"${INSTALLED_PATHS[@]}"}"; do
-        open "$path" && echo "Reopened $path."
+        if open "$path"; then echo "Reopened $path."; else reopened=0; fi
     done
+    # A failed reopen leaves the marker out, so the watcher tries once more.
+    if [ -n "$CLEANUP_DONE" ] && [ "$reopened" -eq 1 ]; then : > "$CLEANUP_DONE"; fi
 }
 
 # MARK: Settings and launch

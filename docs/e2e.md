@@ -127,7 +127,15 @@ These decisions were made when the harness was designed.
   than plain text on disk: the installed keychain build treats a key in its own domain as
   newer, and would replace your real one with it.
 - **One app on the shortcuts.** The installed SpeechText is quit for the run and reopened at
-  the end, after Ctrl-C too.
+  the end, after Ctrl-C too. A run killed outright — an agent's aborted tool call sends
+  SIGKILL to its process group, which no trap catches — skips that cleanup, so a watcher
+  started with the run (`scripts/e2e/reopen-watcher.sh`, in a session of its own) does it
+  once the script is gone: it quits the e2e build and reopens the installed app, and logs
+  to `reopen-watcher.log` in the run's folder. A `kill -TERM` waits for the step running
+  then (a shortcut's hold, a wait for the paste) before the cleanup starts. What the
+  watcher cannot undo is left as it was: the scenario's documents stay open in TextEdit
+  and Script Editor, and the summary stops at the last scenario that finished. If the app
+  is still closed, the run's first lines name the command that reopens it.
 - **No microphone.** `-SPTAudioInput a.wav,b.wav`: each capture start plays the next clip
   through `FileCapture` in real time, in the clip's own 48 kHz format, followed by silence.
   The microphone is never opened and never asked for.

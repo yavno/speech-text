@@ -793,6 +793,7 @@ struct ServerTestResultLine: View {
                         .buttonStyle(.link)
                         .font(.caption)
                 }
+            case .httpsOnly(let refusal): Text(refusal.errorDescription ?? "").rowNote(bad: true)
             }
         }
     }

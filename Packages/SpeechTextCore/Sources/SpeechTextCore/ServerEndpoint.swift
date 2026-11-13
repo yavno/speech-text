@@ -69,6 +69,40 @@ extension ServerEndpoint {
     }
 }
 
+/// A request to the user's server that macOS refused because it was plain `http://`
+/// (NSURLErrorDomain -1022). App Transport Security lets plain HTTP through to loopback,
+/// a LAN address and a `.local` name, and refuses it to a full domain name and to a
+/// Tailscale address (docs/specs/2026-11-07-own-model-server.md › Networking). The app
+/// adds no exception, so the words say what to change instead of macOS's sentence.
+public struct ServerHTTPSOnly: LocalizedError, Equatable, Sendable {
+    public let isTailscale: Bool
+
+    public init(host: String?) { isTailscale = Self.isTailscale(host: host ?? "") }
+
+    /// The refusal, read off the error a request threw; nil for any other failure.
+    public init?(_ error: Error, host: String?) {
+        guard (error as? URLError)?.code == .appTransportSecurityRequiresSecureConnection else { return nil }
+        self.init(host: host)
+    }
+
+    public var errorDescription: String? {
+        let sentence = localized("macOS allows only https:// to this address.")
+        guard isTailscale else { return sentence }
+        return sentence + " " + localized("For a Tailscale address, use the https:// address “tailscale serve” gives the server.")
+    }
+
+    /// An address from Tailscale's range, 100.64.0.0/10, or a MagicDNS name.
+    static func isTailscale(host: String) -> Bool {
+        let host = host.lowercased()
+        if host.hasSuffix(".ts.net") { return true }
+        let octets = host.split(separator: ".", omittingEmptySubsequences: false).map { part in
+            part.utf8.allSatisfy { (48...57).contains($0) } ? UInt8(part) : nil
+        }
+        guard octets.count == 4, !octets.contains(nil) else { return false }
+        return octets[0] == 100 && (64...127).contains(octets[1]!)
+    }
+}
+
 /// Refuses a redirect off the server: without it a server could send the user's words on
 /// to a host Settings never named. A refused redirect comes back as the 3xx it was.
 final class SameOriginRedirects: NSObject, URLSessionTaskDelegate, Sendable {
@@ -116,6 +150,7 @@ public enum ServerTestResult: Equatable, Sendable {
     case badReply
     /// macOS has not let SpeechText reach the local network (`NetworkFailure.isLocalNetworkDenied`).
     case localNetworkDenied
+    case httpsOnly(ServerHTTPSOnly)
 
     /// What a status code on the way to the server means. Nil for a success.
     static func forStatus(_ status: Int) -> ServerTestResult? {
@@ -192,6 +227,7 @@ public enum ServerProbe {
         } catch where NetworkFailure.isLocalNetworkDenied(error, endpoint: endpoint) {
             return .failure(.init(.localNetworkDenied))
         } catch {
+            if let refusal = ServerHTTPSOnly(error, host: endpoint.base.host) { return .failure(.init(.httpsOnly(refusal))) }
             return .failure(.init(.noAnswer))
         }
     }
@@ -207,6 +243,8 @@ public enum ServerProbe {
             return ServerTestResult.forStatus(status) ?? .badReply
         } catch LLMError.localNetworkDenied {
             return .localNetworkDenied
+        } catch let refusal as ServerHTTPSOnly {
+            return .httpsOnly(refusal)
         } catch is LLMError {
             return .badReply
         } catch {
@@ -234,6 +272,8 @@ public enum ServerProbe {
             return .noAnswer
         } catch TranscriptionError.localNetworkDenied {
             return .localNetworkDenied
+        } catch let refusal as ServerHTTPSOnly {
+            return .httpsOnly(refusal)
         } catch is URLError {
             return .noAnswer
         } catch {
@@ -312,6 +352,8 @@ struct ServerTranscriber: BatchTranscriber {
             throw TranscriptionError.serverNoAnswer
         } catch where NetworkFailure.isLocalNetworkDenied(error, endpoint: endpoint) {
             throw TranscriptionError.localNetworkDenied
+        } catch let error as URLError where error.code == .appTransportSecurityRequiresSecureConnection {
+            throw ServerHTTPSOnly(host: endpoint.base.host)
         }
     }
 }

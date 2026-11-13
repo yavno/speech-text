@@ -475,13 +475,16 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
 
         let start = CFAbsoluteTimeGetCurrent()
         dlog("LLM", "\(label): sending request, model=\(model.id), input=\(user.count) chars")
-        let (data, response): (Data, URLResponse)
+        let data: Data, response: URLResponse
         do {
             (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
         } catch where staysOnOrigin
                     && NetworkFailure.isLocalNetworkDenied(error, endpoint: ServerEndpoint(address: baseURL.absoluteString)) {
             // Only the user's server stays on its origin.
             throw LLMError.localNetworkDenied
+        } catch {
+            // Only plain HTTP is refused this way, and only the user's server is ever addressed so.
+            throw ServerHTTPSOnly(error, host: baseURL.host) ?? error
         }
         let elapsed = CFAbsoluteTimeGetCurrent() - start
         // Before the status check: a 429 carries the limit that was hit.
