@@ -114,6 +114,10 @@ public struct RecognitionOutcome: Sendable {
     /// The vendor answered that the model is not served (`ModelUnavailableReply`): the
     /// failure notice offers the model picker. Nothing retries on it.
     public var modelUnavailable = false
+    /// The user's server could not be reached because macOS has not let SpeechText onto
+    /// the local network (`TranscriptionError.localNetworkDenied`): the notice points at
+    /// the setting. Not `offline`, so nothing retries it by itself.
+    public var localNetworkDenied = false
     /// Every request the segment cost (`UsageEvent`) — on an empty or failed outcome too,
     /// since a request the vendor answered was billed whatever the answer held.
     public var usage: [UsageEvent] = []

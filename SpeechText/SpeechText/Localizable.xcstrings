@@ -35,6 +35,23 @@
         }
       }
     },
+    "%@ Pasted the raw transcription." : {
+      "comment" : "Notice after AI Rewrite on the user's own server failed because macOS kept SpeechText off the local network. %@ is the reason (a full sentence). A few lines at most in the floating notice.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Se pegó la transcripción sin procesar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Вставлено сиру транскрипцію."
+          }
+        }
+      }
+    },
     "%@ billed" : {
       "comment" : "Usage page, Requests: audio a vendor billed. %@ is a duration, e.g. 12 min.",
       "localizations" : {
@@ -1907,23 +1924,6 @@
         }
       }
     },
-    "a few minutes" : {
-      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "unos minutos"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "кілька хвилин"
-          }
-        }
-      }
-    },
     "A good explanation feels obvious afterwards, as if the idea had been waiting patiently for someone to say it out loud." : {
       "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing.",
       "localizations" : {
@@ -1971,23 +1971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Меню"
-          }
-        }
-      }
-    },
-    "a minute or two" : {
-      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "un minuto o dos"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "хвилину-дві"
           }
         }
       }
@@ -2073,6 +2056,482 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Звичайне очікування відповіді: половина була швидшою, половина — повільнішою."
+          }
+        }
+      }
+    },
+    "AI" : {
+      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text, when no prompt name is known.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ"
+          }
+        }
+      }
+    },
+    "AI POLISH" : {
+      "comment" : "Setup window, Try it step: small label in capitals over the AI dictation's result.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PULIDO CON IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑ОБРОБКА"
+          }
+        }
+      }
+    },
+    "AI Recording" : {
+      "comment" : "Menu bar menu item. Starts a dictation that AI Rewrite rewrites before pasting. Title case, as macOS menus are in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grabación con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запис із ШІ"
+          }
+        }
+      }
+    },
+    "AI Rewrite" : {
+      "comment" : "The app's AI Rewrite feature, as a button label or an undo action name ('Undo AI Rewrite').",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reescritura con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑переписування"
+          }
+        }
+      }
+    },
+    "AI Rewrite is off, so nothing is sent." : {
+      "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when AI Rewrite has no provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La Reescritura con IA está desactivada, así que no se envía nada."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑переписування вимкнене, тож нічого не надсилається."
+          }
+        }
+      }
+    },
+    "AI Rewrite keeps them as written" : {
+      "comment" : "Dictionary page, What a word does: row title. AI Rewrite is a feature of the app; 'them' is the user's words.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La Reescritura con IA las conserva tal como se escriben"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑переписування зберігає їх як написано"
+          }
+        }
+      }
+    },
+    "AI Rewrite pastes your words as said until you add a key." : {
+      "comment" : "Settings › AI Rewrite › Online services: note under the selected service that has no API key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La Reescritura con IA pega tus palabras tal como las dices hasta que añadas una clave."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑переписування вставляє ваші слова як сказано, доки ви не додасте ключ."
+          }
+        }
+      }
+    },
+    "AI Rewrite was told it was for %@" : {
+      "comment" : "History page, an open AI dictation: what AI Rewrite was told about where the text was going. %@ is that place, e.g. 'a message in Slack'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A la Reescritura con IA se le dijo que era para %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑переписуванню сказали, що текст для: %@"
+          }
+        }
+      }
+    },
+    "AI couldn't answer this time" : {
+      "comment" : "Setup window, Try it step: title when the AI dictation failed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La IA no pudo responder esta vez"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ цього разу не зміг відповісти"
+          }
+        }
+      }
+    },
+    "AI cut this to %lld%% of its length — kept what you dictated" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite's reply was refused for being too short. %lld%% is a percentage, e.g. 20%.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La IA lo recortó al %lld%% de su longitud: se conservó lo que dictaste"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ скоротив текст до %lld%% довжини — залишено те, що ви надиктували"
+          }
+        }
+      }
+    },
+    "AI dictation" : {
+      "comment" : "Dictation overlay: VoiceOver name of a dictation that AI Rewrite rewrites.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictado con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування з ШІ"
+          }
+        }
+      }
+    },
+    "AI dictation — rewritten before it is pasted" : {
+      "comment" : "Dictation overlay: tooltip on the mode mark during an AI dictation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictado con IA: se reescribe antes de pegarse"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування з ШІ — переписується перед вставленням"
+          }
+        }
+      }
+    },
+    "AI dictations and edits are sent to %@. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
+      "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when an online AI service is in use. %@ is the company, e.g. Anthropic. Dictionary is a page of the app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los dictados con IA y las ediciones se envían a %@. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo al que va el texto; un título de ventana puede mostrar el asunto de un correo. Nunca se leen los gestores de contraseñas ni los campos de contraseña."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування з ШІ та редагування надсилаються в %@. Разом із ними — слова з вашого Словника, а також програма, назва вікна й поле, для яких текст. Назва вікна може містити тему листа. Менеджери паролів і поля паролів ніколи не зчитуються."
+          }
+        }
+      }
+    },
+    "AI dictations and edits are sent to the address you entered and nowhere else. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
+      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los dictados y las ediciones con IA se envían a la dirección que indicaste y a ningún otro sitio. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo a los que va destinado el texto: el título de una ventana puede mostrar el asunto de un correo. Los gestores de contraseñas y los campos de contraseña nunca se leen."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктування й редагування з ШІ надсилаються на вказану вами адресу й більше нікуди. Разом із ними йдуть слова з вашого Словника, а також застосунок, заголовок вікна й поле, для яких призначено текст — заголовок вікна може показувати тему листа. Менеджери паролів і поля паролів ніколи не читаються."
+          }
+        }
+      }
+    },
+    "AI edit failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI provider returned an error, shown as the text.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al editar con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося відредагувати з ШІ"
+          }
+        }
+      }
+    },
+    "AI failed: %@" : {
+      "comment" : "Record Window (the app's floating dictation window): status line. %@ is the error message.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de IA: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка ШІ: %@"
+          }
+        }
+      }
+    },
+    "AI is tidying up your text…" : {
+      "comment" : "Setup window, Try it step: title while AI polish rewrites what was said.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La IA está puliendo tu texto…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ впорядковує ваш текст…"
+          }
+        }
+      }
+    },
+    "AI isn't set up" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): ",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La IA no está configurada"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ не налаштовано"
+          }
+        }
+      }
+    },
+    "AI mode off — text is inserted as transcribed" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo IA desactivado: el texto se inserta tal como se transcribe"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режим ШІ вимкнено — текст вставляється як транскрибовано"
+          }
+        }
+      }
+    },
+    "AI mode on — dictation is rewritten using your prompt presets" : {
+      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is on.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo IA activado: el dictado se reescribe con tus prompts"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режим ШІ ввімкнено — диктування переписується за вашими промптами"
+          }
+        }
+      }
+    },
+    "AI model" : {
+      "comment" : "Setup window: what is downloading in the corner pill — the AI model (as opposed to the speech model). Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo de IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель ШІ"
+          }
+        }
+      }
+    },
+    "AI output" : {
+      "comment" : "History page, an open AI dictation: title over the text AI Rewrite wrote.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultado de la IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Результат ШІ"
+          }
+        }
+      }
+    },
+    "AI polish is almost ready" : {
+      "comment" : "Setup window, Try it step: title while the AI model is still downloading. AI polish is the setup's name for AI Rewrite.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pulido con IA está casi listo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑обробка майже готова"
+          }
+        }
+      }
+    },
+    "AI polish is ready — it uses your %@ key." : {
+      "comment" : "Setup window, AI step: shown instead of the key form when the key entered on the Speech step works for AI too. %@ is the service, e.g. Groq.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pulido con IA está listo: usa tu clave de %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ‑обробка готова — вона використовує ваш ключ %@."
+          }
+        }
+      }
+    },
+    "AI processing failed" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite failed and the dictation was pasted as transcribed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al procesar con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося обробити з ШІ"
+          }
+        }
+      }
+    },
+    "AI processing skipped" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite isn't set up, so the dictation was pasted as transcribed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procesamiento con IA omitido"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обробку з ШІ пропущено"
+          }
+        }
+      }
+    },
+    "AI · %@" : {
+      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text. %@ is the name of the prompt it used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IA · %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ШІ · %@"
+          }
+        }
+      }
+    },
+    "API Keys" : {
+      "comment" : "Settings: name of the page (sidebar entry and page title) that holds every API key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claves de API"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-ключі"
           }
         }
       }
@@ -2448,465 +2907,6 @@
         }
       }
     },
-    "AI" : {
-      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text, when no prompt name is known.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ"
-          }
-        }
-      }
-    },
-    "AI couldn't answer this time" : {
-      "comment" : "Setup window, Try it step: title when the AI dictation failed.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La IA no pudo responder esta vez"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ цього разу не зміг відповісти"
-          }
-        }
-      }
-    },
-    "AI cut this to %lld%% of its length — kept what you dictated" : {
-      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite's reply was refused for being too short. %lld%% is a percentage, e.g. 20%.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La IA lo recortó al %lld%% de su longitud: se conservó lo que dictaste"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ скоротив текст до %lld%% довжини — залишено те, що ви надиктували"
-          }
-        }
-      }
-    },
-    "AI dictation" : {
-      "comment" : "Dictation overlay: VoiceOver name of a dictation that AI Rewrite rewrites.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dictado con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Диктування з ШІ"
-          }
-        }
-      }
-    },
-    "AI dictation — rewritten before it is pasted" : {
-      "comment" : "Dictation overlay: tooltip on the mode mark during an AI dictation.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dictado con IA: se reescribe antes de pegarse"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Диктування з ШІ — переписується перед вставленням"
-          }
-        }
-      }
-    },
-    "AI dictations and edits are sent to %@. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
-      "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when an online AI service is in use. %@ is the company, e.g. Anthropic. Dictionary is a page of the app.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los dictados con IA y las ediciones se envían a %@. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo al que va el texto; un título de ventana puede mostrar el asunto de un correo. Nunca se leen los gestores de contraseñas ni los campos de contraseña."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Диктування з ШІ та редагування надсилаються в %@. Разом із ними — слова з вашого Словника, а також програма, назва вікна й поле, для яких текст. Назва вікна може містити тему листа. Менеджери паролів і поля паролів ніколи не зчитуються."
-          }
-        }
-      }
-    },
-    "AI dictations and edits are sent to the address you entered and nowhere else. With it go your Dictionary's words and the app, window title and field the text is for — a window title can show an email subject. Password managers and password fields are never read." : {
-      "comment" : "Settings › Privacy & Data: where AI Rewrite's text goes with the user's server",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los dictados y las ediciones con IA se envían a la dirección que indicaste y a ningún otro sitio. Con ellos van las palabras de tu Diccionario y la app, el título de la ventana y el campo a los que va destinado el texto: el título de una ventana puede mostrar el asunto de un correo. Los gestores de contraseñas y los campos de contraseña nunca se leen."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Диктування й редагування з ШІ надсилаються на вказану вами адресу й більше нікуди. Разом із ними йдуть слова з вашого Словника, а також застосунок, заголовок вікна й поле, для яких призначено текст — заголовок вікна може показувати тему листа. Менеджери паролів і поля паролів ніколи не читаються."
-          }
-        }
-      }
-    },
-    "AI edit failed" : {
-      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): the AI provider returned an error, shown as the text.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error al editar con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не вдалося відредагувати з ШІ"
-          }
-        }
-      }
-    },
-    "AI failed: %@" : {
-      "comment" : "Record Window (the app's floating dictation window): status line. %@ is the error message.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error de IA: %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Помилка ШІ: %@"
-          }
-        }
-      }
-    },
-    "AI is tidying up your text…" : {
-      "comment" : "Setup window, Try it step: title while AI polish rewrites what was said.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La IA está puliendo tu texto…"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ впорядковує ваш текст…"
-          }
-        }
-      }
-    },
-    "AI isn't set up" : {
-      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app): ",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La IA no está configurada"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ не налаштовано"
-          }
-        }
-      }
-    },
-    "AI mode off — text is inserted as transcribed" : {
-      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is off.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modo IA desactivado: el texto se inserta tal como se transcribe"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Режим ШІ вимкнено — текст вставляється як транскрибовано"
-          }
-        }
-      }
-    },
-    "AI mode on — dictation is rewritten using your prompt presets" : {
-      "comment" : "Record Window (the app's floating dictation window): tooltip on the AI Rewrite button when it is on.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modo IA activado: el dictado se reescribe con tus prompts"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Режим ШІ ввімкнено — диктування переписується за вашими промптами"
-          }
-        }
-      }
-    },
-    "AI model" : {
-      "comment" : "Setup window: what is downloading in the corner pill — the AI model (as opposed to the speech model). Inserted into '%@ · %lld%%', '✓ %@ ready' and '⚠︎ %@ download failed · Retry'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modelo de IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Модель ШІ"
-          }
-        }
-      }
-    },
-    "AI output" : {
-      "comment" : "History page, an open AI dictation: title over the text AI Rewrite wrote.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resultado de la IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Результат ШІ"
-          }
-        }
-      }
-    },
-    "AI POLISH" : {
-      "comment" : "Setup window, Try it step: small label in capitals over the AI dictation's result.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PULIDO CON IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑ОБРОБКА"
-          }
-        }
-      }
-    },
-    "AI polish is almost ready" : {
-      "comment" : "Setup window, Try it step: title while the AI model is still downloading. AI polish is the setup's name for AI Rewrite.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El pulido con IA está casi listo"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑обробка майже готова"
-          }
-        }
-      }
-    },
-    "AI polish is ready — it uses your %@ key." : {
-      "comment" : "Setup window, AI step: shown instead of the key form when the key entered on the Speech step works for AI too. %@ is the service, e.g. Groq.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El pulido con IA está listo: usa tu clave de %@."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑обробка готова — вона використовує ваш ключ %@."
-          }
-        }
-      }
-    },
-    "AI processing failed" : {
-      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite failed and the dictation was pasted as transcribed.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error al procesar con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не вдалося обробити з ШІ"
-          }
-        }
-      }
-    },
-    "AI processing skipped" : {
-      "comment" : "Notice beside the dictation overlay: title, one short line. AI Rewrite isn't set up, so the dictation was pasted as transcribed.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Procesamiento con IA omitido"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обробку з ШІ пропущено"
-          }
-        }
-      }
-    },
-    "AI Recording" : {
-      "comment" : "Menu bar menu item. Starts a dictation that AI Rewrite rewrites before pasting. Title case, as macOS menus are in English.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grabación con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Запис із ШІ"
-          }
-        }
-      }
-    },
-    "AI Rewrite" : {
-      "comment" : "The app's AI Rewrite feature, as a button label or an undo action name ('Undo AI Rewrite').",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reescritura con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑переписування"
-          }
-        }
-      }
-    },
-    "AI Rewrite is off, so nothing is sent." : {
-      "comment" : "Settings › Privacy & Data › What leaves this Mac › Your text: when AI Rewrite has no provider.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La Reescritura con IA está desactivada, así que no se envía nada."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑переписування вимкнене, тож нічого не надсилається."
-          }
-        }
-      }
-    },
-    "AI Rewrite keeps them as written" : {
-      "comment" : "Dictionary page, What a word does: row title. AI Rewrite is a feature of the app; 'them' is the user's words.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La Reescritura con IA las conserva tal como se escriben"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑переписування зберігає їх як написано"
-          }
-        }
-      }
-    },
-    "AI Rewrite pastes your words as said until you add a key." : {
-      "comment" : "Settings › AI Rewrite › Online services: note under the selected service that has no API key.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La Reescritura con IA pega tus palabras tal como las dices hasta que añadas una clave."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑переписування вставляє ваші слова як сказано, доки ви не додасте ключ."
-          }
-        }
-      }
-    },
-    "AI Rewrite was told it was for %@" : {
-      "comment" : "History page, an open AI dictation: what AI Rewrite was told about where the text was going. %@ is that place, e.g. 'a message in Slack'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A la Reescritura con IA se le dijo que era para %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ‑переписуванню сказали, що текст для: %@"
-          }
-        }
-      }
-    },
-    "AI · %@" : {
-      "comment" : "Record Window (the app's floating dictation window): status line after AI Rewrite changed the text. %@ is the name of the prompt it used.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IA · %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ШІ · %@"
-          }
-        }
-      }
-    },
     "All" : {
       "comment" : "Debug Log window: level filter option that shows every line.",
       "localizations" : {
@@ -2980,6 +2980,9 @@
           }
         }
       }
+    },
+    "Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
+      "comment" : "Notice beside the dictation overlay: text under 'Local Network access needed — saved to History'. Use macOS's own names for the System Settings path."
     },
     "Allowed" : {
       "comment" : "Setup window, permissions: shown after ✓ when a permission is granted.",
@@ -3202,23 +3205,6 @@
         }
       }
     },
-    "API Keys" : {
-      "comment" : "Settings: name of the page (sidebar entry and page title) that holds every API key.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Claves de API"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "API-ключі"
-          }
-        }
-      }
-    },
     "App" : {
       "comment" : "History page: the app filter's button before an app is chosen.",
       "localizations" : {
@@ -3287,23 +3273,6 @@
         }
       }
     },
-    "Apple can't detect a language, so your keyboard layout picks one — now %@." : {
-      "comment" : "Settings › Dictation › Language: caption when no language is listed and Apple Dictation is in use. %@ is a language's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple no puede detectar un idioma, así que lo elige la distribución de tu teclado: ahora %@."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple не вміє визначати мову, тож її вибирає розкладка клавіатури — зараз %@."
-          }
-        }
-      }
-    },
     "Apple Dictation" : {
       "comment" : "The name of Apple's built-in speech recognizer as a speech model, in model lists and warnings. Keep Apple; name Dictation as macOS does in your language.",
       "localizations" : {
@@ -3334,6 +3303,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Потрібне для Диктування Apple."
+          }
+        }
+      }
+    },
+    "Apple can't detect a language, so your keyboard layout picks one — now %@." : {
+      "comment" : "Settings › Dictation › Language: caption when no language is listed and Apple Dictation is in use. %@ is a language's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple no puede detectar un idioma, así que lo elige la distribución de tu teclado: ahora %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple не вміє визначати мову, тож її вибирає розкладка клавіатури — зараз %@."
           }
         }
       }
@@ -3402,23 +3388,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Як задано в Системних параметрах › Звук."
-          }
-        }
-      }
-    },
-    "as the providers' replies count them" : {
-      "comment" : "Usage page: note after the 'Requests' heading.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "según las cuentan las respuestas de los proveedores"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "за підрахунком провайдерів у відповідях"
           }
         }
       }
@@ -3633,23 +3602,6 @@
         }
       }
     },
-    "besides the prompt, with every AI dictation" : {
-      "comment" : "Prompts page: note after the 'What else AI Rewrite is told' heading.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "además del prompt, con cada dictado con IA"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "окрім промпту, з кожною диктовкою з ШІ"
-          }
-        }
-      }
-    },
     "Best quality" : {
       "comment" : "Settings › Speech to text / AI Rewrite: badge on the local model with the best quality this Mac can run.",
       "localizations" : {
@@ -3663,23 +3615,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Найкраща якість"
-          }
-        }
-      }
-    },
-    "beyond one request a dictation" : {
-      "comment" : "Usage page: note after the 'Overhead' heading.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "más allá de una solicitud por dictado"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "понад один запит на диктовку"
           }
         }
       }
@@ -3871,23 +3806,6 @@
         }
       }
     },
-    "Cancel download" : {
-      "comment" : "Setup window: button in the download pill's popover that stops a model download.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancelar descarga"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скасувати завантаження"
-          }
-        }
-      }
-    },
     "Cancel Recording" : {
       "comment" : "Menu bar menu item. Cancels a dictation that is still starting. Title case.",
       "localizations" : {
@@ -3901,6 +3819,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скасувати запис"
+          }
+        }
+      }
+    },
+    "Cancel download" : {
+      "comment" : "Setup window: button in the download pill's popover that stops a model download.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar descarga"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скасувати завантаження"
           }
         }
       }
@@ -3939,19 +3874,19 @@
         }
       }
     },
-    "Check for updates automatically" : {
-      "comment" : "Settings › General › Updates: row with a switch.",
+    "Check Now…" : {
+      "comment" : "Settings › General › Version: button that checks for an update now.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buscar actualizaciones automáticamente"
+            "value" : "Comprobar ahora…"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перевіряти оновлення автоматично"
+            "value" : "Перевірити зараз…"
           }
         }
       }
@@ -3973,19 +3908,19 @@
         }
       }
     },
-    "Check Now…" : {
-      "comment" : "Settings › General › Version: button that checks for an update now.",
+    "Check for updates automatically" : {
+      "comment" : "Settings › General › Updates: row with a switch.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comprobar ahora…"
+            "value" : "Buscar actualizaciones automáticamente"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перевірити зараз…"
+            "value" : "Перевіряти оновлення автоматично"
           }
         }
       }
@@ -4194,23 +4129,6 @@
         }
       }
     },
-    "choose a provider" : {
-      "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "elijas un proveedor"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "виберете провайдера"
-          }
-        }
-      }
-    },
     "Choose another model…" : {
       "comment" : "Settings › Dictation › Language: link after a warning that the selected model lacks a listed language; opens Settings › Speech to text.",
       "localizations" : {
@@ -4339,23 +4257,6 @@
         }
       }
     },
-    "Clear all of History?" : {
-      "comment" : "History page: title of the confirmation before all of History is deleted.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Borrar todo el historial?"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Очистити всю історію?"
-          }
-        }
-      }
-    },
     "Clear History" : {
       "comment" : "History page: destructive button in the confirmation that deletes all of History. Title case, as macOS buttons are in English.",
       "localizations" : {
@@ -4386,6 +4287,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистити історію…"
+          }
+        }
+      }
+    },
+    "Clear all of History?" : {
+      "comment" : "History page: title of the confirmation before all of History is deleted.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar todo el historial?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити всю історію?"
           }
         }
       }
@@ -4543,23 +4461,6 @@
         }
       }
     },
-    "commit message fix the token expiring too early" : {
-      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in Structured prompt: a request for a commit message, then what it should say. Write a natural example in your language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mensaje de commit arregla que el token caduque demasiado pronto"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "коміт меседж виправ що токен спливає зарано"
-          }
-        }
-      }
-    },
     "Connect your %@ account" : {
       "comment" : "Setup window: heading of the key form. %@ is the service, e.g. Groq.",
       "localizations" : {
@@ -4679,8 +4580,8 @@
         }
       }
     },
-    "Copy instruction" : {
-      "comment" : "History page, an open edit: button that copies the spoken instruction.",
+    "Copy Instruction" : {
+      "comment" : "History page: context menu item on an edit that copies the spoken instruction. Title case, as macOS menu items are in English.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4696,8 +4597,25 @@
         }
       }
     },
-    "Copy Instruction" : {
-      "comment" : "History page: context menu item on an edit that copies the spoken instruction. Title case, as macOS menu items are in English.",
+    "Copy What You Said" : {
+      "comment" : "History page: context menu item on an AI dictation that copies what was said, before the rewrite. Title case, as macOS menu items are in English.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar lo que dijiste"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копіювати сказане"
+          }
+        }
+      }
+    },
+    "Copy instruction" : {
+      "comment" : "History page, an open edit: button that copies the spoken instruction.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4749,23 +4667,6 @@
     },
     "Copy what you said" : {
       "comment" : "History page, an open AI dictation: button that copies what was said, before the rewrite.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar lo que dijiste"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копіювати сказане"
-          }
-        }
-      }
-    },
-    "Copy What You Said" : {
-      "comment" : "History page: context menu item on an AI dictation that copies what was said, before the rewrite. Title case, as macOS menu items are in English.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4957,23 +4858,6 @@
         }
       }
     },
-    "counted since %@" : {
-      "comment" : "Usage page: note after the 'Requests' heading. %@ is a date.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "contado desde %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "з %@"
-          }
-        }
-      }
-    },
     "Curiosity rarely arrives on schedule; it tends to show up halfway through something else, uninvited and oddly persistent." : {
       "comment" : "Usage page, typing test: a sentence to type. Write a natural sentence of about the same length in your language; it is only for timing the typing.",
       "localizations" : {
@@ -5042,23 +4926,6 @@
         }
       }
     },
-    "Debug lines" : {
-      "comment" : "Debug Log window: switch that keeps the most detailed lines.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Líneas de depuración"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Рядки налагодження"
-          }
-        }
-      }
-    },
     "Debug Log" : {
       "comment" : "Debug Log window: its heading.",
       "localizations" : {
@@ -5089,6 +4956,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Журнал налагодження…"
+          }
+        }
+      }
+    },
+    "Debug lines" : {
+      "comment" : "Debug Log window: switch that keeps the most detailed lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Líneas de depuración"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рядки налагодження"
           }
         }
       }
@@ -5848,23 +5732,6 @@
         }
       }
     },
-    "Drag into the Accessibility list" : {
-      "comment" : "Setup window: tooltip on the app's row in the helper; it can be dragged into System Settings' Accessibility list.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrastrar a la lista de Accesibilidad"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перетягніть у список «Доступність»"
-          }
-        }
-      }
-    },
     "Drag SpeechText onto the Applications folder in the disk image's window, then open it from Applications." : {
       "comment" : "Alert when the app couldn't move itself to Applications. Applications is the macOS folder; use its name as Finder shows it.",
       "localizations" : {
@@ -5878,6 +5745,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перетягніть SpeechText на папку «Програми» у вікні образу диска, а потім відкрийте його з «Програм»."
+          }
+        }
+      }
+    },
+    "Drag into the Accessibility list" : {
+      "comment" : "Setup window: tooltip on the app's row in the helper; it can be dragged into System Settings' Accessibility list.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastrar a la lista de Accesibilidad"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетягніть у список «Доступність»"
           }
         }
       }
@@ -5929,57 +5813,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Дублювати"
-          }
-        }
-      }
-    },
-    "e.g. %@" : {
-      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field. %@ is the typed word split into lowercase words (SpeechText → speech text).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "p. ej., %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "напр. %@"
-          }
-        }
-      }
-    },
-    "e.g. speech text, спіч текст" : {
-      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field before a word is typed — examples of how “SpeechText” gets misheard. Commas separate them.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "p. ej., speech text, espich text"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "напр. спіч текст, speech text"
-          }
-        }
-      }
-    },
-    "e.g. SpeechText" : {
-      "comment" : "Dictionary page, Add a word: placeholder in the word field. SpeechText is the app's name; keep it.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "p. ej., SpeechText"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "напр. SpeechText"
           }
         }
       }
@@ -6120,6 +5953,40 @@
         }
       }
     },
+    "Edit Prompts…" : {
+      "comment" : "Settings › AI Rewrite › Prompts: button that opens the Prompts page of the main window.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar prompts…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагувати промпти…"
+          }
+        }
+      }
+    },
+    "Edit Selection" : {
+      "comment" : "Menu bar menu item: rewrites the text selected in the app in front. Title case, as menu items are; the feature is called Edit selection everywhere else.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar selección"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагувати виділене"
+          }
+        }
+      }
+    },
     "Edit needs a provider" : {
       "comment" : "Home page, intro card: large title on the Edit tab when AI Rewrite has no provider.",
       "localizations" : {
@@ -6154,23 +6021,6 @@
         }
       }
     },
-    "Edit Prompts…" : {
-      "comment" : "Settings › AI Rewrite › Prompts: button that opens the Prompts page of the main window.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar prompts…"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редагувати промпти…"
-          }
-        }
-      }
-    },
     "Edit selection" : {
       "comment" : "Dictation overlay: VoiceOver name during Edit Selection with AI.",
       "localizations" : {
@@ -6184,23 +6034,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Редагування виділеного"
-          }
-        }
-      }
-    },
-    "Edit Selection" : {
-      "comment" : "Menu bar menu item: rewrites the text selected in the app in front. Title case, as menu items are; the feature is called Edit selection everywhere else.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar selección"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редагувати виділене"
           }
         }
       }
@@ -6426,6 +6259,23 @@
         }
       }
     },
+    "FOR EXAMPLE" : {
+      "comment" : "Setup window, AI step: small label in capitals over an example of what AI polish does.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "POR EJEMPLO"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "НАПРИКЛАД"
+          }
+        }
+      }
+    },
     "Failed" : {
       "comment" : "Home and History: a row's tag for a failed dictation.",
       "localizations" : {
@@ -6630,23 +6480,6 @@
         }
       }
     },
-    "FOR EXAMPLE" : {
-      "comment" : "Setup window, AI step: small label in capitals over an example of what AI polish does.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "POR EJEMPLO"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "НАПРИКЛАД"
-          }
-        }
-      }
-    },
     "For your %@" : {
       "comment" : "Settings › Speech to text / AI Rewrite › Models on this Mac: note after the heading. %@ is the chip and memory, e.g. M1 Pro, 32 GB.",
       "localizations" : {
@@ -6698,36 +6531,19 @@
         }
       }
     },
-    "from each provider's last reply" : {
-      "comment" : "Usage page: note after the 'Limits right now' heading.",
+    "GPT Live Transcribe picks among these." : {
+      "comment" : "Settings › Dictation › Language: caption when several languages are listed and GPT Live Transcribe (a model name; keep it) is in use.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "según la última respuesta de cada proveedor"
+            "value" : "GPT Live Transcribe elige entre estos."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "з останньої відповіді кожного провайдера"
-          }
-        }
-      }
-    },
-    "from “%@”" : {
-      "comment" : "Prompts page, Last chosen for: under the rewritten text, what was said. %@ is the dictated text.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "de “%@”"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "з «%@»"
+            "value" : "GPT Live Transcribe вибирає серед цих мов."
           }
         }
       }
@@ -6851,23 +6667,6 @@
         }
       }
     },
-    "GPT Live Transcribe picks among these." : {
-      "comment" : "Settings › Dictation › Language: caption when several languages are listed and GPT Live Transcribe (a model name; keep it) is in use.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GPT Live Transcribe elige entre estos."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GPT Live Transcribe вибирає серед цих мов."
-          }
-        }
-      }
-    },
     "Grant Access" : {
       "comment" : "Settings › Privacy & Data › Permissions › Accessibility: button that walks the user to System Settings.",
       "localizations" : {
@@ -6932,23 +6731,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Whisper від Groq отримує їх як підказку"
-          }
-        }
-      }
-    },
-    "h" : {
-      "comment" : "Home and Usage: the unit after a number of hours, small, e.g. ≈ 1 h 20 min.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "h"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "год"
           }
         }
       }
@@ -7265,6 +7047,40 @@
         }
       }
     },
+    "How SpeechText behaves — shortcuts, the look of its windows, formatting and permissions." : {
+      "comment" : "The Settings page's lead under its title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo se comporta SpeechText: los atajos, el aspecto de sus ventanas, el formato y los permisos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як поводиться SpeechText — скорочення, вигляд його вікон, форматування й дозволи."
+          }
+        }
+      }
+    },
+    "How SpeechText works" : {
+      "comment" : "Setup window: VoiceOver label of the welcome animation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як працює SpeechText"
+          }
+        }
+      }
+    },
     "How fast do you type?" : {
       "comment" : "Usage page, typing test popover: title.",
       "localizations" : {
@@ -7278,23 +7094,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Як швидко ви друкуєте?"
-          }
-        }
-      }
-    },
-    "how it comes out wrong — commas between" : {
-      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field when there is no example to show. Commas separate several spellings.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cómo sale mal, separado por comas"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "як воно виходить неправильно — через кому"
           }
         }
       }
@@ -7329,40 +7128,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Наскільки просвічує те, що за панелями."
-          }
-        }
-      }
-    },
-    "How SpeechText behaves — shortcuts, the look of its windows, formatting and permissions." : {
-      "comment" : "The Settings page's lead under its title.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo se comporta SpeechText: los atajos, el aspecto de sus ventanas, el formato y los permisos."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Як поводиться SpeechText — скорочення, вигляд його вікон, форматування й дозволи."
-          }
-        }
-      }
-    },
-    "How SpeechText works" : {
-      "comment" : "Setup window: VoiceOver label of the welcome animation.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo funciona SpeechText"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Як працює SpeechText"
           }
         }
       }
@@ -7448,100 +7213,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Як ви диктуєте: скорочення, мікрофон, ваші мови та як пишеться текст."
-          }
-        }
-      }
-    },
-    "in %@" : {
-      "comment" : "History page, part of 'Nothing … .': a filter or an app the dictations are narrowed to, e.g. 'in Edits' or 'in Slack'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "en %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "у %@"
-          }
-        }
-      }
-    },
-    "in %lld dictations" : {
-      "comment" : "Home and Usage: under the number of words dictated.",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "in %lld dictation"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "in %lld dictations"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "en %lld de dictados"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "en %lld dictado"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "en %lld dictados"
-                }
-              }
-            }
-          }
-        },
-        "uk" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "у %lld диктовках"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "у %lld диктовках"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "у %lld диктовці"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "у %lld диктовки"
-                }
-              }
-            }
           }
         }
       }
@@ -7636,40 +7307,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "У будь-якій програмі ваші слова було б набрано так, як ви їх сказали."
-          }
-        }
-      }
-    },
-    "in the last 30 days" : {
-      "comment" : "History page: part of the empty-state sentence when the date filter is the last 30 days, e.g. “Nothing in Slack, in the last 30 days.”",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "en los últimos 30 días"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "за останні 30 днів"
-          }
-        }
-      }
-    },
-    "in the last 7 days" : {
-      "comment" : "History page: part of the empty-state sentence when the date filter is the last 7 days, e.g. “Nothing in Slack, in the last 7 days.”",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "en los últimos 7 días"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "за останні 7 днів"
           }
         }
       }
@@ -8428,23 +8065,6 @@
         }
       }
     },
-    "last %@" : {
-      "comment" : "Prompts page: when a prompt was last chosen, lowercase. %@ is a time today (14:05), 'yesterday', a weekday or a date.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "último: %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "востаннє %@"
-          }
-        }
-      }
-    },
     "Last 7 days" : {
       "comment" : "Home page: section heading over the last seven days of dictation.",
       "localizations" : {
@@ -8581,23 +8201,6 @@
         }
       }
     },
-    "list for the trip passport charger the blue jacket" : {
-      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in list prompt. Write a natural example in your language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lista para el viaje pasaporte cargador la chaqueta azul"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "список у дорогу паспорт зарядка синя куртка"
-          }
-        }
-      }
-    },
     "Listening" : {
       "comment" : "Dictation overlay: VoiceOver state while it records.",
       "localizations" : {
@@ -8649,6 +8252,12 @@
         }
       }
     },
+    "Local Network access needed — saved to History" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. a dictation to the user's server on another device failed because macOS hasn't allowed Local Network access; its audio is in History. 'Local Network' is macOS's name for the privacy setting."
+    },
+    "Local Network access needed. Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
+      "comment" : "Settings › Speech to text / AI Rewrite and Setup: the result of testing the user's server when macOS hasn't allowed Local Network access. Use macOS's own names for the System Settings path."
+    },
     "Local models take no list of words — the replacements still put them right." : {
       "comment" : "Dictionary page, What a word does: row text when a local speech model is in use.",
       "localizations" : {
@@ -8679,63 +8288,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фіксація"
-          }
-        }
-      }
-    },
-    "macOS also uses %@ (System Settings › Keyboard › Keyboard Shortcuts), and may take it first." : {
-      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS also uses. %@ is the keys. The path is macOS's; use its names in your language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Atajos de teclado), y puede tener prioridad."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS теж використовує %@ (Системні параметри › Клавіатура › Клавіатурні скорочення) і може перехопити його першою."
-          }
-        }
-      }
-    },
-    "macOS asks to allow Speech Recognition the first time." : {
-      "comment" : "Setup window, Speech step: second sentence of Apple Dictation's description. Speech Recognition is macOS's permission name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS pide permitir el Reconocimiento de voz la primera vez."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Першого разу macOS попросить дозволити Розпізнавання мовлення."
-          }
-        }
-      }
-    },
-    "macOS refused %@ (error %lld). Choose another shortcut." : {
-      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS refused. %@ is the keys, %lld an error code.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "macOS refused %1$@ (error %2$lld). Choose another shortcut."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS rechazó %1$@ (error %2$lld). Elige otro atajo."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS відхилила %1$@ (помилка %2$lld). Виберіть інше скорочення."
           }
         }
       }
@@ -8893,23 +8445,6 @@
         }
       }
     },
-    "min" : {
-      "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "min"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "хв"
-          }
-        }
-      }
-    },
     "Minimal" : {
       "comment" : "Settings › Appearance: the name of a skin — plain macOS panels.",
       "localizations" : {
@@ -8957,23 +8492,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID моделі"
-          }
-        }
-      }
-    },
-    "model not recorded" : {
-      "comment" : "Usage page, By engine: for dictations from before History kept the model.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "modelo no registrado"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "модель не записано"
           }
         }
       }
@@ -9080,23 +8598,6 @@
         }
       }
     },
-    "Move to Applications" : {
-      "comment" : "Alert button that moves the app to the Applications folder.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover a Aplicaciones"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перемістити в «Програми»"
-          }
-        }
-      }
-    },
     "Move Up" : {
       "comment" : "Prompts page: context menu item that moves a prompt one place up the list.",
       "localizations" : {
@@ -9110,6 +8611,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перемістити вгору"
+          }
+        }
+      }
+    },
+    "Move to Applications" : {
+      "comment" : "Alert button that moves the app to the Applications folder.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a Aplicaciones"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перемістити в «Програми»"
           }
         }
       }
@@ -9403,40 +8921,6 @@
         }
       }
     },
-    "no connection, so not pasted" : {
-      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sin conexión, así que no se pegó"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "немає з'єднання, тому не вставлено"
-          }
-        }
-      }
-    },
-    "no connection, so not pasted into %@" : {
-      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted. %@ is the app.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sin conexión, así que no se pegó en %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "немає з'єднання, тому не вставлено в %@"
-          }
-        }
-      }
-    },
     "No dictations rewritten by AI yet." : {
       "comment" : "History page: shown when the AI filter has nothing.",
       "localizations" : {
@@ -9675,23 +9159,6 @@
         }
       }
     },
-    "no token counts reported" : {
-      "comment" : "Usage page, Requests: an AI model whose replies had no token counts.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "no se informaron recuentos de tokens"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "кількість токенів не повідомлено"
-          }
-        }
-      }
-    },
     "No words yet." : {
       "comment" : "Dictionary page: shown when the list of words is empty.",
       "localizations" : {
@@ -9722,23 +9189,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ще немає «Коли використовувати» — ШІ‑переписування не знає, коли він підходить."
-          }
-        }
-      }
-    },
-    "none from History" : {
-      "comment" : "Usage page, Overhead: under Retries when there were none.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ninguno del Historial"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "жодних з Історії"
           }
         }
       }
@@ -9841,23 +9291,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Без урахування %@"
-          }
-        }
-      }
-    },
-    "not counting %@" : {
-      "comment" : "Home and Usage: under Spent, after the estimate. %@ is a list of model names with no list price.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sin contar %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "без урахування %@"
           }
         }
       }
@@ -10429,23 +9862,6 @@
         }
       }
     },
-    "of silence a cloud engine was never sent" : {
-      "comment" : "Usage page, Overhead: under the Not sent figure (a duration).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "de silencio que nunca se envió a un motor en la nube"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "тиші, яку не надіслано хмарному рушію"
-          }
-        }
-      }
-    },
     "Off" : {
       "comment" : "State of a switch: off.",
       "localizations" : {
@@ -10565,23 +9981,6 @@
         }
       }
     },
-    "on %@" : {
-      "comment" : "History page, part of 'Nothing … .': one day, e.g. 'on 3 November'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "el %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@"
-          }
-        }
-      }
-    },
     "On this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: title of the card for engines that run on the Mac.",
       "localizations" : {
@@ -10684,23 +10083,6 @@
         }
       }
     },
-    "Once a day. Nothing is installed until you agree." : {
-      "comment" : "Settings › General › Updates › Check for updates automatically: caption when on.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Una vez al día. No se instala nada hasta que aceptes."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Раз на день. Нічого не встановлюється без вашої згоди."
-          }
-        }
-      }
-    },
     "Once AI Rewrite has a provider — a key, or a model on this Mac — it reads what you said, or what you asked for, and picks the prompt whose “When to use” fits." : {
       "comment" : "Prompts page: text at the top when AI Rewrite has no provider. “When to use” is the name of a field.",
       "localizations" : {
@@ -10731,6 +10113,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Коли ШІ‑переписування отримає провайдера, йому передаватимуться ваші слова з кожним диктуванням із ШІ."
+          }
+        }
+      }
+    },
+    "Once a day. Nothing is installed until you agree." : {
+      "comment" : "Settings › General › Updates › Check for updates automatically: caption when on.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una vez al día. No se instala nada hasta que aceptes."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Раз на день. Нічого не встановлюється без вашої згоди."
           }
         }
       }
@@ -10873,40 +10272,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Відкрито"
-          }
-        }
-      }
-    },
-    "Open again" : {
-      "comment" : "Setup window, permissions: opens System Settings › Accessibility again.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir de nuevo"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Відкрити знову"
-          }
-        }
-      }
-    },
-    "Open at login" : {
-      "comment" : "Setup window, permissions: row title and switch label — start the app when the Mac starts.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir al iniciar sesión"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Відкривати під час входу"
           }
         }
       }
@@ -11081,6 +10446,40 @@
         }
       }
     },
+    "Open again" : {
+      "comment" : "Setup window, permissions: opens System Settings › Accessibility again.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir de nuevo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити знову"
+          }
+        }
+      }
+    },
+    "Open at login" : {
+      "comment" : "Setup window, permissions: row title and switch label — start the app when the Mac starts.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir al iniciar sesión"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкривати під час входу"
+          }
+        }
+      }
+    },
     "Opens History" : {
       "comment" : "Dictation overlay: VoiceOver hint on a notice that opens History when clicked.",
       "localizations" : {
@@ -11094,23 +10493,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Відкриває Історію"
-          }
-        }
-      }
-    },
-    "optional" : {
-      "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "opcional"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "необов'язково"
           }
         }
       }
@@ -11875,6 +11257,23 @@
         }
       }
     },
+    "RESULT" : {
+      "comment" : "Setup window, Try it step: small label in capitals over what was typed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RESULTADO"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "РЕЗУЛЬТАТ"
+          }
+        }
+      }
+    },
     "Rate limited by the provider. Wait a moment and retry from History." : {
       "comment" : "Error text when the speech provider refused for too many requests.",
       "localizations" : {
@@ -12028,6 +11427,23 @@
         }
       }
     },
+    "Record Window" : {
+      "comment" : "The Record Window, the app's floating dictation window: a menu bar menu item and a row in Setup's Done step. Title case.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ventana de grabación"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вікно запису"
+          }
+        }
+      }
+    },
     "Record a conversation you're part of, then read who said what, get a summary and ask questions." : {
       "comment" : "The Notetaker page (not built yet): its lead under the title.",
       "localizations" : {
@@ -12058,23 +11474,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Записувати трасування"
-          }
-        }
-      }
-    },
-    "Record Window" : {
-      "comment" : "The Record Window, the app's floating dictation window: a menu bar menu item and a row in Setup's Done step. Title case.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ventana de grabación"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вікно запису"
           }
         }
       }
@@ -12351,23 +11750,6 @@
         }
       }
     },
-    "reply to Oleh in English дякую що прийшли" : {
-      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in Message prompt: a reply asked for in another language, then the words (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "responde a Oleh en inglés дякую що прийшли"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "відповідь Олегу англійською дякую що прийшли"
-          }
-        }
-      }
-    },
     "Report a problem" : {
       "comment" : "About panel: link to the app's issue tracker.",
       "localizations" : {
@@ -12402,23 +11784,6 @@
         }
       }
     },
-    "requests a provider refused or that broke off" : {
-      "comment" : "Usage page, Overhead: under the Refused figure.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "solicitudes que un proveedor rechazó o que se cortaron"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "запити, які провайдер відхилив або які обірвалися"
-          }
-        }
-      }
-    },
     "Requests are counted from this update on." : {
       "comment" : "Usage page, Requests: shown for a period from before the app counted requests.",
       "localizations" : {
@@ -12432,23 +11797,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Запити рахуються від цього оновлення."
-          }
-        }
-      }
-    },
-    "resets in %@" : {
-      "comment" : "Usage page, Limits: when a rate limit resets. %@ is a duration, e.g. 3 min.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "se restablece en %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "скидається через %@"
           }
         }
       }
@@ -12517,23 +11865,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Відновити вбудовані промпти?"
-          }
-        }
-      }
-    },
-    "RESULT" : {
-      "comment" : "Setup window, Try it step: small label in capitals over what was typed.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "RESULTADO"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "РЕЗУЛЬТАТ"
           }
         }
       }
@@ -12874,23 +12205,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Збережено"
-          }
-        }
-      }
-    },
-    "saved as you type" : {
-      "comment" : "Prompts page: note after the 'Edit prompt' heading.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "se guarda mientras escribes"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "зберігається під час введення"
           }
         }
       }
@@ -13635,40 +12949,6 @@
         }
       }
     },
-    "sign in, then click **%@**." : {
-      "comment" : "Setup window: first step of getting a key, after a link to the service's website. %@ is the website's button name, in English as the website shows it; ** marks bold.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "inicia sesión y haz clic en **%@**."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "увійдіть і натисніть **%@**."
-          }
-        }
-      }
-    },
-    "since %@, when History starts" : {
-      "comment" : "Usage page, the chart's note. %@ is a date.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "desde el %@, cuando empieza el Historial"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "з %@, коли починається Історія"
-          }
-        }
-      }
-    },
     "Skip" : {
       "comment" : "Home page: button in the setup card that marks setup as done.",
       "localizations" : {
@@ -14015,6 +13295,57 @@
         }
       }
     },
+    "SpeechText Debug Log" : {
+      "comment" : "Debug Log window: window title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registro de depuración de SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Журнал налагодження SpeechText"
+          }
+        }
+      }
+    },
+    "SpeechText Settings" : {
+      "comment" : "Title of the Settings window (shown in the Window menu and Mission Control). SpeechText is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметри SpeechText"
+          }
+        }
+      }
+    },
+    "SpeechText Setup" : {
+      "comment" : "Setup window: the window's title (in the Window menu and Mission Control).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración inicial de SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Початкове налаштування SpeechText"
+          }
+        }
+      }
+    },
     "SpeechText can't hear you" : {
       "comment" : "Home page: a problem row's title when the microphone permission is off.",
       "localizations" : {
@@ -14062,23 +13393,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SpeechText не вдалося перемістити себе в «Програми»"
-          }
-        }
-      }
-    },
-    "SpeechText Debug Log" : {
-      "comment" : "Debug Log window: window title.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registro de depuración de SpeechText"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Журнал налагодження SpeechText"
           }
         }
       }
@@ -14253,40 +13567,6 @@
         }
       }
     },
-    "SpeechText Settings" : {
-      "comment" : "Title of the Settings window (shown in the Window menu and Mission Control). SpeechText is the app's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustes de SpeechText"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Параметри SpeechText"
-          }
-        }
-      }
-    },
-    "SpeechText Setup" : {
-      "comment" : "Setup window: the window's title (in the Window menu and Mission Control).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configuración inicial de SpeechText"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Початкове налаштування SpeechText"
-          }
-        }
-      }
-    },
     "SpeechText starts when you log in, so the shortcuts always work." : {
       "comment" : "Settings › General › Launch at login: caption when on.",
       "localizations" : {
@@ -14457,29 +13737,6 @@
         }
       }
     },
-    "started in %@, pasted into %@" : {
-      "comment" : "History page: part of a dictation's facts line. The two %@ are app names.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "started in %1$@, pasted into %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iniciado en %1$@, pegado en %2$@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "почато в %1$@, вставлено в %2$@"
-          }
-        }
-      }
-    },
     "Starting" : {
       "comment" : "VoiceOver state while a dictation starts.",
       "localizations" : {
@@ -14599,23 +13856,6 @@
         }
       }
     },
-    "streamed, then uploaded again when the stream broke or came back empty" : {
-      "comment" : "Usage page, Overhead: under the Paid twice figure (a duration).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transmitido y luego subido de nuevo cuando la transmisión se cortó o llegó vacía"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "передано потоком, а потім завантажено знову, коли потік обірвався чи повернувся порожнім"
-          }
-        }
-      }
-    },
     "Style" : {
       "comment" : "Settings › Appearance: group heading over the overlay styles.",
       "localizations" : {
@@ -14718,23 +13958,6 @@
         }
       }
     },
-    "Switch to it" : {
-      "comment" : "Settings › Speech to text / AI Rewrite: link after '%@ is newer.' that selects the newer model.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usarlo"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перейти на неї"
-          }
-        }
-      }
-    },
     "Switch to Plain Text" : {
       "comment" : "Menu bar menu item. During an AI dictation, switches it to plain dictation. Title case.",
       "localizations" : {
@@ -14748,6 +13971,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти на звичайний текст"
+          }
+        }
+      }
+    },
+    "Switch to it" : {
+      "comment" : "Settings › Speech to text / AI Rewrite: link after '%@ is newer.' that selects the newer model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usarlo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти на неї"
           }
         }
       }
@@ -15124,23 +14364,6 @@
         }
       }
     },
-    "that wasn't pasted" : {
-      "comment" : "History page, part of 'Nothing … .': the filter for dictations that weren't pasted anywhere.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "que no se pegó"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "без вставлення"
-          }
-        }
-      }
-    },
     "That's your voice, typed." : {
       "comment" : "Setup window, Try it step: after the first dictation worked.",
       "localizations" : {
@@ -15188,23 +14411,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API-ключ відхилено. Перевірте його в Параметрах."
-          }
-        }
-      }
-    },
-    "the app" : {
-      "comment" : "Stands in for an app's name when it is unknown, inside a sentence: 'Couldn't paste into the app'.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "la app"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "програму"
           }
         }
       }
@@ -16161,6 +15367,23 @@
         }
       }
     },
+    "This Mac." : {
+      "comment" : "Settings › Your server: where the address leads",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей Mac."
+          }
+        }
+      }
+    },
     "This build does not update itself." : {
       "comment" : "About panel: the app's update status.",
       "localizations" : {
@@ -16225,23 +15448,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Цей ключ надсилається без шифрування."
-          }
-        }
-      }
-    },
-    "This Mac." : {
-      "comment" : "Settings › Your server: where the address leads",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este Mac."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цей Mac."
           }
         }
       }
@@ -16399,23 +15605,6 @@
         }
       }
     },
-    "today" : {
-      "comment" : "History page, part of 'Nothing … .': the date filter set to today, lowercase.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "hoy"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "сьогодні"
-          }
-        }
-      }
-    },
     "Too heavy for this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: badge on a local model this Mac lacks the memory for.",
       "localizations" : {
@@ -16429,29 +15618,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заважка для цього Mac"
-          }
-        }
-      }
-    },
-    "top %lld of %lld" : {
-      "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "top %1$lld of %2$lld"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "los %1$lld primeros de %2$lld"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "перші %1$lld з %2$lld"
           }
         }
       }
@@ -16677,6 +15843,23 @@
         }
       }
     },
+    "Turn On…" : {
+      "comment" : "Button that opens the macOS setting to turn on a permission, such as Accessibility.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкнути…"
+          }
+        }
+      }
+    },
     "Turn on Dictation" : {
       "comment" : "Setup window: helper title beside System Settings › Keyboard. Dictation is macOS's setting.",
       "localizations" : {
@@ -16707,23 +15890,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Увімкніть SpeechText"
-          }
-        }
-      }
-    },
-    "Turn On…" : {
-      "comment" : "Button that opens the macOS setting to turn on a permission, such as Accessibility.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activar…"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Увімкнути…"
           }
         }
       }
@@ -16881,23 +16047,6 @@
         }
       }
     },
-    "uh email to Sarah running late start without me" : {
-      "comment" : "Prompts page: an example of something said, rough as spoken, shown in quotes, for the built-in email prompt. Write a natural example in your language.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "eh email a Sarah que llego tarde que empiecen sin mí"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "е-е лист Сарі запізнююсь починайте без мене"
-          }
-        }
-      }
-    },
     "Uh, so I think we should, um, move the meeting to Friday — no, wait, Thursday — and, uh, invite Josh too." : {
       "comment" : "Setup window, Try it step: rough speech for the user to read out, for AI polish to tidy. Keep the hesitations and the correction.",
       "localizations" : {
@@ -16928,23 +16077,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Без назви"
-          }
-        }
-      }
-    },
-    "up to 10 minutes" : {
-      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "hasta 10 minutos"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "до 10 хвилин"
           }
         }
       }
@@ -17277,40 +16409,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версія"
-          }
-        }
-      }
-    },
-    "vs an average typist (%lld wpm)" : {
-      "comment" : "Home page, Last 7 days: under Time saved, when the user hasn't measured their typing. wpm is words per minute.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frente a un mecanógrafo medio (%lld ppm)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "порівняно із середньою швидкістю друку (%lld сл./хв)"
-          }
-        }
-      }
-    },
-    "vs typing at %lld wpm" : {
-      "comment" : "Home and Usage: under Time saved. wpm is words per minute.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frente a escribir a %lld ppm"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "порівняно з друком %lld сл./хв"
           }
         }
       }
@@ -17854,23 +16952,6 @@
         }
       }
     },
-    "With the lid closed, these headphones drop to call quality while you dictate." : {
-      "comment" : "Settings › Dictation › Microphone: caption for Automatic when the system's input is Bluetooth headphones.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Con la tapa cerrada, estos auriculares bajan a calidad de llamada mientras dictas."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Коли кришку закрито, ці навушники під час диктування перемикаються на якість дзвінка."
-          }
-        }
-      }
-    },
     "With the Replacements, in what every engine writes before it's pasted or rewritten, in AI Rewrite's and Edit's replies, and in History." : {
       "comment" : "Dictionary page, What a word does: row text. Replacements is the section of this page; AI Rewrite and Edit are features of the app; History is a page.",
       "localizations" : {
@@ -17884,6 +16965,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заміни застосовуються до того, що пише кожен рушій, перш ніж текст вставлено чи переписано, до відповідей ШІ‑переписування та Редагування, а також в Історії."
+          }
+        }
+      }
+    },
+    "With the lid closed, these headphones drop to call quality while you dictate." : {
+      "comment" : "Settings › Dictation › Microphone: caption for Automatic when the system's input is Bluetooth headphones.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con la tapa cerrada, estos auriculares bajan a calidad de llamada mientras dictas."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коли кришку закрито, ці навушники під час диктування перемикаються на якість дзвінка."
           }
         }
       }
@@ -17935,23 +17033,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слова"
-          }
-        }
-      }
-    },
-    "words a minute" : {
-      "comment" : "Usage page, typing test: after the measured speed (a large number).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "palabras por minuto"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "слів за хвилину"
           }
         }
       }
@@ -18071,23 +17152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слова, які треба впорядкувати, чи прохання на кшталт «зроби списком, англійською»: вибирається промпт, чиє «Коли використовувати» підходить, і виконується решта прохання. Нічого не підходить? Тоді Типовий."
-          }
-        }
-      }
-    },
-    "words · ≈ cost" : {
-      "comment" : "Usage page: note after the 'By kind' heading naming its two columns. ≈ means approximately.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "palabras · ≈ coste"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "слова · ≈ вартість"
           }
         }
       }
@@ -18478,23 +17542,6 @@
         }
       }
     },
-    "Your clipboard is empty — copy the key on the website first." : {
-      "comment" : "Setup window: after Paste with nothing on the clipboard.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu portapapeles está vacío: copia primero la clave en el sitio web."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Буфер обміну порожній — спершу скопіюйте ключ на сайті."
-          }
-        }
-      }
-    },
     "Your Dictionary" : {
       "comment" : "Prompts page, What else AI Rewrite is told: tile title. Dictionary is a page of the app.",
       "localizations" : {
@@ -18508,6 +17555,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваш Словник"
+          }
+        }
+      }
+    },
+    "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac." : {
+      "comment" : "Microphone permission restricted by the Mac's management.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los ajustes de tu Mac no permiten usar el micrófono. Pregunta a quien administre este Mac."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування вашого Mac не дозволяють користуватися мікрофоном. Зверніться до того, хто керує цим Mac."
+          }
+        }
+      }
+    },
+    "Your clipboard is empty — copy the key on the website first." : {
+      "comment" : "Setup window: after Paste with nothing on the clipboard.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu portapapeles está vacío: copia primero la clave en el sitio web."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Буфер обміну порожній — спершу скопіюйте ключ на сайті."
           }
         }
       }
@@ -18559,23 +17640,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваші мови — для точності"
-          }
-        }
-      }
-    },
-    "Your Mac's settings don't allow microphone use. Ask whoever manages this Mac." : {
-      "comment" : "Microphone permission restricted by the Mac's management.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los ajustes de tu Mac no permiten usar el micrófono. Pregunta a quien administre este Mac."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Налаштування вашого Mac не дозволяють користуватися мікрофоном. Зверніться до того, хто керує цим Mac."
           }
         }
       }
@@ -18865,6 +17929,968 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тут з'являться ваші слова."
+          }
+        }
+      }
+    },
+    "a few minutes" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unos minutos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "кілька хвилин"
+          }
+        }
+      }
+    },
+    "a minute or two" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "un minuto o dos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "хвилину-дві"
+          }
+        }
+      }
+    },
+    "as the providers' replies count them" : {
+      "comment" : "Usage page: note after the 'Requests' heading.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "según las cuentan las respuestas de los proveedores"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "за підрахунком провайдерів у відповідях"
+          }
+        }
+      }
+    },
+    "besides the prompt, with every AI dictation" : {
+      "comment" : "Prompts page: note after the 'What else AI Rewrite is told' heading.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "además del prompt, con cada dictado con IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "окрім промпту, з кожною диктовкою з ШІ"
+          }
+        }
+      }
+    },
+    "beyond one request a dictation" : {
+      "comment" : "Usage page: note after the 'Overhead' heading.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "más allá de una solicitud por dictado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "понад один запит на диктовку"
+          }
+        }
+      }
+    },
+    "choose a provider" : {
+      "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "elijas un proveedor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "виберете провайдера"
+          }
+        }
+      }
+    },
+    "commit message fix the token expiring too early" : {
+      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in Structured prompt: a request for a commit message, then what it should say. Write a natural example in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mensaje de commit arregla que el token caduque demasiado pronto"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "коміт меседж виправ що токен спливає зарано"
+          }
+        }
+      }
+    },
+    "counted since %@" : {
+      "comment" : "Usage page: note after the 'Requests' heading. %@ is a date.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "contado desde %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з %@"
+          }
+        }
+      }
+    },
+    "e.g. %@" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field. %@ is the typed word split into lowercase words (SpeechText → speech text).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "напр. %@"
+          }
+        }
+      }
+    },
+    "e.g. SpeechText" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the word field. SpeechText is the app's name; keep it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., SpeechText"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "напр. SpeechText"
+          }
+        }
+      }
+    },
+    "e.g. speech text, спіч текст" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field before a word is typed — examples of how “SpeechText” gets misheard. Commas separate them.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., speech text, espich text"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "напр. спіч текст, speech text"
+          }
+        }
+      }
+    },
+    "from each provider's last reply" : {
+      "comment" : "Usage page: note after the 'Limits right now' heading.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "según la última respuesta de cada proveedor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з останньої відповіді кожного провайдера"
+          }
+        }
+      }
+    },
+    "from “%@”" : {
+      "comment" : "Prompts page, Last chosen for: under the rewritten text, what was said. %@ is the dictated text.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de “%@”"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з «%@»"
+          }
+        }
+      }
+    },
+    "h" : {
+      "comment" : "Home and Usage: the unit after a number of hours, small, e.g. ≈ 1 h 20 min.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "h"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "год"
+          }
+        }
+      }
+    },
+    "how it comes out wrong — commas between" : {
+      "comment" : "Dictionary page, Add a word: placeholder in the 'Often comes out as' field when there is no example to show. Commas separate several spellings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cómo sale mal, separado por comas"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "як воно виходить неправильно — через кому"
+          }
+        }
+      }
+    },
+    "in %@" : {
+      "comment" : "History page, part of 'Nothing … .': a filter or an app the dictations are narrowed to, e.g. 'in Edits' or 'in Slack'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "у %@"
+          }
+        }
+      }
+    },
+    "in %lld dictations" : {
+      "comment" : "Home and Usage: under the number of words dictated.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "in %lld dictation"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "in %lld dictations"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "en %lld de dictados"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "en %lld dictado"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "en %lld dictados"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "у %lld диктовках"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "у %lld диктовках"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "у %lld диктовці"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "у %lld диктовки"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "in the last 30 days" : {
+      "comment" : "History page: part of the empty-state sentence when the date filter is the last 30 days, e.g. “Nothing in Slack, in the last 30 days.”",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en los últimos 30 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "за останні 30 днів"
+          }
+        }
+      }
+    },
+    "in the last 7 days" : {
+      "comment" : "History page: part of the empty-state sentence when the date filter is the last 7 days, e.g. “Nothing in Slack, in the last 7 days.”",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en los últimos 7 días"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "за останні 7 днів"
+          }
+        }
+      }
+    },
+    "last %@" : {
+      "comment" : "Prompts page: when a prompt was last chosen, lowercase. %@ is a time today (14:05), 'yesterday', a weekday or a date.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "último: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "востаннє %@"
+          }
+        }
+      }
+    },
+    "list for the trip passport charger the blue jacket" : {
+      "comment" : "Prompts page: an example of something said, unpunctuated, shown in quotes, for the built-in list prompt. Write a natural example in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lista para el viaje pasaporte cargador la chaqueta azul"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "список у дорогу паспорт зарядка синя куртка"
+          }
+        }
+      }
+    },
+    "macOS also uses %@ (System Settings › Keyboard › Keyboard Shortcuts), and may take it first." : {
+      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS also uses. %@ is the keys. The path is macOS's; use its names in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS también usa %@ (Ajustes del Sistema › Teclado › Atajos de teclado), y puede tener prioridad."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS теж використовує %@ (Системні параметри › Клавіатура › Клавіатурні скорочення) і може перехопити його першою."
+          }
+        }
+      }
+    },
+    "macOS asks to allow Speech Recognition the first time." : {
+      "comment" : "Setup window, Speech step: second sentence of Apple Dictation's description. Speech Recognition is macOS's permission name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS pide permitir el Reconocimiento de voz la primera vez."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Першого разу macOS попросить дозволити Розпізнавання мовлення."
+          }
+        }
+      }
+    },
+    "macOS refused %@ (error %lld). Choose another shortcut." : {
+      "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS refused. %@ is the keys, %lld an error code.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "macOS refused %1$@ (error %2$lld). Choose another shortcut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS rechazó %1$@ (error %2$lld). Elige otro atajo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS відхилила %1$@ (помилка %2$lld). Виберіть інше скорочення."
+          }
+        }
+      }
+    },
+    "min" : {
+      "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "min"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "хв"
+          }
+        }
+      }
+    },
+    "model not recorded" : {
+      "comment" : "Usage page, By engine: for dictations from before History kept the model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modelo no registrado"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "модель не записано"
+          }
+        }
+      }
+    },
+    "no connection, so not pasted" : {
+      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin conexión, así que no se pegó"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "немає з'єднання, тому не вставлено"
+          }
+        }
+      }
+    },
+    "no connection, so not pasted into %@" : {
+      "comment" : "History page: part of a dictation's facts line — it was saved offline and not pasted. %@ is the app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin conexión, así que no se pegó en %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "немає з'єднання, тому не вставлено в %@"
+          }
+        }
+      }
+    },
+    "no token counts reported" : {
+      "comment" : "Usage page, Requests: an AI model whose replies had no token counts.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no se informaron recuentos de tokens"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "кількість токенів не повідомлено"
+          }
+        }
+      }
+    },
+    "none from History" : {
+      "comment" : "Usage page, Overhead: under Retries when there were none.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ninguno del Historial"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "жодних з Історії"
+          }
+        }
+      }
+    },
+    "not counting %@" : {
+      "comment" : "Home and Usage: under Spent, after the estimate. %@ is a list of model names with no list price.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin contar %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "без урахування %@"
+          }
+        }
+      }
+    },
+    "of silence a cloud engine was never sent" : {
+      "comment" : "Usage page, Overhead: under the Not sent figure (a duration).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de silencio que nunca se envió a un motor en la nube"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "тиші, яку не надіслано хмарному рушію"
+          }
+        }
+      }
+    },
+    "on %@" : {
+      "comment" : "History page, part of 'Nothing … .': one day, e.g. 'on 3 November'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "optional" : {
+      "comment" : "Dictionary page, Add a word: small note after a field label; the field may be left empty.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opcional"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "необов'язково"
+          }
+        }
+      }
+    },
+    "reply to Oleh in English дякую що прийшли" : {
+      "comment" : "Prompts page: an example of something said, shown in quotes, for the built-in Message prompt: a reply asked for in another language, then the words (here Ukrainian, 'thank you for coming'). Keep the request in your language and the words in some other language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "responde a Oleh en inglés дякую що прийшли"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "відповідь Олегу англійською дякую що прийшли"
+          }
+        }
+      }
+    },
+    "requests a provider refused or that broke off" : {
+      "comment" : "Usage page, Overhead: under the Refused figure.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "solicitudes que un proveedor rechazó o que se cortaron"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "запити, які провайдер відхилив або які обірвалися"
+          }
+        }
+      }
+    },
+    "resets in %@" : {
+      "comment" : "Usage page, Limits: when a rate limit resets. %@ is a duration, e.g. 3 min.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "se restablece en %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "скидається через %@"
+          }
+        }
+      }
+    },
+    "saved as you type" : {
+      "comment" : "Prompts page: note after the 'Edit prompt' heading.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "se guarda mientras escribes"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "зберігається під час введення"
+          }
+        }
+      }
+    },
+    "sign in, then click **%@**." : {
+      "comment" : "Setup window: first step of getting a key, after a link to the service's website. %@ is the website's button name, in English as the website shows it; ** marks bold.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "inicia sesión y haz clic en **%@**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "увійдіть і натисніть **%@**."
+          }
+        }
+      }
+    },
+    "since %@, when History starts" : {
+      "comment" : "Usage page, the chart's note. %@ is a date.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "desde el %@, cuando empieza el Historial"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "з %@, коли починається Історія"
+          }
+        }
+      }
+    },
+    "started in %@, pasted into %@" : {
+      "comment" : "History page: part of a dictation's facts line. The two %@ are app names.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "started in %1$@, pasted into %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iniciado en %1$@, pegado en %2$@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "почато в %1$@, вставлено в %2$@"
+          }
+        }
+      }
+    },
+    "streamed, then uploaded again when the stream broke or came back empty" : {
+      "comment" : "Usage page, Overhead: under the Paid twice figure (a duration).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "transmitido y luego subido de nuevo cuando la transmisión se cortó o llegó vacía"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "передано потоком, а потім завантажено знову, коли потік обірвався чи повернувся порожнім"
+          }
+        }
+      }
+    },
+    "that wasn't pasted" : {
+      "comment" : "History page, part of 'Nothing … .': the filter for dictations that weren't pasted anywhere.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "que no se pegó"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "без вставлення"
+          }
+        }
+      }
+    },
+    "the app" : {
+      "comment" : "Stands in for an app's name when it is unknown, inside a sentence: 'Couldn't paste into the app'.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "la app"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "програму"
+          }
+        }
+      }
+    },
+    "today" : {
+      "comment" : "History page, part of 'Nothing … .': the date filter set to today, lowercase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hoy"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сьогодні"
+          }
+        }
+      }
+    },
+    "top %lld of %lld" : {
+      "comment" : "Usage page: note after 'Where your words went' when only some apps are shown. The first %lld is how many are shown, the second how many there are.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "top %1$lld of %2$lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los %1$lld primeros de %2$lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "перші %1$lld з %2$lld"
+          }
+        }
+      }
+    },
+    "uh email to Sarah running late start without me" : {
+      "comment" : "Prompts page: an example of something said, rough as spoken, shown in quotes, for the built-in email prompt. Write a natural example in your language.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eh email a Sarah que llego tarde que empiecen sin mí"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "е-е лист Сарі запізнююсь починайте без мене"
+          }
+        }
+      }
+    },
+    "up to 10 minutes" : {
+      "comment" : "Setup window: a duration, inserted into 'This happens only once and takes %@' and similar.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hasta 10 minutos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "до 10 хвилин"
+          }
+        }
+      }
+    },
+    "vs an average typist (%lld wpm)" : {
+      "comment" : "Home page, Last 7 days: under Time saved, when the user hasn't measured their typing. wpm is words per minute.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frente a un mecanógrafo medio (%lld ppm)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "порівняно із середньою швидкістю друку (%lld сл./хв)"
+          }
+        }
+      }
+    },
+    "vs typing at %lld wpm" : {
+      "comment" : "Home and Usage: under Time saved. wpm is words per minute.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frente a escribir a %lld ppm"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "порівняно з друком %lld сл./хв"
+          }
+        }
+      }
+    },
+    "words a minute" : {
+      "comment" : "Usage page, typing test: after the measured speed (a large number).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "palabras por minuto"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "слів за хвилину"
+          }
+        }
+      }
+    },
+    "words · ≈ cost" : {
+      "comment" : "Usage page: note after the 'By kind' heading naming its two columns. ≈ means approximately.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "palabras · ≈ coste"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "слова · ≈ вартість"
           }
         }
       }

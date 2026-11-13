@@ -756,6 +756,14 @@ struct ServerLanguagesNote: View {
     }
 }
 
+/// System Settings › Privacy & Security › Local Network, where a server on another device
+/// is allowed (#228). Checked 2026-11-12 on macOS 26.6.2 (25G83): `open` takes the URL
+/// without an error, and the Privacy & Security extension has the Local Network service
+/// (`PrivacyLocalNetworkService`); the `Privacy_LocalNetwork` anchor is not in its search
+/// terms, and the screen was locked, so whether it lands on the pane itself or on Privacy
+/// & Security was not seen; Privacy & Security lists Local Network either way.
+let localNetworkSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork")!
+
 struct ServerTestResultLine: View {
     let role: ServerRole
     let testing: Bool
@@ -778,6 +786,13 @@ struct ServerTestResultLine: View {
             case .audioRefused: Text("The server refused the test recording. It may not take this model, or WAV.").rowNote(bad: true)
             case .refused(let status): Text("The server refused the request (HTTP \(status)).").rowNote(bad: true)
             case .badReply: Text("The server's reply wasn't one SpeechText can read.").rowNote(bad: true)
+            case .localNetworkDenied:
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Local Network access needed. Allow SpeechText in System Settings › Privacy & Security › Local Network.").rowNote(bad: true)
+                    Button("Open Settings") { NSWorkspace.shared.open(localNetworkSettingsURL) }
+                        .buttonStyle(.link)
+                        .font(.caption)
+                }
             case .httpsOnly(let refusal): Text(refusal.errorDescription ?? "").rowNote(bad: true)
             }
         }

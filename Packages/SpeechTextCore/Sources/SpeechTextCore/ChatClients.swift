@@ -351,6 +351,9 @@ public enum LLMError: LocalizedError, Sendable {
     /// The choice of model was cleared because the one stored leads to no model on offer
     /// (`clearedModelChoice`), and the user has not picked another.
     case noModelChosen(LLMProviderType)
+    /// AI Rewrite's server is on another device and macOS has not let SpeechText reach the
+    /// local network (`NetworkFailure.isLocalNetworkDenied`).
+    case localNetworkDenied
 
     public var errorDescription: String? {
         switch self {
@@ -366,6 +369,7 @@ public enum LLMError: LocalizedError, Sendable {
         case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › AI Rewrite")
         case .noServerAddress: localized("Set your server's address in Settings › AI Rewrite")
         case .noModelChosen(let p): localized("No model chosen for \(p.displayName) — choose one in Settings")
+        case .localNetworkDenied: localized("Allow SpeechText in System Settings › Privacy & Security › Local Network.")
         }
     }
 }
@@ -474,6 +478,10 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
         let data: Data, response: URLResponse
         do {
             (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
+        } catch where staysOnOrigin
+                    && NetworkFailure.isLocalNetworkDenied(error, endpoint: ServerEndpoint(address: baseURL.absoluteString)) {
+            // Only the user's server stays on its origin.
+            throw LLMError.localNetworkDenied
         } catch {
             // Only plain HTTP is refused this way, and only the user's server is ever addressed so.
             throw ServerHTTPSOnly(error, host: baseURL.host) ?? error

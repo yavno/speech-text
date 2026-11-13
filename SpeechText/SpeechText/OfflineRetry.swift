@@ -50,6 +50,8 @@ final class OfflineRetry {
         // `@Sendable`, so it is not taken for main-actor code: the monitor calls it on its own queue.
         monitor.pathUpdateHandler = { @Sendable path in
             let isUp = path.status == .satisfied
+            // Read by requests to the user's server to tell Local Network from offline.
+            NetworkPath.update(isSatisfied: isUp)
             Task { @MainActor in OfflineRetry.shared.networkChanged(isUp: isUp) }
         }
         monitor.start(queue: DispatchQueue(label: "SpeechText.network-monitor", qos: .utility))

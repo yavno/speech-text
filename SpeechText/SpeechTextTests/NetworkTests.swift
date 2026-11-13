@@ -42,11 +42,60 @@ final class NetworkFailureTests: XCTestCase {
     }
 }
 
+// MARK: - Local Network access, not offline (NetworkFailure.swift, #228)
+
+final class LocalNetworkFailureTests: XCTestCase {
+    private let lan = ServerEndpoint(address: "http://192.168.1.20:8000/v1")
+    private let notConnected = URLError(.notConnectedToInternet)
+
+    /// -1009 to another device while the path is satisfied is the prompt pending or denied.
+    func testNotConnectedToAnotherDeviceWhileOnlineIsLocalNetwork() {
+        XCTAssertTrue(NetworkFailure.isLocalNetworkDenied(notConnected, endpoint: lan, pathSatisfied: true))
+        for address in ["http://mac-mini.local:11434/v1", "http://100.101.102.103:8000/v1", "https://models.example.net/v1"] {
+            XCTAssertTrue(NetworkFailure.isLocalNetworkDenied(notConnected, endpoint: ServerEndpoint(address: address),
+                                                              pathSatisfied: true), address)
+        }
+        let wrapped = NSError(domain: "SomeWrapper", code: 1, userInfo: [NSUnderlyingErrorKey: notConnected])
+        XCTAssertTrue(NetworkFailure.isLocalNetworkDenied(wrapped, endpoint: lan, pathSatisfied: true))
+    }
+
+    /// With the path down it is offline after all.
+    func testWithThePathDownItStaysOffline() {
+        XCTAssertFalse(NetworkFailure.isLocalNetworkDenied(notConnected, endpoint: lan, pathSatisfied: false))
+    }
+
+    /// Loopback needs no Local Network permission.
+    func testLoopbackIsNeverLocalNetwork() {
+        for address in ["http://localhost:11434/v1", "http://127.0.0.1:8000/v1", "http://127.1.2.3:8000/v1", "http://[::1]:8000/v1"] {
+            XCTAssertFalse(NetworkFailure.isLocalNetworkDenied(notConnected, endpoint: ServerEndpoint(address: address),
+                                                               pathSatisfied: true), address)
+        }
+        XCTAssertFalse(NetworkFailure.isLocalNetworkDenied(notConnected, endpoint: nil, pathSatisfied: true))
+    }
+
+    /// Only -1009: nothing answering, or no DNS answer, is not the permission.
+    func testOtherCodesAreNotLocalNetwork() {
+        for code: URLError.Code in [.cannotConnectToHost, .cannotFindHost, .networkConnectionLost, .timedOut] {
+            XCTAssertFalse(NetworkFailure.isLocalNetworkDenied(URLError(code), endpoint: lan, pathSatisfied: true), "\(code)")
+        }
+        XCTAssertFalse(NetworkFailure.isLocalNetworkDenied(NSError(domain: "GroqError", code: -1009), endpoint: lan,
+                                                           pathSatisfied: true))
+    }
+
+    /// Not offline, so `OfflineRetry` never queues it.
+    func testTheTypedErrorsAreNotOffline() {
+        XCTAssertFalse(NetworkFailure.isOffline(TranscriptionError.localNetworkDenied))
+        XCTAssertFalse(NetworkFailure.isOffline(LLMError.localNetworkDenied))
+        XCTAssertFalse(NetworkFailure.isOffline(LLMError.localNetworkDenied, reachingOwnServer: true))
+    }
+}
+
 // MARK: - A batch upload with no network
 
 private final class ThrowingBatchTranscriber: BatchTranscriber, @unchecked Sendable {
     let error: Error
-    init(_ error: Error) { self.error = error }
+    let meter: UsageMeter?
+    init(_ error: Error, meter: UsageMeter? = nil) { self.error = error; self.meter = meter }
     func transcribe(audioFileURL: URL, language: String?) async throws -> String { throw error }
 }
 
@@ -90,6 +139,30 @@ final class OfflineOutcomeTests: XCTestCase {
 
         XCTAssertFalse(outcome.offline)
         XCTAssertNotNil(outcome.error)
+    }
+
+    /// Kept in History with its audio, said as Local Network, and not offline, so it is
+    /// not queued for the back-online retry.
+    func testALocalNetworkDenialKeepsItsAudioAndIsNotOffline() async throws {
+        let meter = UsageMeter(vendor: .server, model: "whisper")
+        let session = BatchRecognitionSession(provider: ThrowingBatchTranscriber(TranscriptionError.localNetworkDenied, meter: meter),
+                                              writer: audibleWriter(), language: nil, languages: [])
+        let outcome = await session.finish()
+        let file = try XCTUnwrap(outcome.audioFileURL)
+        defer { AudioBufferWriter.cleanup(fileURL: file) }
+
+        XCTAssertTrue(outcome.localNetworkDenied)
+        XCTAssertFalse(outcome.offline)
+        XCTAssertNotNil(outcome.error)
+        XCTAssertEqual(outcome.usage, [])
+
+        // The same meter does count a failure that reached the server, so the empty
+        // usage above is the denial's doing.
+        let timedOut = await BatchRecognitionSession(provider: ThrowingBatchTranscriber(URLError(.timedOut), meter: meter),
+                                                     writer: audibleWriter(), language: nil, languages: []).finish()
+        timedOut.audioFileURL.map(AudioBufferWriter.cleanup(fileURL:))
+        XCTAssertEqual(timedOut.usage.count, 1)
+        XCTAssertEqual(timedOut.usage.first?.succeeded, false)
     }
 }
 

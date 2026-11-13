@@ -148,6 +148,8 @@ public enum ServerTestResult: Equatable, Sendable {
     case audioRefused
     case refused(status: Int)
     case badReply
+    /// macOS has not let SpeechText reach the local network (`NetworkFailure.isLocalNetworkDenied`).
+    case localNetworkDenied
     case httpsOnly(ServerHTTPSOnly)
 
     /// What a status code on the way to the server means. Nil for a success.
@@ -222,6 +224,8 @@ public enum ServerProbe {
             if let failure = ServerTestResult.forStatus(status) { return .failure(.init(failure)) }
             guard let ids = parseModelIDs(data) else { return .failure(.init(.badReply)) }
             return .success(ids)
+        } catch where NetworkFailure.isLocalNetworkDenied(error, endpoint: endpoint) {
+            return .failure(.init(.localNetworkDenied))
         } catch {
             if let refusal = ServerHTTPSOnly(error, host: endpoint.base.host) { return .failure(.init(.httpsOnly(refusal))) }
             return .failure(.init(.noAnswer))
@@ -237,6 +241,8 @@ public enum ServerProbe {
             return .answered(seconds: CFAbsoluteTimeGetCurrent() - start)
         } catch LLMError.httpError(let status, _) {
             return ServerTestResult.forStatus(status) ?? .badReply
+        } catch LLMError.localNetworkDenied {
+            return .localNetworkDenied
         } catch let refusal as ServerHTTPSOnly {
             return .httpsOnly(refusal)
         } catch is LLMError {
@@ -264,6 +270,8 @@ public enum ServerProbe {
             return speechResult(forStatus: status)
         } catch TranscriptionError.serverNoAnswer {
             return .noAnswer
+        } catch TranscriptionError.localNetworkDenied {
+            return .localNetworkDenied
         } catch let refusal as ServerHTTPSOnly {
             return .httpsOnly(refusal)
         } catch is URLError {
@@ -342,6 +350,8 @@ struct ServerTranscriber: BatchTranscriber {
             return try await transcriber.transcribeMetered(audioFileURL: file, language: language)
         } catch let error as URLError where error.code == .cannotConnectToHost {
             throw TranscriptionError.serverNoAnswer
+        } catch where NetworkFailure.isLocalNetworkDenied(error, endpoint: endpoint) {
+            throw TranscriptionError.localNetworkDenied
         } catch let error as URLError where error.code == .appTransportSecurityRequiresSecureConnection {
             throw ServerHTTPSOnly(host: endpoint.base.host)
         }

@@ -148,6 +148,10 @@ final class SpeechEngine {
     /// The last segment failed because the vendor no longer serves the model
     /// (`RecognitionOutcome.modelUnavailable`); the failure notice offers the picker.
     private(set) var failedForModel = false
+    /// The last segment failed because macOS has not let SpeechText reach the user's
+    /// server on the local network (`RecognitionOutcome.localNetworkDenied`); the failure
+    /// notice points at the setting.
+    private(set) var failedForLocalNetwork = false
     /// The last segment failed for want of a network (`RecognitionOutcome.offline`), read
     /// from the error itself rather than from its message, which is translated. Setup's
     /// Try it step shows its offline panel by it.
@@ -235,6 +239,7 @@ final class SpeechEngine {
         lastRecordID = nil
         offlineRecordID = nil
         failedForModel = false
+        failedForLocalNetwork = false
         failedOffline = false
         spanLayer.reset()
         transcriptionTask?.cancel()
@@ -922,6 +927,7 @@ final class SpeechEngine {
         let audioURL = outcome.audioFileURL ?? (tooShortToRetry ? nil : (try? writer?.writeAudioFile()) ?? nil)
         if let error = failure {
             if outcome.modelUnavailable, !superseded { failedForModel = true }
+            if outcome.localNetworkDenied, !superseded { failedForLocalNetwork = true }
             if outcome.offline, !superseded { failedOffline = true }
             let id = history.recordFailure(error: error, provider: provider, model: model, locale: locale,
                                            duration: duration, audioURL: audioURL, usage: outcome.usage,
