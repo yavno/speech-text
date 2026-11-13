@@ -92,7 +92,7 @@ final class LlamaModel {
     /// request can be sent, most recent first: the routing prompt, the one for an editor, a
     /// program in a terminal or an AI's field, a shell prompt's, a terminal where nothing
     /// says which, and the Edit shortcut's; `RewriteRouter.savedPromptStates` says how
-    /// many, more once two steps ship (#110, off until #114). The prewarm at each dictation touches three of
+    /// many, more for a model two steps shipped for (#110, #114). The prewarm at each dictation touches three of
     /// them, so at three slots it pushed a terminal's prompt out every time, and a dictation
     /// there read it again: 3.5 s against 0.5 s restored. A state is about 147 MB for Gemma
     /// 4 12B, held only once its prompt has been used (M1 Pro, 2026-11-08).

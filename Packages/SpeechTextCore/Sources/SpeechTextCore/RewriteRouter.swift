@@ -31,11 +31,17 @@ public struct RewriteRoute: Codable, Equatable, Sendable {
 /// is the `read` closure of `StepOne`.
 public enum RewriteRouter {
 
-    /// Whether dictations go through two steps. Off until #114 measures them: the owner's
-    /// rule is that two steps ship only where they beat the cleaned one-step prompt, so
-    /// users get `RewriteModes.request` until then. The harness's `route` and `two-step`
-    /// variants and the tests do not read this.
-    public static let twoStepsShip = false
+    /// The models whose dictations go through two steps. The owner's rule is that two steps
+    /// ship only where they beat the cleaned one-step prompt (`RewriteModes.request`), and
+    /// #114 measured that per model (79 fixtures × 3, M1 Pro, 2026-11-13): Qwen3.5 9B
+    /// 195 → 210 of 237 text checks, 7 fixtures better and 2 worse; Gemma 4 12B 222 → 222,
+    /// 2 and 2, so it keeps one step. The harness's `route` and `two-step` variants do
+    /// not read this.
+    static let twoStepModelIDs: Set<String> = ["Qwen3.5-9B-Q4_K_M"]
+
+    public static func twoStepsShip(modelID: String) -> Bool {
+        twoStepModelIDs.contains(modelID) && canReadStepOne(modelID: modelID)
+    }
 
     /// The prompts one request can be sent: routing, a field for another program, a
     /// shell prompt's, a terminal where nothing says which, and the Edit shortcut's.
@@ -44,7 +50,9 @@ public enum RewriteRouter {
     /// any prompt is (D7). Raised only with the gate: a state is about 147 MB for Gemma 4
     /// 12B (M1 Pro, 2026-11-08), and stale ones after a prompt edit would stay this long.
     public static let twoStepPromptStates = 10
-    public static var savedPromptStates: Int { twoStepsShip ? twoStepPromptStates : oneStepPromptStates }
+    public static func savedPromptStates(modelID: String) -> Int {
+        twoStepsShip(modelID: modelID) ? twoStepPromptStates : oneStepPromptStates
+    }
 
     /// The models already loaded for AI Rewrite that router v4 measured (2026-11-03/04):
     /// Gemma 4 12B 42 of 43 at 0.86 s, Qwen3.5 9B 41 at 0.64 s. Plain small models were
