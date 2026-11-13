@@ -415,12 +415,17 @@ struct StatusOverlayView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(titleColor)
                 if let detail {
-                    // Whole, however many lines it takes: the notice grows to fit
-                    // (`StatusOverlayPanel.fit`), so a hint's second sentence is not cut
-                    // off where History is the only place to read it (#239).
+                    // Whole: the notice grows to fit (`StatusOverlayPanel.fit`), so a hint's
+                    // second sentence is not cut off where only History shows it (#239). The
+                    // longest the app writes itself — the https hint for a Tailscale address,
+                    // or the Local Network sentence beside Open Settings, each with "Pasted the
+                    // raw transcription." — took four lines in English (window snapshots,
+                    // 2026-11-13); six leaves a longer language room and keeps a provider's
+                    // long message from growing it without end.
                     Text(detail)
                         .font(.system(size: 11))
                         .foregroundStyle(detailColor)
+                        .lineLimit(6)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }

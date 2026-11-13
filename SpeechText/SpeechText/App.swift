@@ -2843,7 +2843,6 @@ struct ObservedOverlay: View {
     }
 }
 
-
 #if DEBUG
 /// `-SPTSnapshots <folder>`: an end-to-end build (its own preferences and data, see
 /// `E2EMode`) opens each window the user reads — Setup's steps, the main window's pages,
