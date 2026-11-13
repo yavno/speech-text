@@ -140,6 +140,26 @@ final class DeliveryTierTests: XCTestCase {
         probe.valueReadable = false
         XCTAssertEqual(DeliveryTier.resolve(isOwnSurface: false, probe: probe), .b)
     }
+
+    /// VS Code's focused element is Monaco's hidden textarea: an empty value and 0+0,
+    /// whatever is selected in the editor. Writing that back proves nothing.
+    func testAnEmptyFieldsSelectionIsNotWrittenBackAsProof() {
+        XCTAssertFalse(AXTextProbe.canTestSelection(location: 0, length: 0, documentLength: 0))
+    }
+
+    /// Chromium's answer when it knows nothing: a caret at the start of a field with text.
+    func testACaretAtTheStartOfAFieldWithTextIsNotWrittenBackAsProof() {
+        XCTAssertFalse(AXTextProbe.canTestSelection(location: 0, length: 0, documentLength: 42))
+    }
+
+    func testASelectionPastTheEndIsNotWrittenBackAsProof() {
+        XCTAssertFalse(AXTextProbe.canTestSelection(location: 40, length: 5, documentLength: 42))
+    }
+
+    func testASelectionInsideTheTextIsWrittenBack() {
+        XCTAssertTrue(AXTextProbe.canTestSelection(location: 3, length: 5, documentLength: 42))
+        XCTAssertTrue(AXTextProbe.canTestSelection(location: 42, length: 0, documentLength: 42))
+    }
 }
 
 /// The keystroke a simulated ⌘V / ⌘C / ⌘X is posted as. Chrome 156 pastes nothing for a
