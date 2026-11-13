@@ -90,6 +90,36 @@ final class LocalNetworkFailureTests: XCTestCase {
     }
 }
 
+// MARK: - The user's server, out of reach
+
+final class ServerUnreachableTests: XCTestCase {
+
+    /// What Edit selection titles "Couldn't reach your server".
+    func testTheServersOwnFailuresAreUnreachable() {
+        let errors: [Error] = [TranscriptionError.serverNoAnswer, TranscriptionError.localNetworkDenied,
+                               LLMError.localNetworkDenied, ServerHTTPSOnly(host: "100.101.102.103")]
+        for error in errors {
+            XCTAssertTrue(NetworkFailure.isServerUnreachable(error, reachingOwnServer: false), "\(error)")
+        }
+    }
+
+    /// Nothing answering is the chat client's bare URLError, the server's only when the
+    /// rewrite went to it.
+    func testNothingAnsweringIsTheServersOnlyWhenItWasAsked() {
+        XCTAssertTrue(NetworkFailure.isServerUnreachable(URLError(.cannotConnectToHost), reachingOwnServer: true))
+        XCTAssertFalse(NetworkFailure.isServerUnreachable(URLError(.cannotConnectToHost), reachingOwnServer: false))
+    }
+
+    /// A server that answered, or a network that is not there, is something else.
+    func testOtherFailuresAreNot() {
+        let errors: [Error] = [URLError(.timedOut), URLError(.notConnectedToInternet), LLMError.emptyResponse,
+                               LLMError.httpError(500, ""), TranscriptionError.noServerAddress]
+        for error in errors {
+            XCTAssertFalse(NetworkFailure.isServerUnreachable(error, reachingOwnServer: true), "\(error)")
+        }
+    }
+}
+
 // MARK: - A batch upload with no network
 
 private final class ThrowingBatchTranscriber: BatchTranscriber, @unchecked Sendable {
@@ -152,6 +182,7 @@ final class OfflineOutcomeTests: XCTestCase {
         defer { AudioBufferWriter.cleanup(fileURL: file) }
 
         XCTAssertTrue(outcome.localNetworkDenied)
+        XCTAssertTrue(outcome.serverUnreachable)
         XCTAssertFalse(outcome.offline)
         XCTAssertNotNil(outcome.error)
         XCTAssertEqual(outcome.usage, [])

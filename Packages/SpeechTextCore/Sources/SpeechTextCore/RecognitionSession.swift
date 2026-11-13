@@ -118,6 +118,9 @@ public struct RecognitionOutcome: Sendable {
     /// the local network (`TranscriptionError.localNetworkDenied`): the notice points at
     /// the setting. Not `offline`, so nothing retries it by itself.
     public var localNetworkDenied = false
+    /// The user's server could not be reached at all (`NetworkFailure.isServerUnreachable`):
+    /// Edit selection's notice says so instead of blaming the instruction.
+    public var serverUnreachable = false
     /// Every request the segment cost (`UsageEvent`) — on an empty or failed outcome too,
     /// since a request the vendor answered was billed whatever the answer held.
     public var usage: [UsageEvent] = []

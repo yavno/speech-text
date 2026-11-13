@@ -105,6 +105,7 @@ public final class BatchRecognitionSession: RecognitionSession {
                                              offline: NetworkFailure.isOffline(error),
                                              modelUnavailable: (error as? TranscriptionError)?.isModelUnavailable == true,
                                              usage: NetworkFailure.isOffline(error) ? [] : event(nil, succeeded: false))
+            outcome.serverUnreachable = NetworkFailure.isServerUnreachable(error, reachingOwnServer: false)
             if case TranscriptionError.localNetworkDenied = error {
                 // Nothing left the Mac, so nothing is counted, as offline.
                 outcome.localNetworkDenied = true

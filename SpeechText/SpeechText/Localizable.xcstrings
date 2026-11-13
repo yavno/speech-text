@@ -35,23 +35,6 @@
         }
       }
     },
-    "%@ Pasted the raw transcription." : {
-      "comment" : "Notice after AI Rewrite on the user's own server failed because macOS kept SpeechText off the local network. %@ is the reason (a full sentence). A few lines at most in the floating notice.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ Se pegó la transcripción sin procesar."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ Вставлено сиру транскрипцію."
-          }
-        }
-      }
-    },
     "%@ billed" : {
       "comment" : "Usage page, Requests: audio a vendor billed. %@ is a duration, e.g. 12 min.",
       "localizations" : {
@@ -2981,23 +2964,6 @@
         }
       }
     },
-    "Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-      "comment" : "Notice beside the dictation overlay: text under 'Local Network access needed — saved to History'. Use macOS's own names for the System Settings path.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activa SpeechText en Ajustes del Sistema › Privacidad y seguridad › Red local."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Увімкніть SpeechText у Системних параметрах › Приватність і безпека › Локальна мережа."
-          }
-        }
-      }
-    },
     "Allowed" : {
       "comment" : "Setup window, permissions: shown after ✓ when a permission is granted.",
       "localizations" : {
@@ -4797,6 +4763,9 @@
           }
         }
       }
+    },
+    "Couldn't reach your server" : {
+      "comment" : "Notice beside the dictation overlay: title, one short line. Edit Selection with AI (rewrites the text selected in another app) failed because the model server the user runs could not be reached (Local Network access denied, https:// only, or nothing answered)."
     },
     "Couldn't start recording" : {
       "comment" : "Notice beside the dictation overlay: title, one short line. the microphone or the speech engine couldn't start.",
@@ -8283,22 +8252,8 @@
         }
       }
     },
-    "Local Network access needed. Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-      "comment" : "Settings › Speech to text / AI Rewrite and Setup: the result of testing the user's server when macOS hasn't allowed Local Network access. Use macOS's own names for the System Settings path.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se necesita acceso a Red local. Activa SpeechText en Ajustes del Sistema › Privacidad y seguridad › Red local."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Потрібен дозвіл «Локальна мережа». Увімкніть SpeechText у Системних параметрах › Приватність і безпека › Локальна мережа."
-          }
-        }
-      }
+    "Local Network access needed. %@" : {
+      "comment" : "Settings › Speech to text / AI Rewrite, and Setup: result of testing the user's own server, which macOS kept SpeechText from reaching. %@ is the sentence saying to click Open Settings, then choose Local Network."
     },
     "Local models take no list of words — the replacements still put them right." : {
       "comment" : "Dictionary page, What a word does: row text when a local speech model is in use.",
@@ -10402,6 +10357,9 @@
           }
         }
       }
+    },
+    "Open Settings, then choose Local Network and turn on SpeechText." : {
+      "comment" : "Beside an Open Settings button (a notice beside the dictation overlay, or Settings' server test): what to do once the button has opened System Settings › Privacy & Security, which it cannot open one level deeper. 'Local Network' is macOS's name for the privacy setting; 'Open Settings' is the button's own title. One sentence: in the notice it follows the reason, and the notice shows at most six lines of detail."
     },
     "Open Sound Settings" : {
       "comment" : "Button that opens System Settings › Sound.",
