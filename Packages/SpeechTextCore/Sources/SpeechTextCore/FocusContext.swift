@@ -152,7 +152,7 @@ public struct FocusContext: Codable, Equatable, Sendable {
 
     /// Whether Markdown means something where this text lands: an app on the list, or an
     /// editor whose window names a Markdown file. Goes only to the two-step path
-    /// (`RewriteRouter`): the one-step prompt may not change before #114.
+    /// (`RewriteRouter`): #114 measured the one-step prompt without it.
     var rendersMarkdown: Bool {
         if let bundleID, Self.markdownBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) { return true }
         return kind == .codeEditor && Self.namesMarkdownFile(windowTitle)

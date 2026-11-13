@@ -799,13 +799,18 @@ final class RewriteRouterTests: XCTestCase {
                                    defaultPresetID: nil, stepOne: step)
     }
 
-    /// The owner's rule: flipping this needs #114's measurement, and is a change someone meant.
-    func testUsersKeepTheOneStepPromptUntilItIsMeasured() {
-        XCTAssertFalse(RewriteRouter.twoStepsShip, "two steps ship only after #114")
+    /// The owner's rule: two steps ship only for a model #114 measured them to win on, and
+    /// adding one is a change someone meant.
+    func testTwoStepsShipOnlyWhereTheyWereMeasuredToWin() {
+        XCTAssertTrue(RewriteRouter.twoStepsShip(modelID: "Qwen3.5-9B-Q4_K_M"))
+        XCTAssertFalse(RewriteRouter.twoStepsShip(modelID: gemma), "a tie on 2026-11-13 is not a win")
+        XCTAssertFalse(RewriteRouter.twoStepsShip(modelID: "qwen3.5-2b"), "step one cannot be read there")
+        XCTAssertTrue(RewriteRouter.canReadStepOne(modelID: gemma), "the harness still runs two steps on Gemma")
     }
 
-    func testTheServiceKeepsFiveStatesWhileUsersHaveOneStep() {
-        XCTAssertEqual(RewriteRouter.savedPromptStates, 5)
+    func testTheServiceKeepsMoreStatesOnlyForAModelWithTwoSteps() {
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: gemma), 5)
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: "Qwen3.5-9B-Q4_K_M"), 10)
         XCTAssertGreaterThan(RewriteRouter.twoStepPromptStates, RewriteRouter.oneStepPromptStates)
     }
 
@@ -899,9 +904,9 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertEqual(fake.systems, [RewriteModes.request(context: xcode, presets: builtIns).system])
     }
 
-    /// The owner's rule: the prompt users get does not change before #114. These are the
-    /// SHA-256 of what the service sent with no step one, as `twoStepsShip == false` sends
-    /// it, read at 40ac8ad7, the commit before #111 added the Markdown fact. Frozen values,
+    /// The owner's rule: the one-step prompt, which every model without two steps gets, did
+    /// not change for #114. These are the SHA-256 of what the service sent with no step one,
+    /// read at 40ac8ad7, the commit before #111 added the Markdown fact. Frozen values,
     /// so a change to the fact's path that reached this request cannot also change the
     /// expectation; apps on the list and off it, and an editor on a Markdown file.
     func testTheOneStepRequestIsTheOneSentBeforeMarkdownWasKnown() async throws {
@@ -950,6 +955,16 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertEqual(renders?.request.system, plain?.request.system)
         XCTAssertEqual(renders?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
         XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
+    }
+
+    func testAMessageIsNotToldAboutMarkdownButStillGetsAFormatAskedFor() async {
+        let message = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(message?.request.decidedMode, "Message")
+        XCTAssertNil(message?.routeBlock, "a chat reply stays plain text where Markdown renders")
+        let asked = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 2], counts: [3, 4, 3]) })
+        XCTAssertEqual(asked?.routeBlock, "<route>\nformat: markdown\n</route>")
+        let notes = await decide(context: slack, with: stepOne { _ in Self.picking([2, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(notes?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
     }
 
     func testTheMarkdownFactFollowsTheFormatInTheRouteBlock() {

@@ -33,9 +33,10 @@ public enum TextRefinementService {
     /// Window passes none: it is our own surface, and its text as often ends up on the
     /// clipboard as in the app that was in front before it opened.
     ///
-    /// `twoSteps` is false for the Record Window, which keeps one request whatever #114 finds.
+    /// `twoSteps` is false for the Record Window, which keeps one request whatever #114 finds;
+    /// elsewhere two steps run only on a model they shipped for (`RewriteRouter.twoStepsShip`).
     public static func refine(_ transcript: String, context: FocusContext? = nil,
-                              twoSteps: Bool = RewriteRouter.twoStepsShip) async throws -> Result {
+                              twoSteps: Bool = true) async throws -> Result {
         let source = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
         let providerType = LLMConfiguration.providerType
         let modelID = LLMConfiguration.model(for: providerType)
@@ -46,7 +47,7 @@ public enum TextRefinementService {
 
         let provider = try LLMConfiguration.makeChatClient()
         var stepOne: RewriteRouter.StepOne?
-        if twoSteps, providerType == .local, let local = localChatModel(id: modelID) {
+        if twoSteps, providerType == .local, RewriteRouter.twoStepsShip(modelID: modelID), let local = localChatModel(id: modelID) {
             let read = LocalChat.readStepOne
             stepOne = RewriteRouter.StepOne(modelID: modelID, spokenLanguages: storedSpokenLanguages()) { try await read(local, $0) }
         }
