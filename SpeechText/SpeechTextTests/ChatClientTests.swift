@@ -383,6 +383,34 @@ final class ServerEndpointTests: XCTestCase {
         }
     }
 
+    func testTailscaleIsItsRangeAndMagicDNS() {
+        for host in ["100.64.0.0", "100.127.255.255", "100.101.1.1", "studio.tail1234.ts.net", "Studio.Tail1234.TS.NET"] {
+            XCTAssertTrue(ServerHTTPSOnly.isTailscale(host: host), host)
+        }
+        for host in ["100.63.255.255", "100.128.0.0", "101.64.0.1", "10.64.0.1", "100.64.example.com", "100.64.0", "100.+64.0.1",
+                     "evilts.net", "ts.net.example.com", "studio.local", "localhost", ""] {
+            XCTAssertFalse(ServerHTTPSOnly.isTailscale(host: host), host)
+        }
+    }
+
+    func testOnlyAnHTTPSRefusalIsReadAsOne() {
+        let refused = URLError(.appTransportSecurityRequiresSecureConnection)
+        XCTAssertEqual(ServerHTTPSOnly(refused, host: "100.101.1.1")?.isTailscale, true)
+        XCTAssertEqual(ServerHTTPSOnly(refused, host: "models.example.net")?.isTailscale, false)
+        XCTAssertNil(ServerHTTPSOnly(URLError(.cannotConnectToHost), host: "100.101.1.1"))
+        XCTAssertNil(ServerHTTPSOnly(URLError(.notConnectedToInternet), host: "100.101.1.1"))
+    }
+
+    func testTheHTTPSRefusalNamesTailscaleServeOnlyForTailscale() throws {
+        let plain = try XCTUnwrap(ServerHTTPSOnly(host: "models.example.net").errorDescription)
+        let tailscale = try XCTUnwrap(ServerHTTPSOnly(host: "studio.tail1234.ts.net").errorDescription)
+        XCTAssertEqual(plain, "macOS allows only https:// to this address.")
+        XCTAssertTrue(tailscale.hasPrefix(plain + " "))
+        XCTAssertTrue(tailscale.contains("tailscale serve"))
+        // A dictation's notice shows it as it is: none of the codes that would pick another wording.
+        XCTAssertEqual(TranscriptionFailureKind(message: tailscale), .other)
+    }
+
     func testOnlyPlainHTTPOffThisMacIsReadableOnTheWay() {
         XCTAssertEqual(ServerEndpoint(address: "http://localhost/v1")?.isReadableOnTheWay, false)
         XCTAssertEqual(ServerEndpoint(address: "http://studio.local/v1")?.isReadableOnTheWay, true)

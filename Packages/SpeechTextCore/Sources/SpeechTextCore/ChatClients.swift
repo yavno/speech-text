@@ -471,7 +471,13 @@ public struct OpenAICompatibleChatClient: ChatClient, Sendable {
 
         let start = CFAbsoluteTimeGetCurrent()
         dlog("LLM", "\(label): sending request, model=\(model.id), input=\(user.count) chars")
-        let (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
+        let data: Data, response: URLResponse
+        do {
+            (data, response) = try await llmSession.data(for: request, delegate: staysOnOrigin ? SameOriginRedirects() : nil)
+        } catch {
+            // Only plain HTTP is refused this way, and only the user's server is ever addressed so.
+            throw ServerHTTPSOnly(error, host: baseURL.host) ?? error
+        }
         let elapsed = CFAbsoluteTimeGetCurrent() - start
         // Before the status check: a 429 carries the limit that was hit.
         RateLimitStore.shared.record(vendor: model.provider.vendor, model: model.id, response: response)
