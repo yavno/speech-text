@@ -1124,7 +1124,21 @@
       }
     },
     "Allow SpeechText in System Settings › Privacy & Security › Local Network." : {
-      "comment" : "A dictation, AI Rewrite or edit failed: macOS hasn't let SpeechText reach the user's server on the local network. Use macOS's own names for the System Settings path."
+      "comment" : "A dictation, AI Rewrite or edit failed: macOS hasn't let SpeechText reach the user's server on the local network. Use macOS's own names for the System Settings path.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa SpeechText en Ajustes del Sistema › Privacidad y seguridad › Red local."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкніть SpeechText у Системних параметрах › Приватність і безпека › Локальна мережа."
+          }
+        }
+      }
     },
     "Anthropic · Paid" : {
       "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name.",
@@ -1728,7 +1742,21 @@
       }
     },
     "For a Tailscale address, use the https:// address “tailscale serve” gives the server." : {
-      "comment" : "A request to the user's server was refused as plain HTTP, and the address is a Tailscale one: said after “macOS allows only https:// to this address.”, in the same places (under the Test button in Settings and Setup, where it wraps, and a dictation's or AI Rewrite's error). One sentence. “tailscale serve” is a command and stays as it is."
+      "comment" : "A request to the user's server was refused as plain HTTP, and the address is a Tailscale one: said after “macOS allows only https:// to this address.”, in the same places (under the Test button in Settings and Setup, where it wraps, and a dictation's or AI Rewrite's error). One sentence. “tailscale serve” is a command and stays as it is.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para una dirección de Tailscale, usa la dirección https:// que “tailscale serve” da al servidor."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для адреси Tailscale використовуйте адресу https:// від «tailscale serve» для цього сервера."
+          }
+        }
+      }
     },
     "Forever" : {
       "comment" : "Settings › History: the last stop on the slider for how long History keeps dictations.",
@@ -4103,7 +4131,21 @@
       }
     },
     "macOS allows only https:// to this address." : {
-      "comment" : "A request to the user's server was refused because the address is plain http://. Shown under the server's Test button in Settings and Setup, where it wraps, and as the error of a dictation or AI Rewrite (its notice and History). One short sentence. “https://” stays as it is."
+      "comment" : "A request to the user's server was refused because the address is plain http://. Shown under the server's Test button in Settings and Setup, where it wraps, and as the error of a dictation or AI Rewrite (its notice and History). One short sentence. “https://” stays as it is.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS solo permite https:// a esta dirección."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS дозволяє лише https:// до цієї адреси."
+          }
+        }
+      }
     },
     "make it sound more sure" : {
       "comment" : "Home: the intro animation's edit example: the instruction said about the selected text. Lowercase, as spoken.",

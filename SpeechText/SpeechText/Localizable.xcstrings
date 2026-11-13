@@ -8236,7 +8236,21 @@
       }
     },
     "Local Network access needed — saved to History" : {
-      "comment" : "Notice beside the dictation overlay: title, one short line. a dictation to the user's server on another device failed because macOS hasn't allowed Local Network access; its audio is in History. 'Local Network' is macOS's name for the privacy setting."
+      "comment" : "Notice beside the dictation overlay: title, one short line. a dictation to the user's server on another device failed because macOS hasn't allowed Local Network access; its audio is in History. 'Local Network' is macOS's name for the privacy setting.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se necesita acceso a Red local: guardado en el Historial"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрібен дозвіл «Локальна мережа» — збережено в Історії"
+          }
+        }
+      }
     },
     "Local Network access needed. %@" : {
       "comment" : "Settings › Speech to text / AI Rewrite, and Setup: result of testing the user's own server, which macOS kept SpeechText from reaching. %@ is the sentence saying to click Open Settings, then choose Local Network."

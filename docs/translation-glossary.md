@@ -81,6 +81,7 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | Keyboard · Dictation · Appearance (macOS) | Teclado · Dictado · Aspecto |
 | Accessibility | Accesibilidad |
 | Microphone · Speech Recognition · Automation | Micrófono · Reconocimiento de voz · Automatización |
+| Local Network (the privacy setting) | Red local; the permission in a sentence: acceso a Red local |
 | Sound | Sonido |
 | Login Items & Extensions | Ítems de inicio y extensiones |
 | menu bar · Dock · Control Center | barra de menús · Dock · Centro de control |
@@ -129,6 +130,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Keyboard · Dictation · Appearance (macOS) | Клавіатура · Диктування · Вигляд |
 | Accessibility | Доступність, as macOS names it; the permission in a sentence: дозвіл «Доступність» |
 | Microphone · Speech Recognition · Automation | Мікрофон · Розпізнавання мовлення · Автоматизація |
+| Local Network (the privacy setting) | Локальна мережа; the permission in a sentence: дозвіл «Локальна мережа» |
 | Sound | Звук |
 | Login Items & Extensions | Автозапуск і розширення |
 | menu bar · Dock · Control Center | смуга меню · Dock · Центр керування |
