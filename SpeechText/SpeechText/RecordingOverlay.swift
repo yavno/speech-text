@@ -415,10 +415,13 @@ struct StatusOverlayView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(titleColor)
                 if let detail {
+                    // Whole, however many lines it takes: the notice grows to fit
+                    // (`StatusOverlayPanel.fit`), so a hint's second sentence is not cut
+                    // off where History is the only place to read it (#239).
                     Text(detail)
                         .font(.system(size: 11))
                         .foregroundStyle(detailColor)
-                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -432,14 +435,16 @@ struct StatusOverlayView: View {
 
             if let action {
                 Button(action.title, action: action.perform)
-                    .controlSize(.small)
-                    .buttonStyle(.bordered)
-                    .tint(skin == .techno ? techno.phosphor : nil)
+                    .buttonStyle(NoticeActionButtonStyle(
+                        foreground: skin == .techno ? techno.phosphorText : .primary,
+                        fill: skin == .techno ? techno.phosphor : .primary))
                     .fixedSize()
             }
         }
         .padding(.horizontal, 16)
-        .frame(height: 60)
+        .padding(.vertical, 10)
+        .frame(width: StatusOverlayPanel.panelWidth)
+        .frame(minHeight: 60)
         .background {
             if skin == .techno { shape.fill(techno.screen) }
         }
@@ -467,6 +472,24 @@ struct StatusOverlayView: View {
     }
 }
 
+/// The notice's button, drawn here rather than `.bordered`: the notice's panel never
+/// becomes key, so a bordered button kept its inactive look and followed the system's
+/// appearance, not the notice's — dark text on techno's always-dark screen (#239).
+private struct NoticeActionButtonStyle: ButtonStyle {
+    let foreground: Color
+    let fill: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(foreground)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Capsule().fill(fill.opacity(configuration.isPressed ? 0.28 : 0.16)))
+            .contentShape(Capsule())
+    }
+}
+
 final class StatusOverlayPanel: NSPanel {
     static let panelWidth: CGFloat = 340
 
@@ -484,6 +507,12 @@ final class StatusOverlayPanel: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         isMovableByWindowBackground = true
         hasShadow = true
+    }
+
+    /// Takes the height its notice needs at the panel's width.
+    func fit() {
+        guard let content = contentView else { return }
+        setContentSize(NSSize(width: Self.panelWidth, height: content.fittingSize.height))
     }
 
     /// Beside the recording overlay — its frame while it is still up, otherwise the strip at

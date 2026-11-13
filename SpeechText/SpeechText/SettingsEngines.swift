@@ -756,13 +756,24 @@ struct ServerLanguagesNote: View {
     }
 }
 
-/// System Settings › Privacy & Security › Local Network, where a server on another device
-/// is allowed (#228). Checked 2026-11-12 on macOS 26.6.2 (25G83): `open` takes the URL
-/// without an error, and the Privacy & Security extension has the Local Network service
-/// (`PrivacyLocalNetworkService`); the `Privacy_LocalNetwork` anchor is not in its search
-/// terms, and the screen was locked, so whether it lands on the pane itself or on Privacy
-/// & Security was not seen; Privacy & Security lists Local Network either way.
-let localNetworkSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork")!
+/// System Settings › Privacy & Security, one click short of Local Network, where a server on
+/// another device is allowed (#228), so every sentence beside the button names that click
+/// (`localNetworkSettingsSentence`). No URL opens Local Network itself. Checked 2026-11-13 on
+/// macOS 26.6.2 (25G83): the Privacy & Security extension's anchors (`Privacy_Microphone`
+/// and the rest, in its binary) have none for Local Network; `?Privacy_Microphone` lands on
+/// Microphone, while `?Privacy_LocalNetwork`, `?privacy-localnetwork`,
+/// `?Privacy_LocalNetworkService` and `?LocalNetwork`, on this ID and on
+/// `com.apple.settings.PrivacySecurity.extension`, all land on Privacy & Security, as no
+/// anchor does. On macOS 27.0.1 `?Privacy_LocalNetwork` did the same (#239); the others
+/// were not tried there.
+let localNetworkSettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security")!
+
+/// What to do with Open Settings, said beside it: the button stops at Privacy & Security
+/// (`localNetworkSettingsURL`). History, with no button, keeps the error's own sentence,
+/// which names the whole path.
+var localNetworkSettingsSentence: String {
+    String(localized: "Open Settings, then choose Local Network and turn on SpeechText.")
+}
 
 struct ServerTestResultLine: View {
     let role: ServerRole
@@ -788,7 +799,7 @@ struct ServerTestResultLine: View {
             case .badReply: Text("The server's reply wasn't one SpeechText can read.").rowNote(bad: true)
             case .localNetworkDenied:
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Local Network access needed. Allow SpeechText in System Settings › Privacy & Security › Local Network.").rowNote(bad: true)
+                    Text("Local Network access needed. \(localNetworkSettingsSentence)").rowNote(bad: true)
                     Button("Open Settings") { NSWorkspace.shared.open(localNetworkSettingsURL) }
                         .buttonStyle(.link)
                         .font(.caption)

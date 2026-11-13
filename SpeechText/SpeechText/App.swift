@@ -1426,9 +1426,9 @@ final class AppState {
                     // The server is on another device and macOS keeps SpeechText off the
                     // local network (#228): the setting, not the network, is what to fix.
                     self.showStatus(
-                        icon: "sparkles.slash",
+                        icon: "sparkles",
                         title: String(localized: "AI processing failed"),
-                        detail: String(localized: "\(error.localizedDescription) Pasted the raw transcription."),
+                        detail: localNetworkSettingsSentence + " " + String(localized: "Pasted the raw transcription."),
                         tint: .orange,
                         duration: 10,
                         action: StatusOverlayAction(title: String(localized: "Open Settings")) {
@@ -1437,7 +1437,7 @@ final class AppState {
                     )
                 } else {
                     self.showStatus(
-                        icon: "sparkles.slash",
+                        icon: "sparkles",
                         title: String(localized: "AI processing failed"),
                         detail: (error as? LLMError)?.needsModelChoice == true
                             ? String(localized: "The model isn't available to your key. Pasted the raw transcription.")
@@ -1853,8 +1853,14 @@ final class AppState {
             self.transcriptionWaitTask = nil
             if let error = self.speechEngine.errorMessage {
                 dlog("Edit", "instruction failed: \(error)", level: .error)
-                self.abortEdit(icon: "exclamationmark.triangle.fill", title: String(localized: "Couldn't understand the instruction"),
-                               detail: self.friendlySTTError(error))
+                if self.speechEngine.failedForLocalNetwork {
+                    self.abortEditUnreachable(localNetwork: true)
+                } else if self.speechEngine.failedToReachServer {
+                    self.abortEditUnreachable(localNetwork: false, detail: self.friendlySTTError(error))
+                } else {
+                    self.abortEdit(icon: "exclamationmark.triangle.fill", title: String(localized: "Couldn't understand the instruction"),
+                                   detail: self.friendlySTTError(error))
+                }
                 return
             }
             let instruction = self.speechEngine.finalText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -2052,7 +2058,13 @@ final class AppState {
                     context: context)
                 dlog("Edit", "rewrite failed: \(error.localizedDescription)", level: .error)
                 self.refinementTask = nil
-                self.abortEdit(icon: "sparkles", title: String(localized: "AI edit failed"), detail: error.localizedDescription)
+                if case LLMError.localNetworkDenied? = error as? LLMError {
+                    self.abortEditUnreachable(localNetwork: true)
+                } else if NetworkFailure.isServerUnreachable(error, reachingOwnServer: type == .server) {
+                    self.abortEditUnreachable(localNetwork: false, detail: error.localizedDescription)
+                } else {
+                    self.abortEdit(icon: "sparkles", title: String(localized: "AI edit failed"), detail: error.localizedDescription)
+                }
             }
         }
     }
@@ -2160,7 +2172,8 @@ final class AppState {
     /// Ends the edit without a rewrite. Text already cut goes back where it was; `title`,
     /// when given, says why.
     private func abortEdit(icon: String = "", title: String? = nil, detail: String = "",
-                           tint: Color = .orange, notesPutBack: Bool = true) {
+                           tint: Color = .orange, notesPutBack: Bool = true,
+                           duration: TimeInterval = 5, action: StatusOverlayAction? = nil) {
         let removal = editRemoval
         let app = previousApp
         transcriptionWaitTask?.cancel()
@@ -2175,7 +2188,24 @@ final class AppState {
             if title != nil, notesPutBack { detail += " " + String(localized: "The text was put back.") }
         }
         if let title {
-            showStatus(icon: icon, title: title, detail: detail, tint: tint)
+            showStatus(icon: icon, title: title, detail: detail, tint: tint, duration: duration, action: action)
+        }
+    }
+
+    /// Ends the edit because the user's server could not be reached — for the instruction
+    /// or for the rewrite — so the title names the server, not what was asked (#239). A
+    /// Local Network denial gets the setting's button and its sentence, as a dictation's
+    /// notice does; anything else says why in `detail`.
+    private func abortEditUnreachable(localNetwork: Bool, detail: String = "") {
+        if localNetwork {
+            abortEdit(icon: "network.slash", title: String(localized: "Couldn't reach your server"),
+                      detail: localNetworkSettingsSentence, duration: 15,
+                      action: StatusOverlayAction(title: String(localized: "Open Settings")) {
+                          NSWorkspace.shared.open(localNetworkSettingsURL)
+                      })
+        } else {
+            abortEdit(icon: "network.slash", title: String(localized: "Couldn't reach your server"),
+                      detail: detail, duration: 10)
         }
     }
 
@@ -2413,7 +2443,7 @@ final class AppState {
         showStatus(
             icon: "network.slash",
             title: String(localized: "Local Network access needed — saved to History"),
-            detail: String(localized: "Allow SpeechText in System Settings › Privacy & Security › Local Network."),
+            detail: localNetworkSettingsSentence,
             tint: .orange,
             duration: 15,
             action: StatusOverlayAction(title: String(localized: "Open Settings")) {
@@ -2560,6 +2590,7 @@ final class AppState {
                 self?.openHistoryWindow(narrowedTo: historyPlace)
             }
         ))
+        panel.fit()
         panel.place(beside: (overlayPanel ?? confirmationPanel).flatMap { $0.isVisible ? $0.frame : nil })
         panel.orderFrontRegardless()
         statusPanel = panel
@@ -2811,6 +2842,7 @@ struct ObservedOverlay: View {
         )
     }
 }
+
 
 #if DEBUG
 /// `-SPTSnapshots <folder>`: an end-to-end build (its own preferences and data, see

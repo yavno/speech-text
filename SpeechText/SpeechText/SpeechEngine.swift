@@ -152,6 +152,10 @@ final class SpeechEngine {
     /// server on the local network (`RecognitionOutcome.localNetworkDenied`); the failure
     /// notice points at the setting.
     private(set) var failedForLocalNetwork = false
+    /// The last segment failed because the user's server could not be reached at all
+    /// (`RecognitionOutcome.serverUnreachable`), Local Network included; Edit selection's
+    /// notice names the server rather than the instruction.
+    private(set) var failedToReachServer = false
     /// The last segment failed for want of a network (`RecognitionOutcome.offline`), read
     /// from the error itself rather than from its message, which is translated. Setup's
     /// Try it step shows its offline panel by it.
@@ -240,6 +244,7 @@ final class SpeechEngine {
         offlineRecordID = nil
         failedForModel = false
         failedForLocalNetwork = false
+        failedToReachServer = false
         failedOffline = false
         spanLayer.reset()
         transcriptionTask?.cancel()
@@ -928,6 +933,7 @@ final class SpeechEngine {
         if let error = failure {
             if outcome.modelUnavailable, !superseded { failedForModel = true }
             if outcome.localNetworkDenied, !superseded { failedForLocalNetwork = true }
+            if outcome.serverUnreachable, !superseded { failedToReachServer = true }
             if outcome.offline, !superseded { failedOffline = true }
             let id = history.recordFailure(error: error, provider: provider, model: model, locale: locale,
                                            duration: duration, audioURL: audioURL, usage: outcome.usage,

@@ -170,3 +170,27 @@ public struct StreamReconnectPolicy: Sendable {
         return delays[attempt]
     }
 }
+
+// MARK: - The user's server, out of reach
+
+extension NetworkFailure {
+    /// Whether a request to the user's server failed before the server could answer it:
+    /// macOS kept SpeechText off the local network, allowed only https:// to the address,
+    /// or nothing listened there. Edit selection then says "Couldn't reach your server"
+    /// rather than blaming the instruction or the rewrite (#239). Pure logic.
+    ///
+    /// The typed errors come only from the server's own clients. The chat client has none
+    /// for nothing listening — Settings' test reads any `LLMError` as a bad reply — so a
+    /// bare `cannotConnectToHost` counts only when `reachingOwnServer`.
+    public static func isServerUnreachable(_ error: Error, reachingOwnServer: Bool) -> Bool {
+        switch error {
+        case TranscriptionError.serverNoAnswer, TranscriptionError.localNetworkDenied, LLMError.localNetworkDenied:
+            return true
+        case is ServerHTTPSOnly:
+            return true
+        default:
+            let ns = error as NSError
+            return reachingOwnServer && ns.domain == NSURLErrorDomain && ns.code == URLError.cannotConnectToHost.rawValue
+        }
+    }
+}
