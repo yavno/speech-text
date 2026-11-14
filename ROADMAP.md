@@ -6,7 +6,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, and a prompt without its contradictions and repeats (both done): modes for the kind of text, modifiers for language, length, tone and format. Then possibly two steps — a fast model picks the mode, the writing model gets only that mode.
+- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, and a prompt without its contradictions and repeats (both done): modes for the kind of text, modifiers for language, length, tone and format. Two steps (the model on this Mac picks the mode, then writes with only that mode) are measured per model and turned on where they win: Qwen3.5 9B so far.
 - **Your own model server** — use a model you already run, in Ollama, LM Studio or any server that speaks the OpenAI API, for AI Rewrite and, where the server transcribes audio, for dictation: an address, an optional key and a model from the server's list.
 
 ## Next
