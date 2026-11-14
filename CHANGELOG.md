@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **History no longer says "Pasted" for a dictation saved offline.** When a dictation made with no connection was rewritten by AI Rewrite once the network was back, its AI output read *Pasted* though nothing had been pasted; it now reads *Not pasted*, and a rewrite that failed says the dictated text was kept rather than pasted.
 - **Edit Selection works in VS Code.** With text selected in VS Code's editor, the Edit shortcut said *No text selected*; it now reads the selection and rewrites it.
 - **Numbers follow SpeechText's language, not your Mac's region.** On a Mac whose region writes decimals with a comma, an English window could show "483,3 MB" beside "$0.01". Sizes, prices and times now use a point in English, and a comma in Spanish and Ukrainian.
+- **Notices beside the overlay can be read in full.** In the techno skin, with the Mac in light mode, a notice's button — Retry, Show, Choose, Open Settings and the rest — was dark text on the notice's dark screen; it now takes the skin's colors in every appearance, in both skins. A notice's explanation was cut off after two lines; the notice now grows to show up to six. And *AI processing failed* shows its icon, which was missing.
 
 ## [0.10.0] - 2026-10-29
 
