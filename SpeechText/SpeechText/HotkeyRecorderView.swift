@@ -159,8 +159,15 @@ struct HotkeyRecorderView: View {
                 _ = fnFilter.fnDown(at: now, pressesAtOnce: true)
             } else {
                 fnHeld = false
-                // Up with no other key since it went down: fn on its own.
-                if fnFilter.fnUp().contains(.release) { take(FnKey.shortcut) }
+                // Up with no other key since it went down: fn on its own — unless ⌘⌥⌃⇧ are
+                // down with it, which a shortcut on fn cannot carry.
+                guard fnFilter.fnUp().contains(.release) else { return event }
+                if event.modifierFlags.intersection([.command, .option, .control, .shift]).isEmpty {
+                    take(FnKey.shortcut)
+                } else {
+                    refusal = "fn can't be combined with other keys. Press fn on its own, or a shortcut without it."
+                    stopListening()
+                }
             }
             return event
         }

@@ -276,17 +276,21 @@ final class HotkeyManager {
 
     private func watchOtherKeys() {
         stopWatchingOtherKeys()
-        let keyDown: () -> Void = { [weak self] in
+        let ownProcess = Int64(getpid())
+        let keyDown: (NSEvent) -> Void = { [weak self] event in
+            // Our own ⌘C — Edit reading the selection while fn is still down — is not the
+            // user's key. Only the event's source is read, never which key it is.
+            guard event.cgEvent?.getIntegerValueField(.eventSourceUnixProcessID) != ownProcess else { return }
             MainActor.assumeIsolated {
                 guard let self, let action = self.fnAction else { return }
                 self.perform(self.fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
             }
         }
-        if let global = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { _ in keyDown() }) {
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: keyDown) {
             otherKeyMonitors.append(global)
         }
         if let local = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event in
-            keyDown()
+            keyDown(event)
             return event
         }) {
             otherKeyMonitors.append(local)
