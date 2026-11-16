@@ -15,6 +15,11 @@ public enum FnKey {
     /// `kVK_Function`: what the flags-changed event of fn itself carries.
     public static let keyCode = UInt16(kVK_Function)
 
+    /// The key-down 🌐 itself sends on a short press, beside fn's flags change (measured
+    /// 2026-11-16, MacBook Pro keyboard, macOS 26.6.2: every tap under 0.3 s brought one,
+    /// a longer hold none). It is fn, not another key pressed with it.
+    public static let globeKeyCode: UInt16 = 179
+
     /// A shortcut stored as fn's key code with no modifiers is fn on its own.
     public static let shortcut = KeyShortcut(keyCode: UInt32(keyCode), carbonModifiers: 0)
 

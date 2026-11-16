@@ -326,7 +326,10 @@ final class HotkeyManager {
         guard event.getIntegerValueField(.eventSourceUnixProcessID) != Int64(getpid()) else { return }
         // Another of our shortcuts with fn held is that shortcut: ⌃⇧A switches a hold on fn
         // to AI, as it does a hold on ⌃⇧Q. The CGEvent masks are NSEvent's.
-        let pressed = KeyShortcut(keyCode: UInt32(event.getIntegerValueField(.keyboardEventKeycode)),
+        let keyCode = UInt16(truncatingIfNeeded: event.getIntegerValueField(.keyboardEventKeycode))
+        // A short tap of 🌐 sends a key-down of its own: that is fn, not another key.
+        guard keyCode != FnKey.globeKeyCode else { return }
+        let pressed = KeyShortcut(keyCode: UInt32(keyCode),
                                   modifiers: NSEvent.ModifierFlags(rawValue: UInt(event.flags.rawValue)))
         guard !shortcuts.values.contains(pressed) else { return }
         perform(fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
