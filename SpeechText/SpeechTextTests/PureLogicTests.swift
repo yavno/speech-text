@@ -675,11 +675,11 @@ final class FnKeyTests: XCTestCase {
         XCTAssertEqual(FnKey.SystemAction(appleFnUsageType: 2), .showEmojiAndSymbols)
         XCTAssertEqual(FnKey.SystemAction(appleFnUsageType: 3), .startDictation)
         XCTAssertEqual(FnKey.SystemAction(appleFnUsageType: 7), .other(7))
+        XCTAssertEqual(FnKey.SystemAction(appleFnUsageType: nil), .notSet)
     }
 
     func testOnlyDoNothingLeavesThePressToUs() {
-        // A Mac that never changed the setting has no key, and there 🌐 switches the language.
-        XCTAssertEqual(FnKey.SystemAction(appleFnUsageType: nil), .changeInputSource)
+        // A Mac that never changed the setting has no key, and there 🌐 switched the language.
         XCTAssertFalse(FnKey.SystemAction(appleFnUsageType: 0).takesThePress)
         for value in [nil, 1, 2, 3, 7] {
             XCTAssertTrue(FnKey.SystemAction(appleFnUsageType: value).takesThePress, "\(String(describing: value))")
@@ -700,13 +700,13 @@ final class FnKeyTests: XCTestCase {
 
     func testFnAloneWhileIdlePressesAtOnceAndReleasesOnTheWayUp() {
         var filter = FnKeyFilter()
-        XCTAssertEqual(filter.fnDown(at: 0, idle: true), [.press])
+        XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: true), [.press])
         XCTAssertEqual(filter.fnUp(), [.release])
     }
 
     func testAnotherKeyWithFnTakesThePressBack() {
         var filter = FnKeyFilter()
-        XCTAssertEqual(filter.fnDown(at: 0, idle: true), [.press])
+        XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: true), [.press])
         XCTAssertEqual(filter.otherKeyDown(at: 0.1), [.abort(notify: false)])
         // Holding fn for a run of Home and End: one abort, and nothing on the way up.
         XCTAssertEqual(filter.otherKeyDown(at: 0.2), [])
@@ -715,19 +715,19 @@ final class FnKeyTests: XCTestCase {
 
     func testALateOtherKeyAbortsWithANotice() {
         var filter = FnKeyFilter()
-        _ = filter.fnDown(at: 0, idle: true)
+        _ = filter.fnDown(at: 0, pressesAtOnce: true)
         XCTAssertEqual(filter.otherKeyDown(at: DictationHotkeyGesture.tapThreshold), [.abort(notify: true)])
     }
 
     func testWhileSomethingRunsThePressWaitsForTheRelease() {
         var filter = FnKeyFilter()
-        XCTAssertEqual(filter.fnDown(at: 0, idle: false), [])
+        XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: false), [])
         XCTAssertEqual(filter.fnUp(), [.press, .release])
     }
 
     func testFnAsAModifierDuringADictationDoesNothing() {
         var filter = FnKeyFilter()
-        XCTAssertEqual(filter.fnDown(at: 0, idle: false), [])
+        XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: false), [])
         XCTAssertEqual(filter.otherKeyDown(at: 0.05), [])
         XCTAssertEqual(filter.fnUp(), [])
     }
@@ -738,11 +738,64 @@ final class FnKeyTests: XCTestCase {
         XCTAssertEqual(filter.fnUp(), [])
     }
 
+    /// The caller's side, as the hotkey code will be: a press goes through at once when
+    /// idle or when a double tap waits for its second half.
+    private struct HoldOnFn {
+        var filter = FnKeyFilter()
+        var gesture = DictationHotkeyGesture(holdToTalk: true)
+        var phase = DictationHotkeyGesture.Phase.idle
+        var actions: [DictationHotkeyAction] = []
+
+        mutating func fnDown(at time: TimeInterval) {
+            let pressesAtOnce = phase == .idle || gesture.awaitsSecondTap
+            perform(filter.fnDown(at: time, pressesAtOnce: pressesAtOnce), at: time)
+        }
+
+        mutating func fnUp(at time: TimeInterval) {
+            perform(filter.fnUp(), at: time)
+        }
+
+        mutating func perform(_ events: [FnKeyFilter.Event], at time: TimeInterval) {
+            for event in events {
+                let action: DictationHotkeyAction
+                switch event {
+                case .press: action = gesture.press(.inline, in: phase, at: time)
+                case .release: action = gesture.release(.inline, in: phase, at: time)
+                case .abort: action = .cancel(.shortcut)
+                }
+                actions.append(action)
+                switch action {
+                case .start: phase = .recording(ai: false)
+                case .stop, .cancel: phase = .idle
+                case .switchTo, .lock, .ignore: break
+                }
+            }
+        }
+    }
+
+    func testADoubleTapOfFnLocksAHoldDictation() {
+        var run = HoldOnFn()
+        run.fnDown(at: 0)
+        run.fnUp(at: 0.1)
+        run.fnDown(at: 0.2)
+        XCTAssertEqual(run.gesture.tapWindowExpired(in: run.phase, at: 0.45), .ignore)
+        run.fnUp(at: 0.5)
+        XCTAssertEqual(run.actions, [.start(ai: false), .ignore, .lock, .ignore])
+        XCTAssertEqual(run.phase, .recording(ai: false))
+    }
+
+    func testAHoldOnFnStopsOnTheWayUp() {
+        var run = HoldOnFn()
+        run.fnDown(at: 0)
+        run.fnUp(at: 2)
+        XCTAssertEqual(run.actions, [.start(ai: false), .stop])
+    }
+
     func testAMissedReleaseStartsOver() {
         var filter = FnKeyFilter()
-        _ = filter.fnDown(at: 0, idle: true)
+        _ = filter.fnDown(at: 0, pressesAtOnce: true)
         _ = filter.otherKeyDown(at: 0.1)
-        XCTAssertEqual(filter.fnDown(at: 5, idle: true), [.press])
+        XCTAssertEqual(filter.fnDown(at: 5, pressesAtOnce: true), [.press])
         XCTAssertEqual(filter.fnUp(), [.release])
     }
 }

@@ -27,15 +27,18 @@ public enum FnKey {
         case changeInputSource
         case showEmojiAndSymbols
         case startDictation
+        /// The key is absent: the setting was never changed. On the Mac measured, which
+        /// has two input sources, 🌐 then switched the input source; what macOS does on
+        /// a Mac with one is not known, so this names no action.
+        case notSet
         /// A value macOS did not write when this was measured.
         case other(Int)
 
-        /// An absent key is what a Mac that never changed the setting has, and there
-        /// 🌐 switched the input source.
         public init(appleFnUsageType: Int?) {
             switch appleFnUsageType {
+            case nil: self = .notSet
             case 0: self = .doNothing
-            case nil, 1: self = .changeInputSource
+            case 1: self = .changeInputSource
             case 2: self = .showEmojiAndSymbols
             case 3: self = .startDictation
             case let value?: self = .other(value)
@@ -56,8 +59,10 @@ public enum FnKey {
 /// Starting a dictation cannot wait for fn to come up: the microphone needs the head
 /// start, as it does for every shortcut. So with nothing running the press goes through
 /// at once, and another key arriving while fn is still down takes it back (`abort`).
-/// While something runs, the press waits for the release instead — fn+← in the middle
-/// of a dictation is someone moving the cursor, not a stop.
+/// So does the second press of a double tap, which `DictationHotkeyGesture` measures
+/// from the press and cancels if it comes too late. Otherwise, while something runs,
+/// the press waits for the release — fn+← in the middle of a dictation is someone
+/// moving the cursor, not a stop.
 ///
 /// The keyboard reports no other key while Secure Input is on (a password field), so
 /// there fn+← reads as fn alone; kept at the owner's call (2026-11-16) rather than
@@ -89,11 +94,13 @@ public struct FnKeyFilter: Sendable {
 
     public init() {}
 
-    /// `idle`: nothing the shortcut would act on is running, so its press starts something.
-    public mutating func fnDown(at time: TimeInterval, idle: Bool) -> [Event] {
+    /// `pressesAtOnce`: the press cannot wait for the release — nothing the shortcut acts
+    /// on is running (`phase == .idle`), or the gesture waits for the second half of a
+    /// double tap (`awaitsSecondTap`).
+    public mutating func fnDown(at time: TimeInterval, pressesAtOnce: Bool) -> [Event] {
         // A second press with no release between means the release was missed: start over.
-        state = idle ? .pressed(at: time) : .deferred
-        return idle ? [.press] : []
+        state = pressesAtOnce ? .pressed(at: time) : .deferred
+        return pressesAtOnce ? [.press] : []
     }
 
     public mutating func otherKeyDown(at time: TimeInterval) -> [Event] {
