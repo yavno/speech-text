@@ -725,6 +725,20 @@ final class FnKeyTests: XCTestCase {
         XCTAssertEqual(filter.fnUp(), [.press, .release])
     }
 
+    func testAPressHeldBackForADictationThatEndedIsDropped() {
+        var filter = FnKeyFilter()
+        XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: false), [])
+        filter.dropDeferredPress()
+        XCTAssertEqual(filter.fnUp(), [])
+    }
+
+    func testDroppingLeavesAPressAlreadySentAlone() {
+        var filter = FnKeyFilter()
+        _ = filter.fnDown(at: 0, pressesAtOnce: true)
+        filter.dropDeferredPress()
+        XCTAssertEqual(filter.fnUp(), [.release])
+    }
+
     func testFnAsAModifierDuringADictationDoesNothing() {
         var filter = FnKeyFilter()
         XCTAssertEqual(filter.fnDown(at: 0, pressesAtOnce: false), [])

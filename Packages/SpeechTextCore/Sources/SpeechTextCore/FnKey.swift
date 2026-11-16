@@ -124,4 +124,11 @@ public struct FnKeyFilter: Sendable {
         case .up, .modifier: return []
         }
     }
+
+    /// What ran has ended some other way — ⎋, ✕, the menu — with fn still down: its
+    /// held-back press belonged to that, and must not start something new on the way up.
+    /// Called wherever `DictationHotkeyGesture.reset()` is.
+    public mutating func dropDeferredPress() {
+        if case .deferred = state { state = .modifier }
+    }
 }
