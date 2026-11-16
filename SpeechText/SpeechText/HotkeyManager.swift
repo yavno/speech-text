@@ -71,8 +71,8 @@ final class HotkeyManager {
     private var fnAction: ShortcutAction?
     private var fnFilter = FnKeyFilter()
     private var fnMonitors: [Any] = []
-    /// Installed only while fn is down, and their handlers read nothing of the event.
-    private var otherKeyMonitors: [Any] = []
+    /// Exists only while fn is down (`watchOtherKeys`).
+    private var otherKeyTap: (CFMachPort, CFRunLoopSource)?
 
     private static let signature: OSType = 0x56504852
 
@@ -274,32 +274,62 @@ final class HotkeyManager {
         perform(events, for: action)
     }
 
+    /// A listen-only tap at the HID level, from fn down to fn up. NSEvent's key-down
+    /// monitor sees no key macOS's own 🌐 shortcuts take — fn+Q (Quick Note), fn+A, fn+C
+    /// counted none, measured 2026-11-16 — so those read as fn alone; a tap below them
+    /// sees all three, with the Accessibility permission alone. It only listens.
     private func watchOtherKeys() {
         stopWatchingOtherKeys()
-        let ownProcess = Int64(getpid())
-        let keyDown: (NSEvent) -> Void = { [weak self] event in
-            // Our own ⌘C — Edit reading the selection while fn is still down — is not the
-            // user's key. Only the event's source is read, never which key it is.
-            guard event.cgEvent?.getIntegerValueField(.eventSourceUnixProcessID) != ownProcess else { return }
-            MainActor.assumeIsolated {
-                guard let self, let action = self.fnAction else { return }
-                self.perform(self.fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
+        let refcon = Unmanaged.passUnretained(self).toOpaque()
+        guard let tap = CGEvent.tapCreate(tap: .cghidEventTap, place: .headInsertEventTap, options: .listenOnly,
+                                          eventsOfInterest: CGEventMask(1 << CGEventType.keyDown.rawValue),
+                                          callback: { _, type, event, refcon in
+            // Added to the main run loop, so this runs on main.
+            if let refcon {
+                let manager = Unmanaged<HotkeyManager>.fromOpaque(refcon).takeUnretainedValue()
+                MainActor.assumeIsolated { manager.otherKeyEvent(type, event) }
             }
+            return Unmanaged.passUnretained(event)
+        }, userInfo: refcon) else {
+            dlog("Hotkey", "fn: no key tap — fn with another key will read as fn alone", level: .error)
+            return
         }
-        if let global = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: keyDown) {
-            otherKeyMonitors.append(global)
+        guard let source = CFMachPortCreateRunLoopSource(nil, tap, 0) else {
+            CFMachPortInvalidate(tap)
+            return
         }
-        if let local = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event in
-            keyDown(event)
-            return event
-        }) {
-            otherKeyMonitors.append(local)
-        }
+        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
+        otherKeyTap = (tap, source)
     }
 
     private func stopWatchingOtherKeys() {
-        otherKeyMonitors.forEach(NSEvent.removeMonitor)
-        otherKeyMonitors.removeAll()
+        guard let (tap, source) = otherKeyTap else { return }
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
+        CFMachPortInvalidate(tap)
+        otherKeyTap = nil
+    }
+
+    /// Reads only who sent the key and whether it is one of the app's own shortcuts;
+    /// nothing of it is kept or logged.
+    private func otherKeyEvent(_ type: CGEventType, _ event: CGEvent) {
+        switch type {
+        case .tapDisabledByTimeout, .tapDisabledByUserInput:
+            if let (tap, _) = otherKeyTap { CGEvent.tapEnable(tap: tap, enable: true) }
+            return
+        case .keyDown:
+            break
+        default:
+            return
+        }
+        guard let action = fnAction else { return }
+        // Our own ⌘C — Edit reading the selection while fn is still down — is not the user's.
+        guard event.getIntegerValueField(.eventSourceUnixProcessID) != Int64(getpid()) else { return }
+        // Another of our shortcuts with fn held is that shortcut: ⌃⇧A switches a hold on fn
+        // to AI, as it does a hold on ⌃⇧Q. The CGEvent masks are NSEvent's.
+        let pressed = KeyShortcut(keyCode: UInt32(event.getIntegerValueField(.keyboardEventKeycode)),
+                                  modifiers: NSEvent.ModifierFlags(rawValue: UInt(event.flags.rawValue)))
+        guard !shortcuts.values.contains(pressed) else { return }
+        perform(fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
     }
 
     private func perform(_ events: [FnKeyFilter.Event], for action: ShortcutAction) {
