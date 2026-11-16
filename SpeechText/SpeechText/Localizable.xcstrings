@@ -230,7 +230,21 @@
       }
     },
     "%@ isn't downloaded — download it in Settings › Models." : {
-      "comment" : "Notice when the AI Rewrite model on this Mac is missing. %@ is the model's name. Settings › Models is a place in Settings."
+      "comment" : "Notice when the AI Rewrite model on this Mac is missing. %@ is the model's name. Settings › Models is a place in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no está descargado: descárgalo en Ajustes › Modelos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ не завантажено — завантажте її в Параметрах › Моделі."
+          }
+        }
+      }
     },
     "%@ isn't given them" : {
       "comment" : "Dictionary page, What a word does: row title. %@ is the name of the speech model in use.",
@@ -4045,7 +4059,21 @@
       }
     },
     "Choose a model in Settings › Models to use AI mode" : {
-      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no model. Settings › Models is a place in Settings."
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no model. Settings › Models is a place in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un modelo en Ajustes › Modelos para usar el modo IA"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель у Параметрах › Моделі, щоб користуватися режимом ШІ"
+          }
+        }
+      }
     },
     "Choose a model — the one you had is no longer available, and dictation waits for your pick." : {
       "comment" : "Settings › Speech to text / AI Rewrite: note under a service's models when the stored model was removed by its vendor.",
@@ -8511,7 +8539,21 @@
       }
     },
     "Models" : {
-      "comment" : "Settings: name of the page (sidebar entry and page title) that picks the speech model and the AI Rewrite model."
+      "comment" : "Settings: name of the page (sidebar entry and page title) that picks the speech model and the AI Rewrite model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі"
+          }
+        }
+      }
     },
     "Models on this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: group heading over the local models.",
@@ -14314,7 +14356,21 @@
       }
     },
     "Text at your cursor" : {
-      "comment" : "Settings › Models: VoiceOver label of the picture at the end of the chain, the text pasted where the cursor is."
+      "comment" : "Settings › Models: VoiceOver label of the picture at the end of the chain, the text pasted where the cursor is.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto en el cursor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст там, де курсор"
+          }
+        }
+      }
     },
     "That already has a replacement." : {
       "comment" : "Dictionary page, Replacements: error under the form when the same text is already replaced.",
@@ -15065,7 +15121,21 @@
       }
     },
     "The selection, replaced" : {
-      "comment" : "Settings › Models, Edit tab: VoiceOver label of the picture at the end of the chain, the selected text replaced by the rewrite."
+      "comment" : "Settings › Models, Edit tab: VoiceOver label of the picture at the end of the chain, the selected text replaced by the rewrite.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La selección, reemplazada"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виділений текст замінено"
+          }
+        }
+      }
     },
     "The server answered, but not at this path. Most addresses end in /v1." : {
       "comment" : "Settings › Your server: the test got HTTP 404",
@@ -16658,7 +16728,21 @@
       }
     },
     "What turns your voice into text, and what rewrites it — on this Mac, online or on your own server." : {
-      "comment" : "Settings › Models: line under the page title."
+      "comment" : "Settings › Models: line under the page title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que convierte tu voz en texto y lo que lo reescribe, en este Mac, en línea o en tu propio servidor."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що перетворює ваш голос на текст і що його переписує — на цьому Mac, онлайн чи на вашому сервері."
+          }
+        }
+      }
     },
     "What uses it stops working until you add a key again." : {
       "comment" : "Settings: message of the confirmation before removing an API key in use.",

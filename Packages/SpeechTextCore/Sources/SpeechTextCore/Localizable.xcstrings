@@ -2611,7 +2611,21 @@
       }
     },
     "No model on this Mac is ready — choose or download one in Settings › Models" : {
-      "comment" : "Error shown when AI Rewrite is set to a model on this Mac but none is ready. Settings › Models is a place in Settings."
+      "comment" : "Error shown when AI Rewrite is set to a model on this Mac but none is ready. Settings › Models is a place in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún modelo de este Mac está listo: elige o descarga uno en Ajustes › Modelos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жодна модель на цьому Mac не готова — виберіть або завантажте її в Параметрах › Моделі"
+          }
+        }
+      }
     },
     "Not enough disk space: the download needs %@ free, and %@ is." : {
       "comment" : "Error before a model download. The first %@ is the space needed, the second the space free (e.g. 1.2 GB).",
@@ -3045,10 +3059,38 @@
       }
     },
     "Set your server's address in Settings › Models" : {
-      "comment" : "Error shown when AI Rewrite is set to the user's own server but no address is stored. Settings › Models is a place in Settings."
+      "comment" : "Error shown when AI Rewrite is set to the user's own server but no address is stored. Settings › Models is a place in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indica la dirección de tu servidor en Ajustes › Modelos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Укажіть адресу свого сервера в Параметрах › Моделі"
+          }
+        }
+      }
     },
     "Set your server's address in Settings › Models." : {
-      "comment" : "Error shown when speech recognition is set to the user's own server but no address is stored. Settings › Models is a place in Settings."
+      "comment" : "Error shown when speech recognition is set to the user's own server but no address is stored. Settings › Models is a place in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indica la dirección de tu servidor en Ajustes › Modelos."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Укажіть адресу свого сервера в Параметрах › Моделі."
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Notice button that opens Settings.",
