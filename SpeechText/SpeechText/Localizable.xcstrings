@@ -18162,6 +18162,9 @@
         }
       }
     },
+    "fn can't be combined with other keys. Press fn on its own, or a shortcut without it." : {
+
+    },
     "from each provider's last reply" : {
       "comment" : "Usage page: note after the 'Limits right now' heading.",
       "localizations" : {
@@ -18391,6 +18394,9 @@
           }
         }
       }
+    },
+    "macOS also acts on 🌐. To use fn only for this, choose Do Nothing in System Settings › Keyboard › Press 🌐 key to." : {
+
     },
     "macOS also uses %@ (System Settings › Keyboard › Keyboard Shortcuts), and may take it first." : {
       "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS also uses. %@ is the keys. The path is macOS's; use its names in your language.",

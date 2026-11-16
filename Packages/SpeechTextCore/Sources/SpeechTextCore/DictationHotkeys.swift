@@ -43,6 +43,9 @@ public enum DictationCancelReason: Equatable, Sendable {
     case closeButton
     /// The menu's recording item.
     case menu
+    /// fn on its own is the shortcut, and another key went down with it: fn was a
+    /// modifier (fn+← is Home). Within `FnKeyFilter`'s quiet window it shows no notice.
+    case fnWithAnotherKey
 
     /// The notice's title and detail. `savedInHistory`: the dictation was already
     /// transcribed, and History holds it — so a cancel during the AI rewrite loses
@@ -53,6 +56,8 @@ public enum DictationCancelReason: Equatable, Sendable {
             return (localized("Dictation canceled"), localized("A quick tap cancels. Hold the shortcut while you speak, or double-tap to record hands-free."))
         case .releasedEarly:
             return (localized("Dictation canceled"), localized("The shortcut was let go before the microphone opened. Hold it until the overlay listens."))
+        case .fnWithAnotherKey:
+            return (localized("Dictation canceled"), localized("fn went down with another key. Press fn on its own to dictate."))
         case .shortcut, .escape, .closeButton, .menu:
             return (localized("Dictation canceled"), savedInHistory
                     ? localized("Nothing was pasted. The dictation is saved in History.")

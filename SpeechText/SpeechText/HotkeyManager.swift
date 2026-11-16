@@ -56,11 +56,23 @@ final class HotkeyManager {
     var onEditKey: ((Bool) -> Void)?
     /// Bare ⎋, which exists only while `setEscapeShortcut(active: true)`.
     var onEscape: (() -> Void)?
+    /// Whether fn's press for `action` goes through the moment fn goes down, or waits for
+    /// it to come up (`FnKeyFilter`). `AppState` knows what is running.
+    var fnPressesAtOnce: ((ShortcutAction) -> Bool)?
+    /// Another key went down with fn after its press went through: the press was not the
+    /// shortcut, and what it started is taken back.
+    var onFnAbort: ((ShortcutAction, _ notify: Bool) -> Void)?
     private var escapeRef: EventHotKeyRef?
     private var escapeWanted = false
     private nonisolated static let escapeHotKeyID: UInt32 = 5
 
     private var shortcuts: [ShortcutAction: KeyShortcut] = [:]
+    /// The action on fn alone, which Carbon cannot register (`FnKey`).
+    private var fnAction: ShortcutAction?
+    private var fnFilter = FnKeyFilter()
+    private var fnMonitors: [Any] = []
+    /// Installed only while fn is down, and their handlers read nothing of the event.
+    private var otherKeyMonitors: [Any] = []
 
     private static let signature: OSType = 0x56504852
 
@@ -161,16 +173,10 @@ final class HotkeyManager {
                     if waited > 0.2 {
                         dlog("Hotkey", "⚠ shortcut \(id) \(isDown ? "press" : "release") reached the app \(Int(waited * 1000)) ms late — the main thread was busy", level: .notice)
                     }
-                    if let action = ShortcutAction.allCases.first(where: { HotkeyManager.hotKeyID($0) == id }) {
-                        HeldShortcuts.shared.set(action, isDown: isDown)
-                    }
-                    switch id {
-                    case 1: mgr.onDictationKey?(.inline, isDown)
-                    case 2: if isDown { mgr.onRecordWindowToggle?() }
-                    case 3: mgr.onDictationKey?(.ai, isDown)
-                    case 4: mgr.onEditKey?(isDown)
-                    case HotkeyManager.escapeHotKeyID: if isDown { mgr.onEscape?() }
-                    default: break
+                    if id == HotkeyManager.escapeHotKeyID {
+                        if isDown { mgr.onEscape?() }
+                    } else if let action = ShortcutAction.allCases.first(where: { HotkeyManager.hotKeyID($0) == id }) {
+                        mgr.deliver(action, isDown: isDown)
                     }
                 }
                 return noErr
@@ -187,6 +193,12 @@ final class HotkeyManager {
         var failures: [ShortcutAction: OSStatus] = [:]
         for action in ShortcutAction.allCases {
             guard let shortcut = shortcuts[action] else { continue }
+            if shortcut == FnKey.shortcut {
+                // One action on fn: the recorder refuses a second, and an older install's
+                // duplicate goes to the first.
+                if fnAction == nil { fnAction = action }
+                continue
+            }
             var ref: EventHotKeyRef?
             let status = RegisterEventHotKey(shortcut.keyCode, shortcut.carbonModifiers,
                                              EventHotKeyID(signature: Self.signature, id: Self.hotKeyID(action)),
@@ -203,6 +215,106 @@ final class HotkeyManager {
         }
         HotkeyRegistrationStatus.shared.failures = failures
         applyEscapeShortcut()
+        if fnAction != nil { startFnMonitor() }
+    }
+
+    /// The press or release of one of the app's shortcuts, from Carbon or from fn.
+    private func deliver(_ action: ShortcutAction, isDown: Bool) {
+        HeldShortcuts.shared.set(action, isDown: isDown)
+        switch action {
+        case .inline: onDictationKey?(.inline, isDown)
+        case .recordWindow: if isDown { onRecordWindowToggle?() }
+        case .ai: onDictationKey?(.ai, isDown)
+        case .edit: onEditKey?(isDown)
+        }
+    }
+
+    // MARK: fn on its own
+
+    /// A passive monitor: it sees fn go down and up in every app and swallows nothing, so
+    /// whatever "Press 🌐 key to" says still happens beside it. It needs the Accessibility
+    /// permission the paste already has, not Input Monitoring (docs/decisions.md › fn on
+    /// its own).
+    private func startFnMonitor() {
+        let flagsChanged: (NSEvent) -> Void = { [weak self] event in
+            let keyCode = event.keyCode, isDown = event.modifierFlags.contains(.function)
+            MainActor.assumeIsolated { self?.fnChanged(keyCode: keyCode, isDown: isDown) }
+        }
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: flagsChanged) {
+            fnMonitors.append(global)
+        }
+        // A global monitor sees no event of the app's own windows.
+        if let local = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged, handler: { event in
+            flagsChanged(event)
+            return event
+        }) {
+            fnMonitors.append(local)
+        }
+    }
+
+    private func stopFnMonitor() {
+        fnMonitors.forEach(NSEvent.removeMonitor)
+        fnMonitors.removeAll()
+        stopWatchingOtherKeys()
+        fnFilter = FnKeyFilter()
+        fnAction = nil
+    }
+
+    private func fnChanged(keyCode: UInt16, isDown: Bool) {
+        guard keyCode == FnKey.keyCode, let action = fnAction else { return }
+        let events: [FnKeyFilter.Event]
+        if isDown {
+            events = fnFilter.fnDown(at: ProcessInfo.processInfo.systemUptime,
+                                     pressesAtOnce: fnPressesAtOnce?(action) ?? true)
+            watchOtherKeys()
+        } else {
+            stopWatchingOtherKeys()
+            events = fnFilter.fnUp()
+        }
+        perform(events, for: action)
+    }
+
+    private func watchOtherKeys() {
+        stopWatchingOtherKeys()
+        let keyDown: () -> Void = { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, let action = self.fnAction else { return }
+                self.perform(self.fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
+            }
+        }
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { _ in keyDown() }) {
+            otherKeyMonitors.append(global)
+        }
+        if let local = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event in
+            keyDown()
+            return event
+        }) {
+            otherKeyMonitors.append(local)
+        }
+    }
+
+    private func stopWatchingOtherKeys() {
+        otherKeyMonitors.forEach(NSEvent.removeMonitor)
+        otherKeyMonitors.removeAll()
+    }
+
+    private func perform(_ events: [FnKeyFilter.Event], for action: ShortcutAction) {
+        for event in events {
+            switch event {
+            case .press: deliver(action, isDown: true)
+            case .release: deliver(action, isDown: false)
+            case .abort(let notify):
+                dlog("Hotkey", "fn went down with another key → \(action.title) taken back\(notify ? "" : " quietly")")
+                HeldShortcuts.shared.set(action, isDown: false)
+                onFnAbort?(action, notify)
+            }
+        }
+    }
+
+    /// What fn's held-back press was waiting for has ended some other way (⎋, ✕, the
+    /// menu): it must not start something new when fn comes up.
+    func dropDeferredFnPress() {
+        fnFilter.dropDeferredPress()
     }
 
     /// Registers bare ⎋ as a global shortcut for as long as a dictation is on screen. A
@@ -234,6 +346,7 @@ final class HotkeyManager {
 
     private func unregisterHotkeys() {
         HeldShortcuts.shared.clear()
+        stopFnMonitor()
         for ref in hotKeyRefs.values { UnregisterEventHotKey(ref) }
         hotKeyRefs = [:]
         if let ref = escapeRef {
@@ -244,6 +357,12 @@ final class HotkeyManager {
             RemoveEventHandler(ref)
             eventHandlerRef = nil
         }
+    }
+
+    /// What macOS does with a press of 🌐 (System Settings › Keyboard › Press 🌐 key to).
+    static func globeKeyAction() -> FnKey.SystemAction {
+        let value = CFPreferencesCopyAppValue("AppleFnUsageType" as CFString, "com.apple.HIToolbox" as CFString)
+        return FnKey.SystemAction(appleFnUsageType: (value as? NSNumber)?.intValue)
     }
 
     /// The enabled macOS shortcuts (System Settings › Keyboard › Keyboard Shortcuts).

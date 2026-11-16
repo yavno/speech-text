@@ -31,6 +31,8 @@ public enum EditCancelReason: Equatable, Sendable {
     case otherShortcut
     /// The menu's Edit item.
     case menu
+    /// fn on its own is the Edit shortcut, and another key went down with it.
+    case fnWithAnotherKey
 
     /// The notice's title and detail. `textPutBack`: the selection had been cut and was
     /// pasted back where it was. The detail fits the notice's two lines.
@@ -38,6 +40,8 @@ public enum EditCancelReason: Equatable, Sendable {
         switch self {
         case .tap:
             return (localized("Edit canceled"), localized("A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish."))
+        case .fnWithAnotherKey:
+            return (localized("Edit canceled"), localized("fn went down with another key. Press fn on its own to edit."))
         case .shortcut, .escape, .closeButton, .otherShortcut, .menu:
             return (localized("Edit canceled"), textPutBack ? localized("Nothing was changed. The text was put back.") : localized("Nothing was changed."))
         }

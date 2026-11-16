@@ -4096,6 +4096,12 @@
         }
       }
     },
+    "fn went down with another key. Press fn on its own to dictate." : {
+
+    },
+    "fn went down with another key. Press fn on its own to edit." : {
+
+    },
     "for as long as History keeps it" : {
       "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'.",
       "localizations" : {

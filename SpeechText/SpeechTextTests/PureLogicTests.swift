@@ -692,6 +692,20 @@ final class FnKeyTests: XCTestCase {
         XCTAssertNotEqual(FnKey.shortcut, KeyShortcut(keyCode: 63, modifiers: .shift))
     }
 
+    func testKeysALaptopSendsWithFnAreRecordedAsThemselves() {
+        for code in [kVK_F5, kVK_F12, kVK_Home, kVK_End, kVK_PageUp, kVK_PageDown, kVK_ForwardDelete] {
+            XCTAssertTrue(FnKey.isProducedWithFn(UInt16(code)), "\(code)")
+        }
+        for code in [kVK_ANSI_Q, kVK_ANSI_E, kVK_LeftArrow, kVK_Space, kVK_Escape] {
+            XCTAssertFalse(FnKey.isProducedWithFn(UInt16(code)), "\(code)")
+        }
+    }
+
+    func testFnTakenBackHasItsOwnNotice() {
+        XCTAssertEqual(DictationCancelReason.fnWithAnotherKey.notice(savedInHistory: false).title, "Dictation canceled")
+        XCTAssertEqual(EditCancelReason.fnWithAnotherKey.notice(textPutBack: false).title, "Edit canceled")
+    }
+
     func testTwoActionsOnFnCollide() {
         XCTAssertEqual(ShortcutConflict.find(FnKey.shortcut, for: .ai,
                                              assigned: [.inline: FnKey.shortcut], system: []),

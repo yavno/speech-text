@@ -18,6 +18,15 @@ public enum FnKey {
     /// A shortcut stored as fn's key code with no modifiers is fn on its own.
     public static let shortcut = KeyShortcut(keyCode: UInt32(keyCode), carbonModifiers: 0)
 
+    /// Keys a laptop keyboard sends *because* fn is held — F1–F12 over the media keys,
+    /// Home, End, Page Up, Page Down and forward delete over the arrows and ⌫. Recorded
+    /// as themselves, as they were before fn could be a shortcut; any other key with fn
+    /// held is fn plus that key, which no shortcut can be.
+    public static func isProducedWithFn(_ keyCode: UInt16) -> Bool {
+        ShortcutKeyPress.functionKeyNames[keyCode] != nil
+            || [kVK_Home, kVK_End, kVK_PageUp, kVK_PageDown, kVK_ForwardDelete].map(UInt16.init).contains(keyCode)
+    }
+
     /// System Settings › Keyboard › "Press 🌐 key to", stored as `AppleFnUsageType` in
     /// `com.apple.HIToolbox`. The values were read after choosing each option in turn
     /// (2026-11-16, macOS 26.6.2). The double-press dictation shortcut (Keyboard ›
