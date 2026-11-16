@@ -518,7 +518,7 @@ public enum TranscriptionError: LocalizedError, Sendable {
         case .httpError(let provider, let code, let body):
             providerErrorMessage(vendor: provider.displayName, status: code, body: body)
         case .realtime(let provider, let code, let detail): "\(provider.displayName) realtime \(code): \(detail)"
-        case .noServerAddress: localized("Set your server's address in Settings › Speech to text.")
+        case .noServerAddress: localized("Set your server's address in Settings › Models.")
         case .serverNoAnswer: localized("Your server didn't answer.")
         case .localNetworkDenied: localized("Allow SpeechText in System Settings › Privacy & Security › Local Network.")
         }

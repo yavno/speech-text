@@ -921,7 +921,7 @@ struct DirectRecordingPanelView: View {
         guard TextRefinementService.isConfigured else {
             refineStatus = LLMConfiguration.providerType.needsAPIKey
                 ? String(localized: "Set an LLM API key in Settings to use AI mode")
-                : String(localized: "Choose a model in Settings › AI Rewrite to use AI mode")
+                : String(localized: "Choose a model in Settings › Models to use AI mode")
             refineFailed = true
             return
         }

@@ -78,12 +78,28 @@ enum SettingsAnchor: String {
     case history
     /// Dictation › Microphone, from a dictation in which nothing was heard.
     case microphone
+    /// Models, on one model's frame: from a notice about it, Home's Engines or Prompts.
+    case speechModel, aiRewriteModel
 
     var category: SettingsCategory {
         switch self {
         case .history: .privacy
         case .microphone: .dictation
+        case .speechModel, .aiRewriteModel: .models
         }
+    }
+
+    /// The frame a Models link opens, which the page turns to instead of scrolling.
+    var modelRole: ModelRole? {
+        switch self {
+        case .speechModel: .speech
+        case .aiRewriteModel: .aiRewrite
+        case .history, .microphone: nil
+        }
+    }
+
+    init(_ role: ModelRole) {
+        self = role == .speech ? .speechModel : .aiRewriteModel
     }
 
     /// The group the next Settings page to appear scrolls to: a window built ahead, or one
@@ -95,15 +111,15 @@ enum SettingsAnchor: String {
 
 /// The sidebar's entries, in the order the sidebar lists them.
 enum SettingsCategory: String, CaseIterable, Identifiable {
-    case general, appearance, dictation, speech, ai, privacy, apiKeys
+    case general, appearance, dictation, models, privacy, apiKeys
 
     var id: String { rawValue }
 
-    /// Three runs in the sidebar: the app itself; a dictation — how you give it, what
-    /// turns it into text, what rewrites it; and what is kept, sent and allowed.
+    /// Three runs in the sidebar: the app itself; a dictation — how you give it, and the
+    /// models that turn it into text and rewrite it; and what is kept, sent and allowed.
     static let groups: [[SettingsCategory]] = [
         [.general, .appearance],
-        [.dictation, .speech, .ai],
+        [.dictation, .models],
         [.privacy, .apiKeys],
     ]
 
@@ -112,9 +128,8 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .general: "General"
         case .appearance: "Appearance"
         case .dictation: "Dictation"
-        case .speech: "Speech to text"
-        // What the step does rather than what runs it: "AI" alone named the technology.
-        case .ai: "AI Rewrite"
+        // One page for both models, since a dictation passes through them in turn (#247).
+        case .models: "Models"
         case .privacy: "Privacy & Data"
         case .apiKeys: "API Keys"
         }
@@ -125,8 +140,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .general: "gearshape"
         case .appearance: "paintpalette"
         case .dictation: "mic"
-        case .speech: "waveform"
-        case .ai: "sparkles"
+        case .models: "cpu"
         case .privacy: "hand.raised"
         case .apiKeys: "key"
         }
@@ -138,8 +152,7 @@ enum SettingsCategory: String, CaseIterable, Identifiable {
         case .general: "Its language, how SpeechText starts, and how it stays up to date."
         case .appearance: "How the recording overlay and the Record Window look."
         case .dictation: "How you dictate: the shortcuts, the microphone, your languages and how the text is written."
-        case .speech: "What turns your voice into text — on this Mac, online or on your own server."
-        case .ai: "Optional. Turns a dictation into finished text — an email, a list, a translation — or does what you ask (“a short reply, in English”)."
+        case .models: "What turns your voice into text, and what rewrites it — on this Mac, online or on your own server."
         case .privacy: "What is kept on this Mac, what is sent, and what macOS allows."
         case .apiKeys: "Every key SpeechText holds. The ones your choices use come first."
         }
@@ -196,22 +209,19 @@ private struct SettingsSidebarItem: View {
     let action: () -> Void
     @State private var hovering = false
 
-    /// The AI entry lights violet, as the setup window's AI step does.
-    private var tint: SetupTint { category == .ai ? .violet : .green }
-
     var body: some View {
         Button(action: action) {
             HStack(spacing: 9) {
                 RoundedRectangle(cornerRadius: 7)
                     .fill(isSelected
-                          ? AnyShapeStyle(LinearGradient(colors: tint.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
+                          ? AnyShapeStyle(LinearGradient(colors: SetupTint.green.glyph, startPoint: .topLeading, endPoint: .bottomTrailing))
                           : AnyShapeStyle(SettingsColor.panel))
                     .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(isSelected ? .clear : SettingsColor.panelBorder, lineWidth: 0.5))
                     .frame(width: 24, height: 24)
                     .overlay {
                         Image(systemName: category.symbol)
                             .font(.system(size: 11.5, weight: .medium))
-                            .foregroundStyle(isSelected ? tint.glyphInk : SetupColor.label2)
+                            .foregroundStyle(isSelected ? SetupTint.green.glyphInk : SetupColor.label2)
                     }
                 Text(category.title)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
@@ -530,14 +540,20 @@ struct SettingsStatus: View {
     }
 }
 
-/// What a key can be used for, named after the settings page that makes the choice.
-enum SettingsKeyRole: CaseIterable {
-    case speech, aiRewrite
-
-    var category: SettingsCategory {
+/// A model's role, named as its frame on the Models page is — also what a key can be used for.
+extension ModelRole {
+    var title: LocalizedStringResource {
         switch self {
-        case .speech: .speech
-        case .aiRewrite: .ai
+        case .speech: "Speech to text"
+        // What the step does rather than what runs it: "AI" alone named the technology.
+        case .aiRewrite: "AI Rewrite"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .speech: "waveform"
+        case .aiRewrite: "sparkles"
         }
     }
 
@@ -552,14 +568,14 @@ enum SettingsKeyRole: CaseIterable {
 /// One of a key's roles: tinted when the current choices use the key for it, grey when
 /// the key could serve it but nothing selected does.
 struct SettingsKeyRoleTag: View {
-    let role: SettingsKeyRole
+    let role: ModelRole
     let active: Bool
 
     var body: some View {
         let accent = role.tint.accent
         HStack(spacing: 3) {
-            Image(systemName: role.category.symbol).font(.system(size: 9, weight: .semibold))
-            Text(role.category.title).font(.system(size: 10.5, weight: .semibold))
+            Image(systemName: role.symbol).font(.system(size: 9, weight: .semibold))
+            Text(role.title).font(.system(size: 10.5, weight: .semibold))
         }
         .foregroundStyle(active ? accent : SetupColor.label2)
         .padding(.horizontal, 6)
@@ -568,8 +584,8 @@ struct SettingsKeyRoleTag: View {
         .overlay(Capsule().strokeBorder(active ? .clear : SettingsColor.panelBorder, lineWidth: 1))
         .fixedSize()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(active ? "Used for \(String(localized: role.category.title))"
-                            : "Can be used for \(String(localized: role.category.title))")
+        .accessibilityLabel(active ? "Used for \(String(localized: role.title))"
+                            : "Can be used for \(String(localized: role.title))")
     }
 }
 
@@ -584,9 +600,9 @@ struct SettingsKeyField: View {
     /// The link to the vendor's key page; a server the user runs has none.
     var showsGetKey = true
     /// Everything the key can be used for, in pipeline order.
-    var roles: [SettingsKeyRole] = []
+    var roles: [ModelRole] = []
     /// The roles the current choices use it for.
-    var activeRoles: Set<SettingsKeyRole> = []
+    var activeRoles: Set<ModelRole> = []
     var uses: LocalizedStringKey?
     /// The current choices use this key: its row says whether it is filled in.
     var inUse = false

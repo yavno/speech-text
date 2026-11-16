@@ -250,7 +250,7 @@ Read the streaming entries in docs/decisions.md › Key patterns first. The rule
 
 ## 8. UI, tests, docs
 
-- UI: Settings › Speech to text and AI Rewrite list every cloud engine and keyed pick
+- UI: Settings › Models, under its Speech to text and AI Rewrite frames, lists every cloud engine and keyed pick
   with its models and its key (`SettingsEngines.swift`), and the API Keys page follows
   from the descriptors; give the service and its models their one-line descriptions
   there. Add the vendor to `SetupCards` if it gets a setup card — the maintainer's call;
@@ -297,7 +297,7 @@ stt      | Packages/SpeechTextCore/Sources/SpeechTextCore/STTModelCatalog.swift 
 stt      | Packages/SpeechTextCore/Sources/SpeechTextCore/STTModelCatalog.swift       | let sttModelCatalog                    | manual      | one descriptor per model, with a dated comment on why it is offered
 stt      | SpeechText/SpeechText/RecognitionSessionFactory.swift                      | func makeRecognitionSession            | compiler    | add the case to the cloud list
 stt      | Packages/SpeechTextCore/Sources/SpeechTextCore/Settings.swift              | enum SettingsKeys                      | manual      | the model key, named in the descriptor's speechModel (never the API key)
-stt      | Packages/SpeechTextCore/Sources/SpeechTextCore/ModelRowWords.swift         | func onlineSpeechServiceLine           | review      | Settings › Speech to text lists every cloud engine by itself; add its line here, and each model's in onlineSpeechModelLine (the descriptor's caption and a realtime model's settingsNote are shown under its models)
+stt      | Packages/SpeechTextCore/Sources/SpeechTextCore/ModelRowWords.swift         | func onlineSpeechServiceLine           | review      | Settings › Models › Speech to text lists every cloud engine by itself; add its line here, and each model's in onlineSpeechModelLine (the descriptor's caption and a realtime model's settingsNote are shown under its models)
 stt      | SpeechText/SpeechText/SettingsView.swift                                   | struct SpokenLanguagesField            | review      | the caption, only if the engine takes a language set
 stt      | SpeechText/SpeechTextTests/CatalogueTests.swift                            | func testPickersKeepTheirOrderAndNames | manual      | the new picker's ids and names
 stt      | SpeechText/SpeechText/HomeView.swift                                       | private var speechEngine               | compiler    | the engine's line on Home, with its stored model
@@ -310,7 +310,7 @@ llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/ChatClients.swift     
 llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/ChatClients.swift           | static func makeChatClient             | compiler    | OpenAICompatibleChatClient(baseURL:dialect:) or a new struct
 llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/ModelLifecycle.swift        | enum ModelUnavailableReply             | review      | the vendor's "no such model" chat reply, measured, if its shape is new
 llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/Settings.swift              | enum SettingsKeys                      | manual      | the chat model key, named in the descriptor's chatModel
-llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/ModelRowWords.swift         | func onlineAIServiceLine               | review      | Settings › AI Rewrite lists every keyed pick by itself; add its line here, and each model's in chatModelLine
+llm      | Packages/SpeechTextCore/Sources/SpeechTextCore/ModelRowWords.swift         | func onlineAIServiceLine               | review      | Settings › Models › AI Rewrite lists every keyed pick by itself; add its line here, and each model's in chatModelLine
 llm      | SpeechText/SpeechTextTests/ChatClientTests.swift                           | final class ChatRequestBodyTests       | manual      | each model's whole request body, written out
 llm      | SpeechText/SpeechTextTests/HomeSummaryTests.swift                          | final class ListPriceTests             | manual      | each model's token prices, as on its descriptor (docs/prices.md)
 key      | Packages/SpeechTextCore/Sources/SpeechTextCore/Settings.swift              | enum SettingsKeys                      | manual      | <vendor>APIKey

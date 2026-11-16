@@ -648,4 +648,33 @@ final class MainPagesHistoryCacheTests: XCTestCase {
             (a dictation added %.1f ms), a keystroke %.2f ms
             """, promptsBefore, promptsChange, promptsAdded, promptsKeystroke))
     }
+
+    // MARK: - Settings › Models (#247)
+
+    func testEachShortcutPassesThroughItsModels() {
+        XCTAssertEqual(ModelChainShortcut.dictate.roles, [.speech])
+        XCTAssertEqual(ModelChainShortcut.aiRewrite.roles, [.speech, .aiRewrite])
+        // Edit's instruction is spoken, so it is transcribed before it is carried out.
+        XCTAssertEqual(ModelChainShortcut.edit.roles, [.speech, .aiRewrite])
+        XCTAssertTrue(ModelChainShortcut.edit.startsFromSelection)
+        XCTAssertFalse(ModelChainShortcut.aiRewrite.startsFromSelection)
+    }
+
+    func testTheModelsPageOpensWhereItWasLeft() {
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "", storedRole: ""), .initial)
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "edit", storedRole: "aiRewrite"),
+                       ModelsPageSelection(shortcut: .edit, role: .aiRewrite))
+        // Dictate draws no AI Rewrite frame, so it cannot be the one open.
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "dictate", storedRole: "aiRewrite"),
+                       ModelsPageSelection(shortcut: .dictate, role: .speech))
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "gone", storedRole: "gone"), .initial)
+    }
+
+    func testALinkToAFrameTurnsToATabThatHasIt() {
+        let dictate = ModelsPageSelection(shortcut: .dictate, role: .speech)
+        XCTAssertEqual(dictate.opening(.aiRewrite), ModelsPageSelection(shortcut: .aiRewrite, role: .aiRewrite))
+        XCTAssertEqual(dictate.opening(.speech), dictate)
+        let edit = ModelsPageSelection(shortcut: .edit, role: .speech)
+        XCTAssertEqual(edit.opening(.aiRewrite), ModelsPageSelection(shortcut: .edit, role: .aiRewrite))
+    }
 }

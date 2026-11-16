@@ -58,6 +58,7 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | Apple Dictation · Apple on-device (speech models) | Dictado de Apple · Apple en el dispositivo |
 | double tap (a shortcut) | doble pulsación |
 | Record Window | Ventana de grabación |
+| Models (the Settings page for the speech and AI Rewrite models) | Modelos |
 | Home · History · Usage · Prompts · Dictionary | Inicio · Historial · Uso · Prompts · Diccionario |
 | Notepad · Notetaker (pages) | Notas · Reuniones |
 | prompt | prompt (m.) |
@@ -107,6 +108,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | Apple Dictation · Apple on-device (speech models) | Диктування Apple · Apple на пристрої |
 | double tap (a shortcut) | подвійне натискання |
 | Record Window | Вікно запису |
+| Models (the Settings page for the speech and AI Rewrite models) | Моделі |
 | Home · History · Usage · Prompts · Dictionary | Головна · Історія · Облік · Промпти · Словник |
 | Notepad · Notetaker (pages) | Нотатник · Зустрічі |
 | prompt | промпт |
@@ -157,7 +159,7 @@ A new language is not done when every string has a value. Before it is turned on
    is *Параметри* in Ukrainian, not *Налаштування*), a page's name in the sidebar fits it
    at full size (*Облік*, not *Використання*; the rail is 68 pt wide at 11.5 pt), and every string that names a page,
    a feature or a setting uses that word — in the window itself, in the notices that send
-   the user there, and in the paths (*Settings › AI Rewrite*). Grammar around a name
+   the user there, and in the paths (*Settings › Models*). Grammar around a name
    follows the language (Ukrainian puts a path after «у» in the locative).
 
    A macOS name is read from macOS, never from memory, since Apple renames them: the

@@ -5,7 +5,7 @@ import SwiftUI
 import AppKit
 import SpeechTextCore
 
-// Settings › Speech to text and Settings › AI Rewrite: the same question setup asks —
+// Settings › Models, under the Speech to text and AI Rewrite frames: the same question setup asks —
 // on this Mac, or an online service — answered with the same two cards, and under them
 // the choices as rows that say what each one is. A row commits a choice only when it can
 // work: a service without a key opens for its key instead of being selected, so a tap in
@@ -32,7 +32,7 @@ enum EnginePlace: Hashable {
     }
 }
 
-/// The places at the top of both pages: a column each with only its name, and the open
+/// The places at the top of both frames' choices: a column each with only its name, and the open
 /// one's sentence under the row. Sentences inside the cards wrapped to different heights
 /// beside each other, and three abreast left the names too little room (owner, 2026-11-08).
 /// Which one is open is the page's own state; the card holding what is in use says so.
