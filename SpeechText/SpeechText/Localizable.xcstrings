@@ -11095,6 +11095,15 @@
         }
       }
     },
+    "Pressing fn also opens Emoji & Symbols. Set it to Do Nothing in Keyboard Settings." : {
+
+    },
+    "Pressing fn also starts macOS Dictation. Set it to Do Nothing in Keyboard Settings." : {
+
+    },
+    "Pressing fn also switches the input source. Set it to Do Nothing in Keyboard Settings." : {
+
+    },
     "Previous month" : {
       "comment" : "History page, the date filter's calendar: VoiceOver label of the arrow to the previous month.",
       "localizations" : {
@@ -18395,7 +18404,7 @@
         }
       }
     },
-    "macOS also acts on 🌐. To use fn only for this, choose Do Nothing in System Settings › Keyboard › Press 🌐 key to." : {
+    "macOS also acts on a press of fn. Set it to Do Nothing in Keyboard Settings." : {
 
     },
     "macOS also uses %@ (System Settings › Keyboard › Keyboard Shortcuts), and may take it first." : {

@@ -68,6 +68,18 @@ struct HotkeyRecorderView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
+            } else if let globeNotice {
+                // Said once, in the words of the setting, with the way there one click away.
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Label { Text(globeNotice) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Open Keyboard Settings") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
+                    }
+                    .buttonStyle(.link)
+                }
+                .font(.caption)
             }
         }
         .onAppear {
@@ -104,16 +116,25 @@ struct HotkeyRecorderView: View {
                                                 system: systemShortcuts) {
             return Self.describe(conflict, display: currentDisplayString)
         }
-        // A passive monitor swallows nothing: whatever macOS does with 🌐 happens too.
-        if currentShortcut == FnKey.shortcut, globeKey.takesThePress {
-            return "macOS also acts on 🌐. To use fn only for this, choose Do Nothing in System Settings › Keyboard › Press 🌐 key to."
-        }
         if let status = registration.failures[action] {
             return status == OSStatus(eventHotKeyExistsErr)
                 ? "\(currentDisplayString) is reserved by another app, so it won't work. Choose another shortcut."
                 : "macOS refused \(currentDisplayString) (error \(Int(status))). Choose another shortcut."
         }
         return nil
+    }
+
+    /// fn on its own while macOS also acts on a press of it: the monitor swallows nothing,
+    /// so whatever "Press 🌐 key to" says happens beside the shortcut.
+    private var globeNotice: LocalizedStringResource? {
+        guard currentShortcut == FnKey.shortcut else { return nil }
+        switch globeKey {
+        case .doNothing: return nil
+        case .changeInputSource: return "Pressing fn also switches the input source. Set it to Do Nothing in Keyboard Settings."
+        case .showEmojiAndSymbols: return "Pressing fn also opens Emoji & Symbols. Set it to Do Nothing in Keyboard Settings."
+        case .startDictation: return "Pressing fn also starts macOS Dictation. Set it to Do Nothing in Keyboard Settings."
+        case .notSet, .other: return "macOS also acts on a press of fn. Set it to Do Nothing in Keyboard Settings."
+        }
     }
 
     private static func describe(_ conflict: ShortcutConflict, display: String) -> LocalizedStringResource {
