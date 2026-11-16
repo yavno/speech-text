@@ -78,5 +78,12 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
 
     Report it as "CodeRabbit finished clean on `<sha>`" or as "not confirmed".
 
+**A comment on an issue or a pull request is for the person who opened it.** Write a few
+lines: what will happen and anything they need to do. Leave out how it is built —
+file and type names, a design plan, a list of measurements, `docs/decisions.md` entries —
+unless they are writing the code; a reply to a review comment names its entry, as step 10
+says. Working for a maintainer, you put design questions to
+them in your session, not in the thread, which never addresses "the maintainer".
+
 End with a short summary for the user: what changed, what ran and its result, what was
 not run, and anything left for the maintainer to decide.
