@@ -1149,6 +1149,8 @@ private struct GestureDemoList: View {
     let holdToTalk: Bool
     let showsSwitch: Bool
     @State private var windowVisible = true
+    /// Bumped when a shortcut changes: the demos draw the shortcuts as stored.
+    @State private var shortcutsRevision = 0
 
     private struct Demo {
         let gesture: HoldTip.DemoGesture
@@ -1157,6 +1159,7 @@ private struct GestureDemoList: View {
     }
 
     var body: some View {
+        let _ = shortcutsRevision
         let inline = shortcutKeys(shortcutText(for: .inline))
         let ai = shortcutKeys(shortcutText(for: .ai))
         let modifiers = inline.filter(isModifierCap)
@@ -1189,6 +1192,7 @@ private struct GestureDemoList: View {
             Capsule().fill(SetupColor.separator).frame(width: 2)
         }
         .background(WindowVisibilityReader(isVisible: $windowVisible))
+        .onReceive(NotificationCenter.default.publisher(for: .hotkeyDidChange)) { _ in shortcutsRevision += 1 }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(demos.enumerated().reduce(Text(verbatim: "")) { text, item in
             text + Text(verbatim: item.offset > 0 ? " " : "") + Text(item.element.title) + Text(verbatim: ". ")
@@ -1228,10 +1232,13 @@ private struct GestureDemoList: View {
 
     private func row(keys: [String], frame: HoldTip.DemoFrame, ai: Bool, title: LocalizedStringKey, detail: LocalizedStringKey) -> some View {
         GridRow(alignment: .center) {
+            // Centred, so a lone key and a long combination share one axis down the list.
             SetupKeycaps(keys: keys, size: 22,
                          litKeys: frame.caps.indexes(of: .down), fadedKeys: frame.caps.indexes(of: .notNeeded),
                          ringKeys: frame.ringed, ai: ai)
+                .gridColumnAlignment(.center)
             DemoStatus(state: frame.state)
+                .gridColumnAlignment(.center)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 12, weight: .semibold))

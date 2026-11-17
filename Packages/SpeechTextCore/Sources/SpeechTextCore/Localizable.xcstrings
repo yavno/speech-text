@@ -4096,6 +4096,40 @@
         }
       }
     },
+    "fn went down with another key. Press fn on its own to dictate." : {
+      "comment" : "Notice after a dictation on fn was canceled because another key was pressed with fn (fn+← is Home). “fn” is the key's name; keep it. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fn se pulsó junto con otra tecla. Pulsa fn sola para dictar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fn натиснуто разом з іншою клавішею. Щоб диктувати, натисніть лише fn."
+          }
+        }
+      }
+    },
+    "fn went down with another key. Press fn on its own to edit." : {
+      "comment" : "Notice after a selection edit on fn was canceled because another key was pressed with fn. “fn” is the key's name; keep it. Two lines at most.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fn se pulsó junto con otra tecla. Pulsa fn sola para editar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fn натиснуто разом з іншою клавішею. Щоб редагувати, натисніть лише fn."
+          }
+        }
+      }
+    },
     "for as long as History keeps it" : {
       "comment" : "History, a failed dictation: completes 'The audio is kept %@, for a retry…'.",
       "localizations" : {

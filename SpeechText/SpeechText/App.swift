@@ -273,6 +273,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 self?.updateIcon()
             }
         }
+        appState.hotkeyManager.fnPressesAtOnce = { [weak self] action in
+            self?.appState.fnPressesAtOnce(action) ?? true
+        }
+        appState.hotkeyManager.onFnAbort = { [weak self] action, notify in
+            // After the press it takes back, which reaches `AppState` the same way.
+            DispatchQueue.main.async {
+                self?.appState.fnShortcutAborted(action, notify: notify)
+                self?.updateIcon()
+                self?.rebuildMenu()
+            }
+        }
         appState.hotkeyManager.onRecordWindowToggle = { [weak self] in
             DispatchQueue.main.async {
                 self?.appState.toggleOrShowDirectRecordingPanel()
@@ -960,6 +971,45 @@ final class AppState {
         dictationTapTimer?.cancel()
         dictationTapTimer = nil
         hotkeyGesture.reset()
+        hotkeyManager.dropDeferredFnPress()
+    }
+
+    /// fn's press goes through the moment fn goes down when it starts something, or is
+    /// the second half of a double tap the gesture measures from the press; otherwise it
+    /// waits for fn to come up, so fn+← mid-dictation is not a stop (`FnKeyFilter`). The
+    /// Record Window's always waits: nothing it does can be taken back.
+    func fnPressesAtOnce(_ action: ShortcutAction) -> Bool {
+        switch action {
+        case .inline, .ai:
+            return !isEditMode && (dictationPhase == .idle || hotkeyGesture.awaitsSecondTap)
+        case .edit:
+            return (!isEditMode && dictationPhase == .idle)
+                || editGesture.awaitsSecondPress(at: ProcessInfo.processInfo.systemUptime)
+        case .recordWindow:
+            return false
+        }
+    }
+
+    /// Another key went down with fn after fn's press started something: fn was a
+    /// modifier, and what it started is cancelled — with no notice when the key came
+    /// within `DictationHotkeyGesture.tapThreshold`, the usual fn+arrow.
+    func fnShortcutAborted(_ action: ShortcutAction, notify: Bool) {
+        endHoldTip()
+        switch action {
+        case .inline, .ai:
+            guard !isEditMode, dictationPhase != .idle else { return }
+            cancelInlineFlow(.fnWithAnotherKey, notice: notify)
+        case .edit:
+            guard isEditMode else { return }
+            if notify {
+                cancelEdit(.fnWithAnotherKey)
+            } else {
+                dlog("Edit", "cancelled (fn went down with another key), quietly")
+                abortEdit()
+            }
+        case .recordWindow:
+            break
+        }
     }
 
     /// The menu's items: a press with nothing held.
@@ -1009,7 +1059,8 @@ final class AppState {
 
     /// Aborts recording, transcription and any in-flight LLM call, drops the overlay, and
     /// says so: no cancel is silent.
-    func cancelInlineFlow(_ reason: DictationCancelReason) {
+    /// `notice`: false only for fn taken back as a modifier (`fnShortcutAborted`).
+    func cancelInlineFlow(_ reason: DictationCancelReason, notice showsNotice: Bool = true) {
         // Written at the stop, before the LLM: a cancel during the rewrite leaves it there.
         let savedInHistory = isRefining && speechEngine.lastRecordID != nil
         dlog("App", "cancelling mid-flight (\(reason)\(savedInHistory ? ", the transcript stays in History" : ""))")
@@ -1023,6 +1074,7 @@ final class AppState {
         DictationTraceRecorder.current = nil
         speechEngine.cancelRecording()
         hideOverlay()
+        guard showsNotice else { return }
         let notice = reason.notice(savedInHistory: savedInHistory)
         showStatus(icon: "xmark.circle", title: notice.title, detail: notice.detail, tint: .secondary,
                    duration: savedInHistory ? 5 : 3)
@@ -1030,6 +1082,8 @@ final class AppState {
 
     private func startRecording() {
         let began = ProcessInfo.processInfo.systemUptime
+        // A press held back while fn was down belonged to whatever ran before this one.
+        hotkeyManager.dropDeferredFnPress()
         // A choice the launch cleared is the user's to make again: the dictation is
         // refused with the picker on offer, before the overlay or the microphone opens.
         let engine = UserDefaults.standard.string(forKey: SettingsKeys.sttProvider).flatMap(STTProviderType.init) ?? .apple
@@ -2219,6 +2273,7 @@ final class AppState {
         editTapTimer?.cancel()
         editTapTimer = nil
         editGesture.reset()
+        hotkeyManager.dropDeferredFnPress()
         isRefining = false
         isEditMode = false
         editSelection = nil
@@ -2348,6 +2403,9 @@ final class AppState {
     /// tip while the user has yet to learn that they may be.
     private func beginHoldTip(_ action: ShortcutAction, canSwitch: Bool) {
         endHoldTip()
+        // fn has no modifiers to let go of: there is nothing to teach.
+        let stored = action.stored(in: .standard)
+        guard KeyShortcut(keyCode: stored.keyCode, modifiers: stored.modifiers) != FnKey.shortcut else { return }
         holdTipAction = action
         holdTipFollowed = false
         let count = UserDefaults.standard.integer(forKey: SettingsKeys.holdTipFollowedCount)

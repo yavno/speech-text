@@ -21,7 +21,7 @@ across a bundle-identifier rename.
 | `sendVocabularyToEngine` | Send the Dictionary's words to the speech engine — every model that takes a word list, and Groq's prompt; the switch on the Dictionary page | `true` |
 | `spokenLanguages` | The languages the user says they speak, ISO-639-1 joined by commas (`"uk,en"`). Empty means none stated. Exactly one is *forced* on every engine; two or more leave detection to the model and only narrow Apple's keyboard-layout guess | `""` (migrated from `selectedLanguage`) |
 | `selectedLanguage` | Pre-list single choice. Read once by `migrateSelectedLanguageIfNeeded()`, then never again; stays in `portable` so the migration keeps its source across a rename | `"auto"` |
-| `hotkeyKeyCode` / `hotkeyModifierFlags` | Inline recording hotkey | `12` (Q) / Control+Shift |
+| `hotkeyKeyCode` / `hotkeyModifierFlags` | Inline recording hotkey. In this and the three hotkey pairs below, key code `63` with no modifiers is fn on its own (`FnKey.shortcut`) | `12` (Q) / Control+Shift |
 | `recordWindowHotkeyKeyCode` / `recordWindowHotkeyModifierFlags` | Record window hotkey | `13` (W) / Control+Shift |
 | `aiHotkeyKeyCode` / `aiHotkeyModifierFlags` | AI recording hotkey | `0` (A) / Control+Shift |
 | `holdToTalk` | Holding a dictation shortcut records until it is let go (a lone tap cancels, a double tap locks it on hands-free); for the Edit shortcut, a hold is the instruction and a double tap sends none. Setup stores `true` when the key is absent, so a new install starts on hold | `false` |

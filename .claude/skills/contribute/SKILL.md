@@ -39,6 +39,16 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
    `Closes #N`, the checklist, *Users will notice* (what changes for someone using the app,
    or "Nothing"), *Privacy*, *Needs a real-app run* (what only a person
    with the running app can check, or "None"), screenshots for UI.
+
+   Screenshots come from `scripts/window-snapshots.sh --languages en --only <window>
+   --defaults <plist>`: its own build and settings, never the user's app or settings.
+   The plist holds the state the picture needs (`docs/settings-keys.md`); a changed
+   shortcut also needs `hotkeyLayoutVersion` = 1, or the launch migration clears it.
+   Run it in a subagent if your tool has one, since the build fills the session; look
+   at every picture before it goes anywhere. What only a keypress or a system setting
+   can bring on screen, ask the person you work for to do, then take the picture.
+   Working for a maintainer, show them the pictures in the session and they attach
+   them: GitHub has no API for a pull request's images.
 10. **Review comments.** CodeRabbit reviews every pull request; its comments, like a
     person's, are suggestions. Before acting on one, look for its entry in
     `docs/decisions.md` or the comment above the code. Then fix it, or answer in the

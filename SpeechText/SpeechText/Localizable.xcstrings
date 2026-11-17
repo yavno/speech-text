@@ -10369,6 +10369,23 @@
         }
       }
     },
+    "Open Keyboard Settings ↗" : {
+      "comment" : "Settings › Dictation › Shortcuts: a link under the fn notice that opens System Settings › Keyboard. ↗ marks a link out of the app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes de Teclado ↗"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити параметри клавіатури ↗"
+          }
+        }
+      }
+    },
     "Open Privacy Settings" : {
       "comment" : "Button that opens System Settings › Privacy & Security › Speech Recognition.",
       "localizations" : {
@@ -18026,6 +18043,57 @@
         }
       }
     },
+    "also opens Emoji & Symbols. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS opens Emoji & Symbols on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "también abre Emojis y símbolos. En los ajustes de Teclado, elige **No hacer nada** en **Acción al pulsar la tecla 🌐**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "також відкриває меню «Емодзі та символи». У параметрах клавіатури для **Натискати клавішу 🌐, щоб** виберіть **нічого не робити**."
+          }
+        }
+      }
+    },
+    "also starts macOS Dictation. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS starts its own Dictation on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "también inicia el Dictado de macOS. En los ajustes de Teclado, elige **No hacer nada** en **Acción al pulsar la tecla 🌐**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "також запускає Диктування macOS. У параметрах клавіатури для **Натискати клавішу 🌐, щоб** виберіть **нічого не робити**."
+          }
+        }
+      }
+    },
+    "also switches the input source. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS switches the input source on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "también cambia la fuente de entrada. En los ajustes de Teclado, elige **No hacer nada** en **Acción al pulsar la tecla 🌐**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "також змінює джерело вводу. У параметрах клавіатури для **Натискати клавішу 🌐, щоб** виберіть **нічого не робити**."
+          }
+        }
+      }
+    },
     "as the providers' replies count them" : {
       "comment" : "Usage page: note after the 'Requests' heading.",
       "localizations" : {
@@ -18073,6 +18141,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "понад один запит на диктовку"
+          }
+        }
+      }
+    },
+    "can't be combined with other keys. Press it on its own, or choose a shortcut without it." : {
+      "comment" : "Settings › Dictation › Shortcuts: refusal when fn was pressed with another key. Follows a key cap reading “fn”, so the sentence starts mid-way. Wraps to two lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no se puede combinar con otras teclas. Púlsala sola o elige un atajo sin ella."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "не можна поєднувати з іншими клавішами. Натискайте її окремо або виберіть скорочення без неї."
           }
         }
       }
@@ -18462,6 +18547,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS відхилила %1$@ (помилка %2$lld). Виберіть інше скорочення."
+          }
+        }
+      }
+    },
+    "may also do something in macOS. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS's own action on fn is unknown. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "también puede hacer algo en macOS. En los ajustes de Teclado, elige **No hacer nada** en **Acción al pulsar la tecla 🌐**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "може також щось робити в macOS. У параметрах клавіатури для **Натискати клавішу 🌐, щоб** виберіть **нічого не робити**."
           }
         }
       }
