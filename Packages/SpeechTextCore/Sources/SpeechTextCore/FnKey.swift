@@ -15,8 +15,30 @@ public enum FnKey {
     /// `kVK_Function`: what the flags-changed event of fn itself carries.
     public static let keyCode = UInt16(kVK_Function)
 
+    /// The key-down 🌐 itself sends on a short press, beside fn's flags change (measured
+    /// 2026-11-16, MacBook Pro keyboard, macOS 26.6.2: every tap under 0.3 s brought one,
+    /// a longer hold none). It is fn, not another key pressed with it.
+    public static let globeKeyCode: UInt16 = 179
+
     /// A shortcut stored as fn's key code with no modifiers is fn on its own.
     public static let shortcut = KeyShortcut(keyCode: UInt32(keyCode), carbonModifiers: 0)
+
+    /// Whether fn going down with ⌘⌥⌃⇧ already held is ignored as part of another
+    /// combination. It is whenever it would start something, and always for the Record
+    /// Window, whose press waits for the release yet only ever opens it. It is not while
+    /// a dictation runs: holding ⌃⇧A and pressing fn switches it to plain text.
+    public static func ignoresPressWithModifiers(startsSomething: Bool, isRecordWindow: Bool) -> Bool {
+        startsSomething || isRecordWindow
+    }
+
+    /// Keys a laptop keyboard sends *because* fn is held — F1–F12 over the media keys,
+    /// Home, End, Page Up, Page Down and forward delete over the arrows and ⌫. Recorded
+    /// as themselves, as they were before fn could be a shortcut; any other key with fn
+    /// held is fn plus that key, which no shortcut can be.
+    public static func isProducedWithFn(_ keyCode: UInt16) -> Bool {
+        ShortcutKeyPress.functionKeyNames[keyCode] != nil
+            || [kVK_Home, kVK_End, kVK_PageUp, kVK_PageDown, kVK_ForwardDelete].map(UInt16.init).contains(keyCode)
+    }
 
     /// System Settings › Keyboard › "Press 🌐 key to", stored as `AppleFnUsageType` in
     /// `com.apple.HIToolbox`. The values were read after choosing each option in turn

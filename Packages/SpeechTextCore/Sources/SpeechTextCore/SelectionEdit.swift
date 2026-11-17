@@ -31,6 +31,8 @@ public enum EditCancelReason: Equatable, Sendable {
     case otherShortcut
     /// The menu's Edit item.
     case menu
+    /// fn on its own is the Edit shortcut, and another key went down with it.
+    case fnWithAnotherKey
 
     /// The notice's title and detail. `textPutBack`: the selection had been cut and was
     /// pasted back where it was. The detail fits the notice's two lines.
@@ -38,6 +40,8 @@ public enum EditCancelReason: Equatable, Sendable {
         switch self {
         case .tap:
             return (localized("Edit canceled"), localized("A quick tap cancels. Hold the shortcut while you speak, or double-tap to polish."))
+        case .fnWithAnotherKey:
+            return (localized("Edit canceled"), localized("fn went down with another key. Press fn on its own to edit."))
         case .shortcut, .escape, .closeButton, .otherShortcut, .menu:
             return (localized("Edit canceled"), textPutBack ? localized("Nothing was changed. The text was put back.") : localized("Nothing was changed."))
         }
@@ -103,6 +107,15 @@ public struct EditHotkeyGesture: Sendable {
     /// A tap that has not yet been told apart from the first half of a double press.
     /// `AppState` calls `tapWindowExpired` `doubleTapWindow` after the release.
     public var awaitsSecondTap: Bool { tapReleasedAt != nil }
+
+    /// A press at `time` could still be the second half of a double press — after a hold
+    /// tap's release, or, in toggle, within `doubleTapWindow` of the first press, which is
+    /// what the window is timed from. fn's press goes through at once then (`FnKeyFilter`).
+    public func awaitsSecondPress(at time: TimeInterval) -> Bool {
+        if awaitsSecondTap { return true }
+        guard let startedAt else { return false }
+        return time - startedAt <= Self.doubleTapWindow
+    }
 
     public mutating func press(in phase: Phase, at time: TimeInterval) -> EditHotkeyAction {
         switch phase {

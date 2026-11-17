@@ -17,9 +17,19 @@ struct HotkeyRecorderView: View {
     @State private var localMonitor: Any?
     /// Why the last combination pressed was not taken. Cleared by the next attempt.
     @State private var refusal: LocalizedStringResource?
+    /// fn was pressed with another key or a modifier: said with fn drawn as a key.
+    @State private var fnRefused = false
     /// Read when the row appears; the user can change them in System Settings meanwhile,
     /// so a recording re-reads them before checking.
     @State private var systemShortcuts: Set<KeyShortcut> = []
+    @State private var flagsMonitor: Any?
+    /// fn pressed on its own is recorded when it comes up with no other key between.
+    @State private var fnFilter = FnKeyFilter()
+    @State private var fnHeld = false
+    /// ⌘⌥⌃⇧ went down at any point while fn was: not fn on its own.
+    @State private var fnWithModifier = false
+    /// What macOS does with 🌐, re-read when the app comes back from System Settings.
+    @State private var globeKey = HotkeyManager.globeKeyAction()
 
     private let registration = HotkeyRegistrationStatus.shared
 
@@ -57,14 +67,25 @@ struct HotkeyRecorderView: View {
                     }
                 }
             }
-            if let warning {
+            if fnRefused {
+                FnNotice(text: "can't be combined with other keys. Press it on its own, or choose a shortcut without it.",
+                         opensKeyboardSettings: false)
+            } else if let warning {
                 Label { Text(warning) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
+            } else if let globeNotice {
+                FnNotice(text: globeNotice, opensKeyboardSettings: true)
             }
         }
-        .onAppear { systemShortcuts = HotkeyManager.enabledSystemShortcuts() }
+        .onAppear {
+            systemShortcuts = HotkeyManager.enabledSystemShortcuts()
+            globeKey = HotkeyManager.globeKeyAction()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            globeKey = HotkeyManager.globeKeyAction()
+        }
         // Every global shortcut is off while this listens, so any way out of the window
         // has to end it — `onDisappear` alone does not fire when a window is closed.
         .onDisappear { stopListening() }
@@ -100,6 +121,24 @@ struct HotkeyRecorderView: View {
         return nil
     }
 
+    /// fn on its own while macOS also acts on a press of it: the monitor swallows nothing,
+    /// so whatever "Press 🌐 key to" says happens beside the shortcut.
+    /// The setting's own words in bold; the way to it is `FnNotice`'s button.
+    private var globeNotice: LocalizedStringKey? {
+        guard currentShortcut == FnKey.shortcut else { return nil }
+        switch globeKey {
+        case .doNothing: return nil
+        case .changeInputSource:
+            return "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**."
+        case .showEmojiAndSymbols:
+            return "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**."
+        case .startDictation:
+            return "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**."
+        case .notSet, .other:
+            return "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**."
+        }
+    }
+
     private static func describe(_ conflict: ShortcutConflict, display: String) -> LocalizedStringResource {
         switch conflict {
         case .action(let other):
@@ -129,11 +168,48 @@ struct HotkeyRecorderView: View {
     private func startListening() {
         isRecording = true
         refusal = nil
+        fnRefused = false
         systemShortcuts = HotkeyManager.enabledSystemShortcuts()
         // Our own shortcuts are unregistered while this listens, or pressing one of them
         // would start a dictation instead of arriving here as a duplicate.
         NotificationCenter.default.post(name: .hotkeyRecorderDidStart, object: nil)
+        fnFilter = FnKeyFilter()
+        fnHeld = false
+        flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+            let modifiers = !event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift])
+            guard event.keyCode == FnKey.keyCode else {
+                if fnHeld, modifiers { fnWithModifier = true }
+                return event
+            }
+            let now = ProcessInfo.processInfo.systemUptime
+            if event.modifierFlags.contains(.function) {
+                fnHeld = true
+                fnWithModifier = modifiers
+                _ = fnFilter.fnDown(at: now, pressesAtOnce: true)
+            } else {
+                fnHeld = false
+                // Up with no other key since it went down: fn on its own — unless ⌘⌥⌃⇧ are
+                // down with it, which a shortcut on fn cannot carry.
+                guard fnFilter.fnUp().contains(.release) else { return event }
+                if !fnWithModifier, !modifiers {
+                    take(FnKey.shortcut)
+                } else {
+                    fnRefused = true
+                    stopListening()
+                }
+            }
+            return event
+        }
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            // 🌐's own key-down on a short tap is fn, not another key.
+            if event.keyCode == FnKey.globeKeyCode { return nil }
+            _ = fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime)
+            if fnHeld, !FnKey.isProducedWithFn(event.keyCode) {
+                // Dropped from the flags, fn would have turned fn+⌃⇧Q into ⌃⇧Q unsaid.
+                fnRefused = true
+                stopListening()
+                return nil
+            }
             let press = ShortcutKeyPress.decide(keyCode: event.keyCode, flags: event.modifierFlags)
             let mods: NSEvent.ModifierFlags
             switch press {
@@ -147,39 +223,81 @@ struct HotkeyRecorderView: View {
                 mods = recorded
             }
 
-            // One of our own shortcuts twice cannot work, so it is refused. A system
-            // shortcut is only warned about (below the row, once saved): the ones macOS
-            // really acts on never reach this monitor, so one that did is most likely
-            // bound to a context it is not in, and refusing it would be a false alarm.
-            let candidate = KeyShortcut(keyCode: UInt32(event.keyCode), modifiers: mods)
-            if let conflict = ShortcutConflict.find(candidate, for: action,
-                                                    assigned: Self.assignedShortcuts(), system: []) {
-                refusal = Self.describe(conflict, display: shortcutDisplayString(keyCode: event.keyCode, modifierFlags: mods))
-                stopListening()
-                return nil
-            }
-
-            self.keyCode = Int(event.keyCode)
-            self.modifierFlags = Int(mods.rawValue)
-
-            UserDefaults.standard.set(self.keyCode, forKey: action.keyCodeKey)
-            UserDefaults.standard.set(self.modifierFlags, forKey: action.modifierFlagsKey)
-
-            stopListening()
-            NotificationCenter.default.post(name: .hotkeyDidChange, object: nil)
-
+            take(KeyShortcut(keyCode: UInt32(event.keyCode), modifiers: mods), modifiers: mods)
             return nil
         }
+    }
+
+    /// Saves `candidate` as the action's shortcut, unless it is one of ours already.
+    private func take(_ candidate: KeyShortcut, modifiers mods: NSEvent.ModifierFlags = []) {
+        // One of our own shortcuts twice cannot work, so it is refused. A system
+        // shortcut is only warned about (below the row, once saved): the ones macOS
+        // really acts on never reach this monitor, so one that did is most likely
+        // bound to a context it is not in, and refusing it would be a false alarm.
+        let keyCode = UInt16(candidate.keyCode)
+        if let conflict = ShortcutConflict.find(candidate, for: action,
+                                                assigned: Self.assignedShortcuts(), system: []) {
+            refusal = Self.describe(conflict, display: shortcutDisplayString(keyCode: keyCode, modifierFlags: mods))
+            stopListening()
+            return
+        }
+
+        self.keyCode = Int(keyCode)
+        self.modifierFlags = Int(mods.rawValue)
+
+        UserDefaults.standard.set(self.keyCode, forKey: action.keyCodeKey)
+        UserDefaults.standard.set(self.modifierFlags, forKey: action.modifierFlagsKey)
+
+        stopListening()
+        NotificationCenter.default.post(name: .hotkeyDidChange, object: nil)
     }
 
     private func stopListening() {
         // Safe to call when not listening: localMonitor is nil, so this is a no-op.
         isRecording = false
+        if let monitor = flagsMonitor {
+            NSEvent.removeMonitor(monitor)
+            flagsMonitor = nil
+        }
         if let monitor = localMonitor {
             NSEvent.removeMonitor(monitor)
             localMonitor = nil
             NotificationCenter.default.post(name: .hotkeyRecorderDidStop, object: nil)
         }
+    }
+}
+
+/// A line under the shortcut about fn, with fn drawn as the key it is and the sentence
+/// after it: "[fn] also switches the input source…", its bold drawn. Larger than a row's
+/// caption: it asks the user to do something. System Settings opens from a link of its
+/// own under it, "↗" as every link out of the app is marked.
+private struct FnNotice: View {
+    let text: LocalizedStringKey
+    let opensKeyboardSettings: Bool
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    SetupKeycaps(keys: ["fn"], size: 17)
+                        .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4.5 }
+                    Text(text)
+                        .foregroundStyle(SetupColor.label)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if opensKeyboardSettings {
+                    Button("Open Keyboard Settings ↗") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
+                    }
+                    .buttonStyle(SetupInlineLinkStyle(size: 12.5))
+                    .fontWeight(.semibold)
+                    .pointingHandCursor()
+                }
+            }
+        }
+        .font(.system(size: 12.5))
     }
 }
 
@@ -249,6 +367,7 @@ func keyCodeToString(_ keyCode: UInt16) -> String {
     case 48: return "Tab"
     case 51: return "Delete"
     case 53: return "Escape"
+    case FnKey.keyCode: return "fn"
     case 123: return "\u{2190}"
     case 124: return "\u{2192}"
     case 125: return "\u{2193}"

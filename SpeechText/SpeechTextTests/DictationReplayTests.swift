@@ -1186,6 +1186,14 @@ final class EditHotkeyGestureTests: XCTestCase {
         XCTAssertEqual(g.press(in: .starting, at: 10.2), .sendWithoutInstruction)
     }
 
+    func testASecondPressIsAwaitedWithinTheWindowOfTheFirst() {
+        var g = EditHotkeyGesture()
+        XCTAssertFalse(g.awaitsSecondPress(at: 10))
+        _ = g.press(in: .idle, at: 10)
+        XCTAssertTrue(g.awaitsSecondPress(at: 10.2))
+        XCTAssertFalse(g.awaitsSecondPress(at: 10 + EditHotkeyGesture.doubleTapWindow + 0.05))
+    }
+
     func testToggleSecondPressJustOutsideTheWindowIsAStop() {
         var g = EditHotkeyGesture()
         _ = g.press(in: .idle, at: 10)
