@@ -26,7 +26,7 @@
 # that starts with it (setup- for all of Setup's steps). The app then opens those windows
 # and no other. A name that matches no window stops the run and lists
 # the names there are. For a pull request's screenshot:
-#   scripts/window-snapshots.sh --languages en --only settings-speech
+#   scripts/window-snapshots.sh --languages en --only settings-models
 #
 # Every launch starts from empty settings: the e2e domain is deleted first. --defaults
 # imports a property list into it after that (defaults import), so a picture can show a

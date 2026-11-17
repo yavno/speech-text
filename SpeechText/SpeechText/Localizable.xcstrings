@@ -229,19 +229,19 @@
         }
       }
     },
-    "%@ isn't downloaded — download it in Settings › AI Rewrite." : {
-      "comment" : "Error when a local AI Rewrite model is missing. %@ is the model's name; Settings › AI Rewrite is a place in Settings.",
+    "%@ isn't downloaded — download it in Settings › Models." : {
+      "comment" : "Notice when the AI Rewrite model on this Mac is missing. %@ is the model's name. Settings › Models is a place in Settings.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ no está descargado: descárgalo en Ajustes › Reescritura con IA."
+            "value" : "%@ no está descargado: descárgalo en Ajustes › Modelos."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ не завантажено — завантажте її в Параметрах › ШІ‑переписування."
+            "value" : "%@ не завантажено — завантажте її в Параметрах › Моделі."
           }
         }
       }
@@ -4058,19 +4058,19 @@
         }
       }
     },
-    "Choose a model in Settings › AI Rewrite to use AI mode" : {
-      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no model. Settings › AI Rewrite is a place in Settings.",
+    "Choose a model in Settings › Models to use AI mode" : {
+      "comment" : "Record Window (the app's floating dictation window): status line when AI Rewrite has no model. Settings › Models is a place in Settings.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elige un modelo en Ajustes › Reescritura con IA para usar el modo IA"
+            "value" : "Elige un modelo en Ajustes › Modelos para usar el modo IA"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть модель у Параметрах › ШІ‑переписування, щоб користуватися режимом ШІ"
+            "value" : "Виберіть модель у Параметрах › Моделі, щоб користуватися режимом ШІ"
           }
         }
       }
@@ -8538,6 +8538,23 @@
         }
       }
     },
+    "Models" : {
+      "comment" : "Settings: name of the page (sidebar entry and page title) that picks the speech model and the AI Rewrite model.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі"
+          }
+        }
+      }
+    },
     "Models on this Mac" : {
       "comment" : "Settings › Speech to text / AI Rewrite: group heading over the local models.",
       "localizations" : {
@@ -10592,23 +10609,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Необов'язково. Натисніть %1$@ замість %2$@ — і ШІ перетворить сказане на чистий текст для вашої програми."
-          }
-        }
-      }
-    },
-    "Optional. Turns a dictation into finished text — an email, a list, a translation — or does what you ask (“a short reply, in English”)." : {
-      "comment" : "Settings › AI Rewrite: line under the page title.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opcional. Convierte un dictado en texto terminado (un correo, una lista, una traducción) o hace lo que pides (“una respuesta breve, en inglés”)."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Необов'язково. Перетворює диктування на готовий текст — лист, список, переклад — або робить те, про що ви просите («коротка відповідь англійською»)."
           }
         }
       }
@@ -13338,7 +13338,7 @@
       }
     },
     "Speech to text" : {
-      "comment" : "Settings: name of the page (sidebar entry and page title) that picks the speech engine; also a role tag on an API key.",
+      "comment" : "Settings › Models: name of the frame for the speech model, on its edge; also a role tag on an API key.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -14368,6 +14368,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Текст"
+          }
+        }
+      }
+    },
+    "Text at your cursor" : {
+      "comment" : "Settings › Models: VoiceOver label of the picture at the end of the chain, the text pasted where the cursor is.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto en el cursor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст там, де курсор"
           }
         }
       }
@@ -16710,19 +16727,19 @@
         }
       }
     },
-    "What turns your voice into text — on this Mac, online or on your own server." : {
-      "comment" : "Settings › Speech to text: the page's lead",
+    "What turns your voice into text, and what rewrites it — on this Mac, online or on your own server." : {
+      "comment" : "Settings › Models: line under the page title.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lo que convierte tu voz en texto, en este Mac, en línea o en tu propio servidor."
+            "value" : "Lo que convierte tu voz en texto y lo que lo reescribe, en este Mac, en línea o en tu propio servidor."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Що перетворює ваш голос на текст — на цьому Mac, онлайн чи на вашому сервері."
+            "value" : "Що перетворює ваш голос на текст і що його переписує — на цьому Mac, онлайн чи на вашому сервері."
           }
         }
       }

@@ -648,4 +648,38 @@ final class MainPagesHistoryCacheTests: XCTestCase {
             (a dictation added %.1f ms), a keystroke %.2f ms
             """, promptsBefore, promptsChange, promptsAdded, promptsKeystroke))
     }
+
+    // MARK: - Settings › Models (#247)
+
+    func testEachShortcutPassesThroughItsModels() {
+        XCTAssertEqual(ModelChainShortcut.dictate.roles, [.speech])
+        XCTAssertEqual(ModelChainShortcut.aiRewrite.roles, [.speech, .aiRewrite])
+    }
+
+    func testTheModelsPageOpensWhereItWasLeft() {
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "", storedRole: ""),
+                       ModelsPageSelection(shortcut: .aiRewrite, role: .aiRewrite))
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "aiRewrite", storedRole: "speech"),
+                       ModelsPageSelection(shortcut: .aiRewrite, role: .speech))
+        // Dictate draws no AI Rewrite frame, so it cannot be the one open.
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "dictate", storedRole: "aiRewrite"),
+                       ModelsPageSelection(shortcut: .dictate, role: .speech))
+        // The Edit tab is gone (2026-11-17): a page left on it opens as it would at first.
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "edit", storedRole: "speech"),
+                       ModelsPageSelection(shortcut: .aiRewrite, role: .speech))
+        XCTAssertEqual(ModelsPageSelection(storedShortcut: "gone", storedRole: "gone"), .initial)
+    }
+
+    func testATabOpensOnTheModelItAdds() {
+        XCTAssertEqual(ModelsPageSelection.choosing(.aiRewrite), ModelsPageSelection(shortcut: .aiRewrite, role: .aiRewrite))
+        XCTAssertEqual(ModelsPageSelection.choosing(.dictate), ModelsPageSelection(shortcut: .dictate, role: .speech))
+    }
+
+    func testALinkToAFrameTurnsToATabThatHasIt() {
+        let dictate = ModelsPageSelection(shortcut: .dictate, role: .speech)
+        XCTAssertEqual(dictate.opening(.aiRewrite), ModelsPageSelection(shortcut: .aiRewrite, role: .aiRewrite))
+        XCTAssertEqual(dictate.opening(.speech), dictate)
+        let ai = ModelsPageSelection(shortcut: .aiRewrite, role: .aiRewrite)
+        XCTAssertEqual(ai.opening(.speech), ModelsPageSelection(shortcut: .aiRewrite, role: .speech))
+    }
 }

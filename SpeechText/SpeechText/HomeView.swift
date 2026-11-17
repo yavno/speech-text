@@ -434,7 +434,7 @@ struct HomeIntroCard: View {
                 HomeKeycaps(keys: keys, size: 34, radius: 9, fontSize: 15,
                             weight: .medium, spacing: 5, litKeys: litKeys, ai: mode != .dictate)
                 if isAI && !aiConfigured {
-                    Button("Choose a provider") { actions.openSettings(.ai) }
+                    Button("Choose a provider") { actions.openSettingsAt(.aiRewriteModel) }
                         .buttonStyle(SetupButtonStyle(kind: .primary, height: 36))
                         .environment(\.setupTint, .violet)
                         .pointingHandCursor()
@@ -1019,13 +1019,13 @@ struct HomeEngines: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HomeSectionHeader(title: "Engines", link: "Open Settings") { actions.openSettings(.speech) }
+            HomeSectionHeader(title: "Engines", link: "Open Settings") { actions.openSettings(.models) }
             VStack(spacing: 0) {
                 HomeEngineRow(symbol: "waveform", title: "Speech", ai: false,
-                              value: speechEngine, detail: languages) { actions.openSettings(.speech) }
+                              value: speechEngine, detail: languages) { actions.openSettingsAt(.speechModel) }
                 Rectangle().fill(MainColor.separator).frame(height: 1)
                 HomeEngineRow(symbol: "sparkles", title: "AI Rewrite", ai: true,
-                              value: aiEngine, detail: nil) { actions.openSettings(.ai) }
+                              value: aiEngine, detail: nil) { actions.openSettingsAt(.aiRewriteModel) }
             }
             .background(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(MainColor.panelBorder, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -1535,10 +1535,10 @@ private struct HomeWayTile: View {
                         .foregroundStyle(MainColor.ink2)
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
-                        .onTapGesture { actions.openSettings(.ai) }
+                        .onTapGesture { actions.openSettingsAt(.aiRewriteModel) }
                         .pointingHandCursor()
                         .accessibilityAddTraits(.isButton)
-                        .accessibilityAction { actions.openSettings(.ai) }
+                        .accessibilityAction { actions.openSettingsAt(.aiRewriteModel) }
                 } else {
                     Text(description)
                         .font(.system(size: 13))
@@ -1729,7 +1729,8 @@ struct HomeRetryButton: View {
             let installing = store.state(for: missing.id).isBusy
             Button {
                 if !installing { store.install(missing) }
-                openSettings(.speech)
+                ModelsPage.open(.speech)
+                openSettings(.models)
             } label: {
                 HStack(spacing: 5) {
                     if installing { SetupSpinner(size: 10) } else { Image(systemName: "arrow.down.circle") }

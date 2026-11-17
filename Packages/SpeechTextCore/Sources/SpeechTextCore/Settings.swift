@@ -132,6 +132,11 @@ public enum SettingsKeys {
     /// The Prompts page has its card on how AI Rewrite picks a prompt hidden, from
     /// Settings › Appearance. Machine-local, like Home's.
     public static let promptsIntroHidden = "promptsIntroHidden"
+    /// Settings › Models: the shortcut tab (`ModelChainShortcut.rawValue`) and the frame
+    /// (`ModelRole.rawValue`) it was left on, read through `ModelsPageSelection`. Where
+    /// the user was on this Mac's Settings, so not in `portable`.
+    public static let modelsPageShortcut = "modelsPageShortcut"
+    public static let modelsPageRole = "modelsPageRole"
     /// How long History keeps dictations, `HistoryRetention.rawValue`; absent — or the
     /// "300" / "1000" of the count it once was — means forever, so an update deletes
     /// nothing. Machine-local like History itself, so not in `portable`.

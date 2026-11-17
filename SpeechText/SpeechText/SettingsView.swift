@@ -76,9 +76,8 @@ struct SettingsView: View {
         LLMProviderType(rawValue: llmProvider) ?? .groq
     }
 
-    /// The AI page is violet inside the card, as the setup window's AI step is; the
-    /// frame's glow stays green.
-    private var tint: SetupTint { category == .ai ? .violet : .green }
+    /// Green inside the card; the Models page turns its AI Rewrite frame violet itself.
+    private var tint: SetupTint { .green }
 
     var body: some View {
         SetupFrame {
@@ -163,6 +162,11 @@ struct SettingsView: View {
     private func scrollToPendingAnchor(_ scroller: ScrollViewProxy) {
         guard let anchor = SettingsAnchor.pending, anchor.category == category else { return }
         SettingsAnchor.pending = nil
+        // A model's frame is turned to, not scrolled to: the page shows one frame at a time.
+        if let role = anchor.modelRole {
+            ModelsPage.open(role)
+            return
+        }
         // A turn later, once the page has been laid out.
         DispatchQueue.main.async {
             withAnimation(.easeOut(duration: 0.25)) { scroller.scrollTo(anchor, anchor: .top) }
@@ -175,8 +179,7 @@ struct SettingsView: View {
         case .general: generalPage
         case .appearance: appearancePage
         case .dictation: dictationPage
-        case .speech: speechPage
-        case .ai: aiPage
+        case .models: ModelsPage(openPresets: openPresets)
         case .privacy: privacyPage
         case .apiKeys: apiKeysPage
         }
@@ -540,14 +543,6 @@ struct SettingsView: View {
         .help(Text(verbatim: preset.name))
     }
 
-    // MARK: - Speech to text
-
-    /// The page's own state — which place is open, which service is opened for its key —
-    /// lives in the view, so it starts from what is in use each time the page opens.
-    private var speechPage: some View {
-        SpeechEngineSettings()
-    }
-
     // MARK: - Dictation
 
     /// How a dictation is given — the shortcuts, the microphone, the languages — and how
@@ -586,21 +581,6 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - AI
-
-    @ViewBuilder
-    private var aiPage: some View {
-        AIEngineSettings()
-
-        SettingsGroup(title: "Prompts") {
-            SettingsRow(title: "Prompts",
-                        detail: "What a dictation can become. The model picks the one that fits.") {
-                Button("Edit Prompts…") { openPresets() }
-                    .buttonStyle(SetupButtonStyle(kind: .secondary, height: 28))
-            }
-        }
-    }
-
     // MARK: - API Keys
 
     /// Every key the app can use, in pipeline order (speech first). The ones the current
@@ -635,9 +615,9 @@ struct SettingsView: View {
         let service: Provider
         let value: Binding<String>
         /// Everything the key can be used for.
-        let roles: [SettingsKeyRole]
+        let roles: [ModelRole]
         /// The roles the current choices use it for; empty when nothing does.
-        let active: Set<SettingsKeyRole>
+        let active: Set<ModelRole>
 
         /// The tags say what the key does; a caption is left for the one case they
         /// don't spell out — a single key serving both steps at once.
@@ -658,7 +638,7 @@ struct SettingsView: View {
         APIKeyPage.order.compactMap { provider in
             guard let key = provider.descriptor.apiKey else { return nil }
             let roles = provider.descriptor.roles
-            var active: Set<SettingsKeyRole> = []
+            var active: Set<ModelRole> = []
             if stt.vendor == provider { active.insert(.speech) }
             if llm.vendor == provider { active.insert(.aiRewrite) }
             return APIKey(service: provider, value: keyBinding(key.settingsKey),
@@ -1025,7 +1005,8 @@ private struct SpokenLanguagesField: View {
                             .foregroundStyle(SetupColor.warn)
                             .fixedSize(horizontal: false, vertical: true)
                         Button("Choose another model…") {
-                            NotificationCenter.default.post(name: .settingsShowCategory, object: SettingsCategory.speech)
+                            ModelsPage.open(.speech)
+                            NotificationCenter.default.post(name: .settingsShowCategory, object: SettingsCategory.models)
                         }
                         .buttonStyle(SetupInlineLinkStyle())
                     }

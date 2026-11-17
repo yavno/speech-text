@@ -315,12 +315,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let page = (note.object as? String).flatMap(MainPage.init(rawValue:))
             MainActor.assumeIsolated { self?.showMainWindow(on: page) }
         }
-        // A notice's way to a Settings page — the microphone notice's Change.
+        // A notice's way to a Settings page — the microphone notice's Change — or to a
+        // model's frame on Models.
         NotificationCenter.default.addObserver(
             forName: .openSettingsPage, object: nil, queue: .main
         ) { [weak self] note in
+            let anchor = note.object as? SettingsAnchor
             let category = note.object as? SettingsCategory
-            MainActor.assumeIsolated { self?.showSettings(category: category) }
+            MainActor.assumeIsolated {
+                if let anchor { self?.showSettings(at: anchor) } else { self?.showSettings(category: category) }
+            }
         }
 
         // Auto-register as login item on first launch (default: ON) — unless setup is
@@ -763,7 +767,7 @@ extension Notification.Name {
     static let openHistoryWindow = Notification.Name("openHistoryWindow")
     /// A page of the main window, by `MainPage` raw value as the object.
     static let openMainWindowPage = Notification.Name("openMainWindowPage")
-    /// The Settings window, on the `SettingsCategory` given as the object.
+    /// The Settings window, on the `SettingsCategory` or at the `SettingsAnchor` given as the object.
     static let openSettingsPage = Notification.Name("openSettingsPage")
 }
 
@@ -2599,7 +2603,7 @@ final class AppState {
         switch action {
         case .openSettings(let role):
             NotificationCenter.default.post(name: .openSettingsPage,
-                                            object: role == .speech ? SettingsCategory.speech : SettingsCategory.ai)
+                                            object: SettingsAnchor(role == .speech ? .speech : .aiRewrite))
         case .switchModel(let key, let id):
             dlog("App", "model notice: \(key) switched to \(id)")
             UserDefaults.standard.set(id, forKey: key)

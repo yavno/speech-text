@@ -40,11 +40,11 @@ The caption under the Microphone row says which device will record now and why.
 
 ## Apple Dictation: “Couldn't load the … speech model”
 
-The Apple engine (Settings › Speech to text › On this Mac › Apple Dictation) runs on macOS's own on-device recogniser, which needs a speech model for your language. When macOS cannot load it, the dictation stops with:
+The Apple engine (Settings › Models › Speech to text › On this Mac › Apple Dictation) runs on macOS's own on-device recogniser, which needs a speech model for your language. When macOS cannot load it, the dictation stops with:
 
 > Couldn't load the Ukrainian speech model. Add it to Dictation in System Settings › Keyboard.
 
-Add the language under System Settings › Keyboard › Dictation and let macOS download it, or choose another engine — the Speech to text page shows which of your languages each engine knows.
+Add the language under System Settings › Keyboard › Dictation and let macOS download it, or choose another engine — Settings › Models shows which of your languages each engine knows.
 
 If the message is “Speech Recognition is off for SpeechText”, turn it on in System Settings › Privacy & Security › Speech Recognition. Only the Apple engine needs this permission.
 

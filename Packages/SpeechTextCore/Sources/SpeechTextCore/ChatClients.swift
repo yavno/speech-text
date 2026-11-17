@@ -366,8 +366,8 @@ public enum LLMError: LocalizedError, Sendable {
         case .refused(nil): localized("The model declined the request")
         case .emptyResponse: localized("The model returned an empty response")
         case .cutOff: localized("The model's reply was cut off before it ended.")
-        case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › AI Rewrite")
-        case .noServerAddress: localized("Set your server's address in Settings › AI Rewrite")
+        case .noLocalModel: localized("No model on this Mac is ready — choose or download one in Settings › Models")
+        case .noServerAddress: localized("Set your server's address in Settings › Models")
         case .noModelChosen(let p): localized("No model chosen for \(p.displayName) — choose one in Settings")
         case .localNetworkDenied: localized("Allow SpeechText in System Settings › Privacy & Security › Local Network.")
         }

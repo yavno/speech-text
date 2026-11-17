@@ -201,7 +201,7 @@ public struct RecordingConfiguration: Sendable {
     public func batchUnavailableReason(modelInstalled: (String) -> Bool = { isLocalModelInstalled($0) }) -> String? {
         let batch = batchDescriptor
         if batch.vendor == .server, serverEndpoint == nil {
-            return localized("Set your server's address in Settings › Speech to text.")
+            return localized("Set your server's address in Settings › Models.")
         }
         if models[batch.vendor] == clearedModelChoice {
             return batch.vendor == .local

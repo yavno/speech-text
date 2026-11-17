@@ -55,7 +55,7 @@ struct PromptsView: View {
                     // AI Rewrite on, so it shows whatever that setting says.
                     if !introHidden || !aiReady {
                         PromptsBanner(presets: presets, aiReady: aiReady,
-                                      choose: { actions.openSettings(.ai) })
+                                      choose: { actions.openSettingsAt(.aiRewriteModel) })
                     }
                     HStack(alignment: .top, spacing: 24) {
                         list(uses: uses)
