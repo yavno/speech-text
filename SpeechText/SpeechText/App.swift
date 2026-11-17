@@ -1078,6 +1078,8 @@ final class AppState {
 
     private func startRecording() {
         let began = ProcessInfo.processInfo.systemUptime
+        // A press held back while fn was down belonged to whatever ran before this one.
+        hotkeyManager.dropDeferredFnPress()
         // A choice the launch cleared is the user's to make again: the dictation is
         // refused with the picker on offer, before the overlay or the microphone opens.
         let engine = UserDefaults.standard.string(forKey: SettingsKeys.sttProvider).flatMap(STTProviderType.init) ?? .apple
