@@ -15120,23 +15120,6 @@
         }
       }
     },
-    "The selection, replaced" : {
-      "comment" : "Settings › Models, Edit tab: VoiceOver label of the picture at the end of the chain, the selected text replaced by the rewrite.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La selección, reemplazada"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Виділений текст замінено"
-          }
-        }
-      }
-    },
     "The server answered, but not at this path. Most addresses end in /v1." : {
       "comment" : "Settings › Your server: the test got HTTP 404",
       "localizations" : {

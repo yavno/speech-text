@@ -37,11 +37,15 @@ struct ModelsPage: View {
         storedRole = next.role.rawValue
     }
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         let selection = selection
         VStack(alignment: .leading, spacing: 14) {
             ModelChainTabs(selection: selection.shortcut) { shortcut in
-                store(ModelsPageSelection(storedShortcut: shortcut.rawValue, storedRole: selection.role.rawValue))
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                    store(.choosing(shortcut))
+                }
             }
             ModelChain(shortcut: selection.shortcut, selected: selection.role) { role in
                 store(ModelsPageSelection(shortcut: selection.shortcut, role: role))
@@ -70,7 +74,7 @@ struct ModelsPage: View {
 
 // MARK: - Tabs
 
-/// One tab per shortcut, with its keys: Dictate, AI Rewrite, Edit.
+/// One tab per shortcut, with its keys: Dictate, AI Rewrite.
 struct ModelChainTabs: View {
     let selection: ModelChainShortcut
     let choose: (ModelChainShortcut) -> Void
@@ -94,7 +98,6 @@ private struct ModelChainTab: View {
         switch shortcut {
         case .dictate: "Dictate"
         case .aiRewrite: "AI Rewrite"
-        case .edit: "Edit"
         }
     }
 
@@ -132,8 +135,13 @@ struct ModelChain: View {
         HStack(spacing: 0) {
             input
             ForEach(shortcut.roles, id: \.self) { role in
-                ModelChainWire(tint: role.tint)
-                ModelChainFrame(role: role, isSelected: role == selected) { select(role) }
+                // A frame and the wire into it come and go together: switching to Dictate,
+                // AI Rewrite's fades out and Speech to text widens into its room.
+                HStack(spacing: 0) {
+                    ModelChainWire(tint: role.tint)
+                    ModelChainFrame(role: role, isSelected: role == selected) { select(role) }
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .leading)))
             }
             ModelChainWire(tint: shortcut.roles.last?.tint ?? .green)
             result
@@ -141,27 +149,16 @@ struct ModelChain: View {
         .frame(maxWidth: .infinity)
     }
 
-    @ViewBuilder private var input: some View {
-        if shortcut.startsFromSelection {
-            HStack(spacing: 4) {
-                ModelChainDisc(symbol: "highlighter", size: 30)
-                    .accessibilityLabel("Selected text")
-                Text(verbatim: "+").font(.system(size: 13, weight: .semibold)).foregroundStyle(SetupColor.label3)
-                ModelChainDisc(symbol: "mic", size: 30)
-                    .accessibilityLabel("Your voice")
-            }
-        } else {
-            ModelChainDisc(symbol: "mic", size: 38)
-                .accessibilityLabel("Your voice")
-        }
+    private var input: some View {
+        ModelChainDisc(symbol: "mic", size: 38)
+            .accessibilityLabel("Your voice")
     }
 
-    /// The text at the cursor, or the selection replaced; marked with AI's sparkle when AI
-    /// Rewrite wrote it, so it reads as more than the words said.
+    /// The text at the cursor, marked with AI's sparkle when AI Rewrite wrote it, so it
+    /// reads as more than the words said.
     private var result: some View {
-        ModelChainDisc(symbol: shortcut == .edit ? "text.badge.checkmark" : "text.cursor", size: 38,
-                       sparkle: shortcut.roles.contains(.aiRewrite))
-            .accessibilityLabel(shortcut == .edit ? Text("The selection, replaced") : Text("Text at your cursor"))
+        ModelChainDisc(symbol: "text.cursor", size: 38, sparkle: shortcut.roles.contains(.aiRewrite))
+            .accessibilityLabel(Text("Text at your cursor"))
     }
 }
 
@@ -305,6 +302,9 @@ private struct ModelChainFrame: View {
             .background {
                 if isSelected { RoundedRectangle(cornerRadius: 19).fill(tint.glow.opacity(0.32)).padding(-4) }
             }
+            // Only the panel fades on the frame not open; its name stays solid on the edge,
+            // since a faded name let the panel's outline show through it.
+            .opacity(isSelected || hovering ? 1 : 0.6)
             .overlay(alignment: .topLeading) {
                 HStack(spacing: 4) {
                     Image(systemName: role.symbol).font(.system(size: 9, weight: .semibold))
@@ -318,7 +318,6 @@ private struct ModelChainFrame: View {
                 .fixedSize()
                 .offset(x: 10, y: -9)
             }
-            .opacity(isSelected || hovering ? 1 : 0.6)
             .contentShape(RoundedRectangle(cornerRadius: 15))
         }
         .buttonStyle(.plain)
