@@ -261,9 +261,7 @@ final class HotkeyManager {
         fnAction = nil
     }
 
-    /// fn pressed with ⌘⌥⌃⇧ already down, when it would start something, is part of
-    /// another combination, not the shortcut. While a dictation runs it is not: holding
-    /// ⌃⇧A, fn switches it to plain text.
+    /// fn pressed with ⌘⌥⌃⇧ already down and ignored (`FnKey.ignoresPressWithModifiers`).
     private var fnWithModifiers = false
 
     private func fnChanged(keyCode: UInt16, isDown: Bool, withModifiers: Bool) {
@@ -271,7 +269,8 @@ final class HotkeyManager {
         let events: [FnKeyFilter.Event]
         if isDown {
             let pressesAtOnce = fnPressesAtOnce?(action) ?? true
-            fnWithModifiers = withModifiers && pressesAtOnce
+            fnWithModifiers = withModifiers
+                && FnKey.ignoresPressWithModifiers(startsSomething: pressesAtOnce, isRecordWindow: action == .recordWindow)
             guard !fnWithModifiers else { return }
             events = fnFilter.fnDown(at: ProcessInfo.processInfo.systemUptime, pressesAtOnce: pressesAtOnce)
             watchOtherKeys()

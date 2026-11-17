@@ -706,6 +706,14 @@ final class FnKeyTests: XCTestCase {
         XCTAssertEqual(EditCancelReason.fnWithAnotherKey.notice(textPutBack: false).title, "Edit canceled")
     }
 
+    func testFnWithModifiersIsIgnoredUnlessItSwitchesADictation() {
+        XCTAssertTrue(FnKey.ignoresPressWithModifiers(startsSomething: true, isRecordWindow: false))
+        // Holding ⌃⇧A, fn switches the dictation to plain text.
+        XCTAssertFalse(FnKey.ignoresPressWithModifiers(startsSomething: false, isRecordWindow: false))
+        // The Record Window's press always waits for the release, and only ever opens it.
+        XCTAssertTrue(FnKey.ignoresPressWithModifiers(startsSomething: false, isRecordWindow: true))
+    }
+
     func testTwoActionsOnFnCollide() {
         XCTAssertEqual(ShortcutConflict.find(FnKey.shortcut, for: .ai,
                                              assigned: [.inline: FnKey.shortcut], system: []),
