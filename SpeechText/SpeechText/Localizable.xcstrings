@@ -10353,7 +10353,7 @@
       }
     },
     "Open Keyboard Settings ↗" : {
-
+      "comment" : "Settings › Dictation › Shortcuts: a link under the fn notice that opens System Settings › Keyboard. ↗ marks a link out of the app."
     },
     "Open Privacy Settings" : {
       "comment" : "Button that opens System Settings › Privacy & Security › Speech Recognition.",
@@ -18013,13 +18013,13 @@
       }
     },
     "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**." : {
-
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS opens Emoji & Symbols on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**." : {
-
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS starts its own Dictation on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**." : {
-
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS switches the input source on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "as the providers' replies count them" : {
       "comment" : "Usage page: note after the 'Requests' heading.",
@@ -18073,7 +18073,7 @@
       }
     },
     "can't be combined with other keys. Press it on its own, or choose a shortcut without it." : {
-
+      "comment" : "Settings › Dictation › Shortcuts: refusal when fn was pressed with another key. Follows a key cap reading “fn”, so the sentence starts mid-way. Wraps to two lines."
     },
     "choose a provider" : {
       "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
@@ -18465,7 +18465,7 @@
       }
     },
     "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**." : {
-
+      "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS's own action on fn is unknown. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "min" : {
       "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min.",
