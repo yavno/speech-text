@@ -33,6 +33,9 @@
 # stored state, such as a chosen server; write one with
 #   defaults export app.speech-text.SpeechText.e2e f.plist
 # after setting it up in an e2e build, or by hand (docs/settings-keys.md names the keys).
+# A shortcut set this way also needs hotkeyLayoutVersion = 1: with the marker absent, the
+# launch's one-time layout migration deletes the stored Inline, AI and Record Window
+# shortcuts first (Edit's is kept).
 # The user's own domain is never read or written. API keys are refused: they live in the
 # keychain, and an e2e run takes them only from -SPTKeysFile (scripts/e2e.sh).
 #
