@@ -18012,13 +18012,13 @@
         }
       }
     },
-    "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**." : {
+    "also opens Emoji & Symbols. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
       "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS opens Emoji & Symbols on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
-    "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**." : {
+    "also starts macOS Dictation. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
       "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS starts its own Dictation on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
-    "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**." : {
+    "also switches the input source. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
       "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS switches the input source on fn. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "as the providers' replies count them" : {
@@ -18464,7 +18464,7 @@
         }
       }
     },
-    "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**." : {
+    "may also do something in macOS. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**." : {
       "comment" : "Settings › Dictation › Shortcuts: notice when fn is a shortcut and macOS's own action on fn is unknown. Follows a key cap reading “fn”, so the sentence starts mid-way; “Press 🌐 key to” and “Do Nothing” are macOS's own words in Keyboard Settings — use macOS's translation. Under a shortcut in Settings, wraps to two lines."
     },
     "min" : {

@@ -129,13 +129,13 @@ struct HotkeyRecorderView: View {
         switch globeKey {
         case .doNothing: return nil
         case .changeInputSource:
-            return "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**."
+            return "also switches the input source. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**."
         case .showEmojiAndSymbols:
-            return "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**."
+            return "also opens Emoji & Symbols. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**."
         case .startDictation:
-            return "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**."
+            return "also starts macOS Dictation. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**."
         case .notSet, .other:
-            return "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**."
+            return "may also do something in macOS. In Keyboard Settings, choose **Do Nothing** for **Press 🌐 key to**."
         }
     }
 
