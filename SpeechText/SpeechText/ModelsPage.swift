@@ -74,7 +74,9 @@ struct ModelsPage: View {
 
 // MARK: - Tabs
 
-/// One tab per shortcut, with its keys: Dictate, AI Rewrite.
+/// One tab per shortcut, with its keys: Dictate, AI Rewrite. Drawn as Settings › Recording's
+/// Press to toggle / Hold to talk (`RecordingModePicker`), so the two read as one kind of
+/// control.
 struct ModelChainTabs: View {
     let selection: ModelChainShortcut
     let choose: (ModelChainShortcut) -> Void
@@ -85,6 +87,8 @@ struct ModelChainTabs: View {
                 ModelChainTab(shortcut: shortcut, isSelected: shortcut == selection) { choose(shortcut) }
             }
         }
+        .padding(3)
+        .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(SetupColor.separator.opacity(0.55)))
     }
 }
 
@@ -92,7 +96,6 @@ private struct ModelChainTab: View {
     let shortcut: ModelChainShortcut
     let isSelected: Bool
     let action: () -> Void
-    @State private var hovering = false
 
     private var title: LocalizedStringKey {
         switch shortcut {
@@ -103,21 +106,26 @@ private struct ModelChainTab: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 7) {
+            HStack(spacing: 8) {
                 Text(title)
-                    .font(.system(size: 12.5, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(isSelected ? SetupColor.label : SetupColor.label2)
                 HomeKeycaps(keys: shortcutKeys(shortcutText(for: shortcut.action)), size: 16, radius: 4,
                             fontSize: 9.5, spacing: 2, muted: !isSelected)
             }
-            .padding(.horizontal, 11)
-            .padding(.vertical, 5)
-            .background(Capsule().fill(isSelected ? SettingsColor.panel : hovering ? SettingsColor.panel.opacity(0.6) : .clear))
-            .overlay(Capsule().strokeBorder(isSelected ? SettingsColor.panelBorder : .clear, lineWidth: 1))
-            .contentShape(Capsule())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(SettingsColor.background)
+                        .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
+                }
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .onHover { hovering = $0 }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
