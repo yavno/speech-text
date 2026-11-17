@@ -26,6 +26,8 @@ struct HotkeyRecorderView: View {
     /// fn pressed on its own is recorded when it comes up with no other key between.
     @State private var fnFilter = FnKeyFilter()
     @State private var fnHeld = false
+    /// ⌘⌥⌃⇧ went down at any point while fn was: not fn on its own.
+    @State private var fnWithModifier = false
     /// What macOS does with 🌐, re-read when the app comes back from System Settings.
     @State private var globeKey = HotkeyManager.globeKeyAction()
 
@@ -174,17 +176,22 @@ struct HotkeyRecorderView: View {
         fnFilter = FnKeyFilter()
         fnHeld = false
         flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
-            guard event.keyCode == FnKey.keyCode else { return event }
+            let modifiers = !event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift])
+            guard event.keyCode == FnKey.keyCode else {
+                if fnHeld, modifiers { fnWithModifier = true }
+                return event
+            }
             let now = ProcessInfo.processInfo.systemUptime
             if event.modifierFlags.contains(.function) {
                 fnHeld = true
+                fnWithModifier = modifiers
                 _ = fnFilter.fnDown(at: now, pressesAtOnce: true)
             } else {
                 fnHeld = false
                 // Up with no other key since it went down: fn on its own — unless ⌘⌥⌃⇧ are
                 // down with it, which a shortcut on fn cannot carry.
                 guard fnFilter.fnUp().contains(.release) else { return event }
-                if event.modifierFlags.intersection([.command, .option, .control, .shift]).isEmpty {
+                if !fnWithModifier, !modifiers {
                     take(FnKey.shortcut)
                 } else {
                     fnRefused = true
@@ -194,6 +201,8 @@ struct HotkeyRecorderView: View {
             return event
         }
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            // 🌐's own key-down on a short tap is fn, not another key.
+            if event.keyCode == FnKey.globeKeyCode { return nil }
             _ = fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime)
             if fnHeld, !FnKey.isProducedWithFn(event.keyCode) {
                 // Dropped from the flags, fn would have turned fn+⌃⇧Q into ⌃⇧Q unsaid.

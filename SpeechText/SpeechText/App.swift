@@ -979,7 +979,8 @@ final class AppState {
         case .inline, .ai:
             return !isEditMode && (dictationPhase == .idle || hotkeyGesture.awaitsSecondTap)
         case .edit:
-            return (!isEditMode && dictationPhase == .idle) || editGesture.awaitsSecondTap
+            return (!isEditMode && dictationPhase == .idle)
+                || editGesture.awaitsSecondPress(at: ProcessInfo.processInfo.systemUptime)
         case .recordWindow:
             return false
         }

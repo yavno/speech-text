@@ -238,7 +238,8 @@ final class HotkeyManager {
     private func startFnMonitor() {
         let flagsChanged: (NSEvent) -> Void = { [weak self] event in
             let keyCode = event.keyCode, isDown = event.modifierFlags.contains(.function)
-            MainActor.assumeIsolated { self?.fnChanged(keyCode: keyCode, isDown: isDown) }
+            let withModifiers = !event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift])
+            MainActor.assumeIsolated { self?.fnChanged(keyCode: keyCode, isDown: isDown, withModifiers: withModifiers) }
         }
         if let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: flagsChanged) {
             fnMonitors.append(global)
@@ -260,15 +261,29 @@ final class HotkeyManager {
         fnAction = nil
     }
 
-    private func fnChanged(keyCode: UInt16, isDown: Bool) {
+    /// fn pressed with ⌘⌥⌃⇧ already down, when it would start something, is part of
+    /// another combination, not the shortcut. While a dictation runs it is not: holding
+    /// ⌃⇧A, fn switches it to plain text.
+    private var fnWithModifiers = false
+
+    private func fnChanged(keyCode: UInt16, isDown: Bool, withModifiers: Bool) {
         guard keyCode == FnKey.keyCode, let action = fnAction else { return }
         let events: [FnKeyFilter.Event]
         if isDown {
-            events = fnFilter.fnDown(at: ProcessInfo.processInfo.systemUptime,
-                                     pressesAtOnce: fnPressesAtOnce?(action) ?? true)
+            let pressesAtOnce = fnPressesAtOnce?(action) ?? true
+            fnWithModifiers = withModifiers && pressesAtOnce
+            guard !fnWithModifiers else { return }
+            events = fnFilter.fnDown(at: ProcessInfo.processInfo.systemUptime, pressesAtOnce: pressesAtOnce)
             watchOtherKeys()
         } else {
             stopWatchingOtherKeys()
+            guard !fnWithModifiers else {
+                fnWithModifiers = false
+                return
+            }
+            // A press held back for something that has since ended — finished, not only
+            // cancelled — would start something new on the way up.
+            if fnPressesAtOnce?(action) == true { fnFilter.dropDeferredPress() }
             events = fnFilter.fnUp()
         }
         perform(events, for: action)

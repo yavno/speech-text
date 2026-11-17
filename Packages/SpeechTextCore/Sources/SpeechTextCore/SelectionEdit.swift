@@ -108,6 +108,15 @@ public struct EditHotkeyGesture: Sendable {
     /// `AppState` calls `tapWindowExpired` `doubleTapWindow` after the release.
     public var awaitsSecondTap: Bool { tapReleasedAt != nil }
 
+    /// A press at `time` could still be the second half of a double press — after a hold
+    /// tap's release, or, in toggle, within `doubleTapWindow` of the first press, which is
+    /// what the window is timed from. fn's press goes through at once then (`FnKeyFilter`).
+    public func awaitsSecondPress(at time: TimeInterval) -> Bool {
+        if awaitsSecondTap { return true }
+        guard let startedAt else { return false }
+        return time - startedAt <= Self.doubleTapWindow
+    }
+
     public mutating func press(in phase: Phase, at time: TimeInterval) -> EditHotkeyAction {
         switch phase {
         case .idle:
