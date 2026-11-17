@@ -79,6 +79,7 @@ Neutral Spanish, addressed as *tú*, as macOS's Spanish is. Quotation marks “ 
 | System Settings | Ajustes del Sistema |
 | Privacy & Security | Privacidad y seguridad |
 | Keyboard · Dictation · Appearance (macOS) | Teclado · Dictado · Aspecto |
+| Press 🌐 key to · Do Nothing (macOS Keyboard settings) | Acción al pulsar la tecla 🌐 · No hacer nada |
 | Accessibility | Accesibilidad |
 | Microphone · Speech Recognition · Automation | Micrófono · Reconocimiento de voz · Automatización |
 | Local Network (the privacy setting) | Red local; the permission in a sentence: acceso a Red local |
@@ -128,6 +129,7 @@ Addressed as *ви*, lowercase, as macOS's Ukrainian is. Quotation marks « ».
 | System Settings | Системні параметри; a path after a preposition takes the locative: «у Системних параметрах › Звук» |
 | Privacy & Security | Приватність і безпека |
 | Keyboard · Dictation · Appearance (macOS) | Клавіатура · Диктування · Вигляд |
+| Press 🌐 key to · Do Nothing (macOS Keyboard settings) | Натискати клавішу 🌐, щоб · нічого не робити (lowercase, as macOS writes them) |
 | Accessibility | Доступність, as macOS names it; the permission in a sentence: дозвіл «Доступність» |
 | Microphone · Speech Recognition · Automation | Мікрофон · Розпізнавання мовлення · Автоматизація |
 | Local Network (the privacy setting) | Локальна мережа; the permission in a sentence: дозвіл «Локальна мережа» |
