@@ -17,6 +17,8 @@ struct HotkeyRecorderView: View {
     @State private var localMonitor: Any?
     /// Why the last combination pressed was not taken. Cleared by the next attempt.
     @State private var refusal: LocalizedStringResource?
+    /// fn was pressed with another key or a modifier: said with fn drawn as a key.
+    @State private var fnRefused = false
     /// Read when the row appears; the user can change them in System Settings meanwhile,
     /// so a recording re-reads them before checking.
     @State private var systemShortcuts: Set<KeyShortcut> = []
@@ -63,23 +65,16 @@ struct HotkeyRecorderView: View {
                     }
                 }
             }
-            if let warning {
+            if fnRefused {
+                FnNotice(text: "can't be combined with other keys. Press it on its own, or choose a shortcut without it.",
+                         opensKeyboardSettings: false)
+            } else if let warning {
                 Label { Text(warning) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
             } else if let globeNotice {
-                // Said once, in the words of the setting, with the way there one click away.
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Label { Text(globeNotice) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
-                        .foregroundStyle(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Button("Open Keyboard Settings") {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
-                    }
-                    .buttonStyle(.link)
-                }
-                .font(.caption)
+                FnNotice(text: globeNotice, opensKeyboardSettings: true)
             }
         }
         .onAppear {
@@ -126,14 +121,19 @@ struct HotkeyRecorderView: View {
 
     /// fn on its own while macOS also acts on a press of it: the monitor swallows nothing,
     /// so whatever "Press 🌐 key to" says happens beside the shortcut.
-    private var globeNotice: LocalizedStringResource? {
+    /// The setting's own words in bold; the way to it is `FnNotice`'s button.
+    private var globeNotice: LocalizedStringKey? {
         guard currentShortcut == FnKey.shortcut else { return nil }
         switch globeKey {
         case .doNothing: return nil
-        case .changeInputSource: return "Pressing fn also switches the input source. Set it to Do Nothing in Keyboard Settings."
-        case .showEmojiAndSymbols: return "Pressing fn also opens Emoji & Symbols. Set it to Do Nothing in Keyboard Settings."
-        case .startDictation: return "Pressing fn also starts macOS Dictation. Set it to Do Nothing in Keyboard Settings."
-        case .notSet, .other: return "macOS also acts on a press of fn. Set it to Do Nothing in Keyboard Settings."
+        case .changeInputSource:
+            return "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**."
+        case .showEmojiAndSymbols:
+            return "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**."
+        case .startDictation:
+            return "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**."
+        case .notSet, .other:
+            return "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**."
         }
     }
 
@@ -166,6 +166,7 @@ struct HotkeyRecorderView: View {
     private func startListening() {
         isRecording = true
         refusal = nil
+        fnRefused = false
         systemShortcuts = HotkeyManager.enabledSystemShortcuts()
         // Our own shortcuts are unregistered while this listens, or pressing one of them
         // would start a dictation instead of arriving here as a duplicate.
@@ -186,7 +187,7 @@ struct HotkeyRecorderView: View {
                 if event.modifierFlags.intersection([.command, .option, .control, .shift]).isEmpty {
                     take(FnKey.shortcut)
                 } else {
-                    refusal = "fn can't be combined with other keys. Press fn on its own, or a shortcut without it."
+                    fnRefused = true
                     stopListening()
                 }
             }
@@ -196,7 +197,7 @@ struct HotkeyRecorderView: View {
             _ = fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime)
             if fnHeld, !FnKey.isProducedWithFn(event.keyCode) {
                 // Dropped from the flags, fn would have turned fn+⌃⇧Q into ⌃⇧Q unsaid.
-                refusal = "fn can't be combined with other keys. Press fn on its own, or a shortcut without it."
+                fnRefused = true
                 stopListening()
                 return nil
             }
@@ -254,6 +255,40 @@ struct HotkeyRecorderView: View {
             localMonitor = nil
             NotificationCenter.default.post(name: .hotkeyRecorderDidStop, object: nil)
         }
+    }
+}
+
+/// A line under the shortcut about fn, with fn drawn as the key it is and the sentence
+/// after it: "[fn] also switches the input source…", its bold drawn. Larger than a row's
+/// caption: it asks the user to do something. System Settings opens from a link of its
+/// own under it, "↗" as every link out of the app is marked.
+private struct FnNotice: View {
+    let text: LocalizedStringKey
+    let opensKeyboardSettings: Bool
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    SetupKeycaps(keys: ["fn"], size: 17)
+                        .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4.5 }
+                    Text(text)
+                        .foregroundStyle(SetupColor.label)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if opensKeyboardSettings {
+                    Button("Open Keyboard Settings ↗") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
+                    }
+                    .buttonStyle(SetupInlineLinkStyle(size: 12.5))
+                    .fontWeight(.semibold)
+                    .pointingHandCursor()
+                }
+            }
+        }
+        .font(.system(size: 12.5))
     }
 }
 

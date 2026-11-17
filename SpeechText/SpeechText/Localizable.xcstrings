@@ -10352,6 +10352,9 @@
         }
       }
     },
+    "Open Keyboard Settings ↗" : {
+
+    },
     "Open Privacy Settings" : {
       "comment" : "Button that opens System Settings › Privacy & Security › Speech Recognition.",
       "localizations" : {
@@ -11094,15 +11097,6 @@
           }
         }
       }
-    },
-    "Pressing fn also opens Emoji & Symbols. Set it to Do Nothing in Keyboard Settings." : {
-
-    },
-    "Pressing fn also starts macOS Dictation. Set it to Do Nothing in Keyboard Settings." : {
-
-    },
-    "Pressing fn also switches the input source. Set it to Do Nothing in Keyboard Settings." : {
-
     },
     "Previous month" : {
       "comment" : "History page, the date filter's calendar: VoiceOver label of the arrow to the previous month.",
@@ -18018,6 +18012,15 @@
         }
       }
     },
+    "also opens Emoji & Symbols. Set **Press 🌐 key to** to **Do Nothing**." : {
+
+    },
+    "also starts macOS Dictation. Set **Press 🌐 key to** to **Do Nothing**." : {
+
+    },
+    "also switches the input source. Set **Press 🌐 key to** to **Do Nothing**." : {
+
+    },
     "as the providers' replies count them" : {
       "comment" : "Usage page: note after the 'Requests' heading.",
       "localizations" : {
@@ -18068,6 +18071,9 @@
           }
         }
       }
+    },
+    "can't be combined with other keys. Press it on its own, or choose a shortcut without it." : {
+
     },
     "choose a provider" : {
       "comment" : "Home page, More ways to dictate: a link inside a sentence that opens the AI Rewrite settings; lowercase.",
@@ -18170,9 +18176,6 @@
           }
         }
       }
-    },
-    "fn can't be combined with other keys. Press fn on its own, or a shortcut without it." : {
-
     },
     "from each provider's last reply" : {
       "comment" : "Usage page: note after the 'Limits right now' heading.",
@@ -18404,9 +18407,6 @@
         }
       }
     },
-    "macOS also acts on a press of fn. Set it to Do Nothing in Keyboard Settings." : {
-
-    },
     "macOS also uses %@ (System Settings › Keyboard › Keyboard Shortcuts), and may take it first." : {
       "comment" : "Settings › Dictation › Shortcuts: warning under a shortcut macOS also uses. %@ is the keys. The path is macOS's; use its names in your language.",
       "localizations" : {
@@ -18463,6 +18463,9 @@
           }
         }
       }
+    },
+    "may also do something in macOS. Set **Press 🌐 key to** to **Do Nothing**." : {
+
     },
     "min" : {
       "comment" : "Home and Usage: the unit after a number of minutes, small, e.g. ≈ 1 h 20 min.",
