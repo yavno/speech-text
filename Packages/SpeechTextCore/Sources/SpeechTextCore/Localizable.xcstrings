@@ -1140,6 +1140,9 @@
         }
       }
     },
+    "An older Sol, at the same price." : {
+
+    },
     "Anthropic · Paid" : {
       "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name.",
       "localizations" : {

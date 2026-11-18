@@ -33,8 +33,9 @@ final class LLMRequestPayloadTests: XCTestCase {
 
     func testEveryCatalogueReasoningModelGetsTheEffort() {
         for model in knownChatModels(of: .openai) {
-            // 6.1 Sol rejects `none` (checked 2026-10-26).
-            XCTAssertEqual(model.reasoningEffort, model.id == "gpt-6.1-sol" ? "low" : "none", model.id)
+            // 6.1 Sol (checked 2026-10-26) and 6.2 Sol (2026-11-18) reject `none`.
+            XCTAssertEqual(model.reasoningEffort, ["gpt-6.1-sol", "gpt-6.2-sol"].contains(model.id) ? "low" : "none",
+                           model.id)
         }
     }
 
@@ -131,10 +132,10 @@ final class ChatModelCatalogTests: XCTestCase {
                                                         "claude-sonnet-5", "claude-opus-5"])
         XCTAssertEqual(offeredChatModels(of: .anthropic).map(\.displayName), ["Claude Sonnet 5.5", "Claude Opus 5.5", "Claude Haiku 5.5",
                                                                 "Claude Sonnet 5", "Claude Opus 5"])
-        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol",
-                                                     "gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
-        XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-6 Luna", "GPT-6.1 Terra", "GPT-6.1 Sol",
-                                                       "GPT-6 Sol", "GPT-5.6 Luna", "GPT-5.6 Terra", "GPT-5.6 Sol"])
+        XCTAssertEqual(offeredChatModels(of: .openai).map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.2-sol",
+                                                     "gpt-6.1-sol", "gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
+        XCTAssertEqual(offeredChatModels(of: .openai).map(\.displayName), ["GPT-6 Luna", "GPT-6.1 Terra", "GPT-6.2 Sol",
+                                                       "GPT-6.1 Sol", "GPT-6 Sol", "GPT-5.6 Luna", "GPT-5.6 Terra", "GPT-5.6 Sol"])
     }
 
     /// A picker leads with the models to pick now; what a newer model replaced, and a
@@ -146,8 +147,8 @@ final class ChatModelCatalogTests: XCTestCase {
         XCTAssertEqual(anthropic.legacy.map(\.id), ["claude-sonnet-5", "claude-opus-5"])
 
         let openAI = modelPickerRuns(pickerChatModels(of: .openai, selected: "gpt-6-luna"), lifecycle: \.lifecycle)
-        XCTAssertEqual(openAI.current.map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.1-sol"])
-        XCTAssertEqual(openAI.legacy.map(\.id), ["gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
+        XCTAssertEqual(openAI.current.map(\.id), ["gpt-6-luna", "gpt-6.1-terra", "gpt-6.2-sol"])
+        XCTAssertEqual(openAI.legacy.map(\.id), ["gpt-6.1-sol", "gpt-6-sol", "gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"])
 
         let groq = modelPickerRuns(pickerChatModels(of: .groq, selected: "minimaxai/minimax-m2.7"), lifecycle: \.lifecycle)
         XCTAssertEqual(groq.current.map(\.id), ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"])
@@ -210,8 +211,10 @@ final class ChatRequestBodyTests: XCTestCase {
             assertBody(openAI(model), ["model": model, "messages": turns, "max_completion_tokens": 8192,
                                        "reasoning_effort": "none"], model)
         }
-        assertBody(openAI("gpt-6.1-sol"), ["model": "gpt-6.1-sol", "messages": turns, "max_completion_tokens": 8192,
-                                           "reasoning_effort": "low"], "gpt-6.1-sol")
+        for model in ["gpt-6.1-sol", "gpt-6.2-sol"] {
+            assertBody(openAI(model), ["model": model, "messages": turns, "max_completion_tokens": 8192,
+                                       "reasoning_effort": "low"], model)
+        }
     }
 
     func testAnthropicModels() {
