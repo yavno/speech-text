@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-18
+
 ### Added
 
 - **SpeechText can be installed with Homebrew**, as a cask: the command is in the README's Install section. It installs the same signed disk image, and the app still updates itself, so `brew upgrade` leaves it alone unless you pass `--greedy`.
@@ -212,5 +214,6 @@ First tagged as 1.0.0, renumbered on 2026-09-18: SpeechText is still in a closed
 - Webhook delivery: POST the transcribed text to a URL of your own, with optional Bearer token auth.
 - Automatic language detection that follows the active macOS keyboard layout.
 
-[Unreleased]: https://github.com/yavno/speech-text/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/yavno/speech-text/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/yavno/speech-text/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/yavno/speech-text/releases/tag/v0.10.0
