@@ -110,7 +110,7 @@ public func chatModelLine(_ model: ChatModelDescriptor) -> String {
     case "gpt-6.1-terra": localized("Balanced.")
     case "gpt-6.2-sol": localized("The flagship. Slower, and costs more.")
     case "gpt-6.1-sol": localized("The previous Sol, at the same price.")
-    case "gpt-6-sol": localized("An older Sol, at the same price.")
+    case "gpt-6-sol": localized("An older Sol.")
     case "gpt-5.6-luna": localized("The previous Luna. Costs about twice as much.")
     case "gpt-5.6-terra": localized("The previous Terra. Costs about twice as much.")
     case "gpt-5.6-sol": localized("The previous Sol. Costs twice as much.")
