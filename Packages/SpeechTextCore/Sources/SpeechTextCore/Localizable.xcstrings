@@ -1140,6 +1140,23 @@
         }
       }
     },
+    "An older Sol." : {
+      "comment" : "Settings › AI Rewrite and setup: a chat model's row, the line under its name. Sol is a model's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un Sol más antiguo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Старіша Sol."
+          }
+        }
+      }
+    },
     "Anthropic · Paid" : {
       "comment" : "Setup: under 'Claude' on the AI card. Anthropic is the vendor's name.",
       "localizations" : {

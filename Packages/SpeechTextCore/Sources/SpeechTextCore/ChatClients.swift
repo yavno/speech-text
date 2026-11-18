@@ -206,16 +206,25 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .openai, id: "gpt-6.1-terra", displayName: "GPT-6.1 Terra",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 1, cachedInput: 0.05, output: 5))),
-    // Rejects `none` ("Supported values are: 'low', 'medium', 'high', and 'xhigh'").
-    ChatModelDescriptor(provider: .openai, id: "gpt-6.1-sol", displayName: "GPT-6.1 Sol",
+    // Rejects `none` and `minimal` ("Supported values are: 'low', 'medium', 'high', and
+    // 'xhigh'") and `max_tokens`, and kept `<<mode:NAME>>` on line 1, in live calls on
+    // 2026-11-18; 1.2–1.4 s a short clean-up at `low` that day, against 1.6–2.2 s for 6.1
+    // Sol. Price from OpenAI's pricing page that day.
+    ChatModelDescriptor(provider: .openai, id: "gpt-6.2-sol", displayName: "GPT-6.2 Sol",
                         reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 2, cachedInput: 0.10, output: 10))),
+    // Superseded 2026-11-18 by 6.2 Sol, at the same price and not deprecated on OpenAI's
+    // pages that day. Rejects `none` like it.
+    ChatModelDescriptor(provider: .openai, id: "gpt-6.1-sol", displayName: "GPT-6.1 Sol",
+                        reasoningEffort: "low", reasoningOutput: .unchanged, refusalFallbacks: false,
+                        price: .listed(.perMillion(input: 2, cachedInput: 0.10, output: 10)),
+                        lifecycle: .superseded(by: "gpt-6.2-sol")),
     // Superseded 2026-11-01, each by the newest model of its tier (none of them is
     // deprecated on OpenAI's pages that day): offered, under Legacy models, with Switch.
     ChatModelDescriptor(provider: .openai, id: "gpt-6-sol", displayName: "GPT-6 Sol",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 2, cachedInput: 0.20, output: 10)),
-                        lifecycle: .superseded(by: "gpt-6.1-sol")),
+                        lifecycle: .superseded(by: "gpt-6.2-sol")),
     ChatModelDescriptor(provider: .openai, id: "gpt-5.6-luna", displayName: "GPT-5.6 Luna",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 0.20, cachedInput: 0.02, output: 1.20)),
@@ -227,7 +236,7 @@ public let chatModelCatalog: [ChatModelDescriptor] = [
     ChatModelDescriptor(provider: .openai, id: "gpt-5.6-sol", displayName: "GPT-5.6 Sol",
                         reasoningEffort: "none", reasoningOutput: .unchanged, refusalFallbacks: false,
                         price: .listed(.perMillion(input: 4, cachedInput: 0.40, output: 20)),
-                        lifecycle: .superseded(by: "gpt-6.1-sol")),
+                        lifecycle: .superseded(by: "gpt-6.2-sol")),
 ] + localChatModels.map { local in
     // No switches: reasoning is the template's business (`ChatTemplates`), not a request's.
     ChatModelDescriptor(provider: .local, id: local.id, displayName: local.displayName,

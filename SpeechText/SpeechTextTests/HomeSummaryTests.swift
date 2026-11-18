@@ -245,6 +245,7 @@ final class ListPriceTests: XCTestCase {
         "openai/gpt-6-sol": (2, 0.20, 10),
         "openai/gpt-6.1-terra": (1, 0.05, 5),
         "openai/gpt-6.1-sol": (2, 0.10, 10),
+        "openai/gpt-6.2-sol": (2, 0.10, 10),
     ]
 
     func testEverySpeechModelIsPricedFreeOrSaysItIsNot() {
