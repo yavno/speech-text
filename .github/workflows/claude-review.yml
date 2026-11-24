@@ -118,6 +118,7 @@ jobs:
             --jq '.[] | select(.body != "") | {author: .user.login, body}' > "$CONTEXT/reviews.jsonl"
 
       - name: Review
+        id: review
         uses: anthropics/claude-code-action@cd8af988640c832b7cb2b0fb33619d53dd1dc7e2 # v1.0.270
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -139,3 +140,14 @@ jobs:
           claude_args: |
             --model claude-opus-5-5
             --allowedTools "Read,Grep,Glob,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*)"
+
+      # The action exits green without reviewing when this file differs from the one
+      # on the default branch (seen on the pull request that added it, 2026-11-24): it
+      # will not hand its token to a workflow a pull request has changed. A green job
+      # is what tells the author the review is over, and what the next run takes as
+      # the last reviewed commit, so a review that did not run fails here instead.
+      - name: Fail if the review did not run
+        if: steps.review.outputs.conclusion != 'success'
+        run: |
+          echo "::error::Claude did not review this commit (conclusion: '${{ steps.review.outputs.conclusion }}'). A pull request that changes this workflow is not reviewed until the change is on main."
+          exit 1

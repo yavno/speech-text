@@ -100,7 +100,8 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
         `CodeRabbit` check is not enough: it is also green for a review skipped or rate
         limited;
       - the `Claude review` check has concluded `success` (a fork's pull request skips
-        it);
+        it, and one that changes `claude-review.yml` fails it at "Fail if the review
+        did not run": nothing was reviewed, so it is not waited for);
       - the local reviewer has handed back its result for this head;
       - every finding is answered, and Tests, Swift lint and Checks have passed or were
         skipped by CI's Changes job.
