@@ -40,6 +40,16 @@ reviews:
         start, `permissions` wider than the job needs (the default is none or
         read-only), and an action not pinned to a full commit SHA with its version in a
         comment, as the existing steps do.
+        One exception to the secret rule, decided by the maintainer: claude-review.yml
+        gives CLAUDE_CODE_OAUTH_TOKEN to a `pull_request` job. That is allowed only
+        while the job keeps all of these: it is skipped unless the head branch is in
+        this repository (forks get no secrets, and a branch here needs write access);
+        it runs on a GitHub-hosted runner; it never runs the pull request's code (no
+        build, test or script from the head checkout, and Claude starts in the base
+        checkout so the head's .claude/ settings and hooks are not loaded); and Claude's
+        allowed tools stay read-only plus posting comments. Do not flag the token
+        while those hold; flag any change that breaks one of them, and any other job
+        that is given a secret.
     - path: "SpeechText/SpeechText/**/*.swift"
       instructions: >-
         Words the user reads go through the String Catalog
