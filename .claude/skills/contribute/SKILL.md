@@ -98,7 +98,11 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
       - the summary of the `CodeRabbit` check starts with `Result: Success - Review
         completed`, and its summary comment does not say "Reviews paused". A green
         `CodeRabbit` check is not enough: it is also green for a review skipped or rate
-        limited;
+        limited. A summary that starts `Result: Rate limited` is not waited for: the
+        allowance is one review an hour for the whole repository ("up to 1 included
+        review per hour" in CodeRabbit's review info, #269 and #274, 2026-11-24), so a
+        round, even a first one, often finds it used up. Do not ask for the review again; report CodeRabbit as rate limited on
+        that commit and let the other reviewers' results decide;
       - the `Claude review` check has concluded `success` (a draft or a fork's pull
         request skips it, and one that changes `claude-review.yml` fails it at "Fail
         if the review did not run": nothing was reviewed, so it is not waited for);
