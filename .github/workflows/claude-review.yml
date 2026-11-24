@@ -119,7 +119,7 @@ jobs:
 
       - name: Review
         id: review
-        uses: anthropics/claude-code-action@cd8af988640c832b7cb2b0fb33619d53dd1dc7e2 # v1.0.270
+        uses: anthropics/claude-code-action@9eb012b6d0900c2b9eede65ee1758cec4d2973e9 # v1.0.270
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |

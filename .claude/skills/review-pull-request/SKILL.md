@@ -29,7 +29,8 @@ The `ci` reviewer finds them in files the workflow prepared (its prompt names th
 gh pr view <N> --repo yavno/speech-text --json title,body,author,headRefOid,baseRefOid
 git fetch origin pull/<N>/head && git diff <since>..FETCH_HEAD   # or $(git merge-base origin/main FETCH_HEAD)..FETCH_HEAD
 gh api graphql -F number=<N> -f query='query($number: Int!) { repository(owner: "yavno", name: "speech-text") { pullRequest(number: $number) { reviewThreads(first: 100) { nodes { isResolved isOutdated path line comments(first: 50) { nodes { author { login } body } } } } } } }'
-gh api "repos/yavno/speech-text/issues/<N>/comments" --jq '.[] | {author: .user.login, body}'
+gh api --paginate "repos/yavno/speech-text/issues/<N>/comments" --jq '.[] | {author: .user.login, body}'
+gh api --paginate "repos/yavno/speech-text/pulls/<N>/reviews" --jq '.[] | select(.body != "") | {author: .user.login, state, body}'
 ```
 
 ## Review
