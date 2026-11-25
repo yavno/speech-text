@@ -79,7 +79,7 @@ public struct FocusContext: Codable, Equatable, Sendable {
         if context.kind == .terminal {
             let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
             context.terminalFocus = reading.focus
-            context.terminalProgram = clean(reading.program)
+            if !isSecureField { context.terminalProgram = clean(reading.program) }
         }
         if !isSecureField {
             context.windowTitle = clean(windowTitle)

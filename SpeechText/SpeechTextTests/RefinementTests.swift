@@ -731,6 +731,7 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertNil(titled("hskv — vlad@yavno-main: ~ — 80×24", [["ssh"]]), "a name the processes do not have")
         XCTAssertNil(titled("hskv — claude — 80×24", [["ssh"]]), "a remote host may write any word")
         XCTAssertNil(titled("hskv — claude — 80×24", []))
+        XCTAssertNil(titled("hskv — -zsh ▸ ssh — 80×24", [["zsh", "ssh"]]), "a remote host behind the shell")
 
         let context = FocusContext.capture(appName: "cmux", bundleID: "com.cmuxterm.app", windowTitle: "Portfolio agent",
                                            fieldLabels: [], isSecureField: false, foreground: [["claude"]])
@@ -738,6 +739,9 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertEqual(context?.summary, "cmux — claude")
         XCTAssertTrue(context?.promptBlock.contains("program: claude") == true)
         XCTAssertFalse(context?.promptBlock.contains("Portfolio") == true, "the title still stays out")
+        let password = FocusContext.capture(appName: "cmux", bundleID: "com.cmuxterm.app", windowTitle: nil,
+                                            fieldLabels: [], isSecureField: true, foreground: [["sudo"]])
+        XCTAssertNil(password?.terminalProgram, "a secure field keeps only the app's name")
         XCTAssertNil(FocusContext.capture(appName: "Slack", bundleID: "com.tinyspeck.slackmacgap", windowTitle: nil,
                                           fieldLabels: [], isSecureField: false, foreground: [["claude"]])?.terminalProgram)
     }
