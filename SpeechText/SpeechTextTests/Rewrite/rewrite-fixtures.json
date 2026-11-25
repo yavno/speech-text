@@ -831,7 +831,8 @@
       "appName": "Terminal",
       "bundleID": "com.apple.Terminal",
       "windowTitle": "speech-text — Claude Code — claude — 120×40",
-      "terminalFocus": "program"
+      "terminalFocus": "program",
+      "terminalProgram": "claude"
     },
     "modes": [
       "Clean-up",
