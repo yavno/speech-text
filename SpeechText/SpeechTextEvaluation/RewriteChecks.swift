@@ -29,6 +29,7 @@ struct RewriteFixture: Codable, Sendable {
         var windowTitle: String?
         var fieldLabel: String?
         var terminalFocus: TerminalFocus?
+        var terminalProgram: String?
     }
 
     /// A reply written by hand, with whether the text checks must pass it.

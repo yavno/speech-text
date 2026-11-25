@@ -424,7 +424,7 @@ struct PasteService {
     }
 
     /// Every process, from one sysctl. Names and process groups only, and they stay on this
-    /// Mac: what is sent is at most which rule `RewriteModes` used.
+    /// Mac: what is sent is which rule `RewriteModes` used and the one program in front.
     private static func processTable() -> [TerminalFocus.Process] {
         var query = [CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0]
         var size = 0

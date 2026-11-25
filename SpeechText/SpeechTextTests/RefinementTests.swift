@@ -700,6 +700,50 @@ final class RewriteModesTests: XCTestCase {
                      entry(21, parent: 10, group: 21, foreground: 21, device: 6, "zsh"),
                      entry(30, parent: 1, group: 30, foreground: 30, device: 7, "vim")]
         XCTAssertEqual(TerminalFocus.foregroundJobs(of: 10, in: table), [["claude"], ["zsh"]])
+
+        // What an agent starts joins its group, and may be listed before it.
+        let agent = [entry(10, parent: 1, group: 10, foreground: 0, device: nil, "cmux"),
+                     entry(12, parent: 10, group: 12, foreground: 20, device: 5, "zsh"),
+                     entry(19, parent: 20, group: 20, foreground: 20, device: 5, "rg"),
+                     entry(20, parent: 12, group: 20, foreground: 20, device: 5, "claude")]
+        XCTAssertEqual(TerminalFocus.foregroundJobs(of: 10, in: agent), [["claude", "rg"]])
+    }
+
+    /// #275: the program's name where the focus is `.program`, and nowhere else.
+    func testTheProgramInFrontIsNamed() {
+        func program(_ foreground: [[String]], title: String? = nil, app: String = "com.cmuxterm.app") -> String? {
+            TerminalFocus.reading(bundleID: app, windowTitle: title, foreground: foreground).program
+        }
+        XCTAssertEqual(program([["claude", "rg"]]), "claude")
+        XCTAssertEqual(program([["/Users/x/.local/bin/claude"]]), "claude")
+        XCTAssertEqual(program([["zsh", "op"]]), "op", "a shell in front of its child")
+        XCTAssertNil(program([["zsh"]]))
+        XCTAssertNil(program([["ssh"]]))
+        XCTAssertNil(program([["zsh"], ["claude"]]), "which tab is in front is not known")
+
+        func titled(_ title: String) -> String? { program([], title: title, app: "com.apple.Terminal") }
+        XCTAssertEqual(titled("hskv — 3 awaiting input · claude agents — claude ▸ gh — 80×24"), "claude")
+        XCTAssertEqual(titled("hskv — -zsh ▸ op — 80×24"), "op")
+        XCTAssertEqual(titled("hskv — python3 -q — python3 — Python -q — 80×24"), "Python")
+        XCTAssertNil(titled("hskv — hskv@Vlad-DO-Laptop — ~ — -zsh — 80×24"))
+        XCTAssertNil(titled("hskv — vlad@yavno-main: ~ — ssh vlad@yavno — 80×24"))
+
+        let context = FocusContext.capture(appName: "cmux", bundleID: "com.cmuxterm.app", windowTitle: "Portfolio agent",
+                                           fieldLabels: [], isSecureField: false, foreground: [["claude"]])
+        XCTAssertEqual(context?.terminalProgram, "claude")
+        XCTAssertEqual(context?.summary, "cmux — claude")
+        XCTAssertTrue(context?.promptBlock.contains("program: claude") == true)
+        XCTAssertFalse(context?.promptBlock.contains("Portfolio") == true, "the title still stays out")
+        XCTAssertNil(FocusContext.capture(appName: "Slack", bundleID: "com.tinyspeck.slackmacgap", windowTitle: nil,
+                                          fieldLabels: [], isSecureField: false, foreground: [["claude"]])?.terminalProgram)
+    }
+
+    /// A record from before #275 reads with no program.
+    func testAContextStoredBeforeTheProgramDecodes() throws {
+        let stored = Data(#"{"appName":"cmux","bundleID":"com.cmuxterm.app","terminalFocus":"program"}"#.utf8)
+        let context = try JSONDecoder().decode(FocusContext.self, from: stored)
+        XCTAssertNil(context.terminalProgram)
+        XCTAssertEqual(context.terminalFocus, .program)
     }
 
     /// An agent pane's prompt box in an editor is still a prompt in `<context>`: the AI

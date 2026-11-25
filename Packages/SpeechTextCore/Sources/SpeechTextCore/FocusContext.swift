@@ -24,18 +24,24 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// In a terminal, what the cursor was talking to. Stored, unlike `kind`: a retry from
     /// History cannot look at the terminal again.
     public var terminalFocus: TerminalFocus?
+    /// The program there, where `terminalFocus` is `.program`: its process name, never its
+    /// arguments (`TerminalFocus.reading`). Read off this Mac, not off the title a remote
+    /// host can write, so it is told to the model beside the app (#275).
+    public var terminalProgram: String?
 
     /// Long enough for a mail subject or a document path, short enough that a window
     /// title cannot turn into a second transcript.
     static let maxValueLength = 160
 
     public init(appName: String? = nil, bundleID: String? = nil,
-         windowTitle: String? = nil, fieldLabel: String? = nil, terminalFocus: TerminalFocus? = nil) {
+         windowTitle: String? = nil, fieldLabel: String? = nil, terminalFocus: TerminalFocus? = nil,
+         terminalProgram: String? = nil) {
         self.appName = Self.clean(appName)
         self.bundleID = Self.clean(bundleID)
         self.windowTitle = Self.clean(windowTitle)
         self.fieldLabel = Self.clean(fieldLabel)
         self.terminalFocus = terminalFocus
+        self.terminalProgram = Self.clean(terminalProgram)
     }
 
     /// Apps whose windows are nobody's business but the user's. Nothing is read from
@@ -70,7 +76,9 @@ public struct FocusContext: Codable, Equatable, Sendable {
 
         var context = FocusContext(appName: appName, bundleID: bundleID)
         if context.kind == .terminal {
-            context.terminalFocus = TerminalFocus.read(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
+            let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
+            context.terminalFocus = reading.focus
+            context.terminalProgram = clean(reading.program)
         }
         if !isSecureField {
             context.windowTitle = clean(windowTitle)
@@ -225,19 +233,21 @@ public struct FocusContext: Codable, Equatable, Sendable {
         // A terminal's title can be set by a remote host, and text from there has no place
         // beside a prompt that may write a command.
         if let windowTitle, kind != .terminal { lines.append("window: \(windowTitle)") }
+        if let terminalProgram { lines.append("program: \(terminalProgram)") }
         if let fieldLabel { lines.append("field: \(fieldLabel)") }
         // Ours, not read off the screen, so it is a fact the model may lean on.
         if kind == .aiPrompt { lines.append("kind: a prompt to an AI assistant") }
         return "<context>\n\(lines.joined(separator: "\n"))\n</context>"
     }
 
-    /// One line for History and the Debug Log: "Slack — #backend". The app's own name is
+    /// One line for History and the Debug Log: "Slack — #backend", "cmux — claude" for a
+    /// program in a terminal, whose title says less. The app's own name is
     /// said once: a window titled just that ("Claude") adds nothing, and the browsers'
     /// "Page - Google Chrome – Profile" keeps only the page. The model is still told the
     /// title as the app wrote it (`promptBlock`); this is only how it is shown.
     public var summary: String {
         let app = appName ?? bundleID
-        let place = [windowTitle, fieldLabel].lazy
+        let place = [terminalProgram, windowTitle, fieldLabel].lazy
             .compactMap { $0.flatMap { Self.withoutAppName($0, app: app) } }
             .first
         return [app, place].compactMap { $0 }.joined(separator: " — ")
