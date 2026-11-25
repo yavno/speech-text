@@ -36,7 +36,7 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 
 - **What was said:** `transcript`, or for the Edit shortcut (`"kind": "edit"`) a `selection` and an optional `instruction`.
 - **How clean:** `noise` — `dirty` for a transcript written the way a speech engine really writes one (misheard and transliterated words, no punctuation, a word cut in two), `clean` (the default) for text as a person types it. The summary counts the two apart.
-- **Where:** `context` (app, bundle ID, window, field, and in a terminal `terminalFocus`) and `vocabulary` (the Dictionary's words).
+- **Where:** `context` (app, bundle ID, window, field, and in a terminal `terminalFocus` and `terminalProgram`) and `vocabulary` (the Dictionary's words).
 - **What a right reply looks like**, in two kinds kept apart:
   - **Text checks**, which hold whatever the prompt:
     - `language`: `uk`, `any`, or a language written in Latin script;

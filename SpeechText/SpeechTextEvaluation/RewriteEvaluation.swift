@@ -734,14 +734,16 @@ enum RewriteEvaluation {
 
     static func focusContext(_ fixture: RewriteFixture) -> FocusContext? {
         fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus,
+                         terminalProgram: $0.terminalProgram)
         }
     }
 
     /// The system prompt and user message `TextRefinementService` would send.
     static func messages(_ fixture: RewriteFixture, setup: Setup, route: String? = nil) -> (String, String) {
         let context = fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus,
+                         terminalProgram: $0.terminalProgram)
         }
         let vocabulary = Vocabulary.promptBlock((fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) })
         if fixture.isEdit {
@@ -820,7 +822,8 @@ enum RewriteEvaluation {
         var blocks: [String] = []
         if let context = fixture.context {
             let focus = FocusContext(appName: context.appName, bundleID: context.bundleID,
-                                     windowTitle: context.windowTitle, fieldLabel: context.fieldLabel, terminalFocus: context.terminalFocus)
+                                     windowTitle: context.windowTitle, fieldLabel: context.fieldLabel, terminalFocus: context.terminalFocus,
+                                     terminalProgram: context.terminalProgram)
             if !focus.isEmpty { blocks.append(focus.promptBlock) }
             switch context.terminalFocus {
             case .shellPrompt: blocks.append("<terminal>the cursor is at a shell prompt</terminal>")
@@ -1041,7 +1044,8 @@ enum RewriteEvaluation {
 
         guard let fixture = fixtures.first(where: { !$0.isEdit }) ?? fixtures.first else { return "no fixture" }
         let context = fixture.context.map {
-            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus)
+            FocusContext(appName: $0.appName, bundleID: $0.bundleID, windowTitle: $0.windowTitle, fieldLabel: $0.fieldLabel, terminalFocus: $0.terminalFocus,
+                         terminalProgram: $0.terminalProgram)
         }
         let user = TextRefinementService.userMessage(transcript: fixture.transcript ?? "", context: context)
         var kwargs: [String: Any] = [:]
