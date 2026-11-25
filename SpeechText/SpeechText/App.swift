@@ -247,12 +247,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         _ = UpdateChecker.shared
 
         // Set up hotkeys
-        appState.hotkeyManager.onDictationKey = { [weak self] key, isDown in
+        appState.hotkeyManager.onDictationKey = { [weak self] key, isDown, time in
             DispatchQueue.main.async {
                 if isDown {
-                    self?.appState.hotkeyPressed(key)
+                    self?.appState.hotkeyPressed(key, at: time)
                 } else {
-                    self?.appState.hotkeyReleased(key)
+                    self?.appState.hotkeyReleased(key, at: time)
                 }
                 self?.updateIcon()
                 self?.rebuildMenu()
@@ -263,12 +263,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self?.updateIcon()
             self?.rebuildMenu()
         }
-        appState.hotkeyManager.onEditKey = { [weak self] isDown in
+        appState.hotkeyManager.onEditKey = { [weak self] isDown, time in
             DispatchQueue.main.async {
                 if isDown {
-                    self?.appState.editHotkeyPressed()
+                    self?.appState.editHotkeyPressed(at: time)
                 } else {
-                    self?.appState.editHotkeyReleased()
+                    self?.appState.editHotkeyReleased(at: time)
                 }
                 self?.updateIcon()
             }
@@ -903,8 +903,8 @@ final class AppState {
         key == .ai && !TextRefinementService.isConfigured ? .inline : key
     }
 
-    /// A dictation shortcut went down.
-    func hotkeyPressed(_ pressed: DictationHotkey) {
+    /// A dictation shortcut went down, at `time` (`HotkeyManager.onDictationKey`).
+    func hotkeyPressed(_ pressed: DictationHotkey, at time: TimeInterval) {
         // An edit's recording is an instruction, not a dictation: there is nothing for
         // a dictation shortcut to switch or stop, and the likeliest meaning of the press
         // is "not this, I want to dictate". It cancels the edit and does nothing more.
@@ -920,8 +920,8 @@ final class AppState {
         let key = effectiveKey(pressed)
         hotkeyGesture.holdToTalk = UserDefaults.standard.bool(forKey: SettingsKeys.holdToTalk)
         let phase = dictationPhase
-        let action = hotkeyGesture.press(key, in: phase, at: ProcessInfo.processInfo.systemUptime)
-        dlog("Hotkey", "\(key) pressed in \(phase) → \(action)")
+        let action = hotkeyGesture.press(key, in: phase, at: time)
+        dlog("Hotkey", "\(key) pressed in \(phase)\(Self.lateness(of: time)) → \(action)")
         perform(action)
         if case .start = action, hotkeyGesture.owner != nil {
             beginHoldTip(pressed == .ai ? .ai : .inline, canSwitch: TextRefinementService.isConfigured)
@@ -932,17 +932,24 @@ final class AppState {
 
     /// A dictation shortcut came back up. Only acts with hold-to-talk on, and only for the
     /// shortcut that started the dictation.
-    func hotkeyReleased(_ released: DictationHotkey) {
+    func hotkeyReleased(_ released: DictationHotkey, at time: TimeInterval) {
         guard !isEditMode else { return }
         let key = effectiveKey(released)
         let phase = dictationPhase
-        let action = hotkeyGesture.release(key, in: phase, at: ProcessInfo.processInfo.systemUptime)
-        dlog("Hotkey", "\(key) released in \(phase) → \(action)")
+        let action = hotkeyGesture.release(key, in: phase, at: time)
+        dlog("Hotkey", "\(key) released in \(phase)\(Self.lateness(of: time)) → \(action)")
         perform(action)
         if hotkeyGesture.owner == nil { endHoldTip() }
         if hotkeyGesture.awaitsSecondTap {
             scheduleDictationTapTimer()
         }
+    }
+
+    /// How long after the key moved its event reached the gesture, for the log, when that
+    /// is long enough to matter.
+    private static func lateness(of time: TimeInterval) -> String {
+        let late = Int((ProcessInfo.processInfo.systemUptime - time) * 1000)
+        return late >= 50 ? " (\(late) ms late)" : ""
     }
 
     /// Cancels a tapped dictation unless a second tap locks it on first.
@@ -1699,8 +1706,8 @@ final class AppState {
         return .busy
     }
 
-    /// The Edit shortcut went down.
-    func editHotkeyPressed() {
+    /// The Edit shortcut went down, at `time`.
+    func editHotkeyPressed(at time: TimeInterval) {
         guard isEditMode || dictationPhase == .idle else {
             dlog("Hotkey", "edit pressed during a dictation → ignored")
             return
@@ -1709,8 +1716,8 @@ final class AppState {
             editGesture.holdToTalk = UserDefaults.standard.bool(forKey: SettingsKeys.holdToTalk)
         }
         let phase = editPhase
-        let action = editGesture.press(in: phase, at: ProcessInfo.processInfo.systemUptime)
-        dlog("Hotkey", "edit pressed in \(phase) → \(action)")
+        let action = editGesture.press(in: phase, at: time)
+        dlog("Hotkey", "edit pressed in \(phase)\(Self.lateness(of: time)) → \(action)")
         perform(action)
         if case .start = action, editGesture.isHeld, isEditMode {
             beginHoldTip(.edit, canSwitch: false)
@@ -1719,12 +1726,12 @@ final class AppState {
         }
     }
 
-    /// The Edit shortcut came back up.
-    func editHotkeyReleased() {
+    /// The Edit shortcut came back up, at `time`.
+    func editHotkeyReleased(at time: TimeInterval) {
         guard isEditMode else { return }
         let phase = editPhase
-        let action = editGesture.release(in: phase, at: ProcessInfo.processInfo.systemUptime)
-        dlog("Hotkey", "edit released in \(phase) → \(action)")
+        let action = editGesture.release(in: phase, at: time)
+        dlog("Hotkey", "edit released in \(phase)\(Self.lateness(of: time)) → \(action)")
         perform(action)
         if !editGesture.isHeld { endHoldTip() }
         if editGesture.awaitsSecondTap {
