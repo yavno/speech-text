@@ -171,28 +171,13 @@ final class FocusContextTests: XCTestCase {
     /// Checked apps only (#111); see the comment on `markdownBundleIDPrefixes` for why
     /// the AI apps' own prompt boxes are not here.
     func testMarkdownRendersInTheListedAppsAndNoOthers() {
-        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code", "com.tinyspeck.slackmacgap", "notion.id"] {
+        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.tinyspeck.slackmacgap", "notion.id"] {
             XCTAssertTrue(FocusContext(bundleID: id).rendersMarkdown, id)
         }
-        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
+        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.t3tools.t3code", "com.apple.Safari"] {
             XCTAssertFalse(FocusContext(bundleID: id).rendersMarkdown, id)
         }
         XCTAssertFalse(FocusContext(appName: "Obsidian").rendersMarkdown, "known by its ID, not a name")
-    }
-
-    func testAnEditorRendersMarkdownOnlyWhereItsWindowNamesAMarkdownFile() {
-        XCTAssertTrue(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "README.md — speech-text").rendersMarkdown)
-        XCTAssertFalse(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "App.swift — speech-text").rendersMarkdown)
-        let cursor = "com.todesktop.230313mzl4w4u92"
-        for title in ["README.md — speech-text", "● notes.md - Project", "CHANGES.MARKDOWN", "docs/plan.md (Working Tree)"] {
-            XCTAssertTrue(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        for title in ["App.swift — speech-text", "cmd.mdx", ".md", "Markdown guide", "md"] {
-            XCTAssertFalse(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        XCTAssertFalse(FocusContext(bundleID: cursor).rendersMarkdown, "no title")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.TextEdit", windowTitle: "notes.md").rendersMarkdown, "not an editor")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.Terminal", windowTitle: "vim notes.md").rendersMarkdown, "a terminal")
     }
 
     func testTheMarkdownFactIsDerivedNotStored() throws {
