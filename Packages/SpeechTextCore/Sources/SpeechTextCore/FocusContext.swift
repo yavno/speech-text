@@ -25,8 +25,9 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// History cannot look at the terminal again.
     public var terminalFocus: TerminalFocus?
     /// The program there, where `terminalFocus` is `.program`: its process name, never its
-    /// arguments (`TerminalFocus.reading`). Read off this Mac, not off the title a remote
-    /// host can write, so it is told to the model beside the app (#275).
+    /// arguments (`TerminalFocus.reading`). Read off this Mac's process table, which a
+    /// title a remote host writes cannot change, so it is told to the model beside the app
+    /// (#275).
     public var terminalProgram: String?
 
     /// Long enough for a mail subject or a document path, short enough that a window

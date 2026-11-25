@@ -721,12 +721,16 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertNil(program([["ssh"]]))
         XCTAssertNil(program([["zsh"], ["claude"]]), "which tab is in front is not known")
 
-        func titled(_ title: String) -> String? { program([], title: title, app: "com.apple.Terminal") }
-        XCTAssertEqual(titled("hskv — 3 awaiting input · claude agents — claude ▸ gh — 80×24"), "claude")
-        XCTAssertEqual(titled("hskv — -zsh ▸ op — 80×24"), "op")
-        XCTAssertEqual(titled("hskv — python3 -q — python3 — Python -q — 80×24"), "Python")
-        XCTAssertNil(titled("hskv — hskv@Vlad-DO-Laptop — ~ — -zsh — 80×24"))
-        XCTAssertNil(titled("hskv — vlad@yavno-main: ~ — ssh vlad@yavno — 80×24"))
+        func titled(_ title: String, _ foreground: [[String]]) -> String? { program(foreground, title: title, app: "com.apple.Terminal") }
+        XCTAssertEqual(titled("hskv — 3 awaiting input · claude agents — claude ▸ gh — 80×24", [["claude", "gh"]]), "claude")
+        XCTAssertEqual(titled("hskv — -zsh ▸ op — 80×24", [["zsh", "op"]]), "op")
+        XCTAssertEqual(titled("hskv — python3 -q — python3 — Python -q — 80×24", [["Python"]]), "Python")
+        XCTAssertNil(titled("hskv — hskv@Vlad-DO-Laptop — ~ — -zsh — 80×24", [["zsh"]]))
+        XCTAssertNil(titled("hskv — vlad@yavno-main: ~ — ssh vlad@yavno — 80×24", [["ssh"]]))
+        // A profile with no job leaves the title to the remote host.
+        XCTAssertNil(titled("hskv — vlad@yavno-main: ~ — 80×24", [["ssh"]]), "a name the processes do not have")
+        XCTAssertNil(titled("hskv — claude — 80×24", [["ssh"]]), "a remote host may write any word")
+        XCTAssertNil(titled("hskv — claude — 80×24", []))
 
         let context = FocusContext.capture(appName: "cmux", bundleID: "com.cmuxterm.app", windowTitle: "Portfolio agent",
                                            fieldLabels: [], isSecureField: false, foreground: [["claude"]])

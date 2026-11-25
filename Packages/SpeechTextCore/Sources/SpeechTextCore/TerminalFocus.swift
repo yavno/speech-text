@@ -82,7 +82,15 @@ public enum TerminalFocus: String, Codable, Sendable {
             // The end of a title is Terminal's only where its profile shows the job, so a
             // shell the processes do not have is not believed.
             let aShellIsThere = foreground.isEmpty || foreground.contains { !$0.isEmpty && $0.map(commandName).allSatisfy(shells.contains) }
-            if named != .shellPrompt || aShellIsThere { return (named, named == .program ? program(ofJob: job) : nil) }
+            if named != .shellPrompt || aShellIsThere {
+                // Before the size the title is anyone's when the profile shows no job — a
+                // remote shell's "user@host: ~" — so a name is kept only where the processes
+                // have it and nothing in front of them hides a remote host.
+                let names = foreground.joined().map(commandName)
+                let program = named == .program && !names.contains(where: opaque.contains)
+                    ? program(ofJob: job).flatMap { names.contains($0) ? $0 : nil } : nil
+                return (named, program)
+            }
         }
         let tabs = foreground.filter { !$0.isEmpty }.map { $0.map(commandName) }
         guard !tabs.isEmpty else { return (.unknown, nil) }
