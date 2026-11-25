@@ -827,6 +827,16 @@ final class DictationHotkeyGestureTests: XCTestCase {
         XCTAssertEqual(g.press(.inline, in: .recording(ai: false), at: 20), .stop)
     }
 
+    /// A start held the main thread, so the tap's release and the second press reached the
+    /// gesture late and 4 ms apart (2026-11-25). Timed by the keys, as `HotkeyManager`
+    /// times them, it is still a double tap, though the phase is read when they arrive.
+    func testADoubleTapThatWaitedForTheMainThreadStillLocks() {
+        var g = DictationHotkeyGesture(holdToTalk: true)
+        _ = g.press(.ai, in: .idle, at: 10)
+        XCTAssertEqual(g.release(.ai, in: .recording(ai: true), at: 10.15), .ignore)
+        XCTAssertEqual(g.press(.ai, in: .recording(ai: true), at: 10.25), .lock)
+    }
+
     func testASecondPressAfterTheWindowIsNotADoubleTap() {
         var g = DictationHotkeyGesture(holdToTalk: true)
         _ = g.press(.inline, in: .idle, at: 10)

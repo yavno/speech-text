@@ -47,13 +47,15 @@ final class HotkeyManager {
     /// instant stop — instead of reaching the menu item drawn with that shortcut.
     private var pauses = 0
 
-    /// A dictation shortcut went down (`true`) or came back up (`false`). Releases are
-    /// what hold-to-talk runs on; `AppState` decides whether one means anything.
-    var onDictationKey: ((DictationHotkey, Bool) -> Void)?
+    /// A dictation shortcut went down (`true`) or came back up (`false`), and when the key
+    /// moved (`systemUptime`'s clock). Releases are what hold-to-talk runs on; `AppState`
+    /// decides whether one means anything.
+    var onDictationKey: ((DictationHotkey, Bool, TimeInterval) -> Void)?
     var onRecordWindowToggle: (() -> Void)?
     /// The Edit shortcut went down (`true`) or came back up (`false`). Both matter: a
-    /// double press sends the selection with no instruction, and a hold is one.
-    var onEditKey: ((Bool) -> Void)?
+    /// double press sends the selection with no instruction, and a hold is one. With
+    /// when the key moved, as `onDictationKey`.
+    var onEditKey: ((Bool, TimeInterval) -> Void)?
     /// Bare ⎋, which exists only while `setEscapeShortcut(active: true)`.
     var onEscape: (() -> Void)?
     /// Whether fn's press for `action` goes through the moment fn goes down, or waits for
@@ -76,6 +78,12 @@ final class HotkeyManager {
 
     private static let signature: OSType = 0x56504852
 
+    /// When the key of the hotkey event Carbon is about to hand over moved: the NSEvent it
+    /// arrives as carries the keyboard's time, the Carbon event only when the app took it
+    /// off the queue (`hotkeyEventMonitor`).
+    private var hotkeyEventTime: (ref: Int, isDown: Bool, time: TimeInterval)?
+    private var hotkeyEventMonitor: Any?
+
     private nonisolated static func hotKeyID(_ action: ShortcutAction) -> UInt32 {
         switch action {
         case .inline: return 1
@@ -88,6 +96,7 @@ final class HotkeyManager {
     func start() {
         loadHotkeys()
         registerHotkeys()
+        watchHotkeyEventTimes()
 
         let center = NotificationCenter.default
         observers = [
@@ -117,6 +126,40 @@ final class HotkeyManager {
 
     func stop() {
         unregisterHotkeys()
+        if let hotkeyEventMonitor { NSEvent.removeMonitor(hotkeyEventMonitor) }
+        hotkeyEventMonitor = nil
+    }
+
+    /// Times taps by the key, not by when the main thread got to them. A start holds the
+    /// main thread (206 ms on 2026-11-25), and the release and the second press of a double
+    /// tap wait behind it: they reached the gesture 367 ms after the first press and 4 ms
+    /// apart, so the tap read as a hold, its release stopped the dictation, and the second
+    /// press cancelled it. `GetEventTime` is no help: measured the same day with a probe
+    /// whose main thread slept 0.4 s, a release posted at .507 read .808 there and .508 on
+    /// its NSEvent. Carbon's hotkeys reach the app as `.systemDefined` events — subtype 6
+    /// a press, 9 a release, `data1` the `EventHotKeyRef` — seen here just before Carbon's
+    /// handler runs for the same event.
+    private func watchHotkeyEventTimes() {
+        guard hotkeyEventMonitor == nil else { return }
+        hotkeyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .systemDefined) { [weak self] event in
+            let subtype = event.subtype.rawValue
+            if subtype == 6 || subtype == 9 {
+                let stamp = (ref: event.data1, isDown: subtype == 6, time: event.timestamp)
+                MainActor.assumeIsolated { self?.hotkeyEventTime = stamp }
+            }
+            return event
+        }
+    }
+
+    /// When the key behind the Carbon hotkey event in hand moved, or `fallback` — the Carbon
+    /// event's own time — if its NSEvent was not seen.
+    private func keyTime(of id: UInt32, isDown: Bool, fallback: TimeInterval) -> TimeInterval {
+        defer { hotkeyEventTime = nil }
+        let ref = id == Self.escapeHotKeyID ? escapeRef
+            : ShortcutAction.allCases.first(where: { Self.hotKeyID($0) == id }).flatMap { hotKeyRefs[$0] }
+        guard let stamp = hotkeyEventTime, let ref, stamp.ref == Int(bitPattern: UnsafeRawPointer(ref)),
+              stamp.isDown == isDown else { return fallback }
+        return stamp.time
     }
 
     private func loadHotkeys() {
@@ -164,19 +207,21 @@ final class HotkeyManager {
                 guard status == noErr else { return OSStatus(eventNotHandledErr) }
                 let id = hotKeyID.id
                 let isDown = GetEventKind(event) == UInt32(kEventHotKeyPressed)
-                let pressedAt = GetEventTime(event)
+                let fallback = GetEventTime(event)
+                // Carbon runs the application target's handlers on main.
+                let pressedAt = MainActor.assumeIsolated { mgr.keyTime(of: id, isDown: isDown, fallback: fallback) }
 
                 DispatchQueue.main.async {
                     // A shortcut that waited for the main thread was acted on late: a stop
                     // pressed while a start held the thread lands after the fact.
-                    let waited = GetCurrentEventTime() - pressedAt
+                    let waited = ProcessInfo.processInfo.systemUptime - pressedAt
                     if waited > 0.2 {
                         dlog("Hotkey", "⚠ shortcut \(id) \(isDown ? "press" : "release") reached the app \(Int(waited * 1000)) ms late — the main thread was busy", level: .notice)
                     }
                     if id == HotkeyManager.escapeHotKeyID {
                         if isDown { mgr.onEscape?() }
                     } else if let action = ShortcutAction.allCases.first(where: { HotkeyManager.hotKeyID($0) == id }) {
-                        mgr.deliver(action, isDown: isDown)
+                        mgr.deliver(action, isDown: isDown, at: pressedAt)
                     }
                 }
                 return noErr
@@ -218,14 +263,15 @@ final class HotkeyManager {
         if fnAction != nil { startFnMonitor() }
     }
 
-    /// The press or release of one of the app's shortcuts, from Carbon or from fn.
-    private func deliver(_ action: ShortcutAction, isDown: Bool) {
+    /// The press or release of one of the app's shortcuts, from Carbon or from fn, made at
+    /// `time`.
+    private func deliver(_ action: ShortcutAction, isDown: Bool, at time: TimeInterval) {
         HeldShortcuts.shared.set(action, isDown: isDown)
         switch action {
-        case .inline: onDictationKey?(.inline, isDown)
+        case .inline: onDictationKey?(.inline, isDown, time)
         case .recordWindow: if isDown { onRecordWindowToggle?() }
-        case .ai: onDictationKey?(.ai, isDown)
-        case .edit: onEditKey?(isDown)
+        case .ai: onDictationKey?(.ai, isDown, time)
+        case .edit: onEditKey?(isDown, time)
         }
     }
 
@@ -239,7 +285,10 @@ final class HotkeyManager {
         let flagsChanged: (NSEvent) -> Void = { [weak self] event in
             let keyCode = event.keyCode, isDown = event.modifierFlags.contains(.function)
             let withModifiers = !event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift])
-            MainActor.assumeIsolated { self?.fnChanged(keyCode: keyCode, isDown: isDown, withModifiers: withModifiers) }
+            let time = event.timestamp
+            MainActor.assumeIsolated {
+                self?.fnChanged(keyCode: keyCode, isDown: isDown, withModifiers: withModifiers, at: time)
+            }
         }
         if let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: flagsChanged) {
             fnMonitors.append(global)
@@ -264,7 +313,8 @@ final class HotkeyManager {
     /// fn pressed with ⌘⌥⌃⇧ already down and ignored (`FnKey.ignoresPressWithModifiers`).
     private var fnWithModifiers = false
 
-    private func fnChanged(keyCode: UInt16, isDown: Bool, withModifiers: Bool) {
+    /// `time`: when fn moved. A press held back to fn's release is delivered at the release's.
+    private func fnChanged(keyCode: UInt16, isDown: Bool, withModifiers: Bool, at time: TimeInterval) {
         guard keyCode == FnKey.keyCode, let action = fnAction else { return }
         let events: [FnKeyFilter.Event]
         if isDown {
@@ -285,7 +335,7 @@ final class HotkeyManager {
             if fnPressesAtOnce?(action) == true { fnFilter.dropDeferredPress() }
             events = fnFilter.fnUp()
         }
-        perform(events, for: action)
+        perform(events, for: action, at: time)
     }
 
     /// A listen-only tap at the HID level, from fn down to fn up. NSEvent's key-down
@@ -346,14 +396,15 @@ final class HotkeyManager {
         let pressed = KeyShortcut(keyCode: UInt32(keyCode),
                                   modifiers: NSEvent.ModifierFlags(rawValue: UInt(event.flags.rawValue)))
         guard !shortcuts.values.contains(pressed) else { return }
-        perform(fnFilter.otherKeyDown(at: ProcessInfo.processInfo.systemUptime), for: action)
+        let now = ProcessInfo.processInfo.systemUptime
+        perform(fnFilter.otherKeyDown(at: now), for: action, at: now)
     }
 
-    private func perform(_ events: [FnKeyFilter.Event], for action: ShortcutAction) {
+    private func perform(_ events: [FnKeyFilter.Event], for action: ShortcutAction, at time: TimeInterval) {
         for event in events {
             switch event {
-            case .press: deliver(action, isDown: true)
-            case .release: deliver(action, isDown: false)
+            case .press: deliver(action, isDown: true, at: time)
+            case .release: deliver(action, isDown: false, at: time)
             case .abort(let notify):
                 dlog("Hotkey", "fn went down with another key → \(action.title) taken back\(notify ? "" : " quietly")")
                 HeldShortcuts.shared.set(action, isDown: false)
