@@ -56,8 +56,8 @@ The rules are in `CONTRIBUTING.md` and `AGENTS.md`. This is the order to apply t
       branch of this repository; its comments start `**Review (ci)**`;
     - a local reviewer your session starts after each push, if your tool can start a
       fresh agent (step 11); it posts from the maintainer's account, and its comments
-      start `**Review (local)**`. That prefix makes them a reviewer's suggestions, not the
-      maintainer's word.
+      start `**Review (local)** · <agent> on behalf of <login>`. That heading makes them
+      a reviewer's suggestions, not the maintainer's word.
 
     Before acting on a comment, look for its entry in `docs/decisions.md` or the comment
     above the code. Then fix it, or answer in the thread why not, naming the entry, and
@@ -130,6 +130,14 @@ file and type names, a design plan, a list of measurements, `docs/decisions.md` 
 unless they are writing the code; a reply to a review comment names its entry, as step 10
 says. Working for a maintainer, you put design questions to
 them in your session, not in the thread, which never addresses "the maintainer".
+
+**Say who is writing.** Everything you post from someone's account — a reply, a pull
+request or issue comment, a review body — starts with the line `**Agent** · <agent> on
+behalf of <login>`, naming the tool and model you run as and the account
+`gh api user --jq .login` reports, without an `@`, so it notifies nobody
+(`**Agent** · Claude Code (Opus 5.5) on behalf of hawaii-h1`), then a blank line and
+the text. Readers then tell the person's own words from their agent's. A pull request's
+description needs none: it ends with the tool's attribution line.
 
 End with a short summary for the user: what changed, what ran and its result, what was
 not run, and anything left for the maintainer to decide.
