@@ -66,8 +66,13 @@ gh api --paginate "repos/yavno/speech-text/pulls/<N>/reviews" --jq '.[] | select
 
 ## Post
 
-Each finding is one inline comment on the line in the head commit it is about. Begin the
-first line with `**Review (<reviewer>)**`, then the problem in one sentence. After it:
+Each finding is one inline comment on the line in the head commit it is about. Its first
+line is the heading: `**Review (ci)**`, or for `local`, which posts from a person's
+account, `**Review (local)** · <agent> on behalf of <login>`, naming the tool and model
+you run as and the account `gh api user --jq .login` reports, without an `@`, so it
+notifies nobody (`**Review (local)** · Codex (GPT-5.5) on behalf of hawaii-h1`). The
+comments then read as that agent's suggestions, not the person's word. Below it, the problem
+in one sentence. After it:
 what input or state breaks it and what the user then sees, the rule or entry it breaks
 when there is one, and the fix in a sentence or a short suggestion block (only when
 committing the block fixes it entirely).
@@ -77,11 +82,11 @@ committing the block fixes it entirely).
 - `local`: one review holding all the comments, as event `COMMENT`, on the head commit:
   ```bash
   gh api repos/yavno/speech-text/pulls/<N>/reviews --input review.json
-  # review.json: {"commit_id": "<head>", "event": "COMMENT", "body": "", "comments": [{"path": "...", "line": 12, "side": "RIGHT", "body": "**Review (local)** ..."}]}
+  # review.json: {"commit_id": "<head>", "event": "COMMENT", "body": "", "comments": [{"path": "...", "line": 12, "side": "RIGHT", "body": "**Review (local)** · <agent> on behalf of <login>\n\n..."}]}
   ```
 
 A finding with no line in the diff goes into one pull request comment that starts with
-`**Review (<reviewer>)**` and names the head commit. A clean review posts nothing.
+the same heading and names the head commit. A clean review posts nothing.
 
 ## Hand back
 
