@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **AI Rewrite is told which program runs in a terminal.** An AI dictation or an edit into a terminal now sends the name of the program running in front, such as `claude` for Claude Code — only the program's name, never its arguments — so the model knows what it is writing for, and History shows it: "AI Rewrite was told it was for cmux — claude". Before, the name was read on this Mac and never sent. Where SpeechText can't tell which program is in front, as over ssh or in tmux, no name is sent.
+
+### Fixed
+
+- **A double tap locks a hold-to-talk dictation on.** With hold to talk, a quick double tap of the shortcut now keeps the dictation running hands-free. Before, when the dictation was slow to start, the tap was taken for a hold: its release stopped the dictation and the second tap canceled it, with nothing recorded. The Edit shortcut's double press is just as reliable.
+
 ## [0.11.0] - 2026-11-18
 
 ### Added
