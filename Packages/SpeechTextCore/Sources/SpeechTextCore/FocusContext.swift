@@ -197,6 +197,7 @@ public struct FocusContext: Codable, Equatable, Sendable {
         guard kind == .terminal else { return .never }
         switch terminalFocus {
         case .shellPrompt: return .atPrompt
+        case .remotePrompt: return .atRemotePrompt
         case .program: return .never
         case .unknown, nil: return .whenAsked
         }

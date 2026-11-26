@@ -185,7 +185,7 @@ enum RewriteChecks {
     static func read(_ raw: String, fixture: RewriteFixture, presetNames: [String],
                      request: RewriteModes.Request? = nil) -> (text: String, mode: String?, rawMode: String?) {
         let parsed = TextRefinementService.parse(raw, presetNames: presetNames)
-        let dictionary = request?.commands == .atPrompt ? [] : (fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) }
+        let dictionary = request?.commands.writesCommand == true ? [] : (fixture.vocabulary ?? []).map { VocabularyEntry(term: $0) }
         let polished = TextRefinementService.polishedReply(parsed.text, dictionary: dictionary,
                                                            replacements: [], dashStyle: .enDash)
         let text = request.map { RewriteModes.forPaste(polished, request: $0) } ?? polished
