@@ -420,7 +420,17 @@ struct PasteService {
                                     fieldLabels: fieldLabels,
                                     isSecureField: isSecureField,
                                     foreground: FocusContext.isTerminal(bundleID: target.bundleIdentifier)
-                                        ? TerminalFocus.foregroundJobs(of: target.processIdentifier, in: processTable()) : [])
+                                        ? TerminalFocus.foregroundJobs(of: target.processIdentifier, in: processTable()) : [],
+                                    localHostName: localHostName())
+    }
+
+    /// The name a shell's prompt puts in a title, as zsh's `%m` reads it: `gethostname`,
+    /// which asks no network, unlike `ProcessInfo.hostName`, on the way to the recording.
+    private static func localHostName() -> String? {
+        var buffer = [CChar](repeating: 0, count: 256)
+        guard gethostname(&buffer, buffer.count) == 0 else { return nil }
+        let bytes = buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        return String(decoding: bytes, as: UTF8.self)
     }
 
     /// Every process, from one sysctl. Names and process groups only, and they stay on this

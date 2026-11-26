@@ -682,10 +682,29 @@ final class RewriteModesTests: XCTestCase {
         let mixed = [["zsh"], ["claude", "cmux", "cmux-cua"]]
         XCTAssertEqual(read(mixed, title: "…/Development/yavno/speech-text", app: cmux), .shellPrompt)
         XCTAssertEqual(read(mixed, title: "hskv@Vlad-DO-Laptop:~/Documents/Development", app: cmux), .shellPrompt)
-        XCTAssertEqual(read(mixed, title: "Claude Code", app: cmux), .unknown)
-        XCTAssertEqual(read(mixed, title: "python3 -q", app: cmux), .unknown)
+        XCTAssertEqual(read(mixed, title: "Claude Code", app: cmux), .program, "a title that is no directory is a program")
+        XCTAssertEqual(read(mixed, title: "python3 -q", app: cmux), .program)
         XCTAssertEqual(read([["zsh"], ["ssh"]], title: "vlad@yavno-main:~", app: cmux), .unknown, "a remote prompt's title looks the same")
         XCTAssertEqual(read(mixed, title: "…/speech-text"), .unknown, "only cmux was measured to write it")
+    }
+
+    /// The hand run of #115 (2026-11-26): an ssh tab beside the one in front left every
+    /// cmux tab unknown, a prompt and Claude Code alike.
+    func testCmuxBesideAnSshTabReadsThisMacsPromptAndAProgram() {
+        let cmux = "com.cmuxterm.app"
+        let withSSH = [["ssh"], ["claude", "cmux"], ["zsh"]]
+        func read(_ title: String, host: String? = "Vlad-DO-Laptop.local") -> TerminalFocus {
+            TerminalFocus.read(bundleID: cmux, windowTitle: title, foreground: withSSH, localHostName: host)
+        }
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~/.claude-do"), .shellPrompt, "this Mac's prompt")
+        XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "short names, any case")
+        XCTAssertEqual(read("vlad@yavno-main:~"), .unknown, "another host's prompt may be the ssh tab")
+        XCTAssertEqual(read("~/Development"), .unknown, "a bare path names no host")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~", host: nil), .unknown)
+        XCTAssertEqual(read("Claude Code"), .program)
+        XCTAssertEqual(read("ssh vlad@yavno"), .unknown, "the title names what hides the program")
+        XCTAssertNil(TerminalFocus.reading(bundleID: cmux, windowTitle: "Claude Code", foreground: withSSH).program,
+                     "which tab's program is in front is not known")
     }
 
     func testForegroundJobsAreTheAppsOwnPerDevice() {
