@@ -27,10 +27,14 @@ public enum RewriteModes {
             id: fixedID("03"),
             name: "Message",
             whenToUse: "An email, letter, chat message or reply addressed to someone.",
+            // A letter's greeting and sign-off said as such: "only where the form calls for
+            // them" left GPT-6 Luna writing one-line letters into Gmail, 2 of 3 times, which
+            // the owner wants in every email; a chat message gets neither (#115, 2026-11-26).
             instructions: """
             Write the message in the register asked for, else polite and natural for the \
-            app. A greeting and sign-off only where the form calls for them. Invent no \
-            names, dates or facts; leave an obvious [placeholder].
+            app. A letter (mail, or asked for) opens with a greeting and ends with a \
+            sign-off unless it continues one; a chat message has neither. Invent no names, \
+            dates or facts; leave an obvious [placeholder].
             """
         ),
         PromptPreset(
@@ -43,8 +47,8 @@ public enum RewriteModes {
             instructions: """
             Use that text's usual form: compact "- " points grouped by topic, in the order \
             said; an imperative commit subject; problem, steps, expected result; a prompt \
-            as explicit steps. Headings only when asked for. Keep identifiers, paths and \
-            commands exactly as dictated. No padding.
+            as explicit steps. Headings only when asked for, and then as Markdown `#` \
+            headings. Keep identifiers, paths and commands exactly as dictated. No padding.
             """
         ),
     ]
@@ -179,10 +183,13 @@ public enum RewriteModes {
     /// Said once, for every mode: "output only", "invent nothing" and the clean-up. The
     /// wrong script is named because "keep the user's words" otherwise keeps «сетінгс»:
     /// Sonnet and Haiku 5.5 kept it 3 of 3 times each in an AI's field (2026-11-04).
+    /// Nothing said *to the user*, not "no greeting": that read as no greeting in a letter
+    /// either, which the owner wants in every email (#115, 2026-11-26).
     static let rules = """
         Rules:
-        - Output only the finished text: no greeting, preamble, commentary or "Here is…"; \
-        no quotation marks or code fences unless code was asked for.
+        - Output only the finished text, with nothing said to the user: no \
+        preamble, commentary or "Here is…"; no quotation marks or code fences unless code \
+        was asked for.
         - Fix speech-recognition noise: misheard words, homophones, punctuation, capitals; \
         a term the engine spelled in the wrong script goes back to its own («гітхаб» is \
         GitHub); drop fillers.

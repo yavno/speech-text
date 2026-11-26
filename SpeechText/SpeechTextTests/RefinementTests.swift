@@ -484,11 +484,13 @@ final class RewriteModesTests: XCTestCase {
     func testTheRoutingPromptStaysWithinItsBudget() {
         // Today's prompt is 3615 characters with its six built-ins; this one, 3100, its
         // framing 1878 and the three modes 1222 (2026-11-04); Clean-up alone is 1539 with the
-        // context rule a field for another program gained in review (2026-11-06).
+        // context rule a field for another program gained in review (2026-11-06). The modes
+        // 1329 once Message said a letter's greeting and sign-off and Structured Markdown
+        // headings (#115, 2026-11-26): the length is a rate-limit budget, not a latency one.
         let framing = RewriteModes.routingPrompt(modes: [], defaultID: nil, forAnotherProgram: false).count
         let whole = RewriteModes.request(context: nil, presets: builtIns).system.count
         XCTAssertLessThanOrEqual(framing, 1900, "framing is \(framing) characters")
-        XCTAssertLessThanOrEqual(whole - framing, 1250, "the three modes render as \(whole - framing) characters")
+        XCTAssertLessThanOrEqual(whole - framing, 1350, "the three modes render as \(whole - framing) characters")
         XCTAssertLessThanOrEqual(RewriteModes.cleanUpOnlyPrompt.count, 1600)
     }
 
@@ -805,6 +807,17 @@ final class PromptPresetMigrationTests: XCTestCase {
         let once = PromptPresetStore.migrated(october + [own], defaultID: nil).presets
         XCTAssertEqual(PromptPresetStore.migrated(once, defaultID: nil).presets, once)
     }
+    /// #115: the three modes as v0.11.0 shipped them take the new texts; an edited one stays.
+    func testTheNovemberModesTakeTheNewTexts() {
+        let november = PromptPresetStore.november2026
+        XCTAssertEqual(PromptPresetStore.migrated(november + [own], defaultID: nil).presets,
+                       PromptPresetStore.builtInDefaults + [own])
+        var edited = november
+        edited[1].instructions = "Always sign as Vlad."
+        XCTAssertEqual(PromptPresetStore.migrated(edited, defaultID: nil).presets[1], edited[1])
+        XCTAssertNotEqual(november[1], PromptPresetStore.builtInDefaults[1], "Message changed")
+        XCTAssertEqual(november[0], PromptPresetStore.builtInDefaults[0], "Clean-up did not")
+    }
 }
 
 /// AI Rewrite's two steps (#110), with fakes for both models.
@@ -958,17 +971,19 @@ final class RewriteRouterTests: XCTestCase {
 
     /// The owner's rule: the one-step prompt, which every model without two steps gets, did
     /// not change for #114. These are the SHA-256 of what the service sent with no step one,
-    /// read at 40ac8ad7, the commit before #111 added the Markdown fact. Frozen values,
-    /// so a change to the fact's path that reached this request cannot also change the
-    /// expectation; apps on the list and off it, and an editor on a Markdown file.
+    /// first read at 40ac8ad7, the commit before #111 added the Markdown fact, and read
+    /// again where the one-step prompt changed on purpose and was measured (#115's rules
+    /// and modes, 2026-11-26). Frozen values, so a change to the fact's path that reached
+    /// this request cannot also change the expectation; apps on the list and off it, and an
+    /// editor on a Markdown file.
     func testTheOneStepRequestIsTheOneSentBeforeMarkdownWasKnown() async throws {
         let contexts: [(FocusContext, String)] = [
-            (slack, "e16b5bf42515ce84ca9f4a86914ecac1743ac8f83aea3816631267aca7f4b06a"),
-            (FocusContext(appName: "Discord", bundleID: "com.hnc.Discord", windowTitle: "#general"), "070688eb4c0dfc23adef1df9da4cb00ee67464ab3c98c555fd4c9cacf473e81e"),
-            (FocusContext(appName: "Obsidian", bundleID: "md.obsidian", windowTitle: "Notes.md - Vault"), "f1643524c91eaa17ce130fc47b723b7994e75ad39a81c392f8cba3ac7335ced6"),
-            (FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text"), "32a7c2f3cc89ac31ece20e1173038a792cb4e59e6c4dfcf350b67c02fa08e61e"),
-            (FocusContext(appName: "T3 Code", bundleID: "com.t3tools.t3code"), "c9a0ad1842afccec26d9bb3ef85c235a34827c0f1a3141e92ea5bbfe0059f8c5"),
-            (FocusContext(appName: "Claude", bundleID: "com.anthropic.claudefordesktop"), "9b518599aac02ac7eef93416ef6d98991db3502b2764965e78391cf634027279"),
+            (slack, "9fe75e0c2e4b2942f3e8be65193db9d0abdb0572574b43cbb95cc6773ea3ed48"),
+            (FocusContext(appName: "Discord", bundleID: "com.hnc.Discord", windowTitle: "#general"), "4673cf444044aa67d53406cc15d47a5e4276bb7310db9a48ad9add3bd0a6024a"),
+            (FocusContext(appName: "Obsidian", bundleID: "md.obsidian", windowTitle: "Notes.md - Vault"), "cbe79b79c5c8bb7ed16881977e238a0db8668ee7405bd33cc16e0e4397afef3b"),
+            (FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text"), "147573e9a63572457051e33a1b6cdb582b196094363dbe070bbf7ba82ae7eaf4"),
+            (FocusContext(appName: "T3 Code", bundleID: "com.t3tools.t3code"), "bafe8eff3a36707a643e0597895bb0eb74c3befba1308b1e37dc71ccd06e7d39"),
+            (FocusContext(appName: "Claude", bundleID: "com.anthropic.claudefordesktop"), "69f939894c28047fa79ffbb9d606417a82996443467d5cb744f62baffe01c215"),
         ]
         for (context, expected) in contexts {
             let fake = Fake()
