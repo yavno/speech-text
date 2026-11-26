@@ -699,6 +699,8 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~/.claude-do"), .shellPrompt, "this Mac's prompt")
         XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "short names, any case")
         XCTAssertEqual(read("vlad@yavno-main:~"), .unknown, "another host's prompt may be the ssh tab")
+        XCTAssertEqual(read("vlad@yavno-main: ~"), .unknown, "as Ubuntu's bash writes it")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop: ~/src"), .shellPrompt)
         XCTAssertEqual(read("~/Development"), .unknown, "a bare path names no host")
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~", host: nil), .unknown)
         XCTAssertEqual(read("Claude Code"), .program)

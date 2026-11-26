@@ -171,6 +171,7 @@ public enum TerminalFocus: String, Codable, Sendable {
     private static func isDirectoryTitle(_ title: String?) -> Bool {
         guard let title else { return false }
         return title.hasPrefix("…/") || title.hasPrefix("~") || title.hasPrefix("/")
-            || title.range(of: #"^[^\s@]+@[^\s:]+:[~/]"#, options: .regularExpression) != nil
+            // Ubuntu's and Debian's bash put a space after the colon: "vlad@yavno-main: ~".
+            || title.range(of: #"^[^\s@]+@[^\s:]+:\s?[~/]"#, options: .regularExpression) != nil
     }
 }
