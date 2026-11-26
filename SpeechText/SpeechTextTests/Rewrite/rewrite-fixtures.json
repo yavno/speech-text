@@ -2273,5 +2273,145 @@
     ],
     "mustNotAppear": [],
     "maxLengthRatio": 2.0
+  },
+  {
+    "id": "ctx-claude-code-dirty-uk",
+    "note": "A garbled Ukrainian instruction to Claude Code in cmux, where another tab's ssh leaves the focus unknown, stays Ukrainian: repaired, never rewritten into another Cyrillic language (#115).",
+    "noise": "dirty",
+    "transcript": "Найдивсі лох файли в головній директорії, які більші за 100 мегабайт.",
+    "context": {
+      "appName": "cmux",
+      "bundleID": "com.cmuxterm.app",
+      "windowTitle": "Claude Code",
+      "terminalFocus": "unknown"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "файл",
+      "мегабайт"
+    ],
+    "mustNotAppear": [
+      "find ",
+      "du -",
+      "ls -"
+    ],
+    "maxLengthRatio": 1.4,
+    "examples": [
+      {
+        "reply": "Знайди всі лог-файли в головній директорії, які більші за 100 мегабайт.",
+        "passes": true
+      }
+    ]
+  },
+  {
+    "id": "ctx-slack-notes-headings",
+    "note": "Notes with headings asked for in Slack, which renders Markdown headings (owner, 2026-11-26): `#` headings, not plain heading lines (#115).",
+    "transcript": "нотатки зі зустрічі з заголовками щотижневий синк з командою учасники марта дизайнерка і богдан бекенд обговорили терміни релізу онбордингу наступні кроки марта готує макети до середи",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "windowTitle": "Bohdan (DM) - Slack",
+      "fieldLabel": "Message to Bohdan"
+    },
+    "modes": [
+      "Notes / Bullets"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Structured"
+      ]
+    },
+    "format": [
+      "markdown"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "Март",
+      "Богдан",
+      "онбординг",
+      "серед"
+    ],
+    "mustNotAppear": [
+      "нотатки зі зустрічі з заголовками"
+    ],
+    "mustMatch": [
+      "(?m)^#{1,3} \\S"
+    ],
+    "examples": [
+      {
+        "reply": "# Щотижневий синк з командою\n\n## Учасники\n- Марта — дизайнерка\n- Богдан — бекенд\n\n## Обговорили\n- Терміни релізу онбордингу\n\n## Наступні кроки\n- Марта готує макети до середи.",
+        "passes": true
+      },
+      {
+        "reply": "Щотижневий синк з командою\n\nУчасники:\n- Марта — дизайнерка\n- Богдан — бекенд\n\nОбговорили терміни релізу онбордингу.\n\nНаступні кроки:\n- Марта готує макети до середи.",
+        "passes": false,
+        "note": "headings asked for, none written"
+      }
+    ]
+  },
+  {
+    "id": "ctx-gmail-new-letter-uk",
+    "note": "A new letter in Gmail: a salutation on its own line («Привіт, Тарасе!», «Тарасе,») and a sign-off, as the owner expects of any email that does not continue one (#115).",
+    "transcript": "напиши тарасу що звіт буде готовий наступного понеділка і попроси підтвердити що такий термін підходить",
+    "context": {
+      "appName": "Google Chrome",
+      "bundleID": "com.google.Chrome",
+      "windowTitle": "Inbox - someone@example.com - Gmail",
+      "fieldLabel": "Message Body"
+    },
+    "modes": [
+      "Email / Message"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Message"
+      ]
+    },
+    "language": "uk",
+    "placeholders": true,
+    "mustKeep": [
+      "Тарас",
+      "звіт",
+      "понеділ"
+    ],
+    "mustNotAppear": [
+      "напиши тарасу"
+    ],
+    "maxLengthRatio": 3,
+    "mustMatch": [
+      "^(Привіт|Добр|Вітаю|Шановн|Дорог)|^[^\\n]{1,30}[,!]\\n",
+      "(?m)^(З повагою|З найкращими|Гарного|Гарних|Хорошого|Дякую|Щиро|До зв)"
+    ],
+    "examples": [
+      {
+        "reply": "Привіт, Тарасе!\n\nЗвіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить тобі такий термін.\n\nЗ повагою,\n[Ваше ім'я]",
+        "passes": true
+      },
+      {
+        "reply": "Тарасе, звіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить такий термін.",
+        "passes": false,
+        "note": "no greeting, no sign-off"
+      },
+      {
+        "reply": "Тарасе,\n\nзвіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить такий термін.\n\nЗ повагою,\n[Ваше ім'я]",
+        "passes": true
+      },
+      {
+        "reply": "Тарасе, звіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить такий термін.\n\nДякую!",
+        "passes": false,
+        "note": "the name opens the sentence, not a salutation line"
+      }
+    ]
   }
 ]

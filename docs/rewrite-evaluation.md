@@ -39,8 +39,9 @@ A *variant* turns a fixture into requests, and a reply into the text the app wou
 - **Where:** `context` (app, bundle ID, window, field, and in a terminal `terminalFocus` and `terminalProgram`) and `vocabulary` (the Dictionary's words).
 - **What a right reply looks like**, in two kinds kept apart:
   - **Text checks**, which hold whatever the prompt:
-    - `language`: `uk`, `any`, or a language written in Latin script;
+    - `language`: `uk` (Cyrillic, with no letter Ukrainian lacks), `any`, or a language written in Latin script;
     - `mustKeep` / `mustNotAppear`;
+    - `mustMatch`: regular expressions a right reply matches whatever its words, such as a `#` heading asked for or a letter's greeting;
     - `markdown` (headings, bold, tables or fences allowed; lists always are);
     - `placeholders` (a `[name]` gap allowed);
     - `noCode`;

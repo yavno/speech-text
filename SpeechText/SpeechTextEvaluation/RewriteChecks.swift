@@ -75,6 +75,9 @@ struct RewriteFixture: Codable, Sendable {
     var language: String
     var mustKeep: [String]?
     var mustNotAppear: [String]?
+    /// Regular expressions the reply must match: a form a right answer has whatever its
+    /// words — a `#` heading asked for, a letter's greeting.
+    var mustMatch: [String]?
     /// Headings, bold, tables or code fences may appear. Lists always may.
     var markdown: Bool?
     /// A bracketed `[placeholder]` may appear — an email whose sender is not named.
@@ -112,6 +115,7 @@ struct RewriteVerdict: Codable, Equatable, Sendable {
     var empty = false
     var missing: [String] = []
     var unwanted: [String] = []
+    var unmatched: [String] = []
     var wrongLanguage = false
     var reasoningLeak = false
     var markerLeak = false
@@ -130,6 +134,7 @@ struct RewriteVerdict: Codable, Equatable, Sendable {
         if empty { out.append(("empty", "empty")) }
         if !missing.isEmpty { out.append(("missing", "missing \(missing.joined(separator: ", "))")) }
         if !unwanted.isEmpty { out.append(("unwanted", "unwanted \(unwanted.joined(separator: ", "))")) }
+        if !unmatched.isEmpty { out.append(("unmatched", "unmatched \(unmatched.joined(separator: ", "))")) }
         if wrongLanguage { out.append(("wrong language", "wrong language")) }
         if reasoningLeak { out.append(("reasoning", "reasoning leaked")) }
         if markerLeak { out.append(("marker", "marker in the text")) }
@@ -188,12 +193,15 @@ enum RewriteChecks {
         let folded = fold(reply)
         verdict.missing = (fixture.mustKeep ?? []).filter { !folded.contains(fold($0)) }
         verdict.unwanted = (fixture.mustNotAppear ?? []).filter { folded.contains(fold($0)) }
+        verdict.unmatched = (fixture.mustMatch ?? []).filter { reply.range(of: $0, options: .regularExpression) == nil }
         if !reply.isEmpty {
             switch fixture.language {
             case "any": break
             // Written in Cyrillic. Not "most of its letters": an instruction to a coding agent
-            // keeps Settings, Control and a path in Latin, and still is Ukrainian.
-            case "uk": verdict.wrongLanguage = cyrillicShare(reply) < 0.3
+            // keeps Settings, Control and a path in Latin, and still is Ukrainian. And with no
+            // letter Ukrainian lacks: GPT-6 Luna repaired a garbled Ukrainian dictation into
+            // another Cyrillic language, which a share of Cyrillic passes (#115, 2026-11-26).
+            case "uk": verdict.wrongLanguage = cyrillicShare(reply) < 0.3 || reply.contains(where: { "ыэъёЫЭЪЁ".contains($0) })
             // Every other language a fixture names is written in Latin script.
             default: verdict.wrongLanguage = cyrillicShare(reply) > 0.1
             }
