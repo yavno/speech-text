@@ -883,8 +883,8 @@ final class RewriteRouterTests: XCTestCase {
     }
 
     func testTheServiceKeepsMoreStatesOnlyForAModelWithTwoSteps() {
-        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: gemma), 5)
-        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: "Qwen3.5-9B-Q4_K_M"), 10)
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: gemma), 6)
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: "Qwen3.5-9B-Q4_K_M"), 11)
         XCTAssertGreaterThan(RewriteRouter.twoStepPromptStates, RewriteRouter.oneStepPromptStates)
     }
 
