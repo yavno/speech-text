@@ -222,7 +222,7 @@ public enum RewriteRouter {
             if !offered.contains(where: { $0.id != cleanUpID }) {
                 let cleanUp = presets.first { $0.id == cleanUpID } ?? RewriteModes.builtIns[0]
                 return Decision(request: stepTwo(mode: cleanUp, names: [cleanUp.name], forAnotherProgram: true, commands: commands),
-                                routeBlock: routeBlock(language: nil, format: .plain, markdownRenders: markdownRenders),
+                                routeBlock: nil,
                                 route: RewriteRoute(language: nil, format: .plain, languageBy: .code, formatBy: .code, stepOneModel: nil))
             }
         }
@@ -265,7 +265,7 @@ public enum RewriteRouter {
         let names = asked.modes.map(\.name)
         guard asked.asksModifiers else {
             return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: true, commands: commands),
-                            routeBlock: routeBlock(language: nil, format: .plain, markdownRenders: markdownRenders),
+                            routeBlock: nil,
                             route: RewriteRoute(language: nil, format: .plain, languageBy: .code, formatBy: .code, stepOneModel: modelID))
         }
         var language = asked.languages[best(1)]
@@ -276,10 +276,12 @@ public enum RewriteRouter {
             languageBy = .code
         }
         let format = RewriteRoute.Format.allCases[best(2)]
-        // A Message is not told: a chat reply is plain text where Markdown renders too.
-        // Told, Gemma 4 12B and Qwen3.5 9B headed or bolded plain Slack replies that one
-        // step left plain (#114, 2026-11-10); a format asked for still reaches it above.
-        let toldMarkdown = markdownRenders && mode.id != RewriteModes.builtIns[1].id
+        // Only a text with a form of its own is told: dictated text and a chat reply stay
+        // plain where Markdown renders too, and a format asked for still reaches them. Told,
+        // Gemma 4 12B and Qwen3.5 9B headed or bolded plain Slack replies (#114, 2026-11-10)
+        // and GPT-OSS 120B bolded a Clean-up for Discord that one step left plain (#143's
+        // run, 2026-11-25).
+        let toldMarkdown = markdownRenders && mode.id != RewriteModes.builtIns[0].id && mode.id != RewriteModes.builtIns[1].id
         return Decision(request: stepTwo(mode: mode, names: names, forAnotherProgram: false, commands: commands),
                         routeBlock: routeBlock(language: language, format: format, markdownRenders: toldMarkdown),
                         route: RewriteRoute(language: language, format: format, languageBy: languageBy, formatBy: .stepOne,
@@ -365,13 +367,6 @@ public enum RewriteRouter {
         - Do whatever else the transcript asks: length, tone, "rewrite it", "make it better".
         """
 
-    /// D3 with D5's fact: the model still adds no format in a field for another program;
-    /// Markdown said aloud into a Markdown file is kept as dictated. A terminal is never told.
-    private static let stepTwoKeepsMarkdown = """
-        - `markdown: renders here` in <route>: Markdown the transcript spells out stays \
-        Markdown; add none of your own.
-        """
-
     /// The instructions step two is given: for a built-in Clean-up as it ships, the text
     /// that repeats nothing the rules say; else the mode's own, the user's words.
     private static func stepTwoInstructions(_ mode: PromptPreset, forAnotherProgram: Bool) -> String {
@@ -390,12 +385,11 @@ public enum RewriteRouter {
         let instructions = stepTwoInstructions(mode, forAnotherProgram: forAnotherProgram)
         let system: String
         if forAnotherProgram {
-            let markdown = commands == .never ? "\n\(stepTwoKeepsMarkdown)" : ""
             system = """
                 \(RewriteModes.openingForAnotherProgram)
 
                 \(RewriteModes.rules)
-                \(RewriteModes.programRule(commands))\(markdown)
+                \(RewriteModes.programRule(commands))
 
                 \(instructions) Keep the language it was dictated in.
                 """

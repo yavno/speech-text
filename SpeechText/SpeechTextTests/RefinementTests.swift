@@ -171,28 +171,13 @@ final class FocusContextTests: XCTestCase {
     /// Checked apps only (#111); see the comment on `markdownBundleIDPrefixes` for why
     /// the AI apps' own prompt boxes are not here.
     func testMarkdownRendersInTheListedAppsAndNoOthers() {
-        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code", "com.tinyspeck.slackmacgap", "notion.id"] {
+        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.tinyspeck.slackmacgap", "notion.id"] {
             XCTAssertTrue(FocusContext(bundleID: id).rendersMarkdown, id)
         }
-        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
+        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.t3tools.t3code", "com.apple.Safari"] {
             XCTAssertFalse(FocusContext(bundleID: id).rendersMarkdown, id)
         }
         XCTAssertFalse(FocusContext(appName: "Obsidian").rendersMarkdown, "known by its ID, not a name")
-    }
-
-    func testAnEditorRendersMarkdownOnlyWhereItsWindowNamesAMarkdownFile() {
-        XCTAssertTrue(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "README.md — speech-text").rendersMarkdown)
-        XCTAssertFalse(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "App.swift — speech-text").rendersMarkdown)
-        let cursor = "com.todesktop.230313mzl4w4u92"
-        for title in ["README.md — speech-text", "● notes.md - Project", "CHANGES.MARKDOWN", "docs/plan.md (Working Tree)"] {
-            XCTAssertTrue(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        for title in ["App.swift — speech-text", "cmd.mdx", ".md", "Markdown guide", "md"] {
-            XCTAssertFalse(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        XCTAssertFalse(FocusContext(bundleID: cursor).rendersMarkdown, "no title")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.TextEdit", windowTitle: "notes.md").rendersMarkdown, "not an editor")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.Terminal", windowTitle: "vim notes.md").rendersMarkdown, "a terminal")
     }
 
     func testTheMarkdownFactIsDerivedNotStored() throws {
@@ -1009,6 +994,14 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
     }
 
+    func testDictatedTextIsNotToldAboutMarkdown() async {
+        let cleanUp = await decide(context: slack, with: stepOne { _ in Self.picking([0, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(cleanUp?.request.decidedMode, "Clean-up")
+        XCTAssertNil(cleanUp?.routeBlock, "dictated text stays as dictated where Markdown renders")
+        let asked = await decide(context: slack, with: stepOne { _ in Self.picking([0, 0, 1], counts: [3, 4, 3]) })
+        XCTAssertEqual(asked?.routeBlock, "<route>\nformat: list\n</route>")
+    }
+
     func testAMessageIsNotToldAboutMarkdownButStillGetsAFormatAskedFor() async {
         let message = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 0], counts: [3, 4, 3]) })
         XCTAssertEqual(message?.request.decidedMode, "Message")
@@ -1024,21 +1017,23 @@ final class RewriteRouterTests: XCTestCase {
                        "<route>\nlanguage: English\nformat: list\nmarkdown: renders here\n</route>")
     }
 
-    func testAnEditorOnAMarkdownFileIsToldYetStaysPlainByCode() async throws {
+    /// One step leaves Markdown out there unasked, and told, Gemma 4 12B, GPT-6 Luna and
+    /// GPT-OSS 120B bolded a bug report in T3 Code (#143's run, 2026-11-25).
+    func testAFieldForAnotherProgramIsNeverToldAboutMarkdown() async throws {
         let readme = FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text")
         let result = await decide(context: readme, with: stepOne { _ in XCTFail("read"); throw Boom() })
         let made = try XCTUnwrap(result)
         XCTAssertEqual(made.request.decidedMode, "Clean-up")
         XCTAssertEqual(made.route.format, .plain)
         XCTAssertEqual(made.route.formatBy, .code)
-        XCTAssertEqual(made.routeBlock, "<route>\nmarkdown: renders here\n</route>")
-        XCTAssertTrue(made.request.system.contains("add none of your own"))
+        XCTAssertNil(made.routeBlock)
+        XCTAssertFalse(made.request.system.contains("renders here"))
 
         let withOwn = await decide(context: readme, presets: builtIns + [own], with: stepOne { _ in
             RewriteRouter.StepOneReading(probabilities: [[0, 1]])
         })
         XCTAssertEqual(withOwn?.request.decidedMode, "Haiku")
-        XCTAssertEqual(withOwn?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+        XCTAssertNil(withOwn?.routeBlock)
     }
 
     func testATerminalIsNeverToldAboutMarkdown() {
