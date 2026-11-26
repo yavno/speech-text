@@ -69,15 +69,17 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// app does, and the model needs neither to clean up a dictation.
     ///
     /// `foreground` is `TerminalFocus.foregroundJobs` for a terminal, read before the title
-    /// is cut to `maxValueLength`, since Terminal keeps the job at its end.
+    /// is cut to `maxValueLength`, since Terminal keeps the job at its end; `localHostName`
+    /// is this Mac's, which a prompt's title on it names.
     public static func capture(appName: String?, bundleID: String?, windowTitle: String?,
                         fieldLabels: [String?], isSecureField: Bool,
-                        foreground: [[String]] = []) -> FocusContext? {
+                        foreground: [[String]] = [], localHostName: String? = nil) -> FocusContext? {
         if let bundleID, excludedBundleIDs.contains(bundleID) { return nil }
 
         var context = FocusContext(appName: appName, bundleID: bundleID)
         if context.kind == .terminal {
-            let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
+            let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground,
+                                                localHostName: localHostName)
             context.terminalFocus = reading.focus
             if !isSecureField { context.terminalProgram = clean(reading.program) }
         }
@@ -144,38 +146,25 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// app, and listed only where the text itself is read as Markdown, however it got
     /// there: a Discord 0.0.412 message once sent ("Discord also uses Markdown for its
     /// message formatting", discord.com/blog), an Obsidian 1.12.7 note, whose file is
-    /// Markdown (obsidian.md/help/syntax), T3 Code 0.1.7's composer, whose source is
-    /// Markdown (the note in `SelectionEdit`, this repository's, not its maker's).
-    /// Slack 4.53 and Notion 7.42: the owner pasted Markdown into each on 2026-11-10 and it
+    /// Markdown (obsidian.md/help/syntax). Slack 4.53 and Notion 7.42: the owner pasted Markdown into each on 2026-11-10 and it
     /// rendered, though Slack's help says a paste "will appear in plain text"
     /// (slack.com/help/articles/360039953113) and Notion's documents typed shortcuts only.
     /// Left out: the prompt boxes of Claude and ChatGPT, which the same paste showed do not
-    /// render it. An editor counts through its window title, below.
+    /// render it, and every field for another program, T3 Code's composer and an editor on
+    /// a Markdown file among them: step two is never told there (`RewriteRouter.decide`).
     static let markdownBundleIDPrefixes = [
         "com.hnc.Discord",                  // and DiscordPTB, DiscordCanary
-        "com.t3tools.t3code",
         "com.tinyspeck.slackmacgap",
         "md.obsidian",
         "notion.id",
     ]
 
-    /// Whether Markdown means something where this text lands: an app on the list, or an
-    /// editor whose window names a Markdown file. Goes only to the two-step path
-    /// (`RewriteRouter`): #114 measured the one-step prompt without it.
+    /// Whether Markdown means something where this text lands: an app on the list. Goes
+    /// only to the two-step path (`RewriteRouter`): #114 measured the one-step prompt
+    /// without it.
     var rendersMarkdown: Bool {
-        if let bundleID, Self.markdownBundleIDPrefixes.contains(where: { bundleID.hasPrefix($0) }) { return true }
-        return kind == .codeEditor && Self.namesMarkdownFile(windowTitle)
-    }
-
-    /// A word of the title that is a file name ending in `.md` or `.markdown`, wherever it
-    /// sits: editors put the project after it ("README.md — speech-text") and marks before
-    /// it ("● notes.md").
-    private static func namesMarkdownFile(_ title: String?) -> Bool {
-        guard let title else { return false }
-        return title.split(whereSeparator: \.isWhitespace).contains { word in
-            let name = word.trimmingCharacters(in: .punctuationCharacters).lowercased()
-            return name.hasSuffix(".md") || name.hasSuffix(".markdown")
-        }
+        guard let bundleID else { return false }
+        return Self.markdownBundleIDPrefixes.contains { bundleID.hasPrefix($0) }
     }
 
     /// Derived, never stored: `Refinement.context` is kept in History, and a record from

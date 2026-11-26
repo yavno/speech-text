@@ -171,28 +171,13 @@ final class FocusContextTests: XCTestCase {
     /// Checked apps only (#111); see the comment on `markdownBundleIDPrefixes` for why
     /// the AI apps' own prompt boxes are not here.
     func testMarkdownRendersInTheListedAppsAndNoOthers() {
-        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.t3tools.t3code", "com.tinyspeck.slackmacgap", "notion.id"] {
+        for id in ["com.hnc.Discord", "com.hnc.DiscordPTB", "md.obsidian", "com.tinyspeck.slackmacgap", "notion.id"] {
             XCTAssertTrue(FocusContext(bundleID: id).rendersMarkdown, id)
         }
-        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.apple.Safari"] {
+        for id in ["com.anthropic.claudefordesktop", "com.openai.chat", "com.t3tools.t3code", "com.apple.Safari"] {
             XCTAssertFalse(FocusContext(bundleID: id).rendersMarkdown, id)
         }
         XCTAssertFalse(FocusContext(appName: "Obsidian").rendersMarkdown, "known by its ID, not a name")
-    }
-
-    func testAnEditorRendersMarkdownOnlyWhereItsWindowNamesAMarkdownFile() {
-        XCTAssertTrue(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "README.md — speech-text").rendersMarkdown)
-        XCTAssertFalse(FocusContext(bundleID: "com.microsoft.VSCode", windowTitle: "App.swift — speech-text").rendersMarkdown)
-        let cursor = "com.todesktop.230313mzl4w4u92"
-        for title in ["README.md — speech-text", "● notes.md - Project", "CHANGES.MARKDOWN", "docs/plan.md (Working Tree)"] {
-            XCTAssertTrue(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        for title in ["App.swift — speech-text", "cmd.mdx", ".md", "Markdown guide", "md"] {
-            XCTAssertFalse(FocusContext(bundleID: cursor, windowTitle: title).rendersMarkdown, title)
-        }
-        XCTAssertFalse(FocusContext(bundleID: cursor).rendersMarkdown, "no title")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.TextEdit", windowTitle: "notes.md").rendersMarkdown, "not an editor")
-        XCTAssertFalse(FocusContext(bundleID: "com.apple.Terminal", windowTitle: "vim notes.md").rendersMarkdown, "a terminal")
     }
 
     func testTheMarkdownFactIsDerivedNotStored() throws {
@@ -684,10 +669,32 @@ final class RewriteModesTests: XCTestCase {
         let mixed = [["zsh"], ["claude", "cmux", "cmux-cua"]]
         XCTAssertEqual(read(mixed, title: "…/Development/yavno/speech-text", app: cmux), .shellPrompt)
         XCTAssertEqual(read(mixed, title: "hskv@Vlad-DO-Laptop:~/Documents/Development", app: cmux), .shellPrompt)
-        XCTAssertEqual(read(mixed, title: "Claude Code", app: cmux), .unknown)
-        XCTAssertEqual(read(mixed, title: "python3 -q", app: cmux), .unknown)
+        XCTAssertEqual(read(mixed, title: "Claude Code", app: cmux), .program, "a title that is no directory is a program")
+        XCTAssertEqual(read(mixed, title: "python3 -q", app: cmux), .program)
         XCTAssertEqual(read([["zsh"], ["ssh"]], title: "vlad@yavno-main:~", app: cmux), .unknown, "a remote prompt's title looks the same")
         XCTAssertEqual(read(mixed, title: "…/speech-text"), .unknown, "only cmux was measured to write it")
+    }
+
+    /// The hand run of #115 (2026-11-26): an ssh tab beside the one in front left every
+    /// cmux tab unknown, a prompt and Claude Code alike.
+    func testCmuxBesideAnSshTabReadsThisMacsPromptAndAProgram() {
+        let cmux = "com.cmuxterm.app"
+        let withSSH = [["ssh"], ["claude", "cmux"], ["zsh"]]
+        func read(_ title: String, host: String? = "Vlad-DO-Laptop.local") -> TerminalFocus {
+            TerminalFocus.read(bundleID: cmux, windowTitle: title, foreground: withSSH, localHostName: host)
+        }
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~/.claude-do"), .shellPrompt, "this Mac's prompt")
+        XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "any case")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop.example.org:~"), .unknown, "the same short name in another domain")
+        XCTAssertEqual(read("vlad@yavno-main:~"), .unknown, "another host's prompt may be the ssh tab")
+        XCTAssertEqual(read("vlad@yavno-main: ~"), .unknown, "as Ubuntu's bash writes it")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop: ~/src"), .shellPrompt)
+        XCTAssertEqual(read("~/Development"), .unknown, "a bare path names no host")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~", host: nil), .unknown)
+        XCTAssertEqual(read("Claude Code"), .program)
+        XCTAssertEqual(read("ssh vlad@yavno"), .unknown, "the title names what hides the program")
+        XCTAssertNil(TerminalFocus.reading(bundleID: cmux, windowTitle: "Claude Code", foreground: withSSH).program,
+                     "which tab's program is in front is not known")
     }
 
     func testForegroundJobsAreTheAppsOwnPerDevice() {
@@ -1024,6 +1031,14 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertNil(plain?.routeBlock, "Mail is not on the list")
     }
 
+    func testDictatedTextIsNotToldAboutMarkdown() async {
+        let cleanUp = await decide(context: slack, with: stepOne { _ in Self.picking([0, 0, 0], counts: [3, 4, 3]) })
+        XCTAssertEqual(cleanUp?.request.decidedMode, "Clean-up")
+        XCTAssertNil(cleanUp?.routeBlock, "dictated text stays as dictated where Markdown renders")
+        let asked = await decide(context: slack, with: stepOne { _ in Self.picking([0, 0, 1], counts: [3, 4, 3]) })
+        XCTAssertEqual(asked?.routeBlock, "<route>\nformat: list\n</route>")
+    }
+
     func testAMessageIsNotToldAboutMarkdownButStillGetsAFormatAskedFor() async {
         let message = await decide(context: slack, with: stepOne { _ in Self.picking([1, 0, 0], counts: [3, 4, 3]) })
         XCTAssertEqual(message?.request.decidedMode, "Message")
@@ -1039,21 +1054,23 @@ final class RewriteRouterTests: XCTestCase {
                        "<route>\nlanguage: English\nformat: list\nmarkdown: renders here\n</route>")
     }
 
-    func testAnEditorOnAMarkdownFileIsToldYetStaysPlainByCode() async throws {
+    /// One step leaves Markdown out there unasked, and told, Gemma 4 12B, GPT-6 Luna and
+    /// GPT-OSS 120B bolded a bug report in T3 Code (#143's run, 2026-11-25).
+    func testAFieldForAnotherProgramIsNeverToldAboutMarkdown() async throws {
         let readme = FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text")
         let result = await decide(context: readme, with: stepOne { _ in XCTFail("read"); throw Boom() })
         let made = try XCTUnwrap(result)
         XCTAssertEqual(made.request.decidedMode, "Clean-up")
         XCTAssertEqual(made.route.format, .plain)
         XCTAssertEqual(made.route.formatBy, .code)
-        XCTAssertEqual(made.routeBlock, "<route>\nmarkdown: renders here\n</route>")
-        XCTAssertTrue(made.request.system.contains("add none of your own"))
+        XCTAssertNil(made.routeBlock)
+        XCTAssertFalse(made.request.system.contains("renders here"))
 
         let withOwn = await decide(context: readme, presets: builtIns + [own], with: stepOne { _ in
             RewriteRouter.StepOneReading(probabilities: [[0, 1]])
         })
         XCTAssertEqual(withOwn?.request.decidedMode, "Haiku")
-        XCTAssertEqual(withOwn?.routeBlock, "<route>\nmarkdown: renders here\n</route>")
+        XCTAssertNil(withOwn?.routeBlock)
     }
 
     func testATerminalIsNeverToldAboutMarkdown() {
