@@ -69,15 +69,17 @@ public struct FocusContext: Codable, Equatable, Sendable {
     /// app does, and the model needs neither to clean up a dictation.
     ///
     /// `foreground` is `TerminalFocus.foregroundJobs` for a terminal, read before the title
-    /// is cut to `maxValueLength`, since Terminal keeps the job at its end.
+    /// is cut to `maxValueLength`, since Terminal keeps the job at its end; `localHostName`
+    /// is this Mac's, which a prompt's title on it names.
     public static func capture(appName: String?, bundleID: String?, windowTitle: String?,
                         fieldLabels: [String?], isSecureField: Bool,
-                        foreground: [[String]] = []) -> FocusContext? {
+                        foreground: [[String]] = [], localHostName: String? = nil) -> FocusContext? {
         if let bundleID, excludedBundleIDs.contains(bundleID) { return nil }
 
         var context = FocusContext(appName: appName, bundleID: bundleID)
         if context.kind == .terminal {
-            let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground)
+            let reading = TerminalFocus.reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground,
+                                                localHostName: localHostName)
             context.terminalFocus = reading.focus
             if !isSecureField { context.terminalProgram = clean(reading.program) }
         }

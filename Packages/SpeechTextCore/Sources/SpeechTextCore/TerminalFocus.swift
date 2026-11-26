@@ -67,15 +67,18 @@ public enum TerminalFocus: String, Codable, Sendable {
             }
     }
 
-    public static func read(bundleID: String?, windowTitle: String?, foreground: [[String]]) -> TerminalFocus {
-        reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground).focus
+    public static func read(bundleID: String?, windowTitle: String?, foreground: [[String]],
+                            localHostName: String? = nil) -> TerminalFocus {
+        reading(bundleID: bundleID, windowTitle: windowTitle, foreground: foreground, localHostName: localHostName).focus
     }
 
     /// `read`, and for a `.program` the name of that program as the process table or
     /// Terminal's title gives it ("claude", "python3", "node" for a CLI Node runs), never
     /// its arguments: told to the model and kept in History (#275). Nil wherever the focus
-    /// is not `.program`.
-    public static func reading(bundleID: String?, windowTitle: String?, foreground: [[String]]) -> (focus: TerminalFocus, program: String?) {
+    /// is not `.program`. `localHostName` is this Mac's short host name, which a prompt's
+    /// title on it names ("hskv@Vlad-DO-Laptop:~").
+    public static func reading(bundleID: String?, windowTitle: String?, foreground: [[String]],
+                               localHostName: String? = nil) -> (focus: TerminalFocus, program: String?) {
         if bundleID?.hasPrefix("com.apple.Terminal") == true,
            let job = terminalAppJob(windowTitle) {
             let named = focus(ofJob: job)
@@ -96,21 +99,33 @@ public enum TerminalFocus: String, Codable, Sendable {
         guard !tabs.isEmpty else { return (.unknown, nil) }
         let shellTabs = tabs.filter { $0.allSatisfy(shells.contains) }
         if shellTabs.count == tabs.count { return (.shellPrompt, nil) }
-        if tabs.joined().contains(where: opaque.contains) { return (.unknown, nil) }
+        let hidden = tabs.joined().contains(where: opaque.contains)
+        // cmux, several tabs, and its title is all that says which is in front: its shell
+        // puts the directory there at a prompt and the command while one runs. A prompt of
+        // this Mac names it ("hskv@Vlad-DO-Laptop:~"), which an ssh tab beside it cannot
+        // change; another host's, or a bare path behind an ssh tab, may be remote. A title
+        // that is no directory is a program — Claude Code writes its own — unless it names
+        // what hides one: words either way, and told so, not left to the rule for a
+        // terminal nobody can read, where GPT-6 Luna rewrote a garbled Ukrainian request to
+        // Claude Code into another language 4 of 5 times (#115, 2026-11-26).
+        if bundleID?.hasPrefix("com.cmuxterm.app") == true, tabs.count > 1, let windowTitle {
+            if isDirectoryTitle(windowTitle) {
+                let local = localHostName.map { names(windowTitle, host: $0) } ?? false
+                if !shellTabs.isEmpty, !hidden || local { return (.shellPrompt, nil) }
+                return (.unknown, nil)
+            }
+            let first = windowTitle.split(separator: " ").first.map { commandName(String($0)).lowercased() } ?? ""
+            return opaque.contains(first) ? (.unknown, nil) : (.program, nil)
+        }
+        if hidden { return (.unknown, nil) }
         // The group's leader comes first (`foregroundJobs`): the program the shell started,
         // not the `rg` or `git` it runs. A shell in front of its child ("zsh", "op") is
         // passed over.
         if tabs.count == 1 { return (.program, tabs[0].first { !shells.contains($0) }) }
-        // Several tabs and only some at a prompt: the title is of the tab in front. cmux's
-        // shell puts the directory there at a prompt and the command while one runs, so a
-        // directory is a prompt; Claude Code writes its own. An ssh tab was ruled out
-        // above, since a remote shell's title looks the same. A program that writes a path
-        // as its own title would read as a prompt: nothing better says which tab is in
-        // front (cmux's scripting has no tty and its CLI refuses outside processes), and
-        // the cost is a command pasted, never run, where words were wanted.
-        if bundleID?.hasPrefix("com.cmuxterm.app") == true, !shellTabs.isEmpty, isDirectoryTitle(windowTitle) {
-            return (.shellPrompt, nil)
-        }
+        // A program that writes a path as its own title would read as cmux's prompt above:
+        // nothing better says which tab is in front (cmux's scripting has no tty and its
+        // CLI refuses outside processes), and the cost is a command pasted, never run,
+        // where words were wanted.
         return (.unknown, nil)
     }
 
@@ -144,9 +159,21 @@ public enum TerminalFocus: String, Codable, Sendable {
         (raw.hasPrefix("-") ? String(raw.dropFirst()) : raw).components(separatedBy: "/").last ?? raw
     }
 
+    /// "user@host:path" whose host is `host`: the same name, its short form, or that with
+    /// `.local` ("Vlad-DO-Laptop" and "Vlad-DO-Laptop.local" are one Mac), never the same
+    /// short name in another domain ("workstation.example.org").
+    private static func names(_ title: String, host: String) -> Bool {
+        guard let at = title.firstIndex(of: "@"), let colon = title[at...].firstIndex(of: ":") else { return false }
+        let named = title[title.index(after: at)..<colon].lowercased()
+        let own = host.lowercased()
+        let short = own.split(separator: ".").first.map(String.init) ?? ""
+        return !short.isEmpty && [own, short, short + ".local"].contains(named)
+    }
+
     private static func isDirectoryTitle(_ title: String?) -> Bool {
         guard let title else { return false }
         return title.hasPrefix("…/") || title.hasPrefix("~") || title.hasPrefix("/")
-            || title.range(of: #"^[^\s@]+@[^\s:]+:[~/]"#, options: .regularExpression) != nil
+            // Ubuntu's and Debian's bash put a space after the colon: "vlad@yavno-main: ~".
+            || title.range(of: #"^[^\s@]+@[^\s:]+:\s?[~/]"#, options: .regularExpression) != nil
     }
 }
