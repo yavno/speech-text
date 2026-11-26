@@ -159,13 +159,15 @@ public enum TerminalFocus: String, Codable, Sendable {
         (raw.hasPrefix("-") ? String(raw.dropFirst()) : raw).components(separatedBy: "/").last ?? raw
     }
 
-    /// "user@host:path" whose host is `host`, short names compared ("Vlad-DO-Laptop" and
-    /// "Vlad-DO-Laptop.local" are one Mac).
+    /// "user@host:path" whose host is `host`: the same name, its short form, or that with
+    /// `.local` ("Vlad-DO-Laptop" and "Vlad-DO-Laptop.local" are one Mac), never the same
+    /// short name in another domain ("workstation.example.org").
     private static func names(_ title: String, host: String) -> Bool {
         guard let at = title.firstIndex(of: "@"), let colon = title[at...].firstIndex(of: ":") else { return false }
-        let named = title[title.index(after: at)..<colon].split(separator: ".").first.map(String.init) ?? ""
-        let own = host.split(separator: ".").first.map(String.init) ?? ""
-        return !own.isEmpty && named.caseInsensitiveCompare(own) == .orderedSame
+        let named = title[title.index(after: at)..<colon].lowercased()
+        let own = host.lowercased()
+        let short = own.split(separator: ".").first.map(String.init) ?? ""
+        return !short.isEmpty && [own, short, short + ".local"].contains(named)
     }
 
     private static func isDirectoryTitle(_ title: String?) -> Bool {

@@ -697,7 +697,8 @@ final class RewriteModesTests: XCTestCase {
             TerminalFocus.read(bundleID: cmux, windowTitle: title, foreground: withSSH, localHostName: host)
         }
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~/.claude-do"), .shellPrompt, "this Mac's prompt")
-        XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "short names, any case")
+        XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "any case")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop.example.org:~"), .unknown, "the same short name in another domain")
         XCTAssertEqual(read("vlad@yavno-main:~"), .unknown, "another host's prompt may be the ssh tab")
         XCTAssertEqual(read("vlad@yavno-main: ~"), .unknown, "as Ubuntu's bash writes it")
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop: ~/src"), .shellPrompt)
