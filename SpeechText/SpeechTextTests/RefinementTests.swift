@@ -1082,6 +1082,7 @@ final class RewriteRouterTests: XCTestCase {
         XCTAssertTrue(remote.commandWriting.writesCommand)
         let system = RewriteModes.request(context: remote, presets: builtIns).system
         XCTAssertTrue(system.contains("another machine, reached over ssh"), system)
+        XCTAssertTrue(system.contains("common to Linux and BSD"), system)
         XCTAssertFalse(system.contains("macOS"), system)
     }
 

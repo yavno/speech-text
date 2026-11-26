@@ -241,11 +241,12 @@ public enum RewriteModes {
         """
 
     /// The same at a shell on another machine, reached over ssh: what it runs is not known,
-    /// so no tools of one system are named, and a remark there is words as at home.
+    /// so the tools are those Linux and BSD share (GNU and BSD `find` both take `-size +100M`,
+    /// which strict POSIX does not), and a remark there is words as at home.
     private static let remoteShellPromptRule = """
         - The cursor is at a shell prompt on another machine, reached over ssh. A \
         transcript that says what the shell should do, or spells out a command, becomes \
-        that one command on one line, with standard POSIX tools: "list every file bigger \
+        that one command on one line, with tools common to Linux and BSD: "list every file bigger \
         than a hundred megabytes here" is `find . -size +100M`; «гіт коміт мінус ем» is \
         `git commit -m`. It is pasted and never run. No explanation, no `$`. Anything \
         else, a remark or a reply to someone, is written down as the user's words; when in \
