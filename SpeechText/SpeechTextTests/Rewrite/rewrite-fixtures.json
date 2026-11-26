@@ -2450,5 +2450,92 @@
         "note": "a body sentence after «Дякую…» is no signature"
       }
     ]
+  },
+  {
+    "id": "ctx-slack-notes-title-given",
+    "note": "A title given for notes in Slack is their `#` heading (#115).",
+    "transcript": "нотатки з дзвінка з командою заголовок до цієї нотатки план релізу онбордингу ключові пункти перевірити стейдж підготувати тексти і домовитися з дизайном про макети",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "windowTitle": "Marta (DM) - Slack",
+      "fieldLabel": "Message to Marta"
+    },
+    "modes": [
+      "Notes / Bullets"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Structured"
+      ]
+    },
+    "format": [
+      "markdown"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "План релізу онбордингу",
+      "стейдж",
+      "макет"
+    ],
+    "mustNotAppear": [
+      "заголовок до цієї нотатки"
+    ],
+    "mustMatch": [
+      "(?m)^#{1,3} [^\\n]*План релізу онбордингу"
+    ],
+    "examples": [
+      {
+        "reply": "# План релізу онбордингу\n\n- Перевірити стейдж\n- Підготувати тексти\n- Домовитися з дизайном про макети",
+        "passes": true
+      },
+      {
+        "reply": "План релізу онбордингу\n\n- Перевірити стейдж\n- Підготувати тексти\n- Домовитися з дизайном про макети",
+        "passes": false,
+        "note": "the title as a plain line"
+      }
+    ]
+  },
+  {
+    "id": "ctx-slack-notes-name-given",
+    "note": "«Назва: …» for notes in Slack is their `#` heading too (#115).",
+    "transcript": "нотатки з моєї зустрічі назва зустрічі ретро спринту ключові пойнти тести падають на сі ай і треба повернути ревʼю дизайну",
+    "context": {
+      "appName": "Slack",
+      "bundleID": "com.tinyspeck.slackmacgap",
+      "windowTitle": "Marta (DM) - Slack",
+      "fieldLabel": "Message to Marta"
+    },
+    "modes": [
+      "Notes / Bullets"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Structured"
+      ]
+    },
+    "format": [
+      "markdown"
+    ],
+    "language": "uk",
+    "markdown": true,
+    "mustKeep": [
+      "Ретро спринту",
+      "тест",
+      "дизайн"
+    ],
+    "mustNotAppear": [
+      "назва зустрічі"
+    ],
+    "mustMatch": [
+      "(?m)^#{1,3} [^\\n]*[Рр]етро спринту"
+    ],
+    "examples": [
+      {
+        "reply": "# Ретро спринту\n\n- Тести падають на CI\n- Треба повернути ревʼю дизайну",
+        "passes": true
+      }
+    ]
   }
 ]
