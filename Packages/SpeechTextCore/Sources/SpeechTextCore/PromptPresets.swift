@@ -139,8 +139,21 @@ public enum PromptPresetStore {
                      instructions: "Write it in the conventional format for that artefact — imperative mood for commit messages, problem/steps/expected for bug reports, an explicit step-by-step task description for an AI coding instruction. Keep identifiers, paths, commands and code fragments exactly as dictated; correct only obvious speech-recognition mangling of them."),
     ]
 
-    /// Bumped when the built-ins change in a way stored prompts must follow.
-    static let presetsVersion = 1
+    /// Message and Structured as v0.11.0 shipped them (#109, `86e6fd1`), before #115 spelled
+    /// out a letter's greeting and sign-off and Markdown headings. Clean-up is unchanged
+    /// since, so its own entry stands for itself; give it a literal here if it ever changes.
+    public static let november2026: [PromptPreset] = [
+        RewriteModes.builtIns[0],
+        PromptPreset(id: fixedID("03"), name: "Message",
+                     whenToUse: "An email, letter, chat message or reply addressed to someone.",
+                     instructions: "Write the message in the register asked for, else polite and natural for the app. A greeting and sign-off only where the form calls for them. Invent no names, dates or facts; leave an obvious [placeholder]."),
+        PromptPreset(id: fixedID("05"), name: "Structured",
+                     whenToUse: "A text with a form of its own: notes, a summary, a list, a plan or an outline; a commit message, a PR or ticket description, a bug report; a prompt for an AI.",
+                     instructions: "Use that text's usual form: compact \"- \" points grouped by topic, in the order said; an imperative commit subject; problem, steps, expected result; a prompt as explicit steps. Headings only when asked for. Keep identifiers, paths and commands exactly as dictated. No padding."),
+    ]
+
+    /// Bumped when the built-ins change in a way stored prompts must follow: 2 for #115.
+    static let presetsVersion = 2
 
     /// D9: a stored list moved onto the three modes, once. A built-in left as it shipped
     /// — equal in name, *When to use* and instructions to any text it ever had — becomes
@@ -149,7 +162,7 @@ public enum PromptPresetStore {
     /// The new texts match no old one, so a second pass changes nothing. `clearsDefault`:
     /// the stored default pointed at a prompt that went.
     static func migrated(_ stored: [PromptPreset], defaultID: UUID?) -> (presets: [PromptPreset], clearsDefault: Bool) {
-        let shipped = october2026 + august2026
+        let shipped = october2026 + august2026 + november2026
         let replacements = Dictionary(uniqueKeysWithValues: builtInDefaults.map { ($0.id, $0) })
         var removed: Set<UUID> = []
         let presets = stored.compactMap { preset -> PromptPreset? in
@@ -175,7 +188,7 @@ public enum PromptPresetStore {
             if result.presets.isEmpty { defaults.removeObject(forKey: SettingsKeys.promptPresets) } else { save(result.presets) }
         }
         if result.clearsDefault { defaults.removeObject(forKey: SettingsKeys.defaultPresetID) }
-        dlog("Prompts", "moved \(stored.count) stored prompt(s) to \(result.presets.count) on the 2026-11 modes")
+        dlog("Prompts", "moved \(stored.count) stored prompt(s) to \(result.presets.count) on the current built-ins")
     }
 
     public static func load() -> [PromptPreset] {
