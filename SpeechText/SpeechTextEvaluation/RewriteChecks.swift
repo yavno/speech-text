@@ -153,6 +153,29 @@ struct RewriteVerdict: Codable, Equatable, Sendable {
     var passed: Bool { failures.isEmpty }
 }
 
+extension RewriteVerdict {
+    /// `unmatched` is read as empty where it is missing: a run saved before `mustMatch`
+    /// existed still loads for `--recheck`. Written as every other field is.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        empty = try c.decode(Bool.self, forKey: .empty)
+        missing = try c.decode([String].self, forKey: .missing)
+        unwanted = try c.decode([String].self, forKey: .unwanted)
+        unmatched = try c.decodeIfPresent([String].self, forKey: .unmatched) ?? []
+        wrongLanguage = try c.decode(Bool.self, forKey: .wrongLanguage)
+        reasoningLeak = try c.decode(Bool.self, forKey: .reasoningLeak)
+        markerLeak = try c.decode(Bool.self, forKey: .markerLeak)
+        preamble = try c.decodeIfPresent(String.self, forKey: .preamble)
+        wrappedInQuotes = try c.decode(Bool.self, forKey: .wrappedInQuotes)
+        markdown = try c.decode([String].self, forKey: .markdown)
+        placeholders = try c.decode([String].self, forKey: .placeholders)
+        code = try c.decode(Bool.self, forKey: .code)
+        lengthRatio = try c.decodeIfPresent(Double.self, forKey: .lengthRatio)
+        tooShort = try c.decode(Bool.self, forKey: .tooShort)
+        tooLong = try c.decode(Bool.self, forKey: .tooLong)
+    }
+}
+
 enum RewriteChecks {
 
     // MARK: - The reply as the app reads it

@@ -2362,7 +2362,7 @@
   },
   {
     "id": "ctx-gmail-new-letter-uk",
-    "note": "A new letter in Gmail: a salutation on its own line («Привіт, Тарасе!», «Тарасе,») and a sign-off, as the owner expects of any email that does not continue one (#115).",
+    "note": "A new letter in Gmail: a salutation on a line of its own («Привіт, Тарасе!», «Тарасе,») and a closing sign-off, with at most a signature after it, as the owner expects of any email that does not continue one (#115).",
     "transcript": "напиши тарасу що звіт буде готовий наступного понеділка і попроси підтвердити що такий термін підходить",
     "context": {
       "appName": "Google Chrome",
@@ -2390,8 +2390,8 @@
     ],
     "maxLengthRatio": 3,
     "mustMatch": [
-      "^(Привіт|Добр|Вітаю|Шановн|Дорог)|^[^\\n]{1,30}[,!]\\n",
-      "(?m)^(З повагою|З найкращими|Гарного|Гарних|Хорошого|Дякую|Щиро|До зв)"
+      "^(?:(?:Привіт|Добр|Вітаю|Шановн|Дорог)[^\\n]{0,40}|[^\\n]{1,30}[,!])\\n",
+      "(?m)^(?:З повагою|З найкращими|Гарного|Гарних|Хорошого|Дякую|Щиро|До зв)[^\\n]{0,40}(?:\\n+[^\\n]{0,40})?\\s*\\z"
     ],
     "examples": [
       {
@@ -2411,6 +2411,16 @@
         "reply": "Тарасе, звіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить такий термін.\n\nДякую!",
         "passes": false,
         "note": "the name opens the sentence, not a salutation line"
+      },
+      {
+        "reply": "Привіт, Тарасе! Звіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить такий термін.\n\nЗ повагою,\n[Ваше ім'я]",
+        "passes": false,
+        "note": "the greeting opens the sentence, not a line of its own"
+      },
+      {
+        "reply": "Тарасе,\n\nДякую за роботу. Звіт буде готовий наступного понеділка. Підтверди, будь ласка, чи підходить термін.",
+        "passes": false,
+        "note": "«Дякую» opens the body, no sign-off closes it"
       }
     ]
   }
