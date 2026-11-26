@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **AI Rewrite is told which program runs in a terminal.** An AI dictation or an edit into a terminal now sends the name of the program running in front, such as `claude` for Claude Code — only the program's name, never its arguments — so the model knows what it is writing for, and History shows it: "AI Rewrite was told it was for cmux — claude". Before, the name was read on this Mac and never sent. Where SpeechText can't tell which program is in front, as over ssh, in tmux or with several tabs, no name is sent.
+- **AI Rewrite is told which program runs in a terminal.** An AI dictation or an edit into a terminal now sends the name of the program running in front, such as `claude` for Claude Code — only the program's name, never its arguments — so the model knows what it is writing for, and History shows it: "AI Rewrite was told it was for cmux — claude". Before, the name was read on this Mac and never sent. Where SpeechText can't tell which program is in front, as over ssh or in tmux, no name is sent.
 
 ### Fixed
 
