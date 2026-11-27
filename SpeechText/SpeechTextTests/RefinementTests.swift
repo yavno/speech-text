@@ -472,9 +472,10 @@ final class RewriteModesTests: XCTestCase {
         // context rule a field for another program gained in review (2026-11-06). The modes
         // 1329 once Message said a letter's greeting and sign-off and Structured Markdown
         // headings (#115, 2026-11-26): the length is a rate-limit budget, not a latency one.
+        // The framing 2019 once a title named for the text counted as a heading (#115).
         let framing = RewriteModes.routingPrompt(modes: [], defaultID: nil, forAnotherProgram: false).count
         let whole = RewriteModes.request(context: nil, presets: builtIns).system.count
-        XCTAssertLessThanOrEqual(framing, 1900, "framing is \(framing) characters")
+        XCTAssertLessThanOrEqual(framing, 2050, "framing is \(framing) characters")
         XCTAssertLessThanOrEqual(whole - framing, 1350, "the three modes render as \(whole - framing) characters")
         XCTAssertLessThanOrEqual(RewriteModes.cleanUpOnlyPrompt.count, 1600)
     }
@@ -987,9 +988,9 @@ final class RewriteRouterTests: XCTestCase {
     /// editor on a Markdown file.
     func testTheOneStepRequestIsTheOneSentBeforeMarkdownWasKnown() async throws {
         let contexts: [(FocusContext, String)] = [
-            (slack, "9fe75e0c2e4b2942f3e8be65193db9d0abdb0572574b43cbb95cc6773ea3ed48"),
-            (FocusContext(appName: "Discord", bundleID: "com.hnc.Discord", windowTitle: "#general"), "4673cf444044aa67d53406cc15d47a5e4276bb7310db9a48ad9add3bd0a6024a"),
-            (FocusContext(appName: "Obsidian", bundleID: "md.obsidian", windowTitle: "Notes.md - Vault"), "cbe79b79c5c8bb7ed16881977e238a0db8668ee7405bd33cc16e0e4397afef3b"),
+            (slack, "88e37ede1b77913ac12731643c1a92bd3feab157e9ec11ab30e9955d7377c927"),
+            (FocusContext(appName: "Discord", bundleID: "com.hnc.Discord", windowTitle: "#general"), "cf1536c8add78b8a6927606c4d53cbdab2d94c44dd79c32779954584e61df758"),
+            (FocusContext(appName: "Obsidian", bundleID: "md.obsidian", windowTitle: "Notes.md - Vault"), "094c81534220ca7940e1e26a6e499f0f8ef9e2a15d5448713db836484c0abcf1"),
             (FocusContext(appName: "Cursor", bundleID: "com.todesktop.230313mzl4w4u92", windowTitle: "README.md — speech-text"), "147573e9a63572457051e33a1b6cdb582b196094363dbe070bbf7ba82ae7eaf4"),
             (FocusContext(appName: "T3 Code", bundleID: "com.t3tools.t3code"), "bafe8eff3a36707a643e0597895bb0eb74c3befba1308b1e37dc71ccd06e7d39"),
             (FocusContext(appName: "Claude", bundleID: "com.anthropic.claudefordesktop"), "69f939894c28047fa79ffbb9d606417a82996443467d5cb744f62baffe01c215"),

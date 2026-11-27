@@ -276,6 +276,8 @@ public enum RewriteModes {
         }
     }
 
+    /// A title given for the text is its heading: «Заголовок до цієї нотатки: …» came back
+    /// as a plain line from GPT-6 Luna in Slack, which renders `#` (#115, 2026-11-26).
     /// D2, D4 and D5, applied on top of whichever mode was picked, and the rule that an
     /// instruction is done, not written down. Without that rule Gemma 4 12B wrote «перепиши
     /// більш людяно…» out as Clean-up 3 of 3 times, and "the one dictated in" alone had it
@@ -286,7 +288,8 @@ public enum RewriteModes {
         Otherwise keep the dictated one, and a sentence that mixes languages stays \
         mixed. Terms, names and code stay as said.
         - Format: plain text unless asked. A "- " or numbered list when one is asked for; \
-        headings, bold or tables only when named.
+        headings, bold or tables only when named, as Markdown. A title the transcript \
+        names for the text («заголовок: …», «назва: …», "title: …") is a heading asked for.
         - Length, tone, "rewrite it", "make it better": done, on whichever mode fits.
         """
 
