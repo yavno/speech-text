@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **A double tap locks a hold-to-talk dictation on.** With hold to talk, a quick double tap of the shortcut now keeps the dictation running hands-free. Before, when the dictation was slow to start, the tap was taken for a hold: its release stopped the dictation and the second tap canceled it, with nothing recorded. The Edit shortcut's double press is just as reliable.
+- **AI Rewrite on Qwen3.5 9B no longer adds bold or headings nobody asked for.** With Qwen3.5 9B as the AI Rewrite model on this Mac, a clean-up pasted into Slack, Discord, Notion or Obsidian, and text dictated into a code editor, a terminal or an AI's prompt box, could come back with bold words or headings; it now comes back plain. Notes you ask to have headings still get them.
 
 ## [0.11.0] - 2026-11-18
 
