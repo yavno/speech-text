@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **AI Rewrite is told which program runs in a terminal.** An AI dictation or an edit into a terminal now sends the name of the program running in front, such as `claude` for Claude Code — only the program's name, never its arguments — so the model knows what it is writing for, and History shows it: "AI Rewrite was told it was for cmux — claude". Before, the name was read on this Mac and never sent. Where SpeechText can't tell which program is in front, as over ssh or in tmux, no name is sent.
+- **AI Rewrite writes an email as a letter, and asked-for headings as Markdown.** An AI dictation into Mail or Gmail, or one you ask to be a letter, now opens with a greeting and ends with a sign-off, unless it continues an email already there; a chat message still has neither. Before, a letter could come back as a single line. Notes you ask to have headings now get Markdown `#` headings, which Slack, Notion and Obsidian render. The built-in Message and Structured prompts take the new wording by themselves; one you edited on the Prompts page stays as you left it.
 
 ### Fixed
 
