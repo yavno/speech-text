@@ -64,7 +64,7 @@ public enum TextRefinementService {
         // The user's Dictionary and Replacements go in too: a model that rewrote
         // "SpeechText" back into "speech text" would otherwise undo them.
         // A command is exact: a Dictionary word or a Replacement in a path would break it.
-        let polished = request.commands == .atPrompt
+        let polished = request.commands.writesCommand
             ? polishedReply(parsed.text, dictionary: [], replacements: []) : polishedReply(parsed.text)
         let text = RewriteModes.forPaste(polished, request: request)
         dlog("Refine", "preset=\(parsed.presetName ?? "—"), terminal=\(context?.terminalFocus?.rawValue ?? "—"), in=\(source.count) chars, out=\(text.count) chars")

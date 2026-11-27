@@ -827,6 +827,7 @@ enum RewriteEvaluation {
             if !focus.isEmpty { blocks.append(focus.promptBlock) }
             switch context.terminalFocus {
             case .shellPrompt: blocks.append("<terminal>the cursor is at a shell prompt</terminal>")
+            case .remotePrompt: blocks.append("<terminal>the cursor is at a shell prompt on another machine, over ssh</terminal>")
             case .program: blocks.append("<terminal>the cursor is in a program running in the terminal</terminal>")
             case .unknown: blocks.append("<terminal>it is not known whether a shell or a program is at the cursor</terminal>")
             case nil: break

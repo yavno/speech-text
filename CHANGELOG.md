@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **AI Rewrite is told which program runs in a terminal.** An AI dictation or an edit into a terminal now sends the name of the program running in front, such as `claude` for Claude Code — only the program's name, never its arguments — so the model knows what it is writing for, and History shows it: "AI Rewrite was told it was for cmux — claude". Before, the name was read on this Mac and never sent. Where SpeechText can't tell which program is in front, as over ssh or in tmux, no name is sent.
+- **AI Rewrite writes an email as a letter, and asked-for headings as Markdown.** An AI dictation into Mail or Gmail, or one you ask to be a letter, now opens with a greeting and ends with a sign-off, unless it continues an email already there; a chat message still has neither. Before, a letter could come back as a single line. Notes you ask to have headings now get Markdown `#` headings, which Slack, Notion and Obsidian render. The built-in Message and Structured prompts take the new wording by themselves; one you edited on the Prompts page stays as you left it.
 
 ### Fixed
 
 - **A double tap locks a hold-to-talk dictation on.** With hold to talk, a quick double tap of the shortcut now keeps the dictation running hands-free. Before, when the dictation was slow to start, the tap was taken for a hold: its release stopped the dictation and the second tap canceled it, with nothing recorded. The Edit shortcut's double press is just as reliable.
+- **AI Rewrite on Qwen3.5 9B no longer adds bold or headings nobody asked for.** With Qwen3.5 9B as the AI Rewrite model on this Mac, a clean-up pasted into Slack, Discord, Notion or Obsidian, and text dictated into a code editor, a terminal or an AI's prompt box, could come back with bold words or headings; it now comes back plain. Notes you ask to have headings still get them.
+- **AI dictations in cmux read the tab in front again when an ssh tab is open.** With an ssh session in another cmux tab, an AI dictation at this Mac's own shell prompt was written down as words instead of becoming a command, and one into Claude Code was treated as going to a terminal nobody could read, so a model could rewrite it into another language. Now a prompt on this Mac becomes a command as it does without the ssh tab, and a dictation into Claude Code is written down as your words.
 
 ## [0.11.0] - 2026-11-18
 

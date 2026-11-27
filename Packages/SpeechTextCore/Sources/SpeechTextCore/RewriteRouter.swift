@@ -44,12 +44,13 @@ public enum RewriteRouter {
     }
 
     /// The prompts one request can be sent: routing, a field for another program, a
-    /// shell prompt's, a terminal where nothing says which, and the Edit shortcut's.
-    public static let oneStepPromptStates = 5
+    /// shell prompt's, a remote one's behind ssh (#115), a terminal where nothing says
+    /// which, and the Edit shortcut's.
+    public static let oneStepPromptStates = 6
     /// Those, step one's, and a prompt per mode; past it a mode's prompt is read again, as
     /// any prompt is (D7). Raised only with the gate: a state is about 147 MB for Gemma 4
     /// 12B (M1 Pro, 2026-11-08), and stale ones after a prompt edit would stay this long.
-    public static let twoStepPromptStates = 10
+    public static let twoStepPromptStates = 11
     public static func savedPromptStates(modelID: String) -> Int {
         twoStepsShip(modelID: modelID) ? twoStepPromptStates : oneStepPromptStates
     }

@@ -90,8 +90,8 @@ final class LlamaModel {
     /// A copy of the state, not a trimmed cache: Qwen3.5 and 3.8 are hybrid models whose
     /// recurrent layers cannot be rolled back to a position. One is kept per prompt a
     /// request can be sent, most recent first: the routing prompt, the one for an editor, a
-    /// program in a terminal or an AI's field, a shell prompt's, a terminal where nothing
-    /// says which, and the Edit shortcut's; `RewriteRouter.savedPromptStates` says how
+    /// program in a terminal or an AI's field, a shell prompt's, a remote one's behind ssh,
+    /// a terminal where nothing says which, and the Edit shortcut's; `RewriteRouter.savedPromptStates` says how
     /// many, more for a model two steps shipped for (#110, #114). The prewarm at each dictation touches three of
     /// them, so at three slots it pushed a terminal's prompt out every time, and a dictation
     /// there read it again: 3.5 s against 0.5 s restored. A state is about 147 MB for Gemma
