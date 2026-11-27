@@ -671,7 +671,7 @@ final class RewriteModesTests: XCTestCase {
         XCTAssertEqual(read(mixed, title: "hskv@Vlad-DO-Laptop:~/Documents/Development", app: cmux), .shellPrompt)
         XCTAssertEqual(read(mixed, title: "Claude Code", app: cmux), .program, "a title that is no directory is a program")
         XCTAssertEqual(read(mixed, title: "python3 -q", app: cmux), .program)
-        XCTAssertEqual(read([["zsh"], ["ssh"]], title: "vlad@yavno-main:~", app: cmux), .unknown, "a remote prompt's title looks the same")
+        XCTAssertEqual(read([["zsh"], ["ssh"]], title: "vlad@yavno-main:~", app: cmux), .remotePrompt, "another host's prompt, behind ssh")
         XCTAssertEqual(read(mixed, title: "…/speech-text"), .unknown, "only cmux was measured to write it")
     }
 
@@ -685,12 +685,14 @@ final class RewriteModesTests: XCTestCase {
         }
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~/.claude-do"), .shellPrompt, "this Mac's prompt")
         XCTAssertEqual(read("hskv@vlad-do-laptop.local:~"), .shellPrompt, "any case")
-        XCTAssertEqual(read("hskv@Vlad-DO-Laptop.example.org:~"), .unknown, "the same short name in another domain")
-        XCTAssertEqual(read("vlad@yavno-main:~"), .unknown, "another host's prompt may be the ssh tab")
-        XCTAssertEqual(read("vlad@yavno-main: ~"), .unknown, "as Ubuntu's bash writes it")
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop.example.org:~"), .remotePrompt, "the same short name in another domain is another host")
+        XCTAssertEqual(read("vlad@yavno-main:~"), .remotePrompt, "another host's prompt is the ssh tab's (#115)")
+        XCTAssertEqual(read("root@bastion: ~/Ansible"), .remotePrompt, "as Ubuntu's bash writes it")
+        XCTAssertEqual(TerminalFocus.read(bundleID: cmux, windowTitle: "root@bastion: ~", foreground: [["ssh"]]), .remotePrompt,
+                       "one tab, running ssh")
         XCTAssertEqual(read("hskv@Vlad-DO-Laptop: ~/src"), .shellPrompt)
         XCTAssertEqual(read("~/Development"), .unknown, "a bare path names no host")
-        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~", host: nil), .unknown)
+        XCTAssertEqual(read("hskv@Vlad-DO-Laptop:~", host: nil), .remotePrompt, "with no name for this Mac, still a prompt: a command either way")
         XCTAssertEqual(read("Claude Code"), .program)
         XCTAssertEqual(read("ssh vlad@yavno"), .unknown, "the title names what hides the program")
         XCTAssertNil(TerminalFocus.reading(bundleID: cmux, windowTitle: "Claude Code", foreground: withSSH).program,
@@ -881,8 +883,8 @@ final class RewriteRouterTests: XCTestCase {
     }
 
     func testTheServiceKeepsMoreStatesOnlyForAModelWithTwoSteps() {
-        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: gemma), 5)
-        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: "Qwen3.5-9B-Q4_K_M"), 10)
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: gemma), 6)
+        XCTAssertEqual(RewriteRouter.savedPromptStates(modelID: "Qwen3.5-9B-Q4_K_M"), 11)
         XCTAssertGreaterThan(RewriteRouter.twoStepPromptStates, RewriteRouter.oneStepPromptStates)
     }
 
@@ -1071,6 +1073,17 @@ final class RewriteRouterTests: XCTestCase {
         })
         XCTAssertEqual(withOwn?.request.decidedMode, "Haiku")
         XCTAssertNil(withOwn?.routeBlock)
+    }
+
+    /// #115: over ssh the command is written for whatever shell the host runs, not macOS.
+    func testARemotePromptWritesACommandWithoutMacOSTools() {
+        let remote = FocusContext(appName: "cmux", bundleID: "com.cmuxterm.app", terminalFocus: .remotePrompt)
+        XCTAssertEqual(remote.commandWriting, .atRemotePrompt)
+        XCTAssertTrue(remote.commandWriting.writesCommand)
+        let system = RewriteModes.request(context: remote, presets: builtIns).system
+        XCTAssertTrue(system.contains("another machine, reached over ssh"), system)
+        XCTAssertTrue(system.contains("common to Linux and BSD"), system)
+        XCTAssertFalse(system.contains("macOS"), system)
     }
 
     func testATerminalIsNeverToldAboutMarkdown() {

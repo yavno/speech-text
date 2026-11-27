@@ -14,6 +14,9 @@ import Foundation
 /// answers.
 public enum TerminalFocus: String, Codable, Sendable {
     case shellPrompt
+    /// A shell on another machine, behind ssh: cmux's title names that host's prompt
+    /// ("root@bastion: ~/Ansible"). A command there is written without macOS's tools.
+    case remotePrompt
     case program
     /// Nothing here says which: a remote host or a multiplexer hides what runs behind it,
     /// and a process table does not say which of several tabs is in front.
@@ -108,10 +111,19 @@ public enum TerminalFocus: String, Codable, Sendable {
         // what hides one: words either way, and told so, not left to the rule for a
         // terminal nobody can read, where GPT-6 Luna rewrote a garbled Ukrainian request to
         // Claude Code into another language 4 of 5 times (#115, 2026-11-26).
-        if bundleID?.hasPrefix("com.cmuxterm.app") == true, tabs.count > 1, let windowTitle {
+        //
+        // Behind ssh, a prompt's title that names another host is that host's prompt, and
+        // the command asked for there is written (the owner's call, #115, 2026-11-26): a
+        // program on it that leaves the title alone gets a command pasted, never run, where
+        // words were wanted, the cost the title already carries here. A bare path names no
+        // host and stays unknown.
+        if bundleID?.hasPrefix("com.cmuxterm.app") == true, tabs.count > 1 || hidden, let windowTitle {
             if isDirectoryTitle(windowTitle) {
                 let local = localHostName.map { names(windowTitle, host: $0) } ?? false
                 if !shellTabs.isEmpty, !hidden || local { return (.shellPrompt, nil) }
+                if hidden, !local, windowTitle.range(of: #"^[^\s@]+@[^\s:]+:"#, options: .regularExpression) != nil {
+                    return (.remotePrompt, nil)
+                }
                 return (.unknown, nil)
             }
             let first = windowTitle.split(separator: " ").first.map { commandName(String($0)).lowercased() } ?? ""

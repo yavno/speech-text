@@ -2450,5 +2450,79 @@
         "note": "a body sentence after «Дякую…» is no signature"
       }
     ]
+  },
+  {
+    "id": "ctx-ssh-remote-prompt-command",
+    "note": "At a shell on another machine behind ssh, what the shell should do becomes the command, as at home (#115).",
+    "transcript": "знайди всі лог файли в головній папці які більші за сто мегабайт",
+    "context": {
+      "appName": "cmux",
+      "bundleID": "com.cmuxterm.app",
+      "windowTitle": "root@bastion: ~/Ansible",
+      "terminalFocus": "remotePrompt"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "any",
+    "mustKeep": [
+      "find",
+      "-size",
+      "100M"
+    ],
+    "mustNotAppear": [
+      "файл",
+      "мегабайт"
+    ],
+    "maxLengthRatio": 1.4,
+    "examples": [
+      {
+        "reply": "find ~ -name '*.log' -size +100M",
+        "passes": true
+      },
+      {
+        "reply": "Знайди всі лог-файли в головній папці, які більші за 100 мегабайт.",
+        "passes": false,
+        "note": "written down at a prompt"
+      }
+    ]
+  },
+  {
+    "id": "ctx-ssh-remote-prompt-remark",
+    "note": "A remark at a remote prompt stays words.",
+    "transcript": "ну окей зараз я тут ще подивлюся конфіг а потім напишу тобі",
+    "context": {
+      "appName": "cmux",
+      "bundleID": "com.cmuxterm.app",
+      "windowTitle": "root@bastion: ~/Ansible",
+      "terminalFocus": "remotePrompt"
+    },
+    "modes": [
+      "Clean-up",
+      "Technical / Prompt"
+    ],
+    "variantModes": {
+      "2026-11": [
+        "Clean-up"
+      ]
+    },
+    "language": "uk",
+    "noCode": true,
+    "mustKeep": [
+      "конфіг",
+      "напишу"
+    ],
+    "mustNotAppear": [
+      "cat ",
+      "less "
+    ],
+    "minLengthRatio": 0.45,
+    "maxLengthRatio": 1.3
   }
 ]
