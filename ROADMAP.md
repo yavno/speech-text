@@ -6,11 +6,10 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Now
 
-- **AI Rewrite, routed and measured** — a harness that measures what AI Rewrite writes, and a prompt without its contradictions and repeats (both done): modes for the kind of text, modifiers for language, length, tone and format. Two steps (the model on this Mac picks the mode, then writes with only that mode) are measured per model and turned on where they win: Qwen3.5 9B so far.
+- **Notetaker** — record a conversation you are part of, then review a speaker-attributed transcript, summarise it, ask questions and export it. Microphone and system audio are captured as two separate tracks, so who-said-what is exact for a one-to-one conversation without any speaker model at all.
 
 ## Next
 
-- **Notetaker** — record a conversation you are part of, then review a speaker-attributed transcript, summarise it, ask questions and export it. Microphone and system audio are captured as two separate tracks, so who-said-what is exact for a one-to-one conversation without any speaker model at all.
 - **More providers** — behind the provider registry (`ProviderDescriptor`, see `docs/adding-a-provider.md`). New providers are a good contribution.
 - **Playground** — try your own dictations from History through other models and prompts, side by side with what came out, how long it took and what it cost.
 
@@ -21,7 +20,7 @@ Tracked work lives in [issues](../../issues). This file is the direction; issues
 
 ## Done
 
-Kept short, because a roadmap that never records an arrival stops being believed: continuous integration on every pull request; live transcription shown on the overlay while you speak and pasted once at the stop; local speech and chat models with a hardware-based recommendation; first-run setup; signed, notarized releases that update themselves, the first of them public as 0.10.0 and installable with Homebrew; OpenAI as a speech engine; API keys in the keychain; dictations made offline saved and retried once the network is back; a main window with History, Usage and Prompts; a Dictionary whose words reach the engine, a replacement table and the AI prompt; AI Rewrite built into the app on llama.cpp, with nothing else to install; a voice activity detector that keeps typing and room noise from being sent; the languages each model knows, shown before you download it; a lifecycle for models, so one a vendor retires is moved to its replacement; the app in Spanish and Ukrainian, with its language chosen in Setup or in Settings; your own model server — Ollama, LM Studio or anything that speaks the OpenAI API — for AI Rewrite and, where the server transcribes audio, for dictation; a weekly check of the catalogues against the vendors.
+Kept short, because a roadmap that never records an arrival stops being believed: continuous integration on every pull request; live transcription shown on the overlay while you speak and pasted once at the stop; local speech and chat models with a hardware-based recommendation; first-run setup; signed, notarized releases that update themselves, the first of them public as 0.10.0 and installable with Homebrew; OpenAI as a speech engine; API keys in the keychain; dictations made offline saved and retried once the network is back; a main window with History, Usage and Prompts; a Dictionary whose words reach the engine, a replacement table and the AI prompt; AI Rewrite built into the app on llama.cpp, with nothing else to install; a voice activity detector that keeps typing and room noise from being sent; the languages each model knows, shown before you download it; a lifecycle for models, so one a vendor retires is moved to its replacement; the app in Spanish and Ukrainian, with its language chosen in Setup or in Settings; your own model server — Ollama, LM Studio or anything that speaks the OpenAI API — for AI Rewrite and, where the server transcribes audio, for dictation; a weekly check of the catalogues against the vendors; AI Rewrite measured on several models before every prompt change, with three modes for the kind of text, language, length, tone and format on top, and two steps where they win (Qwen3.5 9B on this Mac).
 
 ## Want to help?
 
