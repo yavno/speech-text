@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **A double tap locks a hold-to-talk dictation on.** With hold to talk, a quick double tap of the shortcut now keeps the dictation running hands-free. Before, when the dictation was slow to start, the tap was taken for a hold: its release stopped the dictation and the second tap canceled it, with nothing recorded. The Edit shortcut's double press is just as reliable.
 - **AI Rewrite on Qwen3.5 9B no longer adds bold or headings nobody asked for.** With Qwen3.5 9B as the AI Rewrite model on this Mac, a clean-up pasted into Slack, Discord, Notion or Obsidian, and text dictated into a code editor, a terminal or an AI's prompt box, could come back with bold words or headings; it now comes back plain. Notes you ask to have headings still get them.
+- **AI dictations in cmux read the tab in front again when an ssh tab is open.** With an ssh session in another cmux tab, an AI dictation at this Mac's own shell prompt was written down as words instead of becoming a command, and one into Claude Code was treated as going to a terminal nobody could read, so a model could rewrite it into another language. Now a prompt on this Mac becomes a command as it does without the ssh tab, and a dictation into Claude Code is written down as your words.
 
 ## [0.11.0] - 2026-11-18
 
